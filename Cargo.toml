@@ -7,3 +7,4 @@ description = "An opinionated 2D game engine"
 license = "MIT"
 
 [dependencies]
+winit = "0.19"
