@@ -8,3 +8,8 @@ license = "MIT"
 
 [dependencies]
 winit = "0.19"
+gfx = "0.18"
+gfx_core = "0.9"
+glutin = "0.20"
+gfx_device_gl = "0.16"
+gfx_window_glutin = "0.30"

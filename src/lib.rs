@@ -1,64 +1,58 @@
 pub mod graphics;
 pub mod input;
-pub mod window;
 
 pub trait Game {
-    fn update(&mut self, viewport: Option<&graphics::Viewport>);
+    type View;
+    type Input;
 
-    fn draw(&mut self, _gpu: &mut graphics::Gpu) -> graphics::Result<()> {
+    fn update(&mut self, view: &mut Self::View, window: &graphics::Window);
+
+    fn draw(
+        &self,
+        _view: &mut Self::View,
+        _window: &mut graphics::Window,
+    ) -> graphics::Result<()> {
         Ok(())
     }
 
     fn key_down_event(
-        &mut self,
+        &self,
+        _input: &mut Self::Input,
         _keycode: input::Keycode,
         _keymod: input::Mod,
         _repeat: bool,
     ) {
     }
 
-    fn key_up_event(&mut self, _keycode: input::Keycode, _keymod: input::Mod) {}
-}
-
-pub fn run<G: Game>(
-    game: &mut G,
-    gpu: Option<&mut graphics::Gpu>,
-    ticks_per_second: u32,
-) -> graphics::Result<()> {
-    match gpu {
-        Some(gpu) => run_with_gpu(game, gpu, ticks_per_second),
-        None => {
-            run_headless(game, ticks_per_second);
-            Ok(())
-        }
+    fn key_up_event(
+        &self,
+        _input: &mut Self::Input,
+        _keycode: input::Keycode,
+        _keymod: input::Mod,
+    ) {
     }
 }
 
-fn run_with_gpu<G: Game>(
+pub trait Renderer {}
+
+pub fn run<G: Game>(
     game: &mut G,
-    gpu: &mut graphics::Gpu,
+    view: &mut G::View,
+    window: &mut graphics::Window,
     ticks_per_second: u32,
 ) -> graphics::Result<()> {
     let mut alive = true;
 
     while alive {
-        {
-            let window = gpu.window();
+        window.poll_events(|event| match event {
+            graphics::window::Event::CloseRequested => {
+                alive = false;
+            }
+        });
 
-            window.poll_events(|event| match event {
-                window::Event::CloseRequested => {
-                    alive = false;
-                }
-            });
-        }
-
-        game.update(None);
-        game.draw(gpu)?;
+        game.update(view, window);
+        game.draw(view, window)?;
     }
 
     Ok(())
-}
-
-fn run_headless<G: Game>(game: &mut G, ticks_per_second: u32) {
-    unimplemented! {}
 }
