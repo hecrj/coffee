@@ -3,7 +3,7 @@ use gfx_window_glutin;
 use glutin;
 use winit;
 
-use crate::graphics::gpu::Gpu;
+use crate::graphics::gpu::{self, Gpu};
 
 pub struct Window {
     context: glutin::WindowedContext,
@@ -13,14 +13,6 @@ pub struct Window {
 
 impl Window {
     pub fn new(settings: Settings) -> Window {
-        let window_builder = winit::WindowBuilder::new()
-            .with_title(settings.title)
-            .with_dimensions(winit::dpi::LogicalSize {
-                width: settings.size.0 as f64,
-                height: settings.size.1 as f64,
-            })
-            .with_resizable(settings.resizable);
-
         let gl_builder = glutin::ContextBuilder::new()
             .with_gl(glutin::GlRequest::Latest)
             .with_gl_profile(glutin::GlProfile::Core)
@@ -30,30 +22,21 @@ impl Window {
             .with_vsync(true);
 
         let events_loop = winit::EventsLoop::new();
-        let color_format = gfx::format::Format(
-            gfx::format::SurfaceType::R8_G8_B8_A8,
-            gfx::format::ChannelType::Unorm,
-        );
 
-        let depth_format = gfx::format::Format(
-            gfx::format::SurfaceType::D24_S8,
-            gfx::format::ChannelType::Unorm,
-        );
-
-        let (context, device, mut factory, screen_render_target, depth_view) =
+        let (context, device, factory, screen_render_target, depth_view) =
             gfx_window_glutin::init_raw(
-                window_builder,
+                settings.into_builder(),
                 gl_builder,
                 &events_loop,
-                color_format,
-                depth_format,
+                gpu::COLOR_FORMAT,
+                gpu::DEPTH_FORMAT,
             )
             .unwrap();
 
         Window {
             context,
             events_loop,
-            gpu: Gpu::new(),
+            gpu: Gpu::new(device, factory, screen_render_target, depth_view),
         }
     }
 
@@ -97,6 +80,18 @@ pub struct Settings {
     pub title: String,
     pub size: (u32, u32),
     pub resizable: bool,
+}
+
+impl Settings {
+    fn into_builder(self) -> winit::WindowBuilder {
+        winit::WindowBuilder::new()
+            .with_title(self.title)
+            .with_dimensions(winit::dpi::LogicalSize {
+                width: self.size.0 as f64,
+                height: self.size.1 as f64,
+            })
+            .with_resizable(self.resizable)
+    }
 }
 
 pub enum Event {

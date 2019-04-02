@@ -11,6 +11,7 @@ pub trait Game {
         &self,
         _view: &mut Self::View,
         _window: &mut graphics::Window,
+        _was_updated: bool,
     ) -> graphics::Result<()> {
         Ok(())
     }
@@ -51,7 +52,7 @@ pub fn run<G: Game>(
         });
 
         game.update(view, window);
-        game.draw(view, window)?;
+        game.draw(view, window, true)?;
     }
 
     Ok(())
