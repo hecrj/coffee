@@ -1,0 +1,9 @@
+[package]
+name = "coffee"
+version = "0.0.0"
+authors = ["Héctor Ramón Jiménez <hector0193@gmail.com>"]
+edition = "2018"
+description = "An opinionated 2D game engine"
+license = "MIT"
+
+[dependencies]
