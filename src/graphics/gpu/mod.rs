@@ -40,7 +40,8 @@ impl Gpu {
         depth_view: gfx::handle::RawDepthStencilView<gl::Resources>,
     ) -> Gpu {
         let encoder = factory.create_command_buffer().into();
-        let pipeline = Pipeline::new(&mut factory, &screen_render_target);
+        let pipeline =
+            Pipeline::new(&mut factory, &screen_render_target, COLOR_FORMAT);
 
         Gpu {
             device,

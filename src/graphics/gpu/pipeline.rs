@@ -45,12 +45,14 @@ pub struct Pipeline {
     quads: gfx::handle::Buffer<gl::Resources, Vertex>,
     quad_slice: gfx::Slice<gl::Resources>,
     data: pipe::Data<gl::Resources>,
+    shader: Shader,
 }
 
 impl Pipeline {
     pub fn new(
         factory: &mut gl::Factory,
         target: &gfx::handle::RawRenderTargetView<gl::Resources>,
+        color_format: gfx::format::Format,
     ) -> Pipeline {
         let encoder = factory.create_command_buffer().into();
 
@@ -90,11 +92,24 @@ impl Pipeline {
             out: target.clone(),
         };
 
+        let init = pipe::Init {
+            out: (
+                "Target0",
+                color_format,
+                gfx::state::ColorMask::all(),
+                Some(gfx::preset::blend::ALPHA),
+            ),
+            ..pipe::new()
+        };
+
+        let shader = Shader::new(factory, init);
+
         Pipeline {
             encoder,
             quads,
             quad_slice,
             data,
+            shader,
         }
     }
 
@@ -111,6 +126,42 @@ impl Pipeline {
             gfx::format::Srgba8,
         >,
     ) {
+        self.encoder
+            .draw(&self.quad_slice, &self.shader.state, &self.data)
+    }
+}
+
+pub struct Shader {
+    state: gfx::pso::PipelineState<gl::Resources, pipe::Meta>,
+}
+
+impl Shader {
+    pub fn new(factory: &mut gl::Factory, init: pipe::Init) -> Shader {
+        let set = factory
+            .create_shader_set(
+                include_bytes!("shader/basic.vert"),
+                include_bytes!("shader/basic.frag"),
+            )
+            .unwrap();
+
+        let rasterizer = gfx::state::Rasterizer {
+            front_face: gfx::state::FrontFace::CounterClockwise,
+            cull_face: gfx::state::CullFace::Nothing,
+            method: gfx::state::RasterMethod::Fill,
+            offset: None,
+            samples: None,
+        };
+
+        let state = factory
+            .create_pipeline_state(
+                &set,
+                Primitive::TriangleList,
+                rasterizer,
+                init,
+            )
+            .unwrap();
+
+        Shader { state }
     }
 }
 
