@@ -1,5 +1,4 @@
 use gfx;
-use gfx_device_gl as gl;
 use gfx_window_glutin;
 use glutin;
 use winit;
@@ -11,7 +10,7 @@ pub struct Window {
     context: glutin::WindowedContext,
     events_loop: winit::EventsLoop,
     gpu: Gpu,
-    screen_render_target: gpu::Target,
+    screen_render_target: gpu::TargetView,
 }
 
 impl Window {
@@ -45,9 +44,7 @@ impl Window {
                 screen_render_target.clone(),
                 depth_view,
             ),
-            screen_render_target: gpu::Target(gfx::memory::Typed::new(
-                screen_render_target,
-            )),
+            screen_render_target: gfx::memory::Typed::new(screen_render_target),
         }
     }
 
@@ -114,14 +111,17 @@ pub struct Frame<'a> {
 }
 
 impl<'a> Frame<'a> {
-    pub fn clear(&mut self, color: Color) {
-        let target = self.window.screen_render_target.clone();
-        self.window.gpu.clear(target, color);
+    pub fn as_target(&mut self) -> gpu::Target {
+        let view = self.window.screen_render_target.clone();
+        gpu::Target::new(self.window.gpu(), view)
     }
 
-    pub fn present(self) {
-        let target = self.window.screen_render_target.clone();
-        self.window.gpu.flush(target);
+    pub fn clear(&mut self, color: Color) {
+        self.as_target().clear(color);
+    }
+
+    pub fn present(mut self) {
+        self.as_target().flush();
         self.window.context.swap_buffers().unwrap();
         self.window.gpu.cleanup();
     }

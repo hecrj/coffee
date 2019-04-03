@@ -11,20 +11,21 @@ type View = <gfx::format::Srgba8 as gfx::format::Formatted>::View;
 pub struct Texture {
     texture: gfx::handle::RawTexture<gl::Resources>,
     view: gfx::handle::ShaderResourceView<gl::Resources, View>,
+    width: u16,
+    height: u16,
 }
 
 impl Texture {
-    pub fn new(
+    pub(super) fn new(
         factory: &mut gl::Factory,
         image: &image::DynamicImage,
     ) -> Texture {
         let rgba = image.to_rgba();
+        let width = rgba.width() as u16;
+        let height = rgba.height() as u16;
 
-        let kind = gfx::texture::Kind::D2(
-            rgba.width() as u16,
-            rgba.height() as u16,
-            gfx::texture::AaMode::Single,
-        );
+        let kind =
+            gfx::texture::Kind::D2(width, height, gfx::texture::AaMode::Single);
 
         let info = gfx::texture::Info {
             kind: kind,
@@ -66,6 +67,8 @@ impl Texture {
         Texture {
             texture: texture,
             view: typed_view,
+            width,
+            height,
         }
     }
 
@@ -77,5 +80,13 @@ impl Texture {
         &self,
     ) -> &gfx::handle::ShaderResourceView<gl::Resources, View> {
         &self.view
+    }
+
+    pub fn width(&self) -> u16 {
+        self.width
+    }
+
+    pub fn height(&self) -> u16 {
+        self.height
     }
 }
