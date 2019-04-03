@@ -47,7 +47,7 @@ impl Pipeline {
 
         let data = pipe::Data {
             vertices: quads.clone(),
-            texture: (gfx::memory::Typed::new(texture.view().clone()), sampler),
+            texture: (texture.view().clone(), sampler),
             instances,
             globals: factory.create_constant_buffer(1),
             out: target.clone(),
@@ -62,18 +62,12 @@ impl Pipeline {
 }
 
 gfx_defines! {
-    /// Internal structure containing vertex data.
     vertex Vertex {
         position: [f32; 2] = "a_Pos",
         uv: [f32; 2] = "a_Uv",
     }
 
-    /// Internal structure containing values that are different for each
-    /// drawable object.
     vertex Instance {
-        // the columns here are for the transform matrix;
-        // you can't shove a full matrix into an instance
-        // buffer, annoyingly.
         src: [f32; 4] = "a_Src",
         col1: [f32; 4] = "a_TCol1",
         col2: [f32; 4] = "a_TCol2",
@@ -83,14 +77,10 @@ gfx_defines! {
         layer: u32 = "t_Layer",
     }
 
-    /// Internal structure containing global shader state.
     constant Globals {
         mvp_matrix: [[f32; 4]; 4] = "u_MVP",
     }
 
-    // Internal structure containing graphics pipeline state.
-    // This can't be a doc comment though because it somehow
-    // breaks the gfx_defines! macro though.  :-(
     pipeline pipe {
         vertices: gfx::VertexBuffer<Vertex> = (),
         texture: gfx::TextureSampler<[f32; 4]> = "t_Texture",

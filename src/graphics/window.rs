@@ -1,14 +1,17 @@
 use gfx;
+use gfx_device_gl as gl;
 use gfx_window_glutin;
 use glutin;
 use winit;
 
+use crate::graphics::color::Color;
 use crate::graphics::gpu::{self, Gpu};
 
 pub struct Window {
     context: glutin::WindowedContext,
     events_loop: winit::EventsLoop,
     gpu: Gpu,
+    screen_render_target: gpu::Target,
 }
 
 impl Window {
@@ -36,7 +39,15 @@ impl Window {
         Window {
             context,
             events_loop,
-            gpu: Gpu::new(device, factory, screen_render_target, depth_view),
+            gpu: Gpu::new(
+                device,
+                factory,
+                screen_render_target.clone(),
+                depth_view,
+            ),
+            screen_render_target: gpu::Target(gfx::memory::Typed::new(
+                screen_render_target,
+            )),
         }
     }
 
@@ -103,9 +114,15 @@ pub struct Frame<'a> {
 }
 
 impl<'a> Frame<'a> {
-    pub fn clear(&mut self) {}
+    pub fn clear(&mut self, color: Color) {
+        let target = self.window.screen_render_target.clone();
+        self.window.gpu.clear(target, color);
+    }
 
     pub fn present(self) {
+        let target = self.window.screen_render_target.clone();
+        self.window.gpu.flush(target);
         self.window.context.swap_buffers().unwrap();
+        self.window.gpu.cleanup();
     }
 }

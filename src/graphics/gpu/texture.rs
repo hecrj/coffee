@@ -4,12 +4,13 @@ use gfx_core::factory::Factory;
 use gfx_device_gl as gl;
 use image;
 
-type Surface = <gfx::format::Rgba8 as gfx::format::Formatted>::Surface;
-type Channel = <gfx::format::Rgba8 as gfx::format::Formatted>::Channel;
+type Surface = <gfx::format::Srgba8 as gfx::format::Formatted>::Surface;
+type Channel = <gfx::format::Srgba8 as gfx::format::Formatted>::Channel;
+type View = <gfx::format::Srgba8 as gfx::format::Formatted>::View;
 
 pub struct Texture {
     texture: gfx::handle::RawTexture<gl::Resources>,
-    view: gfx::handle::RawShaderResourceView<gl::Resources>,
+    view: gfx::handle::ShaderResourceView<gl::Resources, View>,
 }
 
 impl Texture {
@@ -57,7 +58,15 @@ impl Texture {
             .view_texture_as_shader_resource_raw(&texture, descriptor)
             .unwrap();
 
-        Texture { texture, view }
+        let typed_view: gfx::handle::ShaderResourceView<
+            _,
+            <gfx::format::Srgba8 as gfx::format::Formatted>::View,
+        > = gfx::memory::Typed::new(view);
+
+        Texture {
+            texture: texture,
+            view: typed_view,
+        }
     }
 
     pub(super) fn handle(&self) -> &gfx::handle::RawTexture<gl::Resources> {
@@ -66,7 +75,7 @@ impl Texture {
 
     pub(super) fn view(
         &self,
-    ) -> &gfx::handle::RawShaderResourceView<gl::Resources> {
+    ) -> &gfx::handle::ShaderResourceView<gl::Resources, View> {
         &self.view
     }
 }

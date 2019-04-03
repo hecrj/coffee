@@ -34,8 +34,6 @@ pub trait Game {
     }
 }
 
-pub trait Renderer {}
-
 pub fn run<G: Game>(
     game: &mut G,
     view: &mut G::View,
