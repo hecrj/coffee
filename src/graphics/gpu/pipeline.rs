@@ -3,6 +3,7 @@ use gfx::{self, *};
 use gfx_device_gl as gl;
 use image;
 
+use crate::graphics::color::Color;
 use crate::graphics::draw_parameters::DrawParameters;
 use crate::graphics::gpu;
 use crate::graphics::gpu::texture::Texture;
@@ -18,12 +19,13 @@ gfx_defines! {
         src: [f32; 4] = "a_Src",
         col1: [f32; 3] = "a_TCol1",
         col2: [f32; 3] = "a_TCol2",
+        col3: [f32; 3] = "a_TCol3",
         color: [f32; 4] = "a_Color",
         layer: u32 = "t_Layer",
     }
 
     constant Globals {
-        mvp_matrix: [[f32; 4]; 4] = "u_MVP",
+        mvp: [[f32; 4]; 4] = "u_MVP",
     }
 
     pipeline pipe {
@@ -46,6 +48,7 @@ pub struct Pipeline {
     quad_slice: gfx::Slice<gl::Resources>,
     data: pipe::Data<gl::Resources>,
     shader: Shader,
+    globals: Globals,
 }
 
 impl Pipeline {
@@ -54,7 +57,8 @@ impl Pipeline {
         target: &gfx::handle::RawRenderTargetView<gl::Resources>,
         color_format: gfx::format::Format,
     ) -> Pipeline {
-        let encoder = factory.create_command_buffer().into();
+        let mut encoder: gfx::Encoder<gl::Resources, gl::CommandBuffer> =
+            factory.create_command_buffer().into();
 
         let instances = factory
             .create_buffer(
@@ -104,13 +108,37 @@ impl Pipeline {
 
         let shader = Shader::new(factory, init);
 
+        let globals = Globals {
+            mvp: Transformation::identity().into(),
+        };
+
+        encoder.update_buffer(&data.globals, &[globals], 0).unwrap();
+
         Pipeline {
             encoder,
             quads,
             quad_slice,
             data,
             shader,
+            globals,
         }
+    }
+
+    pub fn clear(
+        &mut self,
+        view: &gfx::handle::RawRenderTargetView<gl::Resources>,
+        color: Color,
+    ) {
+        let typed_render_target: gfx::handle::RenderTargetView<
+            gl::Resources,
+            gfx::format::Srgba8,
+        > = gfx::memory::Typed::new(view.clone());
+
+        self.encoder.clear(&typed_render_target, color.into())
+    }
+
+    pub fn flush(&mut self, device: &mut gl::Device) {
+        self.encoder.flush(device);
     }
 
     pub fn bind_texture(&mut self, texture: &Texture) {
@@ -121,11 +149,25 @@ impl Pipeline {
         &mut self,
         instance: Instance,
         transformation: &Transformation,
-        view: &gfx::handle::RenderTargetView<
-            gl::Resources,
-            gfx::format::Srgba8,
-        >,
+        view: &gfx::handle::RawRenderTargetView<gl::Resources>,
     ) {
+        let transformation_matrix: [[f32; 4]; 4] =
+            transformation.clone().into();
+
+        if self.globals.mvp != transformation_matrix {
+            self.globals.mvp = transformation_matrix;
+
+            self.encoder
+                .update_buffer(&self.data.globals, &[self.globals], 0)
+                .unwrap();
+        }
+
+        self.data.out = view.clone();
+
+        self.encoder
+            .update_buffer(&self.data.instances, &[instance], 0)
+            .unwrap();
+
         self.encoder
             .draw(&self.quad_slice, &self.shader.state, &self.data)
     }
@@ -198,8 +240,9 @@ impl Instance {
 
         Instance {
             src: [source.x, source.y, source.width, source.height],
-            col1: [scale.x, 0.0, position.x],
-            col2: [0.0, scale.y, position.y],
+            col1: [scale.x, 0.0, 0.0],
+            col2: [0.0, scale.y, 0.0],
+            col3: [position.x, position.y, 0.0],
             color: [1.0, 1.0, 1.0, 1.0],
             layer: 0,
         }

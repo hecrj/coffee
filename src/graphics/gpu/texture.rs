@@ -24,8 +24,12 @@ impl Texture {
         let width = rgba.width() as u16;
         let height = rgba.height() as u16;
 
-        let kind =
-            gfx::texture::Kind::D2(width, height, gfx::texture::AaMode::Single);
+        let kind = gfx::texture::Kind::D2Array(
+            width,
+            height,
+            1,
+            gfx::texture::AaMode::Single,
+        );
 
         let info = gfx::texture::Info {
             kind: kind,

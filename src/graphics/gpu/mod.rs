@@ -21,13 +21,11 @@ pub(super) const DEPTH_FORMAT: gfx::format::Format = gfx::format::Format(
     gfx::format::ChannelType::Unorm,
 );
 
-pub(super) type TargetView =
-    gfx::handle::RenderTargetView<gl::Resources, gfx::format::Srgba8>;
+pub(super) type TargetView = gfx::handle::RawRenderTargetView<gl::Resources>;
 
 pub struct Gpu {
     device: gl::Device,
     factory: gl::Factory,
-    encoder: gfx::Encoder<gl::Resources, gl::CommandBuffer>,
     depth_view: gfx::handle::RawDepthStencilView<gl::Resources>,
     pipeline: Pipeline,
 }
@@ -36,20 +34,22 @@ impl Gpu {
     pub(super) fn new(
         device: gl::Device,
         mut factory: gl::Factory,
-        screen_render_target: gfx::handle::RawRenderTargetView<gl::Resources>,
+        screen_render_target: &gfx::handle::RawRenderTargetView<gl::Resources>,
         depth_view: gfx::handle::RawDepthStencilView<gl::Resources>,
     ) -> Gpu {
-        let encoder = factory.create_command_buffer().into();
         let pipeline =
-            Pipeline::new(&mut factory, &screen_render_target, COLOR_FORMAT);
+            Pipeline::new(&mut factory, screen_render_target, COLOR_FORMAT);
 
         Gpu {
             device,
             factory,
-            encoder,
             depth_view,
             pipeline,
         }
+    }
+
+    pub(super) fn flush(&mut self) {
+        self.pipeline.flush(&mut self.device);
     }
 
     pub(super) fn cleanup(&mut self) {
@@ -71,24 +71,29 @@ pub struct Target<'a> {
 }
 
 impl<'a> Target<'a> {
-    pub(super) fn new(gpu: &mut Gpu, view: TargetView) -> Target {
+    pub(super) fn new(
+        gpu: &mut Gpu,
+        view: TargetView,
+        width: f32,
+        height: f32,
+    ) -> Target {
         Target {
             gpu,
             view,
-            transformation: Transformation::identity(),
+            transformation: Transformation::orthographic(width, height),
         }
-    }
-
-    pub fn clear(&mut self, color: Color) {
-        self.gpu.encoder.clear(&self.view, color.into())
     }
 
     pub fn transform(&mut self, new_transformation: Transformation) -> Target {
         Target {
             gpu: self.gpu,
             view: self.view.clone(),
-            transformation: new_transformation * self.transformation,
+            transformation: self.transformation * new_transformation,
         }
+    }
+
+    pub fn clear(&mut self, color: Color) {
+        self.gpu.pipeline.clear(&self.view, color.into())
     }
 
     pub(super) fn draw_texture(
@@ -103,9 +108,5 @@ impl<'a> Target<'a> {
             &self.transformation,
             &self.view,
         );
-    }
-
-    pub(super) fn flush(&mut self) {
-        self.gpu.encoder.flush(&mut self.gpu.device);
     }
 }
