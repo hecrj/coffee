@@ -104,7 +104,7 @@ impl<'a> Target<'a> {
         self.gpu.pipeline.bind_texture(texture);
 
         self.gpu.pipeline.draw_quad(
-            pipeline::Instance::from_parameters(parameters),
+            pipeline::Point::from_parameters(parameters),
             &self.transformation,
             &self.view,
         );

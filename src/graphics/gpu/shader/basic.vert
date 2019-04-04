@@ -1,8 +1,5 @@
 #version 150 core
 
-in vec2 a_Pos;
-in vec2 a_Uv;
-
 in vec4 a_Src;
 in vec3 a_TCol1;
 in vec3 a_TCol2;
@@ -18,7 +15,14 @@ out vec2 v_Uv;
 out vec4 v_Color;
 flat out uint v_Layer;
 
-const mat4 invert_y_axis = mat4(
+const vec2 QUAD_VERTS[4] = vec2[](
+    vec2(0.0, 0.0),
+    vec2(1.0, 0.0),
+    vec2(1.0, 1.0),
+    vec2(0.0, 1.0)
+);
+
+const mat4 INVERT_Y_AXIS = mat4(
     vec4(1.0, 0.0, 0.0, 0.0),
     vec4(0.0, -1.0, 0.0, 0.0),
     vec4(0.0, 0.0, 1.0, 0.0),
@@ -26,7 +30,8 @@ const mat4 invert_y_axis = mat4(
 );
 
 void main() {
-    v_Uv = a_Uv * a_Src.zw + a_Src.xy;
+    vec2 v_Pos = QUAD_VERTS[gl_VertexID % 4];
+    v_Uv = v_Pos * a_Src.zw + a_Src.xy;
     v_Color = a_Color;
     v_Layer = t_Layer;
 
@@ -37,7 +42,7 @@ void main() {
         vec4(a_TCol3, 1.0)
     );
 
-    vec4 position = invert_y_axis * u_MVP * instance_transform * vec4(a_Pos, 0.0, 1.0);
+    vec4 position = INVERT_Y_AXIS * u_MVP * instance_transform * vec4(v_Pos, 0.0, 1.0);
 
     gl_Position = position;
 }

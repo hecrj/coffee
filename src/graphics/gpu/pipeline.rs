@@ -9,13 +9,11 @@ use crate::graphics::gpu;
 use crate::graphics::gpu::texture::Texture;
 use crate::graphics::transformation::Transformation;
 
-gfx_defines! {
-    vertex Vertex {
-        position: [f32; 2] = "a_Pos",
-        uv: [f32; 2] = "a_Uv",
-    }
+const MAX_POINTS: u32 = 50_000;
+const QUAD_INDICES: [u8; 6] = [0, 1, 2, 0, 2, 3];
 
-    vertex Instance {
+gfx_defines! {
+    vertex Point {
         src: [f32; 4] = "a_Src",
         col1: [f32; 3] = "a_TCol1",
         col2: [f32; 3] = "a_TCol2",
@@ -29,10 +27,9 @@ gfx_defines! {
     }
 
     pipeline pipe {
-        vertices: gfx::VertexBuffer<Vertex> = (),
+        points: gfx::VertexBuffer<Point> = (),
         texture: gfx::TextureSampler<[f32; 4]> = "t_Texture",
         globals: gfx::ConstantBuffer<Globals> = "Globals",
-        instances: gfx::InstanceBuffer<Instance> = (),
         out: gfx::RawRenderTarget =
           (
               "Target0",
@@ -44,8 +41,7 @@ gfx_defines! {
 
 pub struct Pipeline {
     encoder: gfx::Encoder<gl::Resources, gl::CommandBuffer>,
-    quads: gfx::handle::Buffer<gl::Resources, Vertex>,
-    quad_slice: gfx::Slice<gl::Resources>,
+    slice: gfx::Slice<gl::Resources>,
     data: pipe::Data<gl::Resources>,
     shader: Shader,
     globals: Globals,
@@ -60,19 +56,34 @@ impl Pipeline {
         let mut encoder: gfx::Encoder<gl::Resources, gl::CommandBuffer> =
             factory.create_command_buffer().into();
 
-        let instances = factory
+        // Create point buffer
+        let points = factory
             .create_buffer(
-                1,
+                MAX_POINTS as usize,
                 gfx::buffer::Role::Vertex,
                 gfx::memory::Usage::Dynamic,
                 gfx::memory::Bind::SHADER_RESOURCE,
             )
             .unwrap();
 
-        let (quads, mut quad_slice) = factory
-            .create_vertex_buffer_with_slice(&QUAD_VERTS, &QUAD_INDICES[..]);
+        // Generate indices
+        let mut indices: Vec<u32> = Vec::new();
 
-        quad_slice.instances = Some((1, 0));
+        for i in 0..MAX_POINTS {
+            for q in &QUAD_INDICES {
+                indices.push(i * 4 + *q as u32);
+            }
+        }
+
+        let index_buffer = factory.create_index_buffer(&indices[..]);
+
+        let slice = gfx::Slice {
+            start: 0,
+            end: QUAD_INDICES.len() as u32,
+            base_vertex: 0,
+            instances: None,
+            buffer: index_buffer,
+        };
 
         let sampler = factory.create_sampler(gfx::texture::SamplerInfo::new(
             gfx::texture::FilterMethod::Scale,
@@ -89,9 +100,8 @@ impl Pipeline {
         );
 
         let data = pipe::Data {
-            vertices: quads.clone(),
             texture: (texture.view().clone(), sampler),
-            instances,
+            points,
             globals: factory.create_constant_buffer(1),
             out: target.clone(),
         };
@@ -116,8 +126,7 @@ impl Pipeline {
 
         Pipeline {
             encoder,
-            quads,
-            quad_slice,
+            slice,
             data,
             shader,
             globals,
@@ -147,7 +156,7 @@ impl Pipeline {
 
     pub fn draw_quad(
         &mut self,
-        instance: Instance,
+        point: Point,
         transformation: &Transformation,
         view: &gfx::handle::RawRenderTargetView<gl::Resources>,
     ) {
@@ -165,11 +174,13 @@ impl Pipeline {
         self.data.out = view.clone();
 
         self.encoder
-            .update_buffer(&self.data.instances, &[instance], 0)
+            .update_buffer(&self.data.points, &[point, point, point, point], 0)
             .unwrap();
 
+        self.slice.end = QUAD_INDICES.len() as u32;
+
         self.encoder
-            .draw(&self.quad_slice, &self.shader.state, &self.data)
+            .draw(&self.slice, &self.shader.state, &self.data)
     }
 }
 
@@ -207,29 +218,8 @@ impl Shader {
     }
 }
 
-const QUAD_VERTS: [Vertex; 4] = [
-    Vertex {
-        position: [0.0, 0.0],
-        uv: [0.0, 0.0],
-    },
-    Vertex {
-        position: [1.0, 0.0],
-        uv: [1.0, 0.0],
-    },
-    Vertex {
-        position: [1.0, 1.0],
-        uv: [1.0, 1.0],
-    },
-    Vertex {
-        position: [0.0, 1.0],
-        uv: [0.0, 1.0],
-    },
-];
-
-const QUAD_INDICES: [u16; 6] = [0, 1, 2, 0, 2, 3];
-
-impl Instance {
-    pub fn from_parameters(parameters: DrawParameters) -> Instance {
+impl Point {
+    pub fn from_parameters(parameters: DrawParameters) -> Point {
         let scale = nalgebra::Vector2::new(
             parameters.scale.x * parameters.source.width,
             parameters.scale.y * parameters.source.height,
@@ -238,7 +228,7 @@ impl Instance {
         let source = parameters.source;
         let position = parameters.position;
 
-        Instance {
+        Point {
             src: [source.x, source.y, source.width, source.height],
             col1: [scale.x, 0.0, 0.0],
             col2: [0.0, scale.y, 0.0],
