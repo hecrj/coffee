@@ -1,27 +1,20 @@
+mod format;
 mod pipeline;
-mod texture;
-
-pub use crate::graphics::gpu::texture::Texture;
+pub mod texture;
+mod types;
 
 use gfx::{self, Device};
 use gfx_device_gl as gl;
+use glutin;
+use winit;
 
-use crate::graphics::color::Color;
-use crate::graphics::draw_parameters::DrawParameters;
-use crate::graphics::transformation::Transformation;
+pub use self::pipeline::Vertex;
+pub use self::texture::Texture;
+pub use glutin::WindowedContext;
+pub use types::TargetView;
+
+use crate::graphics::{Color, DrawParameters, Transformation};
 use pipeline::Pipeline;
-
-pub(super) const COLOR_FORMAT: gfx::format::Format = gfx::format::Format(
-    gfx::format::SurfaceType::R8_G8_B8_A8,
-    gfx::format::ChannelType::Unorm,
-);
-
-pub(super) const DEPTH_FORMAT: gfx::format::Format = gfx::format::Format(
-    gfx::format::SurfaceType::D24_S8,
-    gfx::format::ChannelType::Unorm,
-);
-
-pub(super) type TargetView = gfx::handle::RawRenderTargetView<gl::Resources>;
 
 pub struct Gpu {
     device: gl::Device,
@@ -37,8 +30,7 @@ impl Gpu {
         screen_render_target: &gfx::handle::RawRenderTargetView<gl::Resources>,
         depth_view: gfx::handle::RawDepthStencilView<gl::Resources>,
     ) -> Gpu {
-        let pipeline =
-            Pipeline::new(&mut factory, screen_render_target, COLOR_FORMAT);
+        let pipeline = Pipeline::new(&mut factory, screen_render_target);
 
         Gpu {
             device,
@@ -46,6 +38,35 @@ impl Gpu {
             depth_view,
             pipeline,
         }
+    }
+
+    pub(super) fn window(
+        builder: winit::WindowBuilder,
+        events_loop: &winit::EventsLoop,
+    ) -> (Gpu, glutin::WindowedContext, TargetView) {
+        let gl_builder = glutin::ContextBuilder::new()
+            .with_gl(glutin::GlRequest::Latest)
+            .with_gl_profile(glutin::GlProfile::Core)
+            .with_multisampling(1)
+            // 24 color bits, 8 alpha bits
+            .with_pixel_format(24, 8)
+            .with_vsync(true);
+
+        let (context, device, factory, screen_render_target, depth_view) =
+            gfx_window_glutin::init_raw(
+                builder,
+                gl_builder,
+                &events_loop,
+                format::COLOR,
+                format::DEPTH,
+            )
+            .unwrap();
+
+        (
+            Gpu::new(device, factory, &screen_render_target, depth_view),
+            context,
+            screen_render_target,
+        )
     }
 
     pub(super) fn flush(&mut self) {
@@ -56,11 +77,26 @@ impl Gpu {
         self.device.cleanup();
     }
 
-    pub(super) fn upload_image(
+    pub(super) fn upload_texture(
         &mut self,
         image: &image::DynamicImage,
     ) -> Texture {
         Texture::new(&mut self.factory, image)
+    }
+
+    pub(super) fn upload_texture_array(
+        &mut self,
+        layers: &[image::DynamicImage],
+    ) -> Texture {
+        Texture::new_array(&mut self.factory, layers)
+    }
+
+    pub(super) fn create_drawable_texture(
+        &mut self,
+        width: u16,
+        height: u16,
+    ) -> texture::Drawable {
+        texture::Drawable::new(&mut self.factory, width, height)
     }
 }
 
@@ -93,7 +129,7 @@ impl<'a> Target<'a> {
     }
 
     pub fn clear(&mut self, color: Color) {
-        self.gpu.pipeline.clear(&self.view, color.into())
+        self.gpu.pipeline.clear(&self.view, color);
     }
 
     pub(super) fn draw_texture(
@@ -104,7 +140,21 @@ impl<'a> Target<'a> {
         self.gpu.pipeline.bind_texture(texture);
 
         self.gpu.pipeline.draw_quad(
-            pipeline::Point::from_parameters(parameters),
+            Vertex::from_parameters(parameters),
+            &self.transformation,
+            &self.view,
+        );
+    }
+
+    pub(super) fn draw_texture_quads_from_vertices(
+        &mut self,
+        texture: &Texture,
+        vertices: &[Vertex],
+    ) {
+        self.gpu.pipeline.bind_texture(texture);
+
+        self.gpu.pipeline.draw_quads_from_vertices(
+            vertices,
             &self.transformation,
             &self.view,
         );

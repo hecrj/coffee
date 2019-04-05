@@ -1,19 +1,18 @@
 use gfx::traits::FactoryExt;
 use gfx::{self, *};
 use gfx_device_gl as gl;
-use image;
 
+use super::format;
+use super::texture::Texture;
 use crate::graphics::color::Color;
 use crate::graphics::draw_parameters::DrawParameters;
-use crate::graphics::gpu;
-use crate::graphics::gpu::texture::Texture;
 use crate::graphics::transformation::Transformation;
 
 const MAX_POINTS: u32 = 50_000;
 const QUAD_INDICES: [u8; 6] = [0, 1, 2, 0, 2, 3];
 
 gfx_defines! {
-    vertex Point {
+    vertex Vertex {
         src: [f32; 4] = "a_Src",
         col1: [f32; 3] = "a_TCol1",
         col2: [f32; 3] = "a_TCol2",
@@ -27,13 +26,13 @@ gfx_defines! {
     }
 
     pipeline pipe {
-        points: gfx::VertexBuffer<Point> = (),
+        points: gfx::VertexBuffer<Vertex> = (),
         texture: gfx::TextureSampler<[f32; 4]> = "t_Texture",
         globals: gfx::ConstantBuffer<Globals> = "Globals",
         out: gfx::RawRenderTarget =
           (
               "Target0",
-               gpu::COLOR_FORMAT, gfx::state::ColorMask::all(),
+               format::COLOR, gfx::state::ColorMask::all(),
                Some(gfx::preset::blend::ALPHA)
           ),
     }
@@ -51,7 +50,6 @@ impl Pipeline {
     pub fn new(
         factory: &mut gl::Factory,
         target: &gfx::handle::RawRenderTargetView<gl::Resources>,
-        color_format: gfx::format::Format,
     ) -> Pipeline {
         let mut encoder: gfx::Encoder<gl::Resources, gl::CommandBuffer> =
             factory.create_command_buffer().into();
@@ -109,7 +107,7 @@ impl Pipeline {
         let init = pipe::Init {
             out: (
                 "Target0",
-                color_format,
+                format::COLOR,
                 gfx::state::ColorMask::all(),
                 Some(gfx::preset::blend::ALPHA),
             ),
@@ -156,7 +154,20 @@ impl Pipeline {
 
     pub fn draw_quad(
         &mut self,
-        point: Point,
+        point: Vertex,
+        transformation: &Transformation,
+        view: &gfx::handle::RawRenderTargetView<gl::Resources>,
+    ) {
+        self.draw_quads_from_vertices(
+            &[point, point, point, point],
+            transformation,
+            view,
+        );
+    }
+
+    pub fn draw_quads_from_vertices(
+        &mut self,
+        vertices: &[Vertex],
         transformation: &Transformation,
         view: &gfx::handle::RawRenderTargetView<gl::Resources>,
     ) {
@@ -174,10 +185,10 @@ impl Pipeline {
         self.data.out = view.clone();
 
         self.encoder
-            .update_buffer(&self.data.points, &[point, point, point, point], 0)
+            .update_buffer(&self.data.points, vertices, 0)
             .unwrap();
 
-        self.slice.end = QUAD_INDICES.len() as u32;
+        self.slice.end = (QUAD_INDICES.len() * vertices.len() / 4) as u32;
 
         self.encoder
             .draw(&self.slice, &self.shader.state, &self.data)
@@ -218,8 +229,8 @@ impl Shader {
     }
 }
 
-impl Point {
-    pub fn from_parameters(parameters: DrawParameters) -> Point {
+impl Vertex {
+    pub fn from_parameters(parameters: DrawParameters) -> Vertex {
         let scale = nalgebra::Vector2::new(
             parameters.scale.x * parameters.source.width,
             parameters.scale.y * parameters.source.height,
@@ -228,7 +239,7 @@ impl Point {
         let source = parameters.source;
         let position = parameters.position;
 
-        Point {
+        Vertex {
             src: [source.x, source.y, source.width, source.height],
             col1: [scale.x, 0.0, 0.0],
             col2: [0.0, scale.y, 0.0],

@@ -1,14 +1,12 @@
-use gfx_window_glutin;
-use glutin;
 use winit;
 
 use crate::graphics::color::Color;
 use crate::graphics::gpu::{self, Gpu};
 
 pub struct Window {
-    context: glutin::WindowedContext,
-    events_loop: winit::EventsLoop,
     gpu: Gpu,
+    context: gpu::WindowedContext,
+    events_loop: winit::EventsLoop,
     screen_render_target: gpu::TargetView,
     width: f32,
     height: f32,
@@ -18,25 +16,10 @@ impl Window {
     pub fn new(settings: Settings) -> Window {
         let (width, height) = settings.size;
 
-        let gl_builder = glutin::ContextBuilder::new()
-            .with_gl(glutin::GlRequest::Latest)
-            .with_gl_profile(glutin::GlProfile::Core)
-            .with_multisampling(1)
-            // 24 color bits, 8 alpha bits
-            .with_pixel_format(24, 8)
-            .with_vsync(true);
-
         let events_loop = winit::EventsLoop::new();
 
-        let (context, device, factory, screen_render_target, depth_view) =
-            gfx_window_glutin::init_raw(
-                settings.into_builder(),
-                gl_builder,
-                &events_loop,
-                gpu::COLOR_FORMAT,
-                gpu::DEPTH_FORMAT,
-            )
-            .unwrap();
+        let (gpu, context, screen_render_target) =
+            Gpu::window(settings.into_builder(), &events_loop);
 
         let window = context.window();
 
@@ -54,7 +37,7 @@ impl Window {
         Window {
             context,
             events_loop,
-            gpu: Gpu::new(device, factory, &screen_render_target, depth_view),
+            gpu,
             screen_render_target,
             width,
             height,

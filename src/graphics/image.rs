@@ -4,9 +4,8 @@ use std::fs::File;
 use std::io::Read;
 use std::path::Path;
 
-use crate::graphics::gpu::{Gpu, Target, Texture};
-use crate::graphics::DrawParameters;
-use crate::graphics::Vector;
+use crate::graphics::gpu::Texture;
+use crate::graphics::{DrawParameters, Gpu, Target, Vector};
 
 pub struct Image {
     texture: Texture,
@@ -27,7 +26,7 @@ impl Image {
         };
 
         Some(Image {
-            texture: gpu.upload_image(&image),
+            texture: gpu.upload_texture(&image),
         })
     }
 
