@@ -47,7 +47,7 @@ impl Gpu {
         let gl_builder = glutin::ContextBuilder::new()
             .with_gl(glutin::GlRequest::Latest)
             .with_gl_profile(glutin::GlProfile::Core)
-            .with_multisampling(1)
+            .with_multisampling(0)
             // 24 color bits, 8 alpha bits
             .with_pixel_format(24, 8)
             .with_vsync(true);
