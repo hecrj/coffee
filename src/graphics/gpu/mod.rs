@@ -8,12 +8,12 @@ use gfx_device_gl as gl;
 use glutin;
 use winit;
 
-pub use self::pipeline::Vertex;
+pub use self::pipeline::Instance;
 pub use self::texture::Texture;
 pub use glutin::WindowedContext;
 pub use types::TargetView;
 
-use crate::graphics::{Color, DrawParameters, Transformation};
+use crate::graphics::{Color, Transformation};
 use pipeline::Pipeline;
 
 pub struct Gpu {
@@ -144,28 +144,14 @@ impl<'a> Target<'a> {
         self.gpu.pipeline.clear(&self.view, color);
     }
 
-    pub(super) fn draw_texture(
+    pub(super) fn draw_texture_quads(
         &mut self,
         texture: &Texture,
-        parameters: DrawParameters,
+        vertices: &[Instance],
     ) {
         self.gpu.pipeline.bind_texture(texture);
 
-        self.gpu.pipeline.draw_quad(
-            Vertex::from_parameters(parameters),
-            &self.transformation,
-            &self.view,
-        );
-    }
-
-    pub(super) fn draw_texture_quads_from_vertices(
-        &mut self,
-        texture: &Texture,
-        vertices: &[Vertex],
-    ) {
-        self.gpu.pipeline.bind_texture(texture);
-
-        self.gpu.pipeline.draw_quads_from_vertices(
+        self.gpu.pipeline.draw_quads(
             vertices,
             &self.transformation,
             &self.view,

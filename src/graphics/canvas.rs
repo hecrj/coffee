@@ -26,6 +26,9 @@ impl Canvas {
     }
 
     pub fn draw(&self, parameters: DrawParameters, target: &mut Target) {
-        target.draw_texture(&self.drawable.texture(), parameters);
+        target.draw_texture_quads(
+            &self.drawable.texture(),
+            &[gpu::Instance::from_parameters(parameters)],
+        );
     }
 }

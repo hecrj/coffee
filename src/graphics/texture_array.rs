@@ -6,7 +6,7 @@ use std::sync::Arc;
 use log::debug;
 
 use crate::graphics;
-use crate::graphics::gpu::{Texture, Vertex};
+use crate::graphics::gpu::{Instance, Texture};
 use crate::graphics::transformation::Transformation;
 
 /// A texture array
@@ -28,14 +28,14 @@ impl TextureArray {
 #[derive(Debug)]
 pub struct Batch {
     texture_array: TextureArray,
-    vertices: Vec<Vertex>,
+    instances: Vec<Instance>,
 }
 
 impl Batch {
     fn new(texture_array: TextureArray) -> Batch {
         Batch {
             texture_array,
-            vertices: Vec::new(),
+            instances: Vec::new(),
         }
     }
 
@@ -46,28 +46,26 @@ impl Batch {
         sprite: Sprite,
         position: graphics::Point,
     ) {
-        let mut vertex = Vertex::from_parameters(graphics::DrawParameters {
-            source: graphics::Rectangle {
-                x: (index.offset.x + sprite.column * sprite.width) as f32
-                    * self.texture_array.x_unit,
-                y: (index.offset.y + sprite.row * sprite.height) as f32
-                    * self.texture_array.y_unit,
-                width: sprite.width as f32 * self.texture_array.x_unit,
-                height: sprite.height as f32 * self.texture_array.y_unit,
-            },
-            position,
-            scale: graphics::Vector::new(
-                sprite.width as f32,
-                sprite.height as f32,
-            ),
-        });
+        let mut instance =
+            Instance::from_parameters(graphics::DrawParameters {
+                source: graphics::Rectangle {
+                    x: (index.offset.x + sprite.column * sprite.width) as f32
+                        * self.texture_array.x_unit,
+                    y: (index.offset.y + sprite.row * sprite.height) as f32
+                        * self.texture_array.y_unit,
+                    width: sprite.width as f32 * self.texture_array.x_unit,
+                    height: sprite.height as f32 * self.texture_array.y_unit,
+                },
+                position,
+                scale: graphics::Vector::new(
+                    sprite.width as f32,
+                    sprite.height as f32,
+                ),
+            });
 
-        vertex.layer = index.layer.into();
+        instance.layer = index.layer.into();
 
-        self.vertices.push(vertex);
-        self.vertices.push(vertex);
-        self.vertices.push(vertex);
-        self.vertices.push(vertex);
+        self.instances.push(instance);
     }
 
     /// Draw the batch
@@ -80,9 +78,9 @@ impl Batch {
             graphics::Vector::new(position.x, position.y),
         ));
 
-        translated.draw_texture_quads_from_vertices(
+        translated.draw_texture_quads(
             &self.texture_array.texture,
-            &self.vertices[..],
+            &self.instances[..],
         );
     }
 }

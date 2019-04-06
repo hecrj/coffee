@@ -4,7 +4,7 @@ use std::fs::File;
 use std::io::Read;
 use std::path::Path;
 
-use crate::graphics::gpu::Texture;
+use crate::graphics::gpu::{self, Texture};
 use crate::graphics::{DrawParameters, Gpu, Target, Vector};
 
 pub struct Image {
@@ -39,6 +39,9 @@ impl Image {
     }
 
     pub fn draw(&self, parameters: DrawParameters, target: &mut Target) {
-        target.draw_texture(&self.texture, parameters);
+        target.draw_texture_quads(
+            &self.texture,
+            &[gpu::Instance::from_parameters(parameters)],
+        );
     }
 }

@@ -8,16 +8,33 @@ use crate::graphics::color::Color;
 use crate::graphics::draw_parameters::DrawParameters;
 use crate::graphics::transformation::Transformation;
 
-const MAX_POINTS: u32 = 50_000;
-const QUAD_INDICES: [u8; 6] = [0, 1, 2, 0, 2, 3];
+const MAX_POINTS: u32 = 100_000;
+const QUAD_INDICES: [u16; 6] = [0, 1, 2, 0, 2, 3];
+
+const QUAD_VERTS: [Vertex; 4] = [
+    Vertex {
+        position: [0.0, 0.0],
+    },
+    Vertex {
+        position: [1.0, 0.0],
+    },
+    Vertex {
+        position: [1.0, 1.0],
+    },
+    Vertex {
+        position: [0.0, 1.0],
+    },
+];
 
 gfx_defines! {
     vertex Vertex {
+        position: [f32; 2] = "a_Pos",
+    }
+
+    vertex Instance {
         src: [f32; 4] = "a_Src",
-        col1: [f32; 3] = "a_TCol1",
-        col2: [f32; 3] = "a_TCol2",
-        col3: [f32; 3] = "a_TCol3",
-        color: [f32; 4] = "a_Color",
+        translation: [f32; 2] = "a_Translation",
+        scale: [f32; 2] = "a_Scale",
         layer: u32 = "t_Layer",
     }
 
@@ -26,9 +43,10 @@ gfx_defines! {
     }
 
     pipeline pipe {
-        points: gfx::VertexBuffer<Vertex> = (),
+        vertices: gfx::VertexBuffer<Vertex> = (),
         texture: gfx::TextureSampler<[f32; 4]> = "t_Texture",
         globals: gfx::ConstantBuffer<Globals> = "Globals",
+        instances: gfx::InstanceBuffer<Instance> = (),
         out: gfx::RawRenderTarget =
           (
               "Target0",
@@ -55,7 +73,7 @@ impl Pipeline {
             factory.create_command_buffer().into();
 
         // Create point buffer
-        let points = factory
+        let instances = factory
             .create_buffer(
                 MAX_POINTS as usize,
                 gfx::buffer::Role::Vertex,
@@ -64,24 +82,8 @@ impl Pipeline {
             )
             .unwrap();
 
-        // Generate indices
-        let mut indices: Vec<u32> = Vec::new();
-
-        for i in 0..MAX_POINTS {
-            for q in &QUAD_INDICES {
-                indices.push(i * 4 + *q as u32);
-            }
-        }
-
-        let index_buffer = factory.create_index_buffer(&indices[..]);
-
-        let slice = gfx::Slice {
-            start: 0,
-            end: QUAD_INDICES.len() as u32,
-            base_vertex: 0,
-            instances: None,
-            buffer: index_buffer,
-        };
+        let (quads, slice) = factory
+            .create_vertex_buffer_with_slice(&QUAD_VERTS, &QUAD_INDICES[..]);
 
         let sampler = factory.create_sampler(gfx::texture::SamplerInfo::new(
             gfx::texture::FilterMethod::Scale,
@@ -98,9 +100,10 @@ impl Pipeline {
         );
 
         let data = pipe::Data {
+            vertices: quads.clone(),
             texture: (texture.view().clone(), sampler),
-            points,
             globals: factory.create_constant_buffer(1),
+            instances,
             out: target.clone(),
         };
 
@@ -152,22 +155,9 @@ impl Pipeline {
         self.data.texture.0 = texture.view().clone();
     }
 
-    pub fn draw_quad(
+    pub fn draw_quads(
         &mut self,
-        point: Vertex,
-        transformation: &Transformation,
-        view: &gfx::handle::RawRenderTargetView<gl::Resources>,
-    ) {
-        self.draw_quads_from_vertices(
-            &[point, point, point, point],
-            transformation,
-            view,
-        );
-    }
-
-    pub fn draw_quads_from_vertices(
-        &mut self,
-        vertices: &[Vertex],
+        instances: &[Instance],
         transformation: &Transformation,
         view: &gfx::handle::RawRenderTargetView<gl::Resources>,
     ) {
@@ -185,10 +175,10 @@ impl Pipeline {
         self.data.out = view.clone();
 
         self.encoder
-            .update_buffer(&self.data.points, vertices, 0)
+            .update_buffer(&self.data.instances, instances, 0)
             .unwrap();
 
-        self.slice.end = (QUAD_INDICES.len() * vertices.len() / 4) as u32;
+        self.slice.instances = Some((instances.len() as u32, 0));
 
         self.encoder
             .draw(&self.slice, &self.shader.state, &self.data)
@@ -229,18 +219,16 @@ impl Shader {
     }
 }
 
-impl Vertex {
-    pub fn from_parameters(parameters: DrawParameters) -> Vertex {
+impl Instance {
+    pub fn from_parameters(parameters: DrawParameters) -> Instance {
         let source = parameters.source;
         let position = parameters.position;
         let scale = parameters.scale;
 
-        Vertex {
+        Instance {
             src: [source.x, source.y, source.width, source.height],
-            col1: [scale.x, 0.0, 0.0],
-            col2: [0.0, scale.y, 0.0],
-            col3: [position.x, position.y, 0.0],
-            color: [1.0, 1.0, 1.0, 1.0],
+            translation: [position.x, position.y],
+            scale: [scale.x, scale.y],
             layer: 0,
         }
     }
