@@ -13,10 +13,18 @@ pub struct Window {
 }
 
 impl Window {
-    pub fn new(settings: Settings) -> Window {
-        let (width, height) = settings.size;
+    pub fn new(mut settings: Settings) -> Window {
+        let (mut width, mut height) = settings.size;
 
         let events_loop = winit::EventsLoop::new();
+
+        // Try to revert DPI
+        let dpi = events_loop.get_primary_monitor().get_hidpi_factor();
+
+        width = (width as f64 / dpi).round() as u32;
+        height = (height as f64 / dpi).round() as u32;
+
+        settings.size = (width, height);
 
         let (gpu, context, screen_render_target) =
             Gpu::window(settings.into_builder(), &events_loop);
