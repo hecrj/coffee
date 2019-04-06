@@ -120,6 +120,18 @@ impl<'a> Target<'a> {
         }
     }
 
+    pub(super) fn with_transformation(
+        gpu: &mut Gpu,
+        view: TargetView,
+        width: f32,
+        height: f32,
+        transformation: Transformation,
+    ) -> Target {
+        let mut target = Self::new(gpu, view, width, height);
+        target.transformation = transformation * target.transformation;
+        target
+    }
+
     pub fn transform(&mut self, new_transformation: Transformation) -> Target {
         Target {
             gpu: self.gpu,

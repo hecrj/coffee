@@ -26,6 +26,12 @@ impl Transformation {
     pub fn scale(scale: f32) -> Transformation {
         Transformation(nalgebra::Matrix4::new_scaling(scale))
     }
+
+    pub fn nonuniform_scale(x: f32, y: f32) -> Transformation {
+        Transformation(nalgebra::Matrix4::new_nonuniform_scaling(
+            &nalgebra::Vector3::new(x, y, 1.0),
+        ))
+    }
 }
 
 impl Mul for Transformation {

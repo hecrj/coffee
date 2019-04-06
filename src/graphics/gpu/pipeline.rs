@@ -231,13 +231,9 @@ impl Shader {
 
 impl Vertex {
     pub fn from_parameters(parameters: DrawParameters) -> Vertex {
-        let scale = nalgebra::Vector2::new(
-            parameters.scale.x * parameters.source.width,
-            parameters.scale.y * parameters.source.height,
-        );
-
         let source = parameters.source;
         let position = parameters.position;
+        let scale = parameters.scale;
 
         Vertex {
             src: [source.x, source.y, source.width, source.height],

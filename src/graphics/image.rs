@@ -38,12 +38,7 @@ impl Image {
         self.texture.height()
     }
 
-    pub fn draw(&self, mut parameters: DrawParameters, target: &mut Target) {
-        parameters.scale = Vector::new(
-            parameters.scale.x * self.width() as f32,
-            parameters.scale.y * self.height() as f32,
-        );
-
+    pub fn draw(&self, parameters: DrawParameters, target: &mut Target) {
         target.draw_texture(&self.texture, parameters);
     }
 }
