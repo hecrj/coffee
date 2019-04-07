@@ -5,13 +5,14 @@ mod types;
 
 use gfx::{self, Device};
 use gfx_device_gl as gl;
+use gfx_window_glutin;
 use glutin;
 use winit;
 
 pub use self::pipeline::Instance;
 pub use self::texture::Texture;
 pub use glutin::WindowedContext;
-pub use types::TargetView;
+pub use types::{DepthView, TargetView};
 
 use crate::graphics::{Color, Transformation};
 use pipeline::Pipeline;
@@ -19,7 +20,6 @@ use pipeline::Pipeline;
 pub struct Gpu {
     device: gl::Device,
     factory: gl::Factory,
-    depth_view: gfx::handle::RawDepthStencilView<gl::Resources>,
     pipeline: Pipeline,
 }
 
@@ -27,15 +27,13 @@ impl Gpu {
     pub(super) fn new(
         device: gl::Device,
         mut factory: gl::Factory,
-        screen_render_target: &gfx::handle::RawRenderTargetView<gl::Resources>,
-        depth_view: gfx::handle::RawDepthStencilView<gl::Resources>,
+        default_target: &TargetView,
     ) -> Gpu {
-        let pipeline = Pipeline::new(&mut factory, screen_render_target);
+        let pipeline = Pipeline::new(&mut factory, default_target);
 
         Gpu {
             device,
             factory,
-            depth_view,
             pipeline,
         }
     }
@@ -43,7 +41,7 @@ impl Gpu {
     pub(super) fn window(
         builder: winit::WindowBuilder,
         events_loop: &winit::EventsLoop,
-    ) -> (Gpu, glutin::WindowedContext, TargetView) {
+    ) -> (Gpu, glutin::WindowedContext, TargetView, DepthView) {
         let gl_builder = glutin::ContextBuilder::new()
             .with_gl(glutin::GlRequest::Latest)
             .with_gl_profile(glutin::GlProfile::Core)
@@ -63,9 +61,10 @@ impl Gpu {
             .unwrap();
 
         (
-            Gpu::new(device, factory, &screen_render_target, depth_view),
+            Gpu::new(device, factory, &screen_render_target),
             context,
             screen_render_target,
+            depth_view,
         )
     }
 
@@ -97,6 +96,25 @@ impl Gpu {
         height: u16,
     ) -> texture::Drawable {
         texture::Drawable::new(&mut self.factory, width, height)
+    }
+
+    pub(super) fn resize_viewport(
+        window: &WindowedContext,
+        target: &TargetView,
+        _depth: &DepthView,
+    ) -> Option<(TargetView, DepthView)> {
+        let dimensions = target.get_dimensions();
+
+        if let Some((cv, dv)) = gfx_window_glutin::update_views_raw(
+            window,
+            dimensions,
+            format::COLOR,
+            format::DEPTH,
+        ) {
+            Some((cv, dv))
+        } else {
+            None
+        }
     }
 }
 

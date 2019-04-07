@@ -6,28 +6,26 @@ use crate::graphics::gpu::{self, Gpu};
 pub struct Window {
     gpu: Gpu,
     context: gpu::WindowedContext,
-    events_loop: winit::EventsLoop,
     screen_render_target: gpu::TargetView,
+    depth_view: gpu::DepthView,
     width: f32,
     height: f32,
 }
 
 impl Window {
-    pub fn new(mut settings: Settings) -> Window {
+    pub fn new(mut settings: Settings, event_loop: &EventLoop) -> Window {
         let (mut width, mut height) = settings.size;
 
-        let events_loop = winit::EventsLoop::new();
-
         // Try to revert DPI
-        let dpi = events_loop.get_primary_monitor().get_hidpi_factor();
+        let dpi = event_loop.0.get_primary_monitor().get_hidpi_factor();
 
         width = (width as f64 / dpi).round() as u32;
         height = (height as f64 / dpi).round() as u32;
 
         settings.size = (width, height);
 
-        let (gpu, context, screen_render_target) =
-            Gpu::window(settings.into_builder(), &events_loop);
+        let (gpu, context, screen_render_target, depth_view) =
+            Gpu::window(settings.into_builder(), &event_loop.0);
 
         let window = context.window();
 
@@ -44,9 +42,9 @@ impl Window {
 
         Window {
             context,
-            events_loop,
             gpu,
             screen_render_target,
+            depth_view,
             width,
             height,
         }
@@ -68,16 +66,47 @@ impl Window {
         self.height
     }
 
-    pub fn poll_events<F>(&mut self, mut f: F)
+    pub fn resize(&mut self, new_size: NewSize) {
+        let dpi = self.context.window().get_hidpi_factor();
+        let physical_size = new_size.0.to_physical(dpi);
+        let new_viewport = Gpu::resize_viewport(
+            &self.context,
+            &self.screen_render_target,
+            &self.depth_view,
+        );
+
+        if let Some((screen_render_target, depth_view)) = new_viewport {
+            self.screen_render_target = screen_render_target;
+            self.depth_view = depth_view;
+        }
+
+        self.width = physical_size.width as f32;
+        self.height = physical_size.height as f32;
+    }
+}
+
+pub struct EventLoop(winit::EventsLoop);
+
+impl EventLoop {
+    pub fn new() -> EventLoop {
+        EventLoop(winit::EventsLoop::new())
+    }
+
+    pub fn poll<F>(&mut self, mut f: F)
     where
         F: FnMut(Event),
     {
-        self.events_loop.poll_events(|event| {
+        self.0.poll_events(|event| {
             match event {
-                winit::Event::WindowEvent {
-                    event: winit::WindowEvent::CloseRequested,
-                    ..
-                } => f(Event::CloseRequested),
+                winit::Event::WindowEvent { event, .. } => match event {
+                    winit::WindowEvent::CloseRequested => {
+                        f(Event::CloseRequested)
+                    }
+                    winit::WindowEvent::Resized(logical_size) => {
+                        f(Event::Resized(NewSize(logical_size)))
+                    }
+                    _ => {}
+                },
                 _ => (),
             };
         });
@@ -104,7 +133,10 @@ impl Settings {
 
 pub enum Event {
     CloseRequested,
+    Resized(NewSize),
 }
+
+pub struct NewSize(winit::dpi::LogicalSize);
 
 pub struct Frame<'a> {
     window: &'a mut Window,
