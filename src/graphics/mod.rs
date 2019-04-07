@@ -1,5 +1,5 @@
 mod canvas;
-pub mod color;
+mod color;
 mod draw_parameters;
 mod gpu;
 mod image;

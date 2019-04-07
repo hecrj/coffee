@@ -1,17 +1,28 @@
 pub mod graphics;
 pub mod input;
 
+mod timer;
+
+use timer::Timer;
+
 pub trait Game {
     type View;
     type Input;
 
-    fn update(&mut self, view: &mut Self::View, window: &graphics::Window);
+    const TICKS_PER_SECOND: u16;
+
+    fn update(
+        &mut self,
+        input: &mut Self::Input,
+        view: &mut Self::View,
+        window: &graphics::Window,
+    );
 
     fn draw(
         &self,
+        _input: &Self::Input,
         _view: &mut Self::View,
         _window: &mut graphics::Window,
-        _was_updated: bool,
     ) -> graphics::Result<()> {
         Ok(())
     }
@@ -36,10 +47,11 @@ pub trait Game {
 
 pub fn run<G: Game>(
     game: &mut G,
+    input: &mut G::Input,
     view: &mut G::View,
     window: &mut graphics::Window,
-    ticks_per_second: u32,
 ) -> graphics::Result<()> {
+    let mut timer = Timer::new(G::TICKS_PER_SECOND);
     let mut alive = true;
 
     while alive {
@@ -49,8 +61,13 @@ pub fn run<G: Game>(
             }
         });
 
-        game.update(view, window);
-        game.draw(view, window, true)?;
+        timer.update();
+
+        while timer.tick() {
+            game.update(input, view, window);
+        }
+
+        game.draw(input, view, window)?;
     }
 
     Ok(())
