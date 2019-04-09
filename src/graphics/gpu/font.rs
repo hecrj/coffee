@@ -28,6 +28,7 @@ impl Font {
                 y: text.size,
             },
             color: text.color.into(),
+            bounds: text.bounds,
             ..Default::default()
         });
     }

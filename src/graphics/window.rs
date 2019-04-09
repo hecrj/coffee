@@ -2,6 +2,7 @@ use winit;
 
 use crate::graphics::gpu::{self, Font, Gpu};
 use crate::graphics::Color;
+use crate::input;
 
 pub struct Window {
     gpu: Gpu,
@@ -105,6 +106,27 @@ impl EventLoop {
         self.0.poll_events(|event| {
             match event {
                 winit::Event::WindowEvent { event, .. } => match event {
+                    winit::WindowEvent::KeyboardInput {
+                        input:
+                            winit::KeyboardInput {
+                                state,
+                                virtual_keycode: Some(virtual_keycode),
+                                ..
+                            },
+                        ..
+                    } => {
+                        f(Event::KeyboardInput {
+                            state: match state {
+                                winit::ElementState::Pressed => {
+                                    input::KeyState::Pressed
+                                }
+                                winit::ElementState::Released => {
+                                    input::KeyState::Released
+                                }
+                            },
+                            key_code: virtual_keycode,
+                        });
+                    }
                     winit::WindowEvent::CloseRequested => {
                         f(Event::CloseRequested)
                     }
@@ -140,6 +162,10 @@ impl Settings {
 pub enum Event {
     CloseRequested,
     Resized(NewSize),
+    KeyboardInput {
+        state: input::KeyState,
+        key_code: input::KeyCode,
+    },
 }
 
 pub struct NewSize(winit::dpi::LogicalSize);

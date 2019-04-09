@@ -13,6 +13,7 @@ pub trait Game {
     type Input;
 
     const TICKS_PER_SECOND: u16;
+    const DEBUG_KEY: Option<input::KeyCode> = Some(input::KeyCode::F12);
 
     fn load(&self, gpu: &mut graphics::Gpu) -> (Self::View, Self::Input);
 
@@ -44,7 +45,7 @@ pub trait Game {
     fn key_down_event(
         &self,
         _input: &mut Self::Input,
-        _keycode: input::Keycode,
+        _keycode: input::KeyCode,
         _keymod: input::Mod,
         _repeat: bool,
     ) {
@@ -53,7 +54,7 @@ pub trait Game {
     fn key_up_event(
         &self,
         _input: &mut Self::Input,
-        _keycode: input::Keycode,
+        _keycode: input::KeyCode,
         _keymod: input::Mod,
     ) {
     }
@@ -68,7 +69,7 @@ pub fn run<G: Game>(
     let window = &mut Window::new(window_settings, &event_loop);
 
     // Debug
-    let mut debug = Debug::new(window.gpu());
+    let mut debug = Debug::new(window.gpu(), G::TICKS_PER_SECOND);
 
     // Load game
     // (Loading progress support soon!)
@@ -85,6 +86,14 @@ pub fn run<G: Game>(
 
         debug.event_loop_started();
         event_loop.poll(|event| match event {
+            graphics::window::Event::KeyboardInput { state, key_code } => {
+                if cfg!(debug_assertions)
+                    && Some(key_code) == G::DEBUG_KEY
+                    && state == input::KeyState::Released
+                {
+                    debug.toggle();
+                }
+            }
             graphics::window::Event::CloseRequested => {
                 alive = false;
             }
