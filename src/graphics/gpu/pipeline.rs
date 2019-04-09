@@ -4,7 +4,6 @@ use gfx_device_gl as gl;
 
 use super::format;
 use super::texture::Texture;
-use crate::graphics::color::Color;
 use crate::graphics::draw_parameters::DrawParameters;
 use crate::graphics::transformation::Transformation;
 
@@ -57,7 +56,6 @@ gfx_defines! {
 }
 
 pub struct Pipeline {
-    encoder: gfx::Encoder<gl::Resources, gl::CommandBuffer>,
     slice: gfx::Slice<gl::Resources>,
     data: pipe::Data<gl::Resources>,
     shader: Shader,
@@ -67,11 +65,9 @@ pub struct Pipeline {
 impl Pipeline {
     pub fn new(
         factory: &mut gl::Factory,
+        encoder: &mut gfx::Encoder<gl::Resources, gl::CommandBuffer>,
         target: &gfx::handle::RawRenderTargetView<gl::Resources>,
     ) -> Pipeline {
-        let mut encoder: gfx::Encoder<gl::Resources, gl::CommandBuffer> =
-            factory.create_command_buffer().into();
-
         // Create point buffer
         let instances = factory
             .create_buffer(
@@ -126,29 +122,11 @@ impl Pipeline {
         encoder.update_buffer(&data.globals, &[globals], 0).unwrap();
 
         Pipeline {
-            encoder,
             slice,
             data,
             shader,
             globals,
         }
-    }
-
-    pub fn clear(
-        &mut self,
-        view: &gfx::handle::RawRenderTargetView<gl::Resources>,
-        color: Color,
-    ) {
-        let typed_render_target: gfx::handle::RenderTargetView<
-            gl::Resources,
-            gfx::format::Srgba8,
-        > = gfx::memory::Typed::new(view.clone());
-
-        self.encoder.clear(&typed_render_target, color.into())
-    }
-
-    pub fn flush(&mut self, device: &mut gl::Device) {
-        self.encoder.flush(device);
     }
 
     pub fn bind_texture(&mut self, texture: &Texture) {
@@ -157,6 +135,7 @@ impl Pipeline {
 
     pub fn draw_quads(
         &mut self,
+        encoder: &mut gfx::Encoder<gl::Resources, gl::CommandBuffer>,
         instances: &[Instance],
         transformation: &Transformation,
         view: &gfx::handle::RawRenderTargetView<gl::Resources>,
@@ -167,21 +146,20 @@ impl Pipeline {
         if self.globals.mvp != transformation_matrix {
             self.globals.mvp = transformation_matrix;
 
-            self.encoder
+            encoder
                 .update_buffer(&self.data.globals, &[self.globals], 0)
                 .unwrap();
         }
 
         self.data.out = view.clone();
 
-        self.encoder
+        encoder
             .update_buffer(&self.data.instances, instances, 0)
             .unwrap();
 
         self.slice.instances = Some((instances.len() as u32, 0));
 
-        self.encoder
-            .draw(&self.slice, &self.shader.state, &self.data)
+        encoder.draw(&self.slice, &self.shader.state, &self.data)
     }
 }
 

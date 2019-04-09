@@ -1,7 +1,14 @@
+mod font;
 mod format;
 mod pipeline;
 pub mod texture;
 mod types;
+
+pub use font::Font;
+pub use glutin::WindowedContext;
+pub use pipeline::Instance;
+pub use texture::Texture;
+pub use types::{DepthView, TargetView};
 
 use gfx::{self, Device};
 use gfx_device_gl as gl;
@@ -9,17 +16,13 @@ use gfx_window_glutin;
 use glutin;
 use winit;
 
-pub use self::pipeline::Instance;
-pub use self::texture::Texture;
-pub use glutin::WindowedContext;
-pub use types::{DepthView, TargetView};
-
 use crate::graphics::{Color, Transformation};
 use pipeline::Pipeline;
 
 pub struct Gpu {
     device: gl::Device,
     factory: gl::Factory,
+    encoder: gfx::Encoder<gl::Resources, gl::CommandBuffer>,
     pipeline: Pipeline,
 }
 
@@ -29,11 +32,16 @@ impl Gpu {
         mut factory: gl::Factory,
         default_target: &TargetView,
     ) -> Gpu {
-        let pipeline = Pipeline::new(&mut factory, default_target);
+        let mut encoder: gfx::Encoder<gl::Resources, gl::CommandBuffer> =
+            factory.create_command_buffer().into();
+
+        let pipeline =
+            Pipeline::new(&mut factory, &mut encoder, default_target);
 
         Gpu {
             device,
             factory,
+            encoder,
             pipeline,
         }
     }
@@ -68,8 +76,17 @@ impl Gpu {
         )
     }
 
+    pub(super) fn clear(&mut self, view: &TargetView, color: Color) {
+        let typed_render_target: gfx::handle::RenderTargetView<
+            gl::Resources,
+            gfx::format::Srgba8,
+        > = gfx::memory::Typed::new(view.clone());
+
+        self.encoder.clear(&typed_render_target, color.into())
+    }
+
     pub(super) fn flush(&mut self) {
-        self.pipeline.flush(&mut self.device);
+        self.encoder.flush(&mut self.device);
     }
 
     pub(super) fn cleanup(&mut self) {
@@ -96,6 +113,19 @@ impl Gpu {
         height: u16,
     ) -> texture::Drawable {
         texture::Drawable::new(&mut self.factory, width, height)
+    }
+
+    pub(super) fn upload_font(&mut self, bytes: &'static [u8]) -> Font {
+        Font::from_bytes(&mut self.factory, bytes)
+    }
+
+    pub(super) fn draw_font(
+        &mut self,
+        font: &mut Font,
+        target: &TargetView,
+        depth: &DepthView,
+    ) {
+        font.draw(&mut self.encoder, target, depth);
     }
 
     pub(super) fn resize_viewport(
@@ -159,7 +189,7 @@ impl<'a> Target<'a> {
     }
 
     pub fn clear(&mut self, color: Color) {
-        self.gpu.pipeline.clear(&self.view, color);
+        self.gpu.clear(&self.view, color);
     }
 
     pub(super) fn draw_texture_quads(
@@ -170,6 +200,7 @@ impl<'a> Target<'a> {
         self.gpu.pipeline.bind_texture(texture);
 
         self.gpu.pipeline.draw_quads(
+            &mut self.gpu.encoder,
             vertices,
             &self.transformation,
             &self.view,

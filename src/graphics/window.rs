@@ -1,7 +1,7 @@
 use winit;
 
-use crate::graphics::color::Color;
-use crate::graphics::gpu::{self, Gpu};
+use crate::graphics::gpu::{self, Font, Gpu};
+use crate::graphics::Color;
 
 pub struct Window {
     gpu: Gpu,
@@ -64,6 +64,12 @@ impl Window {
 
     pub fn height(&self) -> f32 {
         self.height
+    }
+
+    pub(crate) fn swap_buffers(&mut self) {
+        self.gpu.flush();
+        self.context.swap_buffers().unwrap();
+        self.gpu.cleanup();
     }
 
     pub fn resize(&mut self, new_size: NewSize) {
@@ -143,6 +149,14 @@ pub struct Frame<'a> {
 }
 
 impl<'a> Frame<'a> {
+    pub fn width(&self) -> f32 {
+        self.window.width()
+    }
+
+    pub fn height(&self) -> f32 {
+        self.window.height()
+    }
+
     pub fn as_target(&mut self) -> gpu::Target {
         let view = self.window.screen_render_target.clone();
         let width = self.window.width;
@@ -155,9 +169,11 @@ impl<'a> Frame<'a> {
         self.as_target().clear(color);
     }
 
-    pub fn present(self) {
-        self.window.gpu.flush();
-        self.window.context.swap_buffers().unwrap();
-        self.window.gpu.cleanup();
+    pub(super) fn draw_font(&mut self, font: &mut Font) {
+        self.window.gpu.draw_font(
+            font,
+            &self.window.screen_render_target,
+            &self.window.depth_view,
+        );
     }
 }

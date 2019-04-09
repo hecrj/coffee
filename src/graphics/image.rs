@@ -5,7 +5,7 @@ use std::io::Read;
 use std::path::Path;
 
 use crate::graphics::gpu::{self, Texture};
-use crate::graphics::{DrawParameters, Gpu, Target, Vector};
+use crate::graphics::{DrawParameters, Gpu, Target};
 
 pub struct Image {
     texture: Texture,
