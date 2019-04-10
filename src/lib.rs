@@ -42,22 +42,7 @@ pub trait Game {
         debug.draw(&mut window.frame())
     }
 
-    fn key_down_event(
-        &self,
-        _input: &mut Self::Input,
-        _keycode: input::KeyCode,
-        _keymod: input::Mod,
-        _repeat: bool,
-    ) {
-    }
-
-    fn key_up_event(
-        &self,
-        _input: &mut Self::Input,
-        _keycode: input::KeyCode,
-        _keymod: input::Mod,
-    ) {
-    }
+    fn on_input(&self, _input: &mut Self::Input, _event: input::Event) {}
 }
 
 pub fn run<G: Game>(
@@ -86,18 +71,25 @@ pub fn run<G: Game>(
 
         debug.event_loop_started();
         event_loop.poll(|event| match event {
-            graphics::window::Event::KeyboardInput { state, key_code } => {
-                if cfg!(debug_assertions)
-                    && Some(key_code) == G::DEBUG_KEY
-                    && state == input::KeyState::Released
-                {
-                    debug.toggle();
+            window::Event::Input(input_event) => {
+                game.on_input(input, input_event);
+
+                if cfg!(debug_assertions) {
+                    match input_event {
+                        input::Event::KeyboardInput {
+                            state: input::KeyState::Released,
+                            key_code,
+                        } if Some(key_code) == G::DEBUG_KEY => {
+                            debug.toggle();
+                        }
+                        _ => {}
+                    }
                 }
             }
-            graphics::window::Event::CloseRequested => {
+            window::Event::CloseRequested => {
                 alive = false;
             }
-            graphics::window::Event::Resized(new_size) => {
+            window::Event::Resized(new_size) => {
                 window.resize(new_size);
             }
         });

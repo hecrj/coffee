@@ -115,7 +115,7 @@ impl EventLoop {
                             },
                         ..
                     } => {
-                        f(Event::KeyboardInput {
+                        f(Event::Input(input::Event::KeyboardInput {
                             state: match state {
                                 winit::ElementState::Pressed => {
                                     input::KeyState::Pressed
@@ -125,7 +125,7 @@ impl EventLoop {
                                 }
                             },
                             key_code: virtual_keycode,
-                        });
+                        }));
                     }
                     winit::WindowEvent::CloseRequested => {
                         f(Event::CloseRequested)
@@ -162,10 +162,7 @@ impl Settings {
 pub enum Event {
     CloseRequested,
     Resized(NewSize),
-    KeyboardInput {
-        state: input::KeyState,
-        key_code: input::KeyCode,
-    },
+    Input(input::Event),
 }
 
 pub struct NewSize(winit::dpi::LogicalSize);
