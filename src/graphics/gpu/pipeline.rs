@@ -49,7 +49,8 @@ gfx_defines! {
         out: gfx::RawRenderTarget =
           (
               "Target0",
-               format::COLOR, gfx::state::ColorMask::all(),
+               format::COLOR,
+               gfx::state::ColorMask::all(),
                Some(gfx::preset::blend::ALPHA)
           ),
     }
