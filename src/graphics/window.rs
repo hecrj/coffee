@@ -64,15 +64,14 @@ impl Window {
     }
 
     pub(crate) fn swap_buffers(&mut self) {
-        self.gpu.flush();
-        self.context.swap_buffers(&mut self.gpu).unwrap();
-        self.gpu.cleanup();
+        self.context.swap_buffers(&mut self.gpu);
     }
 
     pub fn resize(&mut self, new_size: NewSize) {
+        self.context.update_viewport();
+
         let dpi = self.context.window().get_hidpi_factor();
         let physical_size = new_size.0.to_physical(dpi);
-        let new_viewport = Gpu::resize_viewport(&self.context);
 
         self.width = physical_size.width as f32;
         self.height = physical_size.height as f32;

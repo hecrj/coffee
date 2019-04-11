@@ -106,8 +106,6 @@ impl Gpu {
         depth: &DepthView,
     ) {
     }
-
-    pub(super) fn resize_viewport(window: &WindowedContext) {}
 }
 
 pub struct WindowedContext {
@@ -180,6 +178,8 @@ impl WindowedContext {
     pub fn depth(&self) -> &DepthView {
         &()
     }
+
+    pub(super) fn update_viewport(&mut self) {}
 
     pub fn swap_buffers(&mut self, gpu: &mut Gpu) -> Result<(), ()> {
         let output = self.swap_chain.get_next_texture();

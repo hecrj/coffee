@@ -5,7 +5,6 @@ pub mod texture;
 mod types;
 
 pub use font::Font;
-pub use glutin::WindowedContext;
 pub use pipeline::Instance;
 pub use texture::Texture;
 pub use types::{DepthView, TargetView};
@@ -49,7 +48,7 @@ impl Gpu {
     pub(super) fn window(
         builder: winit::WindowBuilder,
         events_loop: &winit::EventsLoop,
-    ) -> (Gpu, glutin::WindowedContext, TargetView, DepthView) {
+    ) -> (Gpu, WindowedContext) {
         let gl_builder = glutin::ContextBuilder::new()
             .with_gl(glutin::GlRequest::Latest)
             .with_gl_profile(glutin::GlProfile::Core)
@@ -70,9 +69,7 @@ impl Gpu {
 
         (
             Gpu::new(device, factory, &screen_render_target),
-            context,
-            screen_render_target,
-            depth_view,
+            WindowedContext::new(context, screen_render_target, depth_view),
         )
     }
 
@@ -85,11 +82,11 @@ impl Gpu {
         self.encoder.clear(&typed_render_target, color.into())
     }
 
-    pub(super) fn flush(&mut self) {
+    fn flush(&mut self) {
         self.encoder.flush(&mut self.device);
     }
 
-    pub(super) fn cleanup(&mut self) {
+    fn cleanup(&mut self) {
         self.device.cleanup();
     }
 
@@ -127,24 +124,53 @@ impl Gpu {
     ) {
         font.draw(&mut self.encoder, target, depth);
     }
+}
 
-    pub(super) fn resize_viewport(
-        window: &WindowedContext,
-        target: &TargetView,
-        _depth: &DepthView,
-    ) -> Option<(TargetView, DepthView)> {
-        let dimensions = target.get_dimensions();
+pub struct WindowedContext {
+    raw: glutin::WindowedContext,
+    target: TargetView,
+    depth: DepthView,
+}
 
-        if let Some((cv, dv)) = gfx_window_glutin::update_views_raw(
-            window,
+impl WindowedContext {
+    fn new(
+        raw: glutin::WindowedContext,
+        target: TargetView,
+        depth: DepthView,
+    ) -> Self {
+        Self { raw, target, depth }
+    }
+
+    pub(super) fn window(&self) -> &winit::Window {
+        self.raw.window()
+    }
+
+    pub(super) fn target(&self) -> &TargetView {
+        &self.target
+    }
+
+    pub(super) fn depth(&self) -> &DepthView {
+        &self.depth
+    }
+
+    pub(super) fn update_viewport(&mut self) {
+        let dimensions = self.target.get_dimensions();
+
+        if let Some((target, depth)) = gfx_window_glutin::update_views_raw(
+            &self.raw,
             dimensions,
             format::COLOR,
             format::DEPTH,
         ) {
-            Some((cv, dv))
-        } else {
-            None
+            self.target = target;
+            self.depth = depth;
         }
+    }
+
+    pub(super) fn swap_buffers(&mut self, gpu: &mut Gpu) {
+        gpu.flush();
+        self.raw.swap_buffers().unwrap();
+        gpu.cleanup();
     }
 }
 

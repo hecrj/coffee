@@ -7,12 +7,12 @@ description = "An opinionated 2D game engine"
 license = "MIT"
 
 [features]
-default = ["vulkan"]
+default = ["opengl"]
 opengl = ["gfx", "gfx_core", "glutin", "gfx_device_gl", "gfx_window_glutin", "gfx_glyph"]
 vulkan = ["wgpu", "wgpu/vulkan"]
 
 [dependencies]
-winit = "^0.18"
+winit = "0.19"
 image = "0.21"
 nalgebra = "0.18"
 log = "0.4"
