@@ -7,8 +7,6 @@ use crate::input;
 pub struct Window {
     gpu: Gpu,
     context: gpu::WindowedContext,
-    screen_render_target: gpu::TargetView,
-    depth_view: gpu::DepthView,
     width: f32,
     height: f32,
 }
@@ -25,7 +23,7 @@ impl Window {
 
         settings.size = (width, height);
 
-        let (gpu, context, screen_render_target, depth_view) =
+        let (gpu, context) =
             Gpu::window(settings.into_builder(), &event_loop.0);
 
         let window = context.window();
@@ -44,8 +42,6 @@ impl Window {
         Window {
             context,
             gpu,
-            screen_render_target,
-            depth_view,
             width,
             height,
         }
@@ -69,23 +65,14 @@ impl Window {
 
     pub(crate) fn swap_buffers(&mut self) {
         self.gpu.flush();
-        self.context.swap_buffers().unwrap();
+        self.context.swap_buffers(&mut self.gpu).unwrap();
         self.gpu.cleanup();
     }
 
     pub fn resize(&mut self, new_size: NewSize) {
         let dpi = self.context.window().get_hidpi_factor();
         let physical_size = new_size.0.to_physical(dpi);
-        let new_viewport = Gpu::resize_viewport(
-            &self.context,
-            &self.screen_render_target,
-            &self.depth_view,
-        );
-
-        if let Some((screen_render_target, depth_view)) = new_viewport {
-            self.screen_render_target = screen_render_target;
-            self.depth_view = depth_view;
-        }
+        let new_viewport = Gpu::resize_viewport(&self.context);
 
         self.width = physical_size.width as f32;
         self.height = physical_size.height as f32;
@@ -181,7 +168,7 @@ impl<'a> Frame<'a> {
     }
 
     pub fn as_target(&mut self) -> gpu::Target {
-        let view = self.window.screen_render_target.clone();
+        let view = self.window.context.target().clone();
         let width = self.window.width;
         let height = self.window.height;
 
@@ -195,8 +182,8 @@ impl<'a> Frame<'a> {
     pub(super) fn draw_font(&mut self, font: &mut Font) {
         self.window.gpu.draw_font(
             font,
-            &self.window.screen_render_target,
-            &self.window.depth_view,
+            &self.window.context.target(),
+            &self.window.context.depth(),
         );
     }
 }

@@ -1,8 +1,17 @@
+#[cfg(feature = "opengl")]
+mod coffee_gfx;
+#[cfg(feature = "opengl")]
+use coffee_gfx as gpu;
+
+#[cfg(feature = "vulkan")]
+mod coffee_wgpu;
+#[cfg(feature = "vulkan")]
+use coffee_wgpu as gpu;
+
 mod canvas;
 mod color;
 mod draw_parameters;
 mod font;
-mod gpu;
 mod image;
 mod point;
 mod rectangle;

@@ -6,14 +6,26 @@ edition = "2018"
 description = "An opinionated 2D game engine"
 license = "MIT"
 
+[features]
+default = ["vulkan"]
+opengl = ["gfx", "gfx_core", "glutin", "gfx_device_gl", "gfx_window_glutin", "gfx_glyph"]
+vulkan = ["wgpu", "wgpu/vulkan"]
+
 [dependencies]
-winit = "0.19"
-gfx = "0.18"
-gfx_core = "0.9"
-glutin = "0.20"
-gfx_device_gl = "0.16"
-gfx_window_glutin = "0.30"
+winit = "^0.18"
 image = "0.21"
 nalgebra = "0.18"
-gfx_glyph = "0.14"
 log = "0.4"
+
+# GFX
+# TODO: Split into its own crate
+gfx = { version = "0.18", optional = true }
+gfx_core = { version = "0.9", optional = true }
+glutin = { version = "0.20", optional = true }
+gfx_device_gl = { version = "0.16", optional = true }
+gfx_window_glutin = { version = "0.30", optional = true }
+gfx_glyph = { version = "0.14", optional = true }
+
+# WGPU
+# TODO: Split into its own crate
+wgpu = { version = "0.2", optional = true }
