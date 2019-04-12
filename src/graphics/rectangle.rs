@@ -5,14 +5,3 @@ pub struct Rectangle {
     pub width: f32,
     pub height: f32,
 }
-
-impl Default for Rectangle {
-    fn default() -> Self {
-        Self {
-            x: 0.0,
-            y: 0.0,
-            width: 0.0,
-            height: 0.0,
-        }
-    }
-}

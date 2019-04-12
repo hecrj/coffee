@@ -298,23 +298,23 @@ impl Pipeline {
 
 #[derive(Clone, Copy)]
 pub struct Vertex {
-    position: [f32; 2],
+    _position: [f32; 2],
 }
 
 const QUAD_INDICES: [u16; 6] = [0, 1, 2, 0, 2, 3];
 
 const QUAD_VERTS: [Vertex; 4] = [
     Vertex {
-        position: [0.0, 0.0],
+        _position: [0.0, 0.0],
     },
     Vertex {
-        position: [1.0, 0.0],
+        _position: [1.0, 0.0],
     },
     Vertex {
-        position: [1.0, 1.0],
+        _position: [1.0, 1.0],
     },
     Vertex {
-        position: [0.0, 1.0],
+        _position: [0.0, 1.0],
     },
 ];
 

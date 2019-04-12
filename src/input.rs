@@ -1,4 +1,4 @@
-use winit;
+use crate::graphics::window::winit;
 
 pub use winit::VirtualKeyCode as KeyCode;
 

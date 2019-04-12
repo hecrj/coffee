@@ -5,9 +5,9 @@ pub struct Font {
 }
 
 impl Font {
-    pub fn from_bytes(bytes: &'static [u8]) -> Font {
+    pub fn from_bytes(_bytes: &'static [u8]) -> Font {
         Font {}
     }
 
-    pub fn add(&mut self, text: Text) {}
+    pub fn add(&mut self, _text: Text) {}
 }

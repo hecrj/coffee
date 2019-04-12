@@ -7,11 +7,11 @@ pub use font::Font;
 pub use pipeline::Instance;
 pub use texture::Texture;
 pub use types::{DepthView, TargetView};
+pub use wgpu_winit as winit;
 
 use std::rc::Rc;
 
 use wgpu;
-use winit;
 
 use crate::graphics::{Color, Transformation};
 use pipeline::Pipeline;
@@ -69,10 +69,6 @@ impl Gpu {
         self.device.get_queue().submit(&[encoder.finish()]);
     }
 
-    pub(super) fn flush(&mut self) {}
-
-    pub(super) fn cleanup(&mut self) {}
-
     pub(super) fn upload_texture(
         &mut self,
         image: &image::DynamicImage,
@@ -99,11 +95,27 @@ impl Gpu {
         Font::from_bytes(bytes)
     }
 
+    pub(super) fn draw_texture_quads(
+        &mut self,
+        texture: &Texture,
+        instances: &[Instance],
+        view: &TargetView,
+        transformation: &Transformation,
+    ) {
+        self.pipeline.draw_texture_quads(
+            &mut self.device,
+            texture.binding(),
+            instances,
+            &transformation,
+            &view,
+        );
+    }
+
     pub(super) fn draw_font(
         &mut self,
-        font: &mut Font,
-        target: &TargetView,
-        depth: &DepthView,
+        _font: &mut Font,
+        _target: &TargetView,
+        _depth: &DepthView,
     ) {
     }
 }
@@ -181,7 +193,7 @@ impl WindowedContext {
 
     pub(super) fn update_viewport(&mut self) {}
 
-    pub fn swap_buffers(&mut self, gpu: &mut Gpu) -> Result<(), ()> {
+    pub fn swap_buffers(&mut self, gpu: &mut Gpu) {
         let output = self.swap_chain.get_next_texture();
         let mut encoder = gpu.device.create_command_encoder(
             &wgpu::CommandEncoderDescriptor { todo: 0 },
@@ -212,66 +224,5 @@ impl WindowedContext {
         );
 
         gpu.device.get_queue().submit(&[encoder.finish()]);
-
-        Ok(())
-    }
-}
-
-pub struct Target<'a> {
-    gpu: &'a mut Gpu,
-    view: TargetView,
-    transformation: Transformation,
-}
-
-impl<'a> Target<'a> {
-    pub(super) fn new(
-        gpu: &mut Gpu,
-        view: TargetView,
-        width: f32,
-        height: f32,
-    ) -> Target {
-        Target {
-            gpu,
-            view,
-            transformation: Transformation::orthographic(width, height),
-        }
-    }
-
-    pub(super) fn with_transformation(
-        gpu: &mut Gpu,
-        view: TargetView,
-        width: f32,
-        height: f32,
-        transformation: Transformation,
-    ) -> Target {
-        let mut target = Self::new(gpu, view, width, height);
-        target.transformation = transformation * target.transformation;
-        target
-    }
-
-    pub fn transform(&mut self, new_transformation: Transformation) -> Target {
-        Target {
-            gpu: self.gpu,
-            view: self.view.clone(),
-            transformation: self.transformation * new_transformation,
-        }
-    }
-
-    pub fn clear(&mut self, color: Color) {
-        self.gpu.clear(&self.view, color);
-    }
-
-    pub(super) fn draw_texture_quads(
-        &mut self,
-        texture: &Texture,
-        vertices: &[Instance],
-    ) {
-        self.gpu.pipeline.draw_texture_quads(
-            &mut self.gpu.device,
-            texture.binding(),
-            vertices,
-            &self.transformation,
-            &self.view,
-        );
     }
 }

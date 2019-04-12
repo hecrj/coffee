@@ -1,6 +1,5 @@
-use crate::graphics::gpu::texture;
-use crate::graphics::gpu::{self, Gpu, Target};
-use crate::graphics::DrawParameters;
+use crate::graphics::gpu::{self, texture, Gpu};
+use crate::graphics::{DrawParameters, Target};
 
 pub struct Canvas {
     drawable: texture::Drawable,
@@ -16,7 +15,7 @@ impl Canvas {
     pub fn as_target<'a>(&mut self, gpu: &'a mut Gpu) -> Target<'a> {
         let texture = self.drawable.texture();
 
-        gpu::Target::with_transformation(
+        Target::with_transformation(
             gpu,
             self.drawable.target().clone(),
             texture.width() as f32,

@@ -1,12 +1,12 @@
 #[cfg(feature = "opengl")]
-mod coffee_gfx;
+mod backend_gfx;
 #[cfg(feature = "opengl")]
-use coffee_gfx as gpu;
+use backend_gfx as gpu;
 
 #[cfg(feature = "vulkan")]
-mod coffee_wgpu;
+mod backend_wgpu;
 #[cfg(feature = "vulkan")]
-use coffee_wgpu as gpu;
+use backend_wgpu as gpu;
 
 mod canvas;
 mod color;
@@ -15,11 +15,13 @@ mod font;
 mod image;
 mod point;
 mod rectangle;
-pub mod sprite_batch;
+mod target;
 mod text;
-pub mod texture_array;
 mod transformation;
 mod vector;
+
+pub mod sprite_batch;
+pub mod texture_array;
 pub mod window;
 
 pub use self::image::Image;
@@ -27,10 +29,11 @@ pub use canvas::Canvas;
 pub use color::Color;
 pub use draw_parameters::DrawParameters;
 pub use font::Font;
-pub use gpu::{Gpu, Target};
+pub use gpu::Gpu;
 pub use point::Point;
 pub use rectangle::Rectangle;
 pub use sprite_batch::SpriteBatch;
+pub use target::Target;
 pub use text::Text;
 pub use texture_array::TextureArray;
 pub use transformation::Transformation;
