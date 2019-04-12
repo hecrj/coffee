@@ -57,7 +57,7 @@ impl Surface {
         &self.depth
     }
 
-    pub fn update_viewport(&mut self) {
+    pub fn update_viewport(&mut self, _gpu: &mut Gpu) {
         let dimensions = self.target.get_dimensions();
 
         if let Some((target, depth)) = gfx_window_glutin::update_views_raw(

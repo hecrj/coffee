@@ -18,39 +18,10 @@ impl Surface {
         instance: &wgpu::Instance,
         device: &wgpu::Device,
     ) -> Surface {
-        let size = window
-            .get_inner_size()
-            .unwrap()
-            .to_physical(window.get_hidpi_factor());
-
         let surface = instance.create_surface(&window);
-        let swap_chain = device.create_swap_chain(
-            &surface,
-            &wgpu::SwapChainDescriptor {
-                usage: wgpu::TextureUsageFlags::OUTPUT_ATTACHMENT
-                    | wgpu::TextureUsageFlags::TRANSFER_DST,
-                format: wgpu::TextureFormat::Bgra8Unorm,
-                width: size.width.round() as u32,
-                height: size.height.round() as u32,
-            },
-        );
 
-        let extent = wgpu::Extent3d {
-            width: size.width.round() as u32,
-            height: size.height.round() as u32,
-            depth: 1,
-        };
-
-        let buffer = device.create_texture(&wgpu::TextureDescriptor {
-            size: extent,
-            dimension: wgpu::TextureDimension::D2,
-            array_size: 1,
-            format: wgpu::TextureFormat::Bgra8Unorm,
-            usage: wgpu::TextureUsageFlags::OUTPUT_ATTACHMENT
-                | wgpu::TextureUsageFlags::TRANSFER_SRC,
-        });
-
-        let target = Rc::new(buffer.create_default_view());
+        let (swap_chain, extent, buffer, target) =
+            new_swap_chain(device, &surface, &window);
 
         Surface {
             window,
@@ -74,7 +45,15 @@ impl Surface {
         &()
     }
 
-    pub fn update_viewport(&mut self) {}
+    pub fn update_viewport(&mut self, gpu: &mut Gpu) {
+        let (swap_chain, extent, buffer, target) =
+            new_swap_chain(&gpu.device, &self.surface, &self.window);
+
+        self.swap_chain = swap_chain;
+        self.extent = extent;
+        self.buffer = buffer;
+        self.target = target;
+    }
 
     pub fn swap_buffers(&mut self, gpu: &mut Gpu) {
         let output = self.swap_chain.get_next_texture();
@@ -108,4 +87,45 @@ impl Surface {
 
         gpu.device.get_queue().submit(&[encoder.finish()]);
     }
+}
+
+fn new_swap_chain(
+    device: &wgpu::Device,
+    surface: &wgpu::Surface,
+    window: &winit::Window,
+) -> (wgpu::SwapChain, wgpu::Extent3d, wgpu::Texture, TargetView) {
+    let size = window
+        .get_inner_size()
+        .unwrap()
+        .to_physical(window.get_hidpi_factor());
+
+    let swap_chain = device.create_swap_chain(
+        surface,
+        &wgpu::SwapChainDescriptor {
+            usage: wgpu::TextureUsageFlags::OUTPUT_ATTACHMENT
+                | wgpu::TextureUsageFlags::TRANSFER_DST,
+            format: wgpu::TextureFormat::Bgra8Unorm,
+            width: size.width.round() as u32,
+            height: size.height.round() as u32,
+        },
+    );
+
+    let extent = wgpu::Extent3d {
+        width: size.width.round() as u32,
+        height: size.height.round() as u32,
+        depth: 1,
+    };
+
+    let buffer = device.create_texture(&wgpu::TextureDescriptor {
+        size: extent,
+        dimension: wgpu::TextureDimension::D2,
+        array_size: 1,
+        format: wgpu::TextureFormat::Bgra8Unorm,
+        usage: wgpu::TextureUsageFlags::OUTPUT_ATTACHMENT
+            | wgpu::TextureUsageFlags::TRANSFER_SRC,
+    });
+
+    let target = Rc::new(buffer.create_default_view());
+
+    (swap_chain, extent, buffer, target)
 }

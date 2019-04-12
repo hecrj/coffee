@@ -73,7 +73,7 @@ impl Window {
     }
 
     pub fn resize(&mut self, new_size: event::NewSize) {
-        self.surface.update_viewport();
+        self.surface.update_viewport(&mut self.gpu);
 
         let dpi = self.surface.window().get_hidpi_factor();
         let physical_size = new_size.to_physical(dpi);
