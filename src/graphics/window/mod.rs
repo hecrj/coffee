@@ -11,7 +11,7 @@ use crate::graphics::gpu::{self, Gpu};
 
 pub struct Window {
     gpu: Gpu,
-    context: gpu::WindowedContext,
+    surface: gpu::Surface,
     width: f32,
     height: f32,
 }
@@ -28,10 +28,10 @@ impl Window {
 
         settings.size = (width, height);
 
-        let (gpu, context) =
-            Gpu::window(settings.into_builder(), event_loop.raw());
+        let (gpu, surface) =
+            Gpu::for_window(settings.into_builder(), event_loop.raw());
 
-        let window = context.window();
+        let window = surface.window();
 
         let (width, height) = window
             .get_inner_size()
@@ -45,8 +45,8 @@ impl Window {
             .unwrap_or((width as f32, height as f32));
 
         Window {
-            context,
             gpu,
+            surface,
             width,
             height,
         }
@@ -69,13 +69,13 @@ impl Window {
     }
 
     pub(crate) fn swap_buffers(&mut self) {
-        self.context.swap_buffers(&mut self.gpu);
+        self.surface.swap_buffers(&mut self.gpu);
     }
 
     pub fn resize(&mut self, new_size: event::NewSize) {
-        self.context.update_viewport();
+        self.surface.update_viewport();
 
-        let dpi = self.context.window().get_hidpi_factor();
+        let dpi = self.surface.window().get_hidpi_factor();
         let physical_size = new_size.to_physical(dpi);
 
         self.width = physical_size.width as f32;

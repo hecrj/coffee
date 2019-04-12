@@ -20,7 +20,7 @@ impl<'a> Frame<'a> {
     }
 
     pub fn as_target(&mut self) -> Target {
-        let view = self.window.context.target().clone();
+        let view = self.window.surface.target().clone();
         let width = self.window.width;
         let height = self.window.height;
 
@@ -34,8 +34,8 @@ impl<'a> Frame<'a> {
     pub(in crate::graphics) fn draw_font(&mut self, font: &mut gpu::Font) {
         self.window.gpu.draw_font(
             font,
-            &self.window.context.target(),
-            &self.window.context.depth(),
+            &self.window.surface.target(),
+            &self.window.surface.depth(),
         );
     }
 }

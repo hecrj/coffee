@@ -7,7 +7,7 @@ description = "An opinionated 2D game engine"
 license = "MIT"
 
 [features]
-default = ["opengl"]
+default = []
 opengl = ["gfx", "gfx_core", "glutin", "gfx_device_gl", "gfx_window_glutin", "gfx_glyph", "gfx_winit"]
 vulkan = ["wgpu", "wgpu/vulkan", "wgpu_winit"]
 

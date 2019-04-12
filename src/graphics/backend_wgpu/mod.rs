@@ -1,15 +1,14 @@
 mod font;
 mod pipeline;
+mod surface;
 pub mod texture;
 mod types;
 
 pub use font::Font;
 pub use pipeline::Instance;
+pub use surface::{winit, Surface};
 pub use texture::Texture;
 pub use types::{DepthView, TargetView};
-pub use wgpu_winit as winit;
-
-use std::rc::Rc;
 
 use wgpu;
 
@@ -22,31 +21,28 @@ pub struct Gpu {
 }
 
 impl Gpu {
-    pub(super) fn new(mut device: wgpu::Device) -> Gpu {
-        let pipeline = Pipeline::new(&mut device);
-
-        Gpu { device, pipeline }
-    }
-
-    pub(super) fn window(
+    pub(super) fn for_window(
         builder: winit::WindowBuilder,
         events_loop: &winit::EventsLoop,
-    ) -> (Gpu, WindowedContext) {
-        let window = builder.build(events_loop).unwrap();
-
+    ) -> (Gpu, Surface) {
         let instance = wgpu::Instance::new();
+
         let adapter = instance.get_adapter(&wgpu::AdapterDescriptor {
             power_preference: wgpu::PowerPreference::HighPerformance,
         });
-        let device = adapter.create_device(&wgpu::DeviceDescriptor {
+
+        let mut device = adapter.create_device(&wgpu::DeviceDescriptor {
             extensions: wgpu::Extensions {
                 anisotropic_filtering: false,
             },
         });
 
-        let context = WindowedContext::new(window, &instance, &device);
+        let pipeline = Pipeline::new(&mut device);
 
-        (Gpu::new(device), context)
+        let window = builder.build(events_loop).unwrap();
+        let surface = Surface::new(window, &instance, &device);
+
+        (Gpu { device, pipeline }, surface)
     }
 
     pub(super) fn clear(&mut self, view: &TargetView, color: Color) {
@@ -117,112 +113,5 @@ impl Gpu {
         _target: &TargetView,
         _depth: &DepthView,
     ) {
-    }
-}
-
-pub struct WindowedContext {
-    window: winit::Window,
-    surface: wgpu::Surface,
-    swap_chain: wgpu::SwapChain,
-    extent: wgpu::Extent3d,
-    buffer: wgpu::Texture,
-    target: TargetView,
-}
-
-impl WindowedContext {
-    pub fn new(
-        window: winit::Window,
-        instance: &wgpu::Instance,
-        device: &wgpu::Device,
-    ) -> WindowedContext {
-        let size = window
-            .get_inner_size()
-            .unwrap()
-            .to_physical(window.get_hidpi_factor());
-
-        let surface = instance.create_surface(&window);
-        let swap_chain = device.create_swap_chain(
-            &surface,
-            &wgpu::SwapChainDescriptor {
-                usage: wgpu::TextureUsageFlags::OUTPUT_ATTACHMENT
-                    | wgpu::TextureUsageFlags::TRANSFER_DST,
-                format: wgpu::TextureFormat::Bgra8Unorm,
-                width: size.width.round() as u32,
-                height: size.height.round() as u32,
-            },
-        );
-
-        let extent = wgpu::Extent3d {
-            width: size.width.round() as u32,
-            height: size.height.round() as u32,
-            depth: 1,
-        };
-
-        let buffer = device.create_texture(&wgpu::TextureDescriptor {
-            size: extent,
-            dimension: wgpu::TextureDimension::D2,
-            array_size: 1,
-            format: wgpu::TextureFormat::Bgra8Unorm,
-            usage: wgpu::TextureUsageFlags::OUTPUT_ATTACHMENT
-                | wgpu::TextureUsageFlags::TRANSFER_SRC,
-        });
-
-        let target = Rc::new(buffer.create_default_view());
-
-        WindowedContext {
-            window,
-            surface,
-            swap_chain,
-            extent,
-            buffer,
-            target,
-        }
-    }
-
-    pub fn window(&self) -> &winit::Window {
-        &self.window
-    }
-
-    pub fn target(&self) -> &TargetView {
-        &self.target
-    }
-
-    pub fn depth(&self) -> &DepthView {
-        &()
-    }
-
-    pub(super) fn update_viewport(&mut self) {}
-
-    pub fn swap_buffers(&mut self, gpu: &mut Gpu) {
-        let output = self.swap_chain.get_next_texture();
-        let mut encoder = gpu.device.create_command_encoder(
-            &wgpu::CommandEncoderDescriptor { todo: 0 },
-        );
-
-        encoder.copy_texture_to_texture(
-            wgpu::TextureCopyView {
-                texture: &self.buffer,
-                level: 0,
-                slice: 0,
-                origin: wgpu::Origin3d {
-                    x: 0.0,
-                    y: 0.0,
-                    z: 0.0,
-                },
-            },
-            wgpu::TextureCopyView {
-                texture: &output.texture,
-                level: 0,
-                slice: 0,
-                origin: wgpu::Origin3d {
-                    x: 0.0,
-                    y: 0.0,
-                    z: 0.0,
-                },
-            },
-            self.extent,
-        );
-
-        gpu.device.get_queue().submit(&[encoder.finish()]);
     }
 }

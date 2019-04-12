@@ -1,19 +1,18 @@
 mod font;
 mod format;
 mod pipeline;
+mod surface;
 pub mod texture;
 mod types;
 
 pub use font::Font;
 pub use pipeline::Instance;
+pub use surface::{winit, Surface};
 pub use texture::Texture;
 pub use types::{DepthView, TargetView};
 
 use gfx::{self, Device};
 use gfx_device_gl as gl;
-use gfx_window_glutin;
-pub use gfx_winit as winit;
-use glutin;
 
 use crate::graphics::{Color, Transformation};
 use pipeline::Pipeline;
@@ -26,50 +25,26 @@ pub struct Gpu {
 }
 
 impl Gpu {
-    pub(super) fn new(
-        device: gl::Device,
-        mut factory: gl::Factory,
-        default_target: &TargetView,
-    ) -> Gpu {
+    pub(super) fn for_window(
+        builder: winit::WindowBuilder,
+        events_loop: &winit::EventsLoop,
+    ) -> (Gpu, Surface) {
+        let (surface, device, mut factory) = Surface::new(builder, events_loop);
+
         let mut encoder: gfx::Encoder<gl::Resources, gl::CommandBuffer> =
             factory.create_command_buffer().into();
 
         let pipeline =
-            Pipeline::new(&mut factory, &mut encoder, default_target);
-
-        Gpu {
-            device,
-            factory,
-            encoder,
-            pipeline,
-        }
-    }
-
-    pub(super) fn window(
-        builder: winit::WindowBuilder,
-        events_loop: &winit::EventsLoop,
-    ) -> (Gpu, WindowedContext) {
-        let gl_builder = glutin::ContextBuilder::new()
-            .with_gl(glutin::GlRequest::Latest)
-            .with_gl_profile(glutin::GlProfile::Core)
-            .with_multisampling(0)
-            // 24 color bits, 8 alpha bits
-            .with_pixel_format(24, 8)
-            .with_vsync(true);
-
-        let (context, device, factory, screen_render_target, depth_view) =
-            gfx_window_glutin::init_raw(
-                builder,
-                gl_builder,
-                &events_loop,
-                format::COLOR,
-                format::DEPTH,
-            )
-            .unwrap();
+            Pipeline::new(&mut factory, &mut encoder, surface.target());
 
         (
-            Gpu::new(device, factory, &screen_render_target),
-            WindowedContext::new(context, screen_render_target, depth_view),
+            Gpu {
+                device,
+                factory,
+                encoder,
+                pipeline,
+            },
+            surface,
         )
     }
 
@@ -140,53 +115,5 @@ impl Gpu {
         depth: &DepthView,
     ) {
         font.draw(&mut self.encoder, target, depth);
-    }
-}
-
-pub struct WindowedContext {
-    raw: glutin::WindowedContext,
-    target: TargetView,
-    depth: DepthView,
-}
-
-impl WindowedContext {
-    fn new(
-        raw: glutin::WindowedContext,
-        target: TargetView,
-        depth: DepthView,
-    ) -> Self {
-        Self { raw, target, depth }
-    }
-
-    pub(super) fn window(&self) -> &winit::Window {
-        self.raw.window()
-    }
-
-    pub(super) fn target(&self) -> &TargetView {
-        &self.target
-    }
-
-    pub(super) fn depth(&self) -> &DepthView {
-        &self.depth
-    }
-
-    pub(super) fn update_viewport(&mut self) {
-        let dimensions = self.target.get_dimensions();
-
-        if let Some((target, depth)) = gfx_window_glutin::update_views_raw(
-            &self.raw,
-            dimensions,
-            format::COLOR,
-            format::DEPTH,
-        ) {
-            self.target = target;
-            self.depth = depth;
-        }
-    }
-
-    pub(super) fn swap_buffers(&mut self, gpu: &mut Gpu) {
-        gpu.flush();
-        self.raw.swap_buffers().unwrap();
-        gpu.cleanup();
     }
 }
