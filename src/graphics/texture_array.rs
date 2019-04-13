@@ -1,6 +1,6 @@
 use std::fs::File;
 use std::io::Read;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 use log::debug;
@@ -8,6 +8,7 @@ use log::debug;
 use crate::graphics;
 use crate::graphics::gpu::{Instance, Texture};
 use crate::graphics::transformation::Transformation;
+use crate::loader;
 
 /// A texture array
 #[derive(Debug, Clone)]
@@ -300,4 +301,63 @@ impl Layer {
 struct Offset {
     x: u32,
     y: u32,
+}
+
+pub struct Loader<T> {
+    width: u16,
+    height: u16,
+    paths: Vec<PathBuf>,
+    on_completion: Box<FnOnce(TextureArray, LoadedIndices) -> Result<T, ()>>,
+}
+
+#[derive(Clone, Copy)]
+pub struct LazyIndex(u16);
+
+pub struct LoadedIndices {}
+
+impl LoadedIndices {
+    pub fn get(&self, key: LazyIndex) -> Result<Index, ()> {
+        Ok(Index {
+            layer: 0,
+            offset: Offset { x: 0, y: 0 },
+        })
+    }
+}
+
+impl Loader<()> {
+    pub fn new(width: u16, height: u16) -> Loader<()> {
+        Loader {
+            width,
+            height,
+            paths: Vec::new(),
+            on_completion: Box::new(|_, _| Ok(())),
+        }
+    }
+
+    pub fn add<P: Into<PathBuf>>(&mut self, path: P) -> LazyIndex {
+        self.paths.push(path.into());
+        LazyIndex(self.paths.len() as u16 - 1)
+    }
+
+    pub fn finish<F, R>(self, on_completion: F) -> Loader<R>
+    where
+        F: 'static + FnOnce(TextureArray, LoadedIndices) -> Result<R, ()>,
+    {
+        Loader {
+            width: self.width,
+            height: self.height,
+            paths: self.paths,
+            on_completion: Box::new(on_completion),
+        }
+    }
+}
+
+impl<T> loader::Loader<T> for Loader<T> {
+    fn total_work(&self) -> u32 {
+        self.paths.len() as u32 + 1
+    }
+
+    fn load(&mut self, gpu: &mut graphics::Gpu) -> loader::Progress<T> {
+        loader::Progress::Loading { work_completed: 0 }
+    }
 }

@@ -2,10 +2,11 @@ use image;
 use log::debug;
 use std::fs::File;
 use std::io::Read;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use crate::graphics::gpu::{self, Texture};
 use crate::graphics::{Color, DrawParameters, Gpu, Target};
+use crate::loader::Loader;
 
 #[derive(Clone)]
 pub struct Image {
@@ -29,6 +30,20 @@ impl Image {
         Some(Image {
             texture: gpu.upload_texture(&image),
         })
+    }
+
+    pub fn loader<P: Into<PathBuf>>(path: P) -> impl Loader<Image> {
+        let p = path.into();
+        let mut image: Option<Image> = None;
+
+        move |gpu: &mut Gpu| match &image {
+            Some(image) => image.clone(),
+            None => {
+                let loaded = Image::new(gpu, &p).unwrap();
+                image = Some(loaded.clone());
+                loaded
+            }
+        }
     }
 
     pub fn from_image(

@@ -1,10 +1,15 @@
-pub mod debug;
-pub mod graphics;
-pub mod input;
-
+mod debug;
 mod timer;
 
+pub mod graphics;
+pub mod input;
+pub mod loader;
+pub mod loading_screen;
+
 pub use debug::Debug;
+pub use loader::Loader;
+pub use loading_screen::LoadingScreen;
+
 use graphics::window::{self, Window};
 use timer::Timer;
 
@@ -15,7 +20,7 @@ pub trait Game {
     const TICKS_PER_SECOND: u16;
     const DEBUG_KEY: Option<input::KeyCode> = Some(input::KeyCode::F12);
 
-    fn load(&self, gpu: &mut graphics::Gpu) -> (Self::View, Self::Input);
+    fn load(window: &mut graphics::Window) -> (Self::View, Self::Input);
 
     fn update(
         &mut self,
@@ -59,7 +64,7 @@ pub fn run<G: Game>(
     // Load game
     // (Loading progress support soon!)
     debug.loading_started();
-    let (view, input) = &mut game.load(window.gpu());
+    let (view, input) = &mut G::load(window);
     debug.loading_finished();
 
     // Game loop
