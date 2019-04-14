@@ -85,34 +85,35 @@ impl<T> Loader<T> {
     }
 }
 
-pub fn map2<A, B, F, T>(
-    loader_a: Loader<A>,
-    loader_b: Loader<B>,
-    f: F,
-) -> Loader<T>
-where
-    A: 'static,
-    B: 'static,
-    F: 'static + Fn(A, B) -> T,
-{
-    Loader::new(loader_a.total_work() + loader_b.total_work(), move |task| {
-        f((loader_a.function)(task), (loader_b.function)(task))
-    })
+pub trait Join {
+    type Type;
+
+    fn join(self) -> Loader<Self::Type>;
 }
 
-pub fn map3<A, B, C, F, T>(
-    loader_a: Loader<A>,
-    loader_b: Loader<B>,
-    loader_c: Loader<C>,
-    f: F,
-) -> Loader<T>
-where
-    A: 'static,
-    B: 'static,
-    C: 'static,
-    F: 'static + Fn(A, B, C) -> T,
-{
-    let many = map2(loader_a, loader_b, |a, b| (a, b));
+impl<A: 'static, B: 'static> Join for (Loader<A>, Loader<B>) {
+    type Type = (A, B);
 
-    map2(many, loader_c, move |(a, b), c| f(a, b, c))
+    fn join(self) -> Loader<(A, B)> {
+        let (loader_a, loader_b) = self;
+
+        Loader::new(
+            loader_a.total_work() + loader_b.total_work(),
+            move |task| ((loader_a.function)(task), (loader_b.function)(task)),
+        )
+    }
+}
+
+impl<A: 'static, B: 'static, C: 'static> Join
+    for (Loader<A>, Loader<B>, Loader<C>)
+{
+    type Type = (A, B, C);
+
+    fn join(self) -> Loader<(A, B, C)> {
+        let (loader_a, loader_b, loader_c) = self;
+
+        ((loader_a, loader_b).join(), loader_c)
+            .join()
+            .map(|((a, b), c)| (a, b, c))
+    }
 }
