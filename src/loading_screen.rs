@@ -1,5 +1,5 @@
 use crate::graphics;
-use crate::loader::{Loader, Progress};
+use crate::loader::Loader;
 
 pub trait LoadingScreen {
     fn on_progress(
@@ -10,35 +10,34 @@ pub trait LoadingScreen {
 }
 
 pub fn run<T>(
+    loader: Loader<T>,
     screen: &mut LoadingScreen,
-    loader: &mut Loader<T>,
     window: &mut graphics::Window,
 ) -> T {
-    screen.on_progress(0.0, window).unwrap();
-    window.swap_buffers();
-
-    loop {
-        match loader.load(window.gpu()) {
-            Progress::Loading { work_completed } => {
-                screen
-                    .on_progress(
-                        work_completed as f32 / loader.total_work() as f32
-                            * 100.0,
-                        window,
-                    )
-                    .unwrap();
-                window.swap_buffers();
-            }
-            Progress::Done(result) => return result,
-        }
-    }
+    loader.load(window, |progress, window| {
+        screen.on_progress(progress, window).unwrap();
+        window.swap_buffers();
+    })
 }
 
-pub struct ProgressBar {}
+pub struct ProgressBar {
+    font: graphics::Font,
+    pencil: graphics::Image,
+}
 
 impl ProgressBar {
-    pub fn new() -> Self {
-        Self {}
+    pub fn new(gpu: &mut graphics::Gpu) -> Self {
+        Self {
+            font: graphics::Font::from_bytes(
+                gpu,
+                include_bytes!("debug/font/Inconsolata-Regular.ttf"),
+            ),
+            pencil: graphics::Image::from_colors(
+                gpu,
+                &[graphics::Color::WHITE],
+            )
+            .unwrap(),
+        }
     }
 }
 
@@ -46,9 +45,37 @@ impl LoadingScreen for ProgressBar {
     fn on_progress(
         &mut self,
         progress: f32,
-        _window: &mut graphics::Window,
+        window: &mut graphics::Window,
     ) -> graphics::Result<()> {
-        println!("{}", progress);
+        let mut frame = window.frame();
+
+        frame.clear(graphics::Color::BLACK);
+
+        self.pencil.draw(
+            graphics::DrawParameters {
+                position: graphics::Point::new(
+                    50.0,
+                    frame.height() / 2.0 - 25.0,
+                ),
+                scale: graphics::Vector::new(
+                    (frame.width() - 100.0) * (progress / 100.0),
+                    50.0,
+                ),
+                ..Default::default()
+            },
+            &mut frame.as_target(),
+        );
+
+        self.font.add(graphics::Text {
+            content: format!("{:.2}", progress) + "%",
+            position: graphics::Vector::new(50.0, frame.height() / 2.0 + 50.0),
+            size: 30.0,
+            bounds: (frame.width(), frame.height()),
+            color: graphics::Color::WHITE,
+        });
+
+        self.font.draw(&mut frame);
+
         Ok(())
     }
 }

@@ -1,110 +1,111 @@
 use crate::graphics;
 
-pub trait Loader<T> {
-    fn total_work(&self) -> u32;
-
-    fn load(&mut self, gpu: &mut graphics::Gpu) -> Progress<T>;
-}
-
-pub enum Progress<T> {
-    Loading { work_completed: u32 },
-    Done(T),
-}
-
-impl<T, F> Loader<T> for F
-where
-    F: FnMut(&mut graphics::Gpu) -> T,
-{
-    fn total_work(&self) -> u32 {
-        1
-    }
-
-    fn load(&mut self, gpu: &mut graphics::Gpu) -> Progress<T> {
-        Progress::Done(self(gpu))
-    }
-}
-
-pub struct Map<T> {
+pub struct Loader<T> {
     total_work: u32,
-    function: Box<FnMut(&mut graphics::Gpu) -> Progress<T>>,
+    function: Box<Fn(&mut Task) -> T>,
 }
 
-impl<T> Loader<T> for Map<T> {
-    fn total_work(&self) -> u32 {
+pub struct Task<'a> {
+    total_work: u32,
+    work_completed: u32,
+    window: &'a mut graphics::Window,
+    listener: &'a mut FnMut(f32, &mut graphics::Window) -> (),
+}
+
+impl<'a> Task<'a> {
+    pub fn gpu(&mut self) -> &mut graphics::Gpu {
+        self.window.gpu()
+    }
+
+    pub fn progress(&mut self, work: u32) {
+        self.work_completed += work;
+
+        let progress = (self.work_completed as f32
+            / self.total_work.max(1) as f32
+            * 100.0)
+            .min(100.0);
+
+        (self.listener)(progress, self.window);
+    }
+}
+
+impl<T> Loader<T> {
+    pub fn new<F>(total_work: u32, f: F) -> Loader<T>
+    where
+        F: 'static + Fn(&mut Task) -> T,
+    {
+        Loader {
+            total_work,
+            function: Box::new(f),
+        }
+    }
+
+    pub fn one_step<F>(f: F) -> Loader<T>
+    where
+        F: 'static + Fn(&mut Task) -> T,
+    {
+        Loader::new(1, move |task| {
+            let result = f(task);
+
+            task.progress(1);
+
+            result
+        })
+    }
+
+    pub fn total_work(&self) -> u32 {
         self.total_work
     }
 
-    fn load(&mut self, gpu: &mut graphics::Gpu) -> Progress<T> {
-        (self.function)(gpu)
-    }
-}
+    pub fn load<F>(self, window: &mut graphics::Window, mut on_progress: F) -> T
+    where
+        F: FnMut(f32, &mut graphics::Window) -> (),
+    {
+        on_progress(0.0, window);
 
-pub fn map<A, F, T>(
-    mut loader: impl 'static + Loader<A>,
-    f: F,
-) -> impl Loader<T>
-where
-    A: 'static,
-    F: 'static + Fn(A) -> T,
-{
-    Map {
-        total_work: loader.total_work(),
-        function: Box::new(move |gpu| match loader.load(gpu) {
-            Progress::Loading { work_completed } => {
-                Progress::Loading { work_completed }
-            }
-            Progress::Done(a) => Progress::Done(f(a)),
-        }),
+        let mut task = Task {
+            total_work: self.total_work,
+            work_completed: 0,
+            window,
+            listener: &mut on_progress,
+        };
+
+        (self.function)(&mut task)
+    }
+
+    pub fn map<F, A>(self, f: F) -> Loader<A>
+    where
+        T: 'static,
+        F: 'static + Fn(T) -> A,
+    {
+        Loader {
+            total_work: self.total_work,
+            function: Box::new(move |task| f((self.function)(task))),
+        }
     }
 }
 
 pub fn map2<A, B, F, T>(
-    mut loader_a: impl 'static + Loader<A>,
-    mut loader_b: impl 'static + Loader<B>,
+    loader_a: Loader<A>,
+    loader_b: Loader<B>,
     f: F,
-) -> Map<T>
+) -> Loader<T>
 where
     A: 'static,
     B: 'static,
     F: 'static + Fn(A, B) -> T,
 {
-    let mut loaded = false;
-
-    Map {
-        total_work: loader_a.total_work() + loader_b.total_work(),
-        function: Box::new(move |gpu| match loader_a.load(gpu) {
-            Progress::Loading { work_completed } => {
-                Progress::Loading { work_completed }
-            }
-            Progress::Done(a) => {
-                if loaded {
-                    match loader_b.load(gpu) {
-                        Progress::Loading { work_completed } => {
-                            Progress::Loading {
-                                work_completed: loader_a.total_work()
-                                    + work_completed,
-                            }
-                        }
-                        Progress::Done(b) => Progress::Done(f(a, b)),
-                    }
-                } else {
-                    loaded = true;
-
-                    Progress::Loading {
-                        work_completed: loader_a.total_work(),
-                    }
-                }
-            }
-        }),
-    }
+    Loader::new(loader_a.total_work() + loader_b.total_work(), move |task| {
+        f((loader_a.function)(task), (loader_b.function)(task))
+    })
 }
 
 pub fn map3<A, B, C, F, T>(
-    loader_a: impl 'static + Loader<A>,
-    loader_b: impl 'static + Loader<B>,
-    loader_c: impl 'static + Loader<C>,
+    loader_a: Loader<A>,
+    loader_b: Loader<B>,
+    loader_c: Loader<C>,
     f: F,
-) -> Map<T>
+) -> Loader<T>
 where
     A: 'static,
     B: 'static,

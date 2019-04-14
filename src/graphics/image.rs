@@ -32,18 +32,10 @@ impl Image {
         })
     }
 
-    pub fn loader<P: Into<PathBuf>>(path: P) -> impl Loader<Image> {
+    pub fn loader<P: Into<PathBuf>>(path: P) -> Loader<Image> {
         let p = path.into();
-        let mut image: Option<Image> = None;
 
-        move |gpu: &mut Gpu| match &image {
-            Some(image) => image.clone(),
-            None => {
-                let loaded = Image::new(gpu, &p).unwrap();
-                image = Some(loaded.clone());
-                loaded
-            }
-        }
+        Loader::one_step(move |task| Image::new(task.gpu(), &p).unwrap())
     }
 
     pub fn from_image(

@@ -1,3 +1,4 @@
+use std::collections::VecDeque;
 use std::fs::File;
 use std::io::Read;
 use std::path::{Path, PathBuf};
@@ -162,7 +163,7 @@ impl Builder {
     }
 
     /// Build the texture array
-    pub fn build(mut self, gpu: &mut graphics::Gpu) -> TextureArray {
+    pub fn build(&mut self, gpu: &mut graphics::Gpu) -> TextureArray {
         if !self.current.is_empty() {
             self.layers.push(self.current.clone());
             self.current = Layer::new(0, 0);
@@ -187,7 +188,7 @@ impl Builder {
 }
 
 /// An index that identifies a texture in a texture array.
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct Index {
     layer: u16,
     offset: Offset,
@@ -297,67 +298,68 @@ impl Layer {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 struct Offset {
     x: u32,
     y: u32,
 }
 
-pub struct Loader<T> {
+pub struct Loader {
     width: u16,
     height: u16,
     paths: Vec<PathBuf>,
-    on_completion: Box<FnOnce(TextureArray, LoadedIndices) -> Result<T, ()>>,
 }
 
 #[derive(Clone, Copy)]
-pub struct LazyIndex(u16);
+pub struct LazyIndex(usize);
 
-pub struct LoadedIndices {}
+pub struct LoadedIndices(Vec<Index>);
 
 impl LoadedIndices {
-    pub fn get(&self, key: LazyIndex) -> Result<Index, ()> {
-        Ok(Index {
-            layer: 0,
-            offset: Offset { x: 0, y: 0 },
-        })
+    pub fn get(&self, key: LazyIndex) -> Index {
+        self.0[key.0]
     }
 }
 
-impl Loader<()> {
-    pub fn new(width: u16, height: u16) -> Loader<()> {
+impl Loader {
+    pub fn new(width: u16, height: u16) -> Loader {
         Loader {
             width,
             height,
             paths: Vec::new(),
-            on_completion: Box::new(|_, _| Ok(())),
         }
     }
 
     pub fn add<P: Into<PathBuf>>(&mut self, path: P) -> LazyIndex {
         self.paths.push(path.into());
-        LazyIndex(self.paths.len() as u16 - 1)
+        LazyIndex(self.paths.len() - 1)
     }
 
-    pub fn finish<F, R>(self, on_completion: F) -> Loader<R>
+    pub fn finish<F, R>(self, on_completion: F) -> loader::Loader<R>
     where
-        F: 'static + FnOnce(TextureArray, LoadedIndices) -> Result<R, ()>,
+        F: 'static + Fn(TextureArray, LoadedIndices) -> R,
     {
-        Loader {
-            width: self.width,
-            height: self.height,
-            paths: self.paths,
-            on_completion: Box::new(on_completion),
-        }
-    }
-}
+        let total_work = self.paths.len() as u32 + 1;
 
-impl<T> loader::Loader<T> for Loader<T> {
-    fn total_work(&self) -> u32 {
-        self.paths.len() as u32 + 1
-    }
+        loader::Loader::new(total_work, move |task| {
+            let mut builder = Builder::new(self.width, self.height);
+            let mut work_todo = VecDeque::from(self.paths.clone());
+            let mut indices = Vec::new();
 
-    fn load(&mut self, gpu: &mut graphics::Gpu) -> loader::Progress<T> {
-        loader::Progress::Loading { work_completed: 0 }
+            while let Some(next) = work_todo.pop_front() {
+                indices.push(builder.add(next).unwrap());
+
+                task.progress(1);
+            }
+
+            let result = on_completion(
+                builder.build(task.gpu()),
+                LoadedIndices(indices),
+            );
+
+            task.progress(1);
+
+            result
+        })
     }
 }
