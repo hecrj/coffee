@@ -7,17 +7,17 @@ pub trait LoadingScreen {
         progress: f32,
         window: &mut graphics::Window,
     ) -> graphics::Result<()>;
-}
 
-pub fn run<T>(
-    loader: Loader<T>,
-    screen: &mut LoadingScreen,
-    window: &mut graphics::Window,
-) -> T {
-    loader.load(window, |progress, window| {
-        screen.on_progress(progress, window).unwrap();
-        window.swap_buffers();
-    })
+    fn run<T>(
+        &mut self,
+        loader: Loader<T>,
+        window: &mut graphics::Window,
+    ) -> T {
+        loader.load(window, |progress, window| {
+            self.on_progress(progress, window).unwrap();
+            window.swap_buffers();
+        })
+    }
 }
 
 pub struct ProgressBar {
