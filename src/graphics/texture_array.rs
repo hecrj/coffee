@@ -9,7 +9,7 @@ use log::debug;
 use crate::graphics;
 use crate::graphics::gpu::{Instance, Texture};
 use crate::graphics::transformation::Transformation;
-use crate::loader;
+use crate::load;
 
 /// A texture array
 #[derive(Debug, Clone)]
@@ -335,13 +335,13 @@ impl Loader {
         LazyIndex(self.paths.len() - 1)
     }
 
-    pub fn finish<F, R>(self, on_completion: F) -> loader::Loader<R>
+    pub fn finish<F, R>(self, on_completion: F) -> load::Task<R>
     where
         F: 'static + Fn(TextureArray, LoadedIndices) -> R,
     {
         let total_work = self.paths.len() as u32 + 1;
 
-        loader::Loader::new(total_work, move |task| {
+        load::Task::sequence(total_work, move |task| {
             let mut builder = Builder::new(self.width, self.height);
             let mut work_todo = VecDeque::from(self.paths.clone());
             let mut indices = Vec::new();
@@ -349,7 +349,7 @@ impl Loader {
             while let Some(next) = work_todo.pop_front() {
                 indices.push(builder.add(next).unwrap());
 
-                task.progress(1);
+                task.notify_progress(1);
             }
 
             let result = on_completion(
@@ -357,7 +357,7 @@ impl Loader {
                 LoadedIndices(indices),
             );
 
-            task.progress(1);
+            task.notify_progress(1);
 
             result
         })

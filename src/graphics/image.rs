@@ -6,7 +6,7 @@ use std::path::{Path, PathBuf};
 
 use crate::graphics::gpu::{self, Texture};
 use crate::graphics::{Color, DrawParameters, Gpu, Target};
-use crate::loader::Loader;
+use crate::load;
 
 #[derive(Clone)]
 pub struct Image {
@@ -32,10 +32,10 @@ impl Image {
         })
     }
 
-    pub fn loader<P: Into<PathBuf>>(path: P) -> Loader<Image> {
+    pub fn loader<P: Into<PathBuf>>(path: P) -> load::Task<Image> {
         let p = path.into();
 
-        Loader::one_step(move |task| Image::new(task.gpu(), &p).unwrap())
+        load::Task::using_gpu(move |gpu| Image::new(gpu, &p).unwrap())
     }
 
     pub fn from_image(

@@ -1,5 +1,5 @@
+use super::Task;
 use crate::graphics;
-use crate::loader::Loader;
 
 pub trait LoadingScreen {
     fn on_progress(
@@ -8,12 +8,8 @@ pub trait LoadingScreen {
         window: &mut graphics::Window,
     ) -> graphics::Result<()>;
 
-    fn run<T>(
-        &mut self,
-        loader: Loader<T>,
-        window: &mut graphics::Window,
-    ) -> T {
-        loader.load(window, |progress, window| {
+    fn run<T>(&mut self, task: Task<T>, window: &mut graphics::Window) -> T {
+        task.run(window, |progress, window| {
             self.on_progress(progress, window).unwrap();
             window.swap_buffers();
         })
@@ -30,7 +26,7 @@ impl ProgressBar {
         Self {
             font: graphics::Font::from_bytes(
                 gpu,
-                include_bytes!("debug/font/Inconsolata-Regular.ttf"),
+                include_bytes!("../debug/font/Inconsolata-Regular.ttf"),
             ),
             pencil: graphics::Image::from_colors(
                 gpu,

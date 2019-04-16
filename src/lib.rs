@@ -5,29 +5,27 @@ mod timer;
 
 pub mod graphics;
 pub mod input;
-pub mod loader;
-pub mod loading_screen;
+pub mod load;
 
 pub use debug::Debug;
-pub use loader::Loader;
-pub use loading_screen::LoadingScreen;
+pub use load::Task;
 
 use graphics::window::{self, Window};
 use timer::Timer;
 
-/// A Coffee game has a bunch of related types, constants, and methods.
+/// A Coffee game represents the entrypoint of the engine. It describes your
+/// game logic.
 ///
 /// Implementors of this trait should hold the game state.
 ///
 /// Coffee forces you to decouple your game state from your view and input
-/// state. While this might seem limiting at first, it helps to keep mutability
-/// at bay and forces you to think about the architecture of your game.
+/// state. While this might seem limiting at first, it helps you to keep
+/// mutability at bay and forces you to think about the architecture of your
+/// game.
 ///
 /// Ideally, your game state should be an opaque type with a meaningful API with
-/// clear boundaries. External code (like draw code or input code) can rely on
-/// this API to do its job.
-///
-/// This is the main reason why Coffee is _opinionated_.
+/// clear boundaries. External code (like draw code or input code) should rely
+/// on this API to do its job.
 pub trait Game {
     /// The view data of your game.
     ///
@@ -37,21 +35,24 @@ pub trait Game {
 
     /// The input data of your game.
     ///
-    /// You can start by simply using a `HashSet` here to see which keys are
-    /// pressed at any given time. Then, you can iterate when needed (e.g. if
-    /// you need to know which keys were _just_ released, etc.).
+    /// For instance, you could start by simply using a `HashSet` here to track
+    /// which keys are pressed at any given time.
     type Input;
 
-    /// Defines how many times the `update` function should be called per
+    /// Defines how many times the [`update`] function should be called per
     /// second.
     ///
     /// A common value is `60`.
+    ///
+    /// [`update`]: #tymethod.update
     const TICKS_PER_SECOND: u16;
 
-    /// Defines the key that will be used to toggle the debug view. Set it to
+    /// Defines the key that will be used to toggle the [`debug`] view. Set it to
     /// `None` if you want to disable it.
     ///
     /// By default, it is set to `F12`.
+    ///
+    /// [`debug`]: #method.debug
     const DEBUG_KEY: Option<input::KeyCode> = Some(input::KeyCode::F12);
 
     /// Create your game here.
@@ -59,74 +60,65 @@ pub trait Game {
     /// You need to return your initial game state, view state, and input state.
     ///
     /// It is recommended to load your game assets right here. You can use
-    /// the `Loader` abstraction to declaratively describe how to load your
-    /// assets and easily get a _consistent_ `LoadingScreen` for free!
+    /// the [`load`] module to declaratively describe how to load your
+    /// assets and easily get a _consistent_ loading screen for free!
+    ///
+    /// [`load`]: load/index.html
     fn new(window: &mut graphics::Window) -> (Self, Self::View, Self::Input)
     where
         Self: Sized;
 
-    /// Consume user input to control your view state here.
+    /// Consume your [`Input`] to let users interact with your game here.
     ///
-    /// Unlike `update`, this function is guaranteed to be called once per
-    /// frame, after event processing. This allows you to keep your UI updated
-    /// every frame in order to offer a smooth user experience independently of
-    /// the `TICKS_PER_SECOND` setting.
+    /// Right before an [`update`], input events will be processed and this
+    /// function will be called. This reduces latency when multiple updates need
+    /// to happen during a single frame.
     ///
-    /// You can access the GPU in case you need to prepare some new assets
-    /// before rendering.
-    fn control(
-        &self,
+    /// If no [`update`] is needed during a frame, it will still be called once,
+    /// right after processing input events and before drawing. This allows you
+    /// to keep your view updated every frame in order to offer a smooth user
+    /// experience independently of the [`TICKS_PER_SECOND`] setting.
+    ///
+    /// You can access the GPU if, as a consequence of the interaction, you need
+    /// to prepare some assets before rendering.
+    ///
+    /// [`Input`]: #associatedtype.Input
+    /// [`update`]: #tymethod.update
+    /// [`TICKS_PER_SECOND`]: #associatedconstant.TICKS_PER_SECOND
+    fn interact(
+        &mut self,
         input: &mut Self::Input,
         view: &mut Self::View,
         gpu: &mut graphics::Gpu,
     );
 
-    /// Consume input and update your game state here.
+    /// Update your game state here.
     ///
-    /// You should probably translate input into game actions based on the state
-    /// of your UI! For instance, if a text box is currently focused, you
-    /// probably do not want to perform player movement actions when keys are
-    /// pressed.
-    ///
-    /// The `TICKS_PER_SECOND` constant defines how many times this function
+    /// The [`TICKS_PER_SECOND`] constant defines how many times this function
     /// will be called per second. This function may be called multiple times
     /// per frame if it is necessary.
     ///
-    /// Notice that you are also allowed to access window information. This can
-    /// be useful if your game state needs to know how much of the world is
+    /// Notice that you are also allowed to access view and window data. This
+    /// can be useful if your game state needs to know how much of the world is
     /// visible.
-    fn update(
-        &mut self,
-        input: &mut Self::Input,
-        view: &Self::View,
-        window: &graphics::Window,
-    );
+    ///
+    /// [`TICKS_PER_SECOND`]: #associatedconstant.TICKS_PER_SECOND
+    /// [`View`]: #associatedtype.View
+    fn update(&mut self, view: &Self::View, window: &Window);
 
     /// Here is where you draw your game!
     ///
-    /// You probably want to get a `window.frame()` and clear it first:
+    /// Check out the [`graphics`] module to learn more about rendering in
+    /// Coffee.
     ///
-    /// ```
-    /// use coffee::graphics::{Result, Window, Color};
-    /// # struct Game { state: () }
-    /// # struct View;
+    /// `was_updated` tells you whether the [`update`] function was called during
+    /// this frame. You can use this to avoid recalculating data when the game
+    /// state has not changed.
     ///
-    /// # impl Game {
-    /// fn draw(&self, view: &mut View, window: &mut Window, _was_updated: bool) -> Result<()> {
-    ///     let frame = &mut window.frame();
+    /// This function will be called once per frame.
     ///
-    ///     frame.clear(Color::BLACK);
-    ///     // ...
-    ///
-    ///     Ok(())
-    /// }
-    /// # }
-    /// ```
-    ///
-    /// `was_updated` tells you whether the `update` function was called during
-    /// this frame. This allows you to perform optimizations.
-    ///
-    /// This function will be called once per frame, after `update`.
+    /// [`graphics`]: graphics/index.html
+    /// [`update`]: #tymethod.update
     fn draw(
         &self,
         view: &mut Self::View,
@@ -134,14 +126,28 @@ pub trait Game {
         was_updated: bool,
     ) -> graphics::Result<()>;
 
+    /// Process an input event and keep track of it in your [`Input`] type.
+    ///
+    /// This function may be called multiple times during event processing,
+    /// before [`interact`].
+    ///
+    /// By default, it does nothing.
+    ///
+    /// [`Input`]: #associatedtype.Input
+    /// [`interact`]: #tymethod.interact
+    fn on_input(&self, _input: &mut Self::Input, _event: input::Event) {}
+
     /// Implement this function to display debug information.
     ///
     /// It is called after `draw` once per frame when debug has been toggled
-    /// using the `DEBUG_KEY`. Anything you draw here will be on top. Debug code
-    /// is only called when compiling with `debug_assertions` enabled.
+    /// using the [`DEBUG_KEY`]. Anything you draw here will be on top. Debug
+    /// code is only called when compiling with `debug_assertions` enabled.
     ///
-    /// By default, it just calls `Debug::draw` which displays a brief summary
-    /// about game performance in the top left corner.
+    /// By default, it shows [`Debug`], which displays a brief summary about
+    /// game performance in the top left corner.
+    ///
+    /// [`DEBUG_KEY`]: #associatedconstant.DEBUG_KEY
+    /// [`Debug`]: struct.Debug.html
     fn debug(
         &self,
         _input: &Self::Input,
@@ -151,14 +157,6 @@ pub trait Game {
     ) -> graphics::Result<()> {
         debug.draw(&mut window.frame())
     }
-
-    /// Process an input event and apply it to your `Input` type.
-    ///
-    /// This function may be called multiple times during event processing,
-    /// right before `play`.
-    ///
-    /// It does nothing by default.
-    fn on_input(&self, _input: &mut Self::Input, _event: input::Event) {}
 }
 
 pub fn run<G: Game>(window_settings: window::Settings) -> graphics::Result<()> {
@@ -180,9 +178,15 @@ pub fn run<G: Game>(window_settings: window::Settings) -> graphics::Result<()> {
     let mut alive = true;
     let mut was_updated = true;
 
-    while alive {
-        debug.frame_started();
-
+    fn process_events<G: Game>(
+        game: &mut G,
+        input: &mut G::Input,
+        view: &mut G::View,
+        debug: &mut Debug,
+        window: &mut Window,
+        event_loop: &mut window::EventLoop,
+        alive: &mut bool,
+    ) {
         debug.event_loop_started();
         event_loop.poll(|event| match event {
             window::Event::Input(input_event) => {
@@ -201,24 +205,50 @@ pub fn run<G: Game>(window_settings: window::Settings) -> graphics::Result<()> {
                 }
             }
             window::Event::CloseRequested => {
-                alive = false;
+                *alive = false;
             }
             window::Event::Resized(new_size) => {
                 window.resize(new_size);
             }
         });
-        game.control(input, view, window.gpu());
+        game.interact(input, view, window.gpu());
         debug.event_loop_finished();
+    }
+
+    while alive {
+        debug.frame_started();
 
         // Update loop
         timer.update();
 
         while timer.tick() {
+            process_events(
+                game,
+                input,
+                view,
+                &mut debug,
+                window,
+                &mut event_loop,
+                &mut alive,
+            );
+
             debug.update_started();
-            game.update(input, view, window);
+            game.update(view, window);
             debug.update_finished();
 
             was_updated = true;
+        }
+
+        if !was_updated {
+            process_events(
+                game,
+                input,
+                view,
+                &mut debug,
+                window,
+                &mut event_loop,
+                &mut alive,
+            );
         }
 
         debug.draw_started();
