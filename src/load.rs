@@ -34,7 +34,10 @@ use crate::graphics;
 /// we could define a task to load an `Image` like this:
 ///
 /// ```
-/// Task::using_gpu(move |gpu| Image::new(gpu, "my-image.png"))
+/// # use coffee::graphics::Image;
+/// # use coffee::Task;
+///
+/// let load_image = Task::using_gpu(|gpu| Image::new(gpu, "my-image.png"));
 /// ```
 ///
 /// Here we just _describe_ how to load an image, we do not load it right away.
@@ -48,6 +51,10 @@ use crate::graphics;
 /// obtain a `Task<(Image, TextureArray)>` like this:
 ///
 /// ```
+/// # use coffee::load::{Task, Join};
+/// # let load_image = Task::new(|| ());
+/// # let load_texture_array = Task::new(|| ());
+///
 /// let combined_task = (load_image, load_texture_array).join();
 /// ```
 ///
@@ -55,6 +62,9 @@ use crate::graphics;
 /// meaningful structs using [`map`]:
 ///
 /// ```
+/// # use coffee::load::{Task, Join};
+/// # use coffee::graphics::Image;
+///
 /// pub struct PlayerAssets {
 ///     idle: Image,
 ///     running: Image,
@@ -67,7 +77,7 @@ use crate::graphics;
 ///             Image::load("player/running.png"),
 ///         )
 ///             .join()
-///             .map(|(idle, running)| PlayerAssets { idle, running });
+///             .map(|(idle, running)| PlayerAssets { idle, running })
 ///     }
 /// }
 /// ```
