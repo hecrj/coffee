@@ -1,10 +1,10 @@
-use super::Task;
+use super::{Progress, Task};
 use crate::graphics;
 
 pub trait LoadingScreen {
     fn on_progress(
         &mut self,
-        progress: f32,
+        progress: Progress,
         window: &mut graphics::Window,
     ) -> graphics::Result<()>;
 
@@ -40,7 +40,7 @@ impl ProgressBar {
 impl LoadingScreen for ProgressBar {
     fn on_progress(
         &mut self,
-        progress: f32,
+        progress: Progress,
         window: &mut graphics::Window,
     ) -> graphics::Result<()> {
         let mut frame = window.frame();
@@ -54,7 +54,7 @@ impl LoadingScreen for ProgressBar {
                     frame.height() / 2.0 - 25.0,
                 ),
                 scale: graphics::Vector::new(
-                    (frame.width() - 100.0) * (progress / 100.0),
+                    (frame.width() - 100.0) * (progress.percentage() / 100.0),
                     50.0,
                 ),
                 ..Default::default()
@@ -62,8 +62,21 @@ impl LoadingScreen for ProgressBar {
             &mut frame.as_target(),
         );
 
+        if let Some(stage) = progress.current_stage() {
+            self.font.add(graphics::Text {
+                content: stage.clone(),
+                position: graphics::Vector::new(
+                    50.0,
+                    frame.height() / 2.0 - 80.0,
+                ),
+                size: 30.0,
+                bounds: (frame.width(), frame.height()),
+                color: graphics::Color::WHITE,
+            });
+        }
+
         self.font.add(graphics::Text {
-            content: format!("{:.2}", progress) + "%",
+            content: format!("{:.2}", progress.percentage()) + "%",
             position: graphics::Vector::new(50.0, frame.height() / 2.0 + 50.0),
             size: 30.0,
             bounds: (frame.width(), frame.height()),

@@ -37,7 +37,7 @@ use crate::graphics;
 /// Task::using_gpu(move |gpu| Image::new(gpu, "my-image.png"))
 /// ```
 ///
-/// See? We just _describe_ how to load an image, we do not load it right away.
+/// Here we just _describe_ how to load an image, we do not load it right away.
 /// This is how [`Image::load`] works, you should use that instead of writing
 /// this over and over!
 ///
@@ -76,30 +76,6 @@ pub struct Task<T> {
     function: Box<Fn(&mut Worker) -> T>,
 }
 
-pub struct Worker<'a> {
-    total_work: u32,
-    work_completed: u32,
-    window: &'a mut graphics::Window,
-    listener: &'a mut FnMut(f32, &mut graphics::Window) -> (),
-}
-
-impl<'a> Worker<'a> {
-    pub fn gpu(&mut self) -> &mut graphics::Gpu {
-        self.window.gpu()
-    }
-
-    pub fn notify_progress(&mut self, work: u32) {
-        self.work_completed += work;
-
-        let progress = (self.work_completed as f32
-            / self.total_work.max(1) as f32
-            * 100.0)
-            .min(100.0);
-
-        (self.listener)(progress, self.window);
-    }
-}
-
 impl<T> Task<T> {
     pub fn new<F>(f: F) -> Task<T>
     where
@@ -134,24 +110,22 @@ impl<T> Task<T> {
         })
     }
 
-    pub fn total_work(&self) -> u32 {
-        self.total_work
+    pub fn stage<S: Into<String>>(title: S, task: Task<T>) -> Task<T>
+    where
+        T: 'static,
+    {
+        let title = title.into();
+
+        Task {
+            total_work: task.total_work,
+            function: Box::new(move |worker| {
+                worker.with_stage(title.clone(), &task.function)
+            }),
+        }
     }
 
-    pub fn run<F>(self, window: &mut graphics::Window, mut on_progress: F) -> T
-    where
-        F: FnMut(f32, &mut graphics::Window) -> (),
-    {
-        on_progress(0.0, window);
-
-        let mut worker = Worker {
-            total_work: self.total_work,
-            work_completed: 0,
-            window,
-            listener: &mut on_progress,
-        };
-
-        (self.function)(&mut worker)
+    pub fn total_work(&self) -> u32 {
+        self.total_work
     }
 
     pub fn map<F, A>(self, f: F) -> Task<A>
@@ -161,8 +135,82 @@ impl<T> Task<T> {
     {
         Task {
             total_work: self.total_work,
-            function: Box::new(move |task| f((self.function)(task))),
+            function: Box::new(move |worker| f((self.function)(worker))),
         }
+    }
+
+    pub fn run<F>(self, window: &mut graphics::Window, mut on_progress: F) -> T
+    where
+        F: FnMut(Progress, &mut graphics::Window) -> (),
+    {
+        let mut worker = Worker {
+            total_work: self.total_work,
+            work_completed: 0,
+            stages: Vec::new(),
+            window,
+            listener: &mut on_progress,
+        };
+
+        worker.notify_progress(0);
+
+        (self.function)(&mut worker)
+    }
+}
+
+pub(crate) struct Worker<'a> {
+    total_work: u32,
+    work_completed: u32,
+    stages: Vec<String>,
+    window: &'a mut graphics::Window,
+    listener: &'a mut FnMut(Progress, &mut graphics::Window) -> (),
+}
+
+impl<'a> Worker<'a> {
+    pub fn gpu(&mut self) -> &mut graphics::Gpu {
+        self.window.gpu()
+    }
+
+    pub fn notify_progress(&mut self, work: u32) {
+        self.work_completed += work;
+
+        let progress = Progress {
+            total_work: self.total_work,
+            work_completed: self.work_completed,
+            stages: &self.stages,
+        };
+
+        (self.listener)(progress, self.window);
+    }
+
+    pub fn with_stage<T>(
+        &mut self,
+        title: String,
+        f: &Box<Fn(&mut Worker) -> T>,
+    ) -> T {
+        self.stages.push(title);
+        self.notify_progress(0);
+
+        let result = f(self);
+        let _ = self.stages.pop();
+
+        result
+    }
+}
+
+pub struct Progress<'a> {
+    total_work: u32,
+    work_completed: u32,
+    stages: &'a Vec<String>,
+}
+
+impl<'a> Progress<'a> {
+    pub fn percentage(&self) -> f32 {
+        (self.work_completed as f32 / self.total_work.max(1) as f32 * 100.0)
+            .min(100.0)
+    }
+
+    pub fn current_stage(&self) -> Option<&String> {
+        self.stages.last()
     }
 }
 
