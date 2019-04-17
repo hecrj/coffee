@@ -2,7 +2,7 @@ mod event;
 mod frame;
 mod settings;
 
-pub use event::{Event, EventLoop, NewSize};
+pub(crate) use event::{Event, EventLoop};
 pub use frame::Frame;
 pub use settings::Settings;
 
@@ -72,7 +72,7 @@ impl Window {
         self.surface.swap_buffers(&mut self.gpu);
     }
 
-    pub fn resize(&mut self, new_size: event::NewSize) {
+    pub(crate) fn resize(&mut self, new_size: event::NewSize) {
         self.surface.update_viewport(&mut self.gpu);
 
         let dpi = self.surface.window().get_hidpi_factor();

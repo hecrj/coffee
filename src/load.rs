@@ -27,8 +27,9 @@ use crate::graphics;
 /// A `Task<T>` represents an operation that produces a value of type `T`.
 ///
 /// # Laziness
-/// A [`Task`] is just a recipe that describes how to produce a specific asset.
-/// Like functions, they can be combined and run whenever needed.
+/// A [`Task`] is just a recipe that describes how to produce a specific output,
+/// like a function. They can be combined or transformed in certain ways and
+/// run whenever needed.
 ///
 /// Creating a [`Task`] consists in specifying this recipe. For instance,
 /// we could define a task to load an `Image` like this:
@@ -36,7 +37,7 @@ use crate::graphics;
 /// ```
 /// # use coffee::graphics::Image;
 /// # use coffee::Task;
-///
+/// #
 /// let load_image = Task::using_gpu(|gpu| Image::new(gpu, "my-image.png"));
 /// ```
 ///
@@ -51,9 +52,11 @@ use crate::graphics;
 /// obtain a `Task<(Image, TextureArray)>` like this:
 ///
 /// ```
-/// # use coffee::load::{Task, Join};
+/// # use coffee::load::Task;
 /// # let load_image = Task::new(|| ());
 /// # let load_texture_array = Task::new(|| ());
+/// #
+/// use coffee::load::Join;
 ///
 /// let combined_task = (load_image, load_texture_array).join();
 /// ```
@@ -62,8 +65,10 @@ use crate::graphics;
 /// meaningful structs using [`map`]:
 ///
 /// ```
-/// # use coffee::load::{Task, Join};
+/// # use coffee::load::Task;
 /// # use coffee::graphics::Image;
+/// #
+/// use coffee::load::Join;
 ///
 /// pub struct PlayerAssets {
 ///     idle: Image,
@@ -81,12 +86,37 @@ use crate::graphics;
 ///     }
 /// }
 /// ```
+///
+/// [`Task`]: struct.Task.html
+/// [`Join`]: trait.Join.html
+/// [`Image::load`]: ../graphics/struct.Image.html#method.load
+/// [`map`]: #method.map
 pub struct Task<T> {
     total_work: u32,
     function: Box<Fn(&mut Worker) -> T>,
 }
 
 impl<T> Task<T> {
+    /// Create a new task from a lazy operation.
+    ///
+    /// Imagine we had to generate a random game map, we could represent this
+    /// as a `Task`:
+    /// ```
+    /// # use coffee::load::Task;
+    /// struct Map {
+    ///     // ...
+    /// }
+    ///
+    /// impl Map {
+    ///     pub fn generate() -> Map {
+    ///         Map { /*...*/ }
+    ///     }
+    /// }
+    ///
+    /// let generate_map = Task::new(Map::generate);
+    /// ```
+    ///
+    /// [`Task`]: struct.Task.html
     pub fn new<F>(f: F) -> Task<T>
     where
         F: 'static + Fn() -> T,
@@ -97,16 +127,19 @@ impl<T> Task<T> {
         }
     }
 
-    pub(crate) fn sequence<F>(total_work: u32, f: F) -> Task<T>
-    where
-        F: 'static + Fn(&mut Worker) -> T,
-    {
-        Task {
-            total_work,
-            function: Box::new(f),
-        }
-    }
-
+    /// Create a new task that uses the GPU.
+    ///
+    /// You can use this to load and prepare graphical assets.
+    ///
+    /// Keep in mind that many types in [`graphics`] already implement loading
+    /// methods returning a `Task` (like [`Image::load`] or [`Font::load`]).
+    /// Before using this, check out whether whatever you want to load has
+    /// already a useful helper that suits your needs!
+    ///
+    /// [`graphics`]: ../graphics/index.html
+    /// [`Task`]: struct.Task.html
+    /// [`Image::load`]: ../graphics/struct.Image.html#method.load
+    /// [`Font::load`]: ../graphics/struct.Font.html#method.load
     pub fn using_gpu<F>(f: F) -> Task<T>
     where
         F: 'static + Fn(&mut graphics::Gpu) -> T,
@@ -120,6 +153,49 @@ impl<T> Task<T> {
         })
     }
 
+    pub(crate) fn sequence<F>(total_work: u32, f: F) -> Task<T>
+    where
+        F: 'static + Fn(&mut Worker) -> T,
+    {
+        Task {
+            total_work,
+            function: Box::new(f),
+        }
+    }
+
+    /// Add a title to a task.
+    ///
+    /// The title will be used when reporting progress once the task is run.
+    /// This allows task runners, like loading screens, to show additional
+    /// feedback to the user.
+    ///
+    /// For example, let's say we want to generate a map and load some terrain
+    /// assets. We can define a couple stages for each task:
+    /// ```
+    /// # use coffee::load::Task;
+    /// # use coffee::graphics::Image;
+    /// # struct Map;
+    /// # impl Map {
+    /// # fn generate() -> Map { Map }
+    /// # }
+    /// # struct TerrainAssets;
+    /// # impl TerrainAssets {
+    /// # fn load() -> Task<()> { Task::new(|| ()) }
+    /// # }
+    /// use coffee::load::Join;
+    ///
+    /// let load_game =
+    ///     (
+    ///         Task::stage("Generating map...", Task::new(Map::generate)),
+    ///         Task::stage("Loading terrain...", TerrainAssets::load())
+    ///     )
+    ///         .join();
+    /// ```
+    /// If we then used this task with the [`ProgressBar`] loading screen, it
+    /// would show each of these titles on top of the progress bar when its
+    /// according tasks are being run.
+    ///
+    /// [`ProgressBar`]: loading_screen/struct.ProgressBar.html
     pub fn stage<S: Into<String>>(title: S, task: Task<T>) -> Task<T>
     where
         T: 'static,
@@ -134,10 +210,17 @@ impl<T> Task<T> {
         }
     }
 
+    /// Get the total units of work of the task.
     pub fn total_work(&self) -> u32 {
         self.total_work
     }
 
+    /// Transform the output of a task.
+    ///
+    /// As [explained above], use this method to make your tasks return your
+    /// own custom types, enhancing composability.
+    ///
+    /// [explained above]: #composition
     pub fn map<F, A>(self, f: F) -> Task<A>
     where
         T: 'static,
@@ -149,6 +232,18 @@ impl<T> Task<T> {
         }
     }
 
+    /// Run a task and obtain the produced value.
+    ///
+    /// You can provide a function to keep track of its progress.
+    ///
+    /// As of now, this method needs a [`Window`] because tasks are mostly
+    /// meant to be used with loading screens. However, the `Task` abstraction
+    /// is generic enough to be useful in other scenarios and we could work on
+    /// removing this dependency. If you have a particular use case for them,
+    /// feel free to [open an issue] detailing it!
+    ///
+    /// [`Window`]: ../graphics/window/struct.Window.html
+    /// [open an issue]: https://github.com/hecrj/coffee/issues
     pub fn run<F>(self, window: &mut graphics::Window, mut on_progress: F) -> T
     where
         F: FnMut(Progress, &mut graphics::Window) -> (),

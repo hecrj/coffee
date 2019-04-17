@@ -1,7 +1,7 @@
 use super::winit;
 use crate::input;
 
-pub enum Event {
+pub(crate) enum Event {
     CloseRequested,
     Resized(NewSize),
     Input(input::Event),
@@ -18,7 +18,7 @@ impl EventLoop {
         &self.0
     }
 
-    pub fn poll<F>(&mut self, mut f: F)
+    pub(crate) fn poll<F>(&mut self, mut f: F)
     where
         F: FnMut(Event),
     {
@@ -60,7 +60,7 @@ impl EventLoop {
     }
 }
 
-pub struct NewSize(winit::dpi::LogicalSize);
+pub(crate) struct NewSize(winit::dpi::LogicalSize);
 
 impl NewSize {
     pub fn to_physical(&self, dpi: f64) -> winit::dpi::PhysicalSize {
