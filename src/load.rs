@@ -35,8 +35,8 @@ use crate::graphics;
 /// we could define a task to load an `Image` like this:
 ///
 /// ```
+/// # use coffee::load::Task;
 /// # use coffee::graphics::Image;
-/// # use coffee::Task;
 /// #
 /// let load_image = Task::using_gpu(|gpu| Image::new(gpu, "my-image.png"));
 /// ```
@@ -192,7 +192,7 @@ impl<T> Task<T> {
     ///         .join();
     /// ```
     /// If we then used this task with the [`ProgressBar`] loading screen, it
-    /// would show each of these titles on top of the progress bar when its
+    /// would show each of these titles on top of the progress bar when their
     /// according tasks are being run.
     ///
     /// [`ProgressBar`]: loading_screen/struct.ProgressBar.html
@@ -234,7 +234,7 @@ impl<T> Task<T> {
 
     /// Run a task and obtain the produced value.
     ///
-    /// You can provide a function to keep track of its progress.
+    /// You can provide a function to keep track of [`Progress`].
     ///
     /// As of now, this method needs a [`Window`] because tasks are mostly
     /// meant to be used with loading screens. However, the `Task` abstraction
@@ -242,6 +242,7 @@ impl<T> Task<T> {
     /// removing this dependency. If you have a particular use case for them,
     /// feel free to [open an issue] detailing it!
     ///
+    /// [`Progress`]: struct.Progress.html
     /// [`Window`]: ../graphics/window/struct.Window.html
     /// [open an issue]: https://github.com/hecrj/coffee/issues
     pub fn run<F>(self, window: &mut graphics::Window, mut on_progress: F) -> T
@@ -325,7 +326,7 @@ impl Progress {
 
     /// Get the title of the current stage, if there is one.
     ///
-    /// It allows task runners to provide additional feedback to users.
+    /// You can use this to provide additional feedback to users.
     pub fn stage(&self) -> Option<&String> {
         self.stages.last()
     }

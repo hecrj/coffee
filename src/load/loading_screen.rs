@@ -1,13 +1,105 @@
+//! Build consistent loading screens that run tasks.
+//!
+//! Any [`Task`] allows querying its total amount of work without running it. A
+//! loading screen uses this feature to keep track of the overall progress
+//! consistently.
+//!
+//! If you want to implement your own loading screen, check out the
+//! [`LoadingScreen`] trait.
+//!
+//! If you just want a simple placeholder, you can try out the built-in
+//! [`ProgressBar`] loading screen.
+//!
+//! [`Task`]: ../struct.Task.html
+//! [`LoadingScreen`]: trait.LoadingScreen.html
+//! [`ProgressBar`]: struct.ProgressBar.html
 use super::{Progress, Task};
 use crate::graphics;
 
+/// A loading screen can keep track of the progress of a task and provide
+/// feedback to the user.
+///
+/// # Usage
+/// If you have a [`LoadingScreen`], you can use it in your [`Game::new`] method
+/// easily. Let's say we want to use the [`ProgressBar`] loading screen in our
+/// game:
+///
+/// ```
+/// use std::collections::HashSet;
+///
+/// use coffee::Game;
+/// use coffee::input::KeyCode;
+/// use coffee::load::{Task, Join, LoadingScreen};
+/// use coffee::load::loading_screen::ProgressBar;
+/// use coffee::graphics::Window;
+/// # use coffee::graphics::{Result, Gpu};
+/// #
+/// # struct State;
+/// # impl State {
+/// # fn load() -> Task<State> { Task::new(|| State) }
+/// # }
+/// # struct View;
+/// # impl View {
+/// # fn load() -> Task<View> { Task::new(|| View) }
+/// # }
+/// #
+///
+/// struct MyGame {
+///     state: State,
+///     // ...
+/// }
+///
+/// impl Game for MyGame {
+///     type View = View;
+///     type Input = HashSet<KeyCode>;
+///
+///     const TICKS_PER_SECOND: u16 = 60;
+///
+///     fn new(window: &mut Window) -> (MyGame, Self::View, Self::Input) {
+///         let load =
+///             (
+///                 Task::stage("Loading state...", State::load()),
+///                 Task::stage("Loading assets...", View::load()),
+///             )
+///                 .join();
+///
+///         let mut progress_bar = ProgressBar::new(window.gpu());
+///         let (state, view) = progress_bar.run(load, window);
+///
+///         (MyGame { state }, view, HashSet::new())
+///     }
+///
+///     // ...
+///     # fn interact(&mut self, _input: &mut Self::Input,
+///     #             _view: &mut Self::View, _gpu: &mut Gpu) {}
+///     # fn update(&mut self, _view: &View, window: &Window) {}
+///     # fn draw(&self, _view: &mut Self::View, _window: &mut Window,
+///     #         _was_updated: bool) -> Result<()> { Ok(()) }
+/// }
+/// ```
+///
+/// [`Task`]: ../struct.Task.html
+/// [`LoadingScreen`]: trait.LoadingScreen.html
+/// [`ProgressBar`]: struct.ProgressBar.html
+/// [`Game::new`]: ../../trait.Game.html#tymethod.new
 pub trait LoadingScreen {
+    /// React to task progress.
+    ///
+    /// You should provide feedback to the user here. You can draw on the given
+    /// [`Window`], like in [`Game::draw`].
+    ///
+    /// [`Window`]: ../../graphics/struct.Window.html
+    /// [`Game::draw`]: ../../trait.Game.html#tymethod.draw
     fn on_progress(
         &mut self,
         progress: &Progress,
         window: &mut graphics::Window,
     ) -> graphics::Result<()>;
 
+    /// Run the loading screen with a task and obtain its result.
+    ///
+    /// By default, it runs the task and refreshes the window when there is
+    /// progress.
     fn run<T>(&mut self, task: Task<T>, window: &mut graphics::Window) -> T {
         task.run(window, |progress, window| {
             self.on_progress(progress, window).unwrap();

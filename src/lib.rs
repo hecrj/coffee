@@ -8,7 +8,6 @@ pub mod input;
 pub mod load;
 
 pub use debug::Debug;
-pub use load::Task;
 
 use graphics::window::{self, Window};
 use timer::Timer;
