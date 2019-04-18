@@ -4,7 +4,7 @@ use crate::graphics;
 pub trait LoadingScreen {
     fn on_progress(
         &mut self,
-        progress: Progress,
+        progress: &Progress,
         window: &mut graphics::Window,
     ) -> graphics::Result<()>;
 
@@ -40,7 +40,7 @@ impl ProgressBar {
 impl LoadingScreen for ProgressBar {
     fn on_progress(
         &mut self,
-        progress: Progress,
+        progress: &Progress,
         window: &mut graphics::Window,
     ) -> graphics::Result<()> {
         let mut frame = window.frame();
@@ -62,7 +62,7 @@ impl LoadingScreen for ProgressBar {
             &mut frame.as_target(),
         );
 
-        if let Some(stage) = progress.current_stage() {
+        if let Some(stage) = progress.stage() {
             self.font.add(graphics::Text {
                 content: stage.clone(),
                 position: graphics::Vector::new(

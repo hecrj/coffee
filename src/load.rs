@@ -246,14 +246,16 @@ impl<T> Task<T> {
     /// [open an issue]: https://github.com/hecrj/coffee/issues
     pub fn run<F>(self, window: &mut graphics::Window, mut on_progress: F) -> T
     where
-        F: FnMut(Progress, &mut graphics::Window) -> (),
+        F: FnMut(&Progress, &mut graphics::Window) -> (),
     {
         let mut worker = Worker {
-            total_work: self.total_work,
-            work_completed: 0,
-            stages: Vec::new(),
             window,
             listener: &mut on_progress,
+            progress: Progress {
+                total_work: self.total_work,
+                work_completed: 0,
+                stages: Vec::new(),
+            },
         };
 
         worker.notify_progress(0);
@@ -263,11 +265,9 @@ impl<T> Task<T> {
 }
 
 pub(crate) struct Worker<'a> {
-    total_work: u32,
-    work_completed: u32,
-    stages: Vec<String>,
     window: &'a mut graphics::Window,
-    listener: &'a mut FnMut(Progress, &mut graphics::Window) -> (),
+    listener: &'a mut FnMut(&Progress, &mut graphics::Window) -> (),
+    progress: Progress,
 }
 
 impl<'a> Worker<'a> {
@@ -276,15 +276,9 @@ impl<'a> Worker<'a> {
     }
 
     pub fn notify_progress(&mut self, work: u32) {
-        self.work_completed += work;
+        self.progress.work_completed += work;
 
-        let progress = Progress {
-            total_work: self.total_work,
-            work_completed: self.work_completed,
-            stages: &self.stages,
-        };
-
-        (self.listener)(progress, self.window);
+        (self.listener)(&self.progress, self.window);
     }
 
     pub fn with_stage<T>(
@@ -292,33 +286,56 @@ impl<'a> Worker<'a> {
         title: String,
         f: &Box<Fn(&mut Worker) -> T>,
     ) -> T {
-        self.stages.push(title);
+        self.progress.stages.push(title);
         self.notify_progress(0);
 
         let result = f(self);
-        let _ = self.stages.pop();
+        let _ = self.progress.stages.pop();
 
         result
     }
 }
 
-pub struct Progress<'a> {
+/// The progress of a task.
+pub struct Progress {
     total_work: u32,
     work_completed: u32,
-    stages: &'a Vec<String>,
+    stages: Vec<String>,
 }
 
-impl<'a> Progress<'a> {
-    pub fn percentage(&self) -> f32 {
-        (self.work_completed as f32 / self.total_work.max(1) as f32 * 100.0)
-            .min(100.0)
+impl Progress {
+    /// Get the total amount of work of the related task for this progress.
+    pub fn total_work(&self) -> u32 {
+        self.total_work
     }
 
-    pub fn current_stage(&self) -> Option<&String> {
+    /// Get the amount of completed work.
+    ///
+    /// The returned value is guaranteed to be in [0, total_work].
+    pub fn completed_work(&self) -> u32 {
+        self.work_completed.min(self.total_work)
+    }
+
+    /// Get the amount of progress as a percentage.
+    ///
+    /// You can use this value directly in your loading screen.
+    pub fn percentage(&self) -> f32 {
+        (self.completed_work() as f32 / self.total_work.max(1) as f32 * 100.0)
+    }
+
+    /// Get the title of the current stage, if there is one.
+    ///
+    /// It allows task runners to provide additional feedback to users.
+    pub fn stage(&self) -> Option<&String> {
         self.stages.last()
     }
 }
 
+/// Join tasks with ease.
+///
+/// Learn more about how to use this trait in the [`Task`] docs.
+///
+/// [`Task`]: struct.Task.html#composition
 pub trait Join {
     type Type;
 
