@@ -12,8 +12,7 @@ pub use debug::Debug;
 use graphics::window::{self, Window};
 use timer::Timer;
 
-/// A Coffee game represents the entrypoint of the engine. It describes your
-/// game logic.
+/// Represents the entrypoint of the engine. It describes your game logic.
 ///
 /// Implementors of this trait should hold the game state.
 ///

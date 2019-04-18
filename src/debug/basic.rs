@@ -2,6 +2,20 @@ use std::time;
 
 use crate::graphics;
 
+/// A bunch of performance information about loading, frame, event loop, update,
+/// and draw steps. It can be drawn!
+///
+/// ![Debug information][debug]
+///
+/// This is the default debug information that will be shown when the
+/// [`Game::DEBUG_KEY`] is pressed.
+///
+/// Overriding [`Game::debug`] gives you access to this struct, allowing you to
+/// implement your own debug view.
+///
+/// [debug]: https://i.imgur.com/6r3xNAP.png
+/// [`Game::DEBUG_KEY`]: trait.Game.html#associatedconstant.DEBUG_KEY
+/// [`Game::debug`]: trait.Game.html#method.debug
 pub struct Debug {
     font: graphics::Font,
     enabled: bool,
@@ -21,7 +35,7 @@ pub struct Debug {
 }
 
 impl Debug {
-    pub fn new(gpu: &mut graphics::Gpu, draw_rate: u16) -> Self {
+    pub(crate) fn new(gpu: &mut graphics::Gpu, draw_rate: u16) -> Self {
         let now = time::Instant::now();
 
         Self {
@@ -54,12 +68,26 @@ impl Debug {
         self.load_duration = time::Instant::now() - self.load_start;
     }
 
+    /// Get the time spent running [`Game::new`].
+    ///
+    /// [`Game::new`]: trait.Game.html#tymethod.new
+    pub fn load_duration(&self) -> time::Duration {
+        self.load_duration
+    }
+
     pub(crate) fn frame_started(&mut self) {
         self.frame_start = time::Instant::now();
     }
     pub(crate) fn frame_finished(&mut self) {
         self.frame_durations
             .push(time::Instant::now() - self.frame_start);
+    }
+
+    /// Get the average time spent per frame.
+    ///
+    /// It includes time spent on V-Sync, if enabled.
+    pub fn frame_duration(&self) -> time::Duration {
+        self.frame_durations.average()
     }
 
     pub(crate) fn event_loop_started(&mut self) {
@@ -70,6 +98,11 @@ impl Debug {
         self.event_loop_duration = time::Instant::now() - self.event_loop_start;
     }
 
+    /// Get the average time spent processing window events.
+    pub fn event_loop_duration(&self) -> time::Duration {
+        self.event_loop_duration
+    }
+
     pub(crate) fn update_started(&mut self) {
         self.update_start = time::Instant::now();
     }
@@ -77,6 +110,13 @@ impl Debug {
     pub(crate) fn update_finished(&mut self) {
         self.update_durations
             .push(time::Instant::now() - self.update_start);
+    }
+
+    /// Get the average time spent running [`Game::update`].
+    ///
+    /// [`Game::update`]: trait.Game.html#tymethod.update
+    pub fn update_duration(&self) -> time::Duration {
+        self.update_durations.average()
     }
 
     pub(crate) fn draw_started(&mut self) {
@@ -91,11 +131,19 @@ impl Debug {
         }
     }
 
-    pub fn toggle(&mut self) {
+    /// Get the average time spent running [`Game::draw`].
+    ///
+    /// [`Game::draw`]: trait.Game.html#tymethod.draw
+    pub fn draw_duration(&self) -> time::Duration {
+        self.draw_durations.average()
+    }
+
+    pub(crate) fn toggle(&mut self) {
         self.enabled = !self.enabled;
         self.frames_until_refresh = 0;
     }
 
+    /// Draw the debug information.
     pub fn draw(
         &mut self,
         frame: &mut graphics::Frame,

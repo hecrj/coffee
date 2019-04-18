@@ -123,7 +123,7 @@ pub trait LoadingScreen {
 ///
 /// See [`LoadingScreen`] for a detailed example on how to use it.
 ///
-/// [progress_bar]: https://i.imgur.com/YLNxRtM.png
+/// [progress_bar]: https://github.com/hecrj/coffee/blob/e079e7205a53f92ac6614382b5cdd250fed64a98/images/loading_screen/progress_bar.png?raw=true
 /// [`LoadingScreen`]: trait.LoadingScreen.html
 pub struct ProgressBar {
     font: graphics::Font,
