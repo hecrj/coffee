@@ -78,10 +78,19 @@ use crate::graphics;
 /// }
 /// ```
 ///
+/// # Future plans
+/// As of now, Coffee only ships with the [`ProgressBar`] loading screen. In the
+/// near future, the plan is to add more interesting (and configurable!) loading
+/// screens. If you make a cool loading screen or have an interesting idea and
+/// you would like to share it, feel free to [create an issue] or
+/// [open a pull request]!
+///
 /// [`Task`]: ../struct.Task.html
 /// [`LoadingScreen`]: trait.LoadingScreen.html
 /// [`ProgressBar`]: struct.ProgressBar.html
 /// [`Game::new`]: ../../trait.Game.html#tymethod.new
+/// [create an issue]: https://github.com/hecrj/coffee/issues
+/// [open a pull request]: https://github.com/hecrj/coffee/pulls
 pub trait LoadingScreen {
     /// React to task progress.
     ///
@@ -108,12 +117,21 @@ pub trait LoadingScreen {
     }
 }
 
+/// A simple loading screen showing a progress bar and the current stage.
+///
+/// ![The ProgressBar loading screen][progress_bar]
+///
+/// See [`LoadingScreen`] for a detailed example on how to use it.
+///
+/// [progress_bar]: https://i.imgur.com/YLNxRtM.png
+/// [`LoadingScreen`]: trait.LoadingScreen.html
 pub struct ProgressBar {
     font: graphics::Font,
     pencil: graphics::Image,
 }
 
 impl ProgressBar {
+    /// Create the loading screen. It loads a font.
     pub fn new(gpu: &mut graphics::Gpu) -> Self {
         Self {
             font: graphics::Font::from_bytes(
@@ -168,7 +186,7 @@ impl LoadingScreen for ProgressBar {
         }
 
         self.font.add(graphics::Text {
-            content: format!("{:.2}", progress.percentage()) + "%",
+            content: format!("{:.0}", progress.percentage()) + "%",
             position: graphics::Vector::new(50.0, frame.height() / 2.0 + 50.0),
             size: 30.0,
             bounds: (frame.width(), frame.height()),
