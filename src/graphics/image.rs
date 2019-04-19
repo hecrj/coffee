@@ -5,12 +5,12 @@ use std::io::Read;
 use std::path::{Path, PathBuf};
 
 use crate::graphics::gpu::{self, Texture};
-use crate::graphics::{Color, DrawParameters, Gpu, Target};
+use crate::graphics::{Color, Gpu, Quad, Target};
 use crate::load;
 
 #[derive(Clone)]
 pub struct Image {
-    texture: Texture,
+    pub(super) texture: Texture,
 }
 
 impl Image {
@@ -27,9 +27,7 @@ impl Image {
             image::load_from_memory(&buf).unwrap()
         };
 
-        Some(Image {
-            texture: gpu.upload_texture(&image),
-        })
+        Image::from_image(gpu, image)
     }
 
     pub fn load<P: Into<PathBuf>>(path: P) -> load::Task<Image> {
@@ -42,9 +40,9 @@ impl Image {
         gpu: &mut Gpu,
         image: image::DynamicImage,
     ) -> Option<Image> {
-        Some(Image {
-            texture: gpu.upload_texture(&image),
-        })
+        let texture = gpu.upload_texture(&image);
+
+        Some(Image { texture })
     }
 
     pub fn from_colors(gpu: &mut Gpu, colors: &[Color]) -> Option<Image> {
@@ -64,10 +62,6 @@ impl Image {
         )
     }
 
-    pub(super) fn texture(&self) -> &Texture {
-        &self.texture
-    }
-
     pub fn width(&self) -> u16 {
         self.texture.width()
     }
@@ -76,10 +70,11 @@ impl Image {
         self.texture.height()
     }
 
-    pub fn draw(&self, parameters: DrawParameters, target: &mut Target) {
+    #[inline]
+    pub fn draw(&self, quad: Quad, target: &mut Target) {
         target.draw_texture_quads(
             &self.texture,
-            &[gpu::Instance::from_parameters(parameters)],
+            &[gpu::Instance::from_quad(quad)],
         );
     }
 }

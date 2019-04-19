@@ -17,6 +17,18 @@ use gfx_device_gl as gl;
 use crate::graphics::{Color, Transformation};
 use pipeline::Pipeline;
 
+/// A link between your game and a graphics processor.
+///
+/// It is necessary to perform any kind of graphical operation, like loading
+/// resources and drawing.
+///
+/// [`Game`] provides a value of this type in the [`interact`] method. A [`Gpu`]
+/// can also be obtained from a [`Window`].
+///
+/// [`Gpu`]: struct.Gpu.html
+/// [`Game`]: ../trait.Game.html
+/// [`interact`]: ../trait.Game.html#tymethod.interact
+/// [`Window`]: struct.Window.html
 pub struct Gpu {
     device: gl::Device,
     factory: gl::Factory,

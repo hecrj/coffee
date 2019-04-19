@@ -13,7 +13,7 @@ use crate::graphics;
 /// Overriding [`Game::debug`] gives you access to this struct, allowing you to
 /// implement your own debug view.
 ///
-/// [debug]: https://i.imgur.com/6r3xNAP.png
+/// [debug]: https://github.com/hecrj/coffee/blob/ee73432533e6f3162c942c9e2b474d3b0b524ad0/images/debug.png?raw=true
 /// [`Game::DEBUG_KEY`]: trait.Game.html#associatedconstant.DEBUG_KEY
 /// [`Game::debug`]: trait.Game.html#method.debug
 pub struct Debug {

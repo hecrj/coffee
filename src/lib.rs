@@ -12,7 +12,7 @@ pub use debug::Debug;
 use graphics::window::{self, Window};
 use timer::Timer;
 
-/// Represents the entrypoint of the engine. It describes your game logic.
+/// The entrypoint of the engine. It describes your game logic.
 ///
 /// Implementors of this trait should hold the game state.
 ///

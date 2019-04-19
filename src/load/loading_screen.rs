@@ -158,12 +158,12 @@ impl LoadingScreen for ProgressBar {
         frame.clear(graphics::Color::BLACK);
 
         self.pencil.draw(
-            graphics::DrawParameters {
+            graphics::Quad {
                 position: graphics::Point::new(
                     50.0,
                     frame.height() / 2.0 - 25.0,
                 ),
-                scale: graphics::Vector::new(
+                size: (
                     (frame.width() - 100.0) * (progress.percentage() / 100.0),
                     50.0,
                 ),

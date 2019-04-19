@@ -92,6 +92,7 @@ impl Texture {
     }
 }
 
+#[derive(Clone)]
 pub struct Drawable {
     texture: Texture,
     target: TargetView,

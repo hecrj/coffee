@@ -1,15 +1,21 @@
 use crate::graphics::point::Point;
 use crate::graphics::rectangle::Rectangle;
-use crate::graphics::vector::Vector;
 
+/// A textured quad.
 #[derive(Debug)]
-pub struct DrawParameters {
+pub struct Quad {
+    /// The region of the resource that should be shown on the quad, in relative
+    /// coordinates: [0.0, 1.0].
     pub source: Rectangle,
+
+    /// The position of the quad.
     pub position: Point,
-    pub scale: Vector,
+
+    /// The size of the quad.
+    pub size: (f32, f32),
 }
 
-impl Default for DrawParameters {
+impl Default for Quad {
     fn default() -> Self {
         Self {
             source: Rectangle {
@@ -19,7 +25,7 @@ impl Default for DrawParameters {
                 height: 1.0,
             },
             position: Point::new(0.0, 0.0),
-            scale: Vector::new(1.0, 1.0),
+            size: (1.0, 1.0),
         }
     }
 }

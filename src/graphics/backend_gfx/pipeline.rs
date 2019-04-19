@@ -4,8 +4,7 @@ use gfx_device_gl as gl;
 
 use super::format;
 use super::texture::Texture;
-use crate::graphics::draw_parameters::DrawParameters;
-use crate::graphics::transformation::Transformation;
+use crate::graphics::{Quad, Transformation};
 
 const MAX_POINTS: u32 = 100_000;
 const QUAD_INDICES: [u16; 6] = [0, 1, 2, 0, 2, 3];
@@ -199,15 +198,15 @@ impl Shader {
 }
 
 impl Instance {
-    pub fn from_parameters(parameters: DrawParameters) -> Instance {
-        let source = parameters.source;
-        let position = parameters.position;
-        let scale = parameters.scale;
+    pub fn from_quad(quad: Quad) -> Instance {
+        let source = quad.source;
+        let position = quad.position;
+        let (width, height) = quad.size;
 
         Instance {
             src: [source.x, source.y, source.width, source.height],
             translation: [position.x, position.y],
-            scale: [scale.x, scale.y],
+            scale: [width, height],
             layer: 0,
         }
     }

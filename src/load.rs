@@ -46,10 +46,10 @@ use crate::graphics;
 /// this over and over!
 ///
 /// # Composition
-/// Tasks can be combined easily thanks to the [`Join`] trait.
+/// Tasks can be combined thanks to the [`Join`] trait.
 ///
-/// Let's say we have a `Task<Image>` and a `Task<TextureArray>`, we can easily
-/// obtain a `Task<(Image, TextureArray)>` like this:
+/// Let's say we have a `Task<Image>` and a `Task<TextureArray>`, we can obtain
+/// a `Task<(Image, TextureArray)>` like this:
 ///
 /// ```
 /// # use coffee::load::Task;

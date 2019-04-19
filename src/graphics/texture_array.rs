@@ -6,9 +6,10 @@ use std::sync::Arc;
 
 use log::debug;
 
-use crate::graphics;
 use crate::graphics::gpu::{Instance, Texture};
-use crate::graphics::transformation::Transformation;
+use crate::graphics::{
+    Gpu, Point, Quad, Sprite, Target, Transformation, Vector,
+};
 use crate::load;
 
 /// A texture array
@@ -41,43 +42,40 @@ impl Batch {
         }
     }
 
-    /// Add a sprite to the batch
-    pub fn add(
-        &mut self,
-        index: &Index,
-        sprite: Sprite,
-        position: graphics::Point,
-    ) {
-        let mut instance =
-            Instance::from_parameters(graphics::DrawParameters {
-                source: graphics::Rectangle {
-                    x: (index.offset.x + sprite.column * sprite.width) as f32
-                        * self.texture_array.x_unit,
-                    y: (index.offset.y + sprite.row * sprite.height) as f32
-                        * self.texture_array.y_unit,
-                    width: sprite.width as f32 * self.texture_array.x_unit,
-                    height: sprite.height as f32 * self.texture_array.y_unit,
-                },
-                position,
-                scale: graphics::Vector::new(
-                    sprite.width as f32,
-                    sprite.height as f32,
-                ),
-            });
+    /// Add a quad to the batch
+    #[inline]
+    pub fn add_quad(&mut self, index: &Index, mut quad: Quad) {
+        quad.source.x += index.offset.x;
+        quad.source.y += index.offset.y;
+
+        let mut instance = Instance::from_quad(quad);
 
         instance.layer = index.layer.into();
 
         self.instances.push(instance);
     }
 
-    /// Draw the batch
-    pub fn draw(
-        &self,
-        position: graphics::Point,
-        target: &mut graphics::Target,
+    /// Add a sprite to the batch
+    #[inline]
+    pub fn add_sprite(
+        &mut self,
+        index: &Index,
+        sprite: Sprite,
+        position: Point,
     ) {
+        let quad = sprite.into_quad(
+            self.texture_array.x_unit,
+            self.texture_array.y_unit,
+            position,
+        );
+
+        self.add_quad(index, quad)
+    }
+
+    /// Draw the batch
+    pub fn draw(&self, position: Point, target: &mut Target) {
         let mut translated = target.transform(Transformation::translate(
-            graphics::Vector::new(position.x, position.y),
+            Vector::new(position.x, position.y),
         ));
 
         translated.draw_texture_quads(
@@ -85,19 +83,6 @@ impl Batch {
             &self.instances[..],
         );
     }
-}
-
-/// Represents a sprite
-#[derive(Debug)]
-pub struct Sprite {
-    /// Sprite row
-    pub row: u32,
-    /// Sprite column
-    pub column: u32,
-    /// Sprite width
-    pub width: u32,
-    /// Sprite height
-    pub height: u32,
 }
 
 /// A texture array builder
@@ -163,7 +148,7 @@ impl Builder {
     }
 
     /// Build the texture array
-    pub fn build(&mut self, gpu: &mut graphics::Gpu) -> TextureArray {
+    pub fn build(&mut self, gpu: &mut Gpu) -> TextureArray {
         if !self.current.is_empty() {
             self.layers.push(self.current.clone());
             self.current = Layer::new(0, 0);
@@ -224,7 +209,7 @@ impl Layer {
     }
 
     fn add(&mut self, image: Arc<image::RgbaImage>) -> Option<Offset> {
-        let current_row_width =
+        let current_row_width: u32 =
             self.current_row.iter().map(|i| i.width()).sum();
 
         if current_row_width + image.width() <= self.max_width {
@@ -232,8 +217,8 @@ impl Layer {
                 self.current_row.push(image);
 
                 Some(Offset {
-                    x: current_row_width,
-                    y: self.current_height(),
+                    x: current_row_width as f32 / self.max_width as f32,
+                    y: self.current_height() as f32 / self.max_height as f32,
                 })
             } else {
                 None
@@ -253,8 +238,8 @@ impl Layer {
                 self.current_row = vec![image];
 
                 Some(Offset {
-                    x: 0,
-                    y: self.current_height(),
+                    x: 0.0,
+                    y: self.current_height() as f32 / self.max_height as f32,
                 })
             } else {
                 None
@@ -300,8 +285,8 @@ impl Layer {
 
 #[derive(Debug, Clone, Copy)]
 struct Offset {
-    x: u32,
-    y: u32,
+    x: f32,
+    y: f32,
 }
 
 pub struct Loader {

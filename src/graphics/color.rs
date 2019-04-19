@@ -1,4 +1,5 @@
-#[derive(Clone)]
+/// An RGBA color in the sRGB color space.
+#[derive(PartialEq, Clone, Copy, Debug)]
 pub struct Color {
     r: f32,
     g: f32,
@@ -7,6 +8,7 @@ pub struct Color {
 }
 
 impl Color {
+    /// White color.
     pub const WHITE: Self = Self {
         r: 1.0,
         g: 1.0,
@@ -14,6 +16,7 @@ impl Color {
         a: 1.0,
     };
 
+    /// Black color.
     pub const BLACK: Self = Self {
         r: 0.0,
         g: 0.0,
@@ -21,10 +24,12 @@ impl Color {
         a: 1.0,
     };
 
+    /// Create a new color from components in the [0, 1.0] range.
     pub fn new(r: f32, g: f32, b: f32, a: f32) -> Color {
         Color { r, g, b, a }
     }
 
+    /// Create a new color from its RGB components in the [0, 255] range.
     pub fn from_rgb(r: u8, g: u8, b: u8) -> Color {
         Color {
             r: r as f32 / 255.0,
@@ -34,6 +39,7 @@ impl Color {
         }
     }
 
+    /// Get the color components in the [0, 255] range.
     pub fn to_rgba(&self) -> [u8; 4] {
         [
             (self.r * 255.0).round() as u8,
@@ -44,8 +50,22 @@ impl Color {
     }
 }
 
-impl Into<[f32; 4]> for Color {
-    fn into(self) -> [f32; 4] {
-        [self.r, self.g, self.b, self.a]
+impl From<[u8; 3]> for Color {
+    fn from(values: [u8; 3]) -> Color {
+        let [r, g, b] = values;
+
+        Color::from_rgb(r, g, b)
+    }
+}
+
+impl From<Color> for [f32; 4] {
+    fn from(color: Color) -> [f32; 4] {
+        [color.r, color.g, color.b, color.a]
+    }
+}
+
+impl From<Color> for [u8; 4] {
+    fn from(color: Color) -> [u8; 4] {
+        color.to_rgba()
     }
 }
