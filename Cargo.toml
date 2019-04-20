@@ -6,6 +6,9 @@ edition = "2018"
 description = "An opinionated 2D game engine"
 license = "MIT"
 
+[package.metadata.docs.rs]
+features = ["opengl"]
+
 [features]
 default = []
 opengl = ["gfx", "gfx_core", "glutin", "gfx_device_gl", "gfx_window_glutin", "gfx_glyph", "gfx_winit"]

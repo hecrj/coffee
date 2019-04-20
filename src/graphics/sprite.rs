@@ -1,27 +1,32 @@
-use crate::graphics::{Point, Quad, Rectangle};
+use crate::graphics::{IntoQuad, Point, Quad, Rectangle};
 
-/// A portion of a texture in absolute coordinates.
+/// A quad describing the portion of a resource in absolute coordinates.
 ///
-/// Unlike a [`Region`], the coordinates of a [`Sprite`] are absolute. It can be
-/// used as a convenient alternative.
+/// Unlike a [`Quad`], the `source` coordinates of a [`Sprite`] are absolute. It
+/// can be used as a convenient alternative.
+///
+/// [`Quad`]: struct.Quad.html
+/// [`Sprite`]: struct.Sprite.html
 pub struct Sprite {
-    pub x: u16,
-    pub y: u16,
-    pub width: u16,
-    pub height: u16,
+    /// The portion of a resource that contains the sprite, in absolute
+    /// coordinates.
+    pub source: Rectangle<u16>,
+
+    /// The position where the sprite should be drawn.
+    pub position: Point,
 }
 
-impl Sprite {
-    pub fn into_quad(self, x_unit: f32, y_unit: f32, position: Point) -> Quad {
+impl IntoQuad for Sprite {
+    fn into_quad(self, x_unit: f32, y_unit: f32) -> Quad {
         Quad {
             source: Rectangle {
-                x: self.x as f32 * x_unit,
-                y: self.y as f32 * y_unit,
-                width: self.width as f32 * x_unit,
-                height: self.height as f32 * y_unit,
+                x: self.source.x as f32 * x_unit,
+                y: self.source.y as f32 * y_unit,
+                width: self.source.width as f32 * x_unit,
+                height: self.source.height as f32 * y_unit,
             },
-            position,
-            size: (self.width as f32, self.height as f32),
+            position: self.position,
+            size: (self.source.width as f32, self.source.height as f32),
         }
     }
 }

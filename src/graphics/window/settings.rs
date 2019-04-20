@@ -1,8 +1,14 @@
 use super::winit;
 
+/// A window configuration.
 pub struct Settings {
+    /// A title for the window.
     pub title: String,
+
+    /// A target size for the window.
     pub size: (u32, u32),
+
+    /// Defines whether if the window should be resizable.
     pub resizable: bool,
 }
 

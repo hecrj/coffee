@@ -9,6 +9,11 @@ pub use settings::Settings;
 pub(crate) use crate::graphics::gpu::winit;
 use crate::graphics::gpu::{self, Gpu};
 
+/// An open window.
+///
+/// It is provided as an argument in some methods in [`Game`].
+///
+/// [`Game`]: ../trait.Game.html
 pub struct Window {
     gpu: Gpu,
     surface: gpu::Surface,
@@ -17,7 +22,10 @@ pub struct Window {
 }
 
 impl Window {
-    pub fn new(mut settings: Settings, event_loop: &EventLoop) -> Window {
+    pub(crate) fn new(
+        mut settings: Settings,
+        event_loop: &EventLoop,
+    ) -> Window {
         let (mut width, mut height) = settings.size;
 
         // Try to revert DPI
@@ -52,18 +60,32 @@ impl Window {
         }
     }
 
+    /// Get the [`Gpu`] linked to the [`Window`].
+    ///
+    /// [`Gpu`]: struct.Gpu.html
+    /// [`Window`]: struct.Window.html
     pub fn gpu(&mut self) -> &mut Gpu {
         &mut self.gpu
     }
 
+    /// Get the next [`Frame`] that will be shown on the [`Window`].
+    ///
+    /// [`Frame`]: struct.Frame.html
+    /// [`Window`]: struct.Window.html
     pub fn frame(&mut self) -> Frame {
         Frame::new(self)
     }
 
+    /// Get the width of the [`Window`].
+    ///
+    /// [`Window`]: struct.Window.html
     pub fn width(&self) -> f32 {
         self.width
     }
 
+    /// Get the height of the [`Window`].
+    ///
+    /// [`Window`]: struct.Window.html
     pub fn height(&self) -> f32 {
         self.height
     }

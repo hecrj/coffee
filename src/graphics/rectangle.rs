@@ -1,7 +1,15 @@
-#[derive(Debug)]
-pub struct Rectangle {
-    pub x: f32,
-    pub y: f32,
-    pub width: f32,
-    pub height: f32,
+/// A generic rectangle.
+#[derive(Debug, PartialEq, Eq, Copy, Clone)]
+pub struct Rectangle<T> {
+    /// X coordinate of the top-left corner.
+    pub x: T,
+
+    /// Y coordinate of the top-left corner.
+    pub y: T,
+
+    /// Width of the rectangle.
+    pub width: T,
+
+    /// Height of the rectangle.
+    pub height: T,
 }
