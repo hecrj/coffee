@@ -90,11 +90,15 @@ impl Window {
         self.height
     }
 
+    pub(crate) fn dpi(&self) -> f64 {
+        self.surface.window().get_hidpi_factor()
+    }
+
     pub(crate) fn swap_buffers(&mut self) {
         self.surface.swap_buffers(&mut self.gpu);
     }
 
-    pub(crate) fn resize(&mut self, new_size: event::NewSize) {
+    pub(crate) fn resize(&mut self, new_size: winit::dpi::LogicalSize) {
         self.surface.update_viewport(&mut self.gpu);
 
         let dpi = self.surface.window().get_hidpi_factor();

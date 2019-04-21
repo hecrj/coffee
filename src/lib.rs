@@ -121,6 +121,7 @@ pub trait Game {
         &self,
         view: &mut Self::View,
         window: &mut graphics::Window,
+        delta: std::time::Duration,
         was_updated: bool,
     ) -> graphics::Result<()>;
 
@@ -157,7 +158,9 @@ pub trait Game {
     }
 }
 
-pub fn run<G: Game>(window_settings: window::Settings) -> graphics::Result<()> {
+pub fn run<G: Game>(
+    window_settings: graphics::WindowSettings,
+) -> graphics::Result<()> {
     // Set up window
     let mut event_loop = window::EventLoop::new();
     let window = &mut Window::new(window_settings, &event_loop);
@@ -190,7 +193,7 @@ pub fn run<G: Game>(window_settings: window::Settings) -> graphics::Result<()> {
             window::Event::Input(input_event) => {
                 game.on_input(input, input_event);
 
-                if cfg!(debug_assertions) {
+                if cfg!(any(debug_assertions, feature = "debug")) {
                     match input_event {
                         input::Event::KeyboardInput {
                             state: input::KeyState::Released,
@@ -201,6 +204,17 @@ pub fn run<G: Game>(window_settings: window::Settings) -> graphics::Result<()> {
                         _ => {}
                     }
                 }
+            }
+            window::Event::CursorMoved(logical_position) => {
+                let position = logical_position.to_physical(window.dpi());
+
+                game.on_input(
+                    input,
+                    input::Event::CursorMoved {
+                        x: position.x as f32,
+                        y: position.y as f32,
+                    },
+                )
             }
             window::Event::CloseRequested => {
                 *alive = false;
@@ -250,7 +264,7 @@ pub fn run<G: Game>(window_settings: window::Settings) -> graphics::Result<()> {
         }
 
         debug.draw_started();
-        game.draw(view, window, was_updated)?;
+        game.draw(view, window, timer.delta(), was_updated)?;
         debug.draw_finished();
 
         game.debug(input, view, window, &mut debug).unwrap();

@@ -1,11 +1,11 @@
-#[cfg(not(debug_assertions))]
+#[cfg(not(any(debug_assertions, feature = "debug")))]
 mod null;
 
-#[cfg(debug_assertions)]
+#[cfg(any(debug_assertions, feature = "debug"))]
 mod basic;
 
-#[cfg(not(debug_assertions))]
+#[cfg(not(any(debug_assertions, feature = "debug")))]
 pub use null::Debug;
 
-#[cfg(debug_assertions)]
+#[cfg(any(debug_assertions, feature = "debug"))]
 pub use basic::Debug;

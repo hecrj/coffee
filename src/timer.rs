@@ -38,4 +38,8 @@ impl Timer {
             false
         }
     }
+
+    pub fn delta(&self) -> time::Duration {
+        self.accumulated_delta
+    }
 }

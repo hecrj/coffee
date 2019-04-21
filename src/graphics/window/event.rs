@@ -3,8 +3,9 @@ use crate::input;
 
 pub(crate) enum Event {
     CloseRequested,
-    Resized(NewSize),
+    Resized(winit::dpi::LogicalSize),
     Input(input::Event),
+    CursorMoved(winit::dpi::LogicalPosition),
 }
 
 pub struct EventLoop(winit::EventsLoop);
@@ -29,41 +30,29 @@ impl EventLoop {
                         input:
                             winit::KeyboardInput {
                                 state,
-                                virtual_keycode: Some(virtual_keycode),
+                                virtual_keycode: Some(key_code),
                                 ..
                             },
                         ..
                     } => {
                         f(Event::Input(input::Event::KeyboardInput {
-                            state: match state {
-                                winit::ElementState::Pressed => {
-                                    input::KeyState::Pressed
-                                }
-                                winit::ElementState::Released => {
-                                    input::KeyState::Released
-                                }
-                            },
-                            key_code: virtual_keycode,
+                            state,
+                            key_code,
                         }));
+                    }
+                    winit::WindowEvent::CursorMoved { position, .. } => {
+                        f(Event::CursorMoved(position))
                     }
                     winit::WindowEvent::CloseRequested => {
                         f(Event::CloseRequested)
                     }
                     winit::WindowEvent::Resized(logical_size) => {
-                        f(Event::Resized(NewSize(logical_size)))
+                        f(Event::Resized(logical_size))
                     }
                     _ => {}
                 },
                 _ => (),
             };
         });
-    }
-}
-
-pub(crate) struct NewSize(winit::dpi::LogicalSize);
-
-impl NewSize {
-    pub fn to_physical(&self, dpi: f64) -> winit::dpi::PhysicalSize {
-        self.0.to_physical(dpi)
     }
 }

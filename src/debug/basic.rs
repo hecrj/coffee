@@ -2,8 +2,8 @@ use std::time;
 
 use crate::graphics;
 
-/// A bunch of performance information about loading, frame, event loop, update,
-/// and draw steps. It can be drawn!
+/// A bunch of performance information about loading, frame, interaction,
+/// update, and draw steps. It can be drawn!
 ///
 /// ![Debug information][debug]
 ///
@@ -183,7 +183,7 @@ impl Debug {
         let fps = (1_000_000.0 / frame_micros as f32).round() as u32;
         let rows = [
             ("Load:", self.load_duration, None),
-            ("Event loop:", self.event_loop_duration, None),
+            ("Interaction:", self.event_loop_duration, None),
             ("Update:", self.update_durations.average(), None),
             ("Draw:", self.draw_durations.average(), None),
             ("Frame:", frame_duration, Some(fps.to_string() + " fps")),

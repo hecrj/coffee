@@ -4,7 +4,7 @@
 //! Operations like matrix transformations, off-screen rendering and draw calls
 //! have always an explicit scope. In Coffee, you do not have to remember to pop
 //! a transformation from the matrix stack, reset the render target, reset the
-//! screen coordinates, etc.
+//! screen coordinates, etc. There are no global functions!
 //!
 //! # Basic concepts
 //! The graphics module revolves around three concepts: [graphics processors],

@@ -16,8 +16,8 @@
 use super::{Progress, Task};
 use crate::graphics;
 
-/// A loading screen can keep track of the progress of a task and provide
-/// feedback to the user.
+/// A loading screen keeps track of the progress of a task and provides feedback
+/// to the user.
 ///
 /// # Usage
 /// If you have a [`LoadingScreen`], you can use it in your [`Game::new`] method
@@ -131,7 +131,7 @@ pub struct ProgressBar {
 }
 
 impl ProgressBar {
-    /// Create the loading screen. It loads a font.
+    /// Create the loading screen.
     pub fn new(gpu: &mut graphics::Gpu) -> Self {
         Self {
             font: graphics::Font::from_bytes(

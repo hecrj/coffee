@@ -13,14 +13,14 @@ features = ["opengl"]
 default = []
 opengl = ["gfx", "gfx_core", "glutin", "gfx_device_gl", "gfx_window_glutin", "gfx_glyph", "gfx_winit"]
 vulkan = ["wgpu", "wgpu/vulkan", "wgpu_winit"]
+debug = []
 
 [dependencies]
 image = "0.21"
 nalgebra = "0.18"
 log = "0.4"
 
-# GFX
-# TODO: Split into its own crate
+# gfx (OpenGL)
 gfx = { version = "0.18", optional = true }
 gfx_core = { version = "0.9", optional = true }
 glutin = { version = "0.20", optional = true }
@@ -29,7 +29,10 @@ gfx_window_glutin = { version = "0.30", optional = true }
 gfx_glyph = { version = "0.14", optional = true }
 gfx_winit = { package = "winit", version = "0.19", optional = true }
 
-# WGPU
-# TODO: Split into its own crate
+# wgpu (Vulkan, Metal, D3D)
 wgpu = { version = "0.2", optional = true }
 wgpu_winit = { package = "winit", version = "0.18", optional = true }
+
+[dev-dependencies]
+rand = "0.6"
+rayon = "1.0"
