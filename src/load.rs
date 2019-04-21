@@ -123,7 +123,13 @@ impl<T> Task<T> {
     {
         Task {
             total_work: 1,
-            function: Box::new(move |_| f()),
+            function: Box::new(move |worker| {
+                let result = f();
+
+                worker.notify_progress(1);
+
+                result
+            }),
         }
     }
 

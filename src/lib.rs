@@ -8,9 +8,9 @@ pub mod input;
 pub mod load;
 
 pub use debug::Debug;
+pub use timer::Timer;
 
 use graphics::window::{self, Window};
-use timer::Timer;
 
 /// The entrypoint of the engine. It describes your game logic.
 ///
@@ -109,10 +109,6 @@ pub trait Game {
     /// Check out the [`graphics`] module to learn more about rendering in
     /// Coffee.
     ///
-    /// `was_updated` tells you whether the [`update`] function was called during
-    /// this frame. You can use this to avoid recalculating data when the game
-    /// state has not changed.
-    ///
     /// This function will be called once per frame.
     ///
     /// [`graphics`]: graphics/index.html
@@ -121,8 +117,7 @@ pub trait Game {
         &self,
         view: &mut Self::View,
         window: &mut graphics::Window,
-        delta: std::time::Duration,
-        was_updated: bool,
+        timer: &Timer,
     ) -> graphics::Result<()>;
 
     /// Process an input event and keep track of it in your [`Input`] type.
@@ -264,7 +259,7 @@ pub fn run<G: Game>(
         }
 
         debug.draw_started();
-        game.draw(view, window, timer.delta(), was_updated)?;
+        game.draw(view, window, &timer)?;
         debug.draw_finished();
 
         game.debug(input, view, window, &mut debug).unwrap();

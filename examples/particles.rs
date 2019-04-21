@@ -1,6 +1,5 @@
 use rand::Rng;
 use rayon::prelude::*;
-use std::time;
 
 use coffee::graphics::{
     Batch, Color, Gpu, Image, Point, Rectangle, Result, Sprite, Vector, Window,
@@ -8,7 +7,7 @@ use coffee::graphics::{
 };
 use coffee::input;
 use coffee::load::{loading_screen, Join, LoadingScreen, Task};
-use coffee::Game;
+use coffee::{Game, Timer};
 
 fn main() {
     coffee::run::<Particles>(WindowSettings {
@@ -49,6 +48,7 @@ impl Game for Particles {
     type View = View;
     type Input = Input;
 
+    // We set it low, so graphics interpolation is noticeable
     const TICKS_PER_SECOND: u16 = 20;
 
     fn new(window: &mut Window) -> (Particles, View, Input) {
@@ -105,7 +105,7 @@ impl Game for Particles {
 
             particle.acceleration = -((Self::G * Self::MASS)
                 * distance.normalize())
-                / distance.component_mul(&distance).norm().max(1000.0);
+                / distance.norm_squared().max(1000.0);
 
             particle.velocity += particle.acceleration;
             particle.position += particle.velocity;
@@ -116,13 +116,10 @@ impl Game for Particles {
         &self,
         view: &mut View,
         window: &mut Window,
-        delta: time::Duration,
-        _was_updated: bool,
+        timer: &Timer,
     ) -> Result<()> {
-        let delta_ = if view.interpolate {
-            Self::TICKS_PER_SECOND as f32
-                * (delta.as_secs() as f32 + delta.subsec_micros() as f32)
-                / 1_000_000.0
+        let delta_factor = if view.interpolate {
+            timer.next_tick_proximity()
         } else {
             0.0
         };
@@ -133,7 +130,8 @@ impl Game for Particles {
         let mut batch = Batch::new(view.palette.clone());
 
         for particle in &self.particles {
-            let velocity = particle.velocity + particle.acceleration * delta_;
+            let velocity =
+                particle.velocity + particle.acceleration * delta_factor;
 
             batch.add(Sprite {
                 source: Rectangle {
@@ -142,7 +140,7 @@ impl Game for Particles {
                     width: 1,
                     height: 1,
                 },
-                position: particle.position + velocity * delta_,
+                position: particle.position + velocity * delta_factor,
             });
         }
 
