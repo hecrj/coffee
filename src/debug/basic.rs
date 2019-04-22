@@ -143,15 +143,15 @@ impl Debug {
         self.frames_until_refresh = 0;
     }
 
+    pub(crate) fn is_enabled(&self) -> bool {
+        self.enabled
+    }
+
     /// Draw the debug information.
     pub fn draw(
         &mut self,
         frame: &mut graphics::Frame,
     ) -> graphics::Result<()> {
-        if !self.enabled {
-            return Ok(());
-        }
-
         if self.frames_until_refresh <= 0 {
             self.text.clear();
             self.refresh_text(frame);

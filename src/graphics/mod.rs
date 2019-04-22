@@ -39,7 +39,7 @@
 //! [`Frame`] and clearing it:
 //!
 //! ```
-//! use coffee::Game;
+//! use coffee::{Game, Timer};
 //! use coffee::graphics::{Window, Color};
 //! # use coffee::graphics::{Result, Gpu};
 //! #
@@ -66,22 +66,22 @@
 //!         &self,
 //!         _view: &mut Self::View,
 //!         window: &mut Window,
-//!         _was_updated: bool
+//!         _timer: &Timer,
 //!     ) -> Result<()> {
 //!         let mut frame = window.frame();
-//!
 //!         frame.clear(Color::BLACK);
 //!
 //!         // Use your resources here...
+//!         // view.image.draw(Sprite { ... }, &mut frame.as_target());
 //!
 //!         Ok(())
 //!     }
 //! }
 //! ```
 //!
-//! You should probably load your resources during [`Game::new`]. Check out the
-//! different types in this module to get a basic understanding of which kind of
-//! resources are supported.
+//! You can load your resources during [`Game::new`]. Check out the different
+//! types in this module to get a basic understanding of which kind of resources
+//! are supported.
 //!
 //! [graphics processors]: #graphics-processors
 //! [targets]: #targets

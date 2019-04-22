@@ -25,13 +25,11 @@ use crate::graphics;
 /// game:
 ///
 /// ```
-/// use std::collections::HashSet;
-///
 /// use coffee::Game;
-/// use coffee::input::KeyCode;
 /// use coffee::load::{Task, Join, LoadingScreen};
 /// use coffee::load::loading_screen::ProgressBar;
 /// use coffee::graphics::Window;
+/// # use coffee::Timer;
 /// # use coffee::graphics::{Result, Gpu};
 /// #
 /// # struct State;
@@ -42,7 +40,10 @@ use crate::graphics;
 /// # impl View {
 /// # fn load() -> Task<View> { Task::new(|| View) }
 /// # }
-/// #
+/// # struct Input;
+/// # impl Input {
+/// # fn new() -> Input { Input }
+/// # }
 ///
 /// struct MyGame {
 ///     state: State,
@@ -50,12 +51,14 @@ use crate::graphics;
 /// }
 ///
 /// impl Game for MyGame {
-///     type View = View;
-///     type Input = HashSet<KeyCode>;
+/// #   type View = View;
+/// #   type Input = Input;
+/// #
+/// #   const TICKS_PER_SECOND: u16 = 60;
+/// #
+///     // ...
 ///
-///     const TICKS_PER_SECOND: u16 = 60;
-///
-///     fn new(window: &mut Window) -> (MyGame, Self::View, Self::Input) {
+///     fn new(window: &mut Window) -> (MyGame, View, Input) {
 ///         let load =
 ///             (
 ///                 Task::stage("Loading state...", State::load()),
@@ -63,10 +66,11 @@ use crate::graphics;
 ///             )
 ///                 .join();
 ///
+///         // Create the loading screen and use `run`
 ///         let mut progress_bar = ProgressBar::new(window.gpu());
 ///         let (state, view) = progress_bar.run(load, window);
 ///
-///         (MyGame { state }, view, HashSet::new())
+///         (MyGame { state }, view, Input::new())
 ///     }
 ///
 ///     // ...
@@ -74,7 +78,7 @@ use crate::graphics;
 ///     #             _view: &mut Self::View, _gpu: &mut Gpu) {}
 ///     # fn update(&mut self, _view: &View, window: &Window) {}
 ///     # fn draw(&self, _view: &mut Self::View, _window: &mut Window,
-///     #         _was_updated: bool) -> Result<()> { Ok(()) }
+///     #         _timer: &Timer) -> Result<()> { Ok(()) }
 /// }
 /// ```
 ///

@@ -29,7 +29,11 @@ impl Debug {
 
     pub(crate) fn draw_finished(&mut self) {}
 
-    pub fn toggle(&mut self) {}
+    pub(crate) fn toggle(&mut self) {}
+
+    pub(crate) fn is_enabled(&self) -> bool {
+        false
+    }
 
     pub fn draw(
         &mut self,

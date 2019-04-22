@@ -135,7 +135,8 @@ pub trait Game {
     ///
     /// It is called after `draw` once per frame when debug has been toggled
     /// using the [`DEBUG_KEY`]. Anything you draw here will be on top. Debug
-    /// code is only called when compiling with `debug_assertions` enabled.
+    /// code is only called when compiling with `debug_assertions` _or_ the
+    /// `debug` feature enabled.
     ///
     /// By default, it shows [`Debug`], which displays a brief summary about
     /// game performance in the top left corner.
@@ -159,12 +160,9 @@ pub fn run<G: Game>(
     // Set up window
     let mut event_loop = window::EventLoop::new();
     let window = &mut Window::new(window_settings, &event_loop);
-
-    // Debug
     let mut debug = Debug::new(window.gpu(), G::TICKS_PER_SECOND);
 
     // Load game
-    // (Loading progress support soon!)
     debug.loading_started();
     let (game, view, input) = &mut G::new(window);
     debug.loading_finished();
@@ -172,7 +170,6 @@ pub fn run<G: Game>(
     // Game loop
     let mut timer = Timer::new(G::TICKS_PER_SECOND);
     let mut alive = true;
-    let mut was_updated = true;
 
     fn process_events<G: Game>(
         game: &mut G,
@@ -224,8 +221,6 @@ pub fn run<G: Game>(
 
     while alive {
         debug.frame_started();
-
-        // Update loop
         timer.update();
 
         while timer.tick() {
@@ -242,11 +237,9 @@ pub fn run<G: Game>(
             debug.update_started();
             game.update(view, window);
             debug.update_finished();
-
-            was_updated = true;
         }
 
-        if !was_updated {
+        if !timer.has_ticked() {
             process_events(
                 game,
                 input,
@@ -262,12 +255,12 @@ pub fn run<G: Game>(
         game.draw(view, window, &timer)?;
         debug.draw_finished();
 
-        game.debug(input, view, window, &mut debug).unwrap();
+        if debug.is_enabled() {
+            game.debug(input, view, window, &mut debug).unwrap();
+        }
+
         window.swap_buffers();
-
         debug.frame_finished();
-
-        was_updated = false;
     }
 
     Ok(())
