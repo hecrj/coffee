@@ -12,7 +12,7 @@ use coffee::{Game, Timer};
 
 fn main() {
     coffee::run::<Particles>(WindowSettings {
-        title: String::from("Particles"),
+        title: String::from("Particles - Coffee"),
         size: (1280, 1024),
         resizable: false,
     })
@@ -49,7 +49,8 @@ impl Game for Particles {
     type View = View;
     type Input = Input;
 
-    // Low, so graphics interpolation is really noticeable
+    // Low update rate.
+    // This way, graphics interpolation is really noticeable when toggled!
     const TICKS_PER_SECOND: u16 = 20;
 
     fn new(window: &mut Window) -> (Particles, View, Input) {
@@ -105,6 +106,7 @@ impl Game for Particles {
     fn update(&mut self, _view: &View, _window: &Window) {
         let gravity_center = self.gravity_center.clone();
 
+        // Update particles in parallel! <3 rayon
         self.particles.par_iter_mut().for_each(move |particle| {
             let distance = particle.position - gravity_center;
 
