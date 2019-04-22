@@ -2,8 +2,7 @@ use std::time;
 
 use crate::graphics;
 
-/// A bunch of performance information about loading, frame, interaction,
-/// update, and draw steps. It can be drawn!
+/// A bunch of performance information about a [`Game`]. It can be drawn!
 ///
 /// ![Debug information][debug]
 ///
@@ -13,6 +12,7 @@ use crate::graphics;
 /// Overriding [`Game::debug`] gives you access to this struct, allowing you to
 /// implement your own debug view.
 ///
+/// [`Game`]: trait.Game.html
 /// [debug]: https://github.com/hecrj/coffee/blob/ee73432533e6f3162c942c9e2b474d3b0b524ad0/images/debug.png?raw=true
 /// [`Game::DEBUG_KEY`]: trait.Game.html#associatedconstant.DEBUG_KEY
 /// [`Game::debug`]: trait.Game.html#method.debug

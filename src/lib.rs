@@ -152,116 +152,121 @@ pub trait Game {
     ) -> graphics::Result<()> {
         debug.draw(&mut window.frame())
     }
-}
 
-pub fn run<G: Game>(
-    window_settings: graphics::WindowSettings,
-) -> graphics::Result<()> {
-    // Set up window
-    let mut event_loop = window::EventLoop::new();
-    let window = &mut Window::new(window_settings, &event_loop);
-    let mut debug = Debug::new(window.gpu(), G::TICKS_PER_SECOND);
+    /// Runs the [`Game`] with the given [`WindowSettings`].
+    ///
+    /// [`Game`]: trait.Game.html
+    /// [`WindowSettings`]: graphics/struct.WindowSettings.html
+    fn run(window_settings: graphics::WindowSettings) -> graphics::Result<()>
+    where
+        Self: Sized,
+    {
+        // Set up window
+        let mut event_loop = window::EventLoop::new();
+        let window = &mut Window::new(window_settings, &event_loop);
+        let mut debug = Debug::new(window.gpu(), Self::TICKS_PER_SECOND);
 
-    // Load game
-    debug.loading_started();
-    let (game, view, input) = &mut G::new(window);
-    debug.loading_finished();
+        // Load game
+        debug.loading_started();
+        let (game, view, input) = &mut Self::new(window);
+        debug.loading_finished();
 
-    // Game loop
-    let mut timer = Timer::new(G::TICKS_PER_SECOND);
-    let mut alive = true;
+        // Game loop
+        let mut timer = Timer::new(Self::TICKS_PER_SECOND);
+        let mut alive = true;
 
-    fn process_events<G: Game>(
-        game: &mut G,
-        input: &mut G::Input,
-        view: &mut G::View,
-        debug: &mut Debug,
-        window: &mut Window,
-        event_loop: &mut window::EventLoop,
-        alive: &mut bool,
-    ) {
-        debug.event_loop_started();
-        event_loop.poll(|event| match event {
-            window::Event::Input(input_event) => {
-                game.on_input(input, input_event);
+        fn process_events<G: Game>(
+            game: &mut G,
+            input: &mut G::Input,
+            view: &mut G::View,
+            debug: &mut Debug,
+            window: &mut Window,
+            event_loop: &mut window::EventLoop,
+            alive: &mut bool,
+        ) {
+            debug.event_loop_started();
+            event_loop.poll(|event| match event {
+                window::Event::Input(input_event) => {
+                    game.on_input(input, input_event);
 
-                if cfg!(any(debug_assertions, feature = "debug")) {
-                    match input_event {
-                        input::Event::KeyboardInput {
-                            state: input::KeyState::Released,
-                            key_code,
-                        } if Some(key_code) == G::DEBUG_KEY => {
-                            debug.toggle();
+                    if cfg!(any(debug_assertions, feature = "debug")) {
+                        match input_event {
+                            input::Event::KeyboardInput {
+                                state: input::KeyState::Released,
+                                key_code,
+                            } if Some(key_code) == G::DEBUG_KEY => {
+                                debug.toggle();
+                            }
+                            _ => {}
                         }
-                        _ => {}
                     }
                 }
-            }
-            window::Event::CursorMoved(logical_position) => {
-                let position = logical_position.to_physical(window.dpi());
+                window::Event::CursorMoved(logical_position) => {
+                    let position = logical_position.to_physical(window.dpi());
 
-                game.on_input(
+                    game.on_input(
+                        input,
+                        input::Event::CursorMoved {
+                            x: position.x as f32,
+                            y: position.y as f32,
+                        },
+                    )
+                }
+                window::Event::CloseRequested => {
+                    *alive = false;
+                }
+                window::Event::Resized(new_size) => {
+                    window.resize(new_size);
+                }
+            });
+            game.interact(input, view, window.gpu());
+            debug.event_loop_finished();
+        }
+
+        while alive {
+            debug.frame_started();
+            timer.update();
+
+            while timer.tick() {
+                process_events(
+                    game,
                     input,
-                    input::Event::CursorMoved {
-                        x: position.x as f32,
-                        y: position.y as f32,
-                    },
-                )
+                    view,
+                    &mut debug,
+                    window,
+                    &mut event_loop,
+                    &mut alive,
+                );
+
+                debug.update_started();
+                game.update(view, window);
+                debug.update_finished();
             }
-            window::Event::CloseRequested => {
-                *alive = false;
+
+            if !timer.has_ticked() {
+                process_events(
+                    game,
+                    input,
+                    view,
+                    &mut debug,
+                    window,
+                    &mut event_loop,
+                    &mut alive,
+                );
             }
-            window::Event::Resized(new_size) => {
-                window.resize(new_size);
+
+            debug.draw_started();
+            game.draw(view, window, &timer)?;
+            debug.draw_finished();
+
+            if debug.is_enabled() {
+                game.debug(input, view, window, &mut debug).unwrap();
             }
-        });
-        game.interact(input, view, window.gpu());
-        debug.event_loop_finished();
+
+            window.swap_buffers();
+            debug.frame_finished();
+        }
+
+        Ok(())
     }
-
-    while alive {
-        debug.frame_started();
-        timer.update();
-
-        while timer.tick() {
-            process_events(
-                game,
-                input,
-                view,
-                &mut debug,
-                window,
-                &mut event_loop,
-                &mut alive,
-            );
-
-            debug.update_started();
-            game.update(view, window);
-            debug.update_finished();
-        }
-
-        if !timer.has_ticked() {
-            process_events(
-                game,
-                input,
-                view,
-                &mut debug,
-                window,
-                &mut event_loop,
-                &mut alive,
-            );
-        }
-
-        debug.draw_started();
-        game.draw(view, window, &timer)?;
-        debug.draw_finished();
-
-        if debug.is_enabled() {
-            game.debug(input, view, window, &mut debug).unwrap();
-        }
-
-        window.swap_buffers();
-        debug.frame_finished();
-    }
-
-    Ok(())
 }

@@ -1,5 +1,5 @@
-//! Load your game assets with _type-safety_ and build loading screens that can
-//! keep track of progress _consistently_.
+//! Load your game assets with type-safety and build loading screens that can
+//! keep track of progress consistently.
 //!
 //! # Tasks
 //! The generic [`Task`] struct represents a lazy loading operation that can

@@ -11,7 +11,7 @@ use coffee::load::{loading_screen, Join, LoadingScreen, Task};
 use coffee::{Game, Timer};
 
 fn main() {
-    coffee::run::<Particles>(WindowSettings {
+    Particles::run(WindowSettings {
         title: String::from("Particles - Coffee"),
         size: (1280, 1024),
         resizable: false,
