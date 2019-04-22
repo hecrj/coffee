@@ -103,7 +103,7 @@ impl Image {
     pub fn draw<Q: IntoQuad>(&self, quad: Q, target: &mut Target) {
         target.draw_texture_quads(
             &self.texture,
-            &[gpu::Instance::from_quad(quad.into_quad(
+            &[gpu::Instance::from(quad.into_quad(
                 1.0 / self.width() as f32,
                 1.0 / self.height() as f32,
             ))],

@@ -35,7 +35,7 @@ impl Batch {
     #[inline]
     pub fn add<Q: IntoQuad>(&mut self, quad: Q) {
         let instance =
-            gpu::Instance::from_quad(quad.into_quad(self.x_unit, self.y_unit));
+            gpu::Instance::from(quad.into_quad(self.x_unit, self.y_unit));
 
         self.instances.push(instance);
     }

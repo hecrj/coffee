@@ -197,8 +197,8 @@ impl Shader {
     }
 }
 
-impl Instance {
-    pub fn from_quad(quad: Quad) -> Instance {
+impl From<Quad> for Instance {
+    fn from(quad: Quad) -> Instance {
         let source = quad.source;
         let position = quad.position;
         let (width, height) = quad.size;

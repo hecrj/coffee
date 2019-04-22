@@ -36,7 +36,7 @@ impl Batch {
         quad.source.x += index.offset.x;
         quad.source.y += index.offset.y;
 
-        let mut instance = Instance::from_quad(quad);
+        let mut instance = Instance::from(quad);
 
         instance.layer = index.layer.into();
 

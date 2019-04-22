@@ -2,7 +2,7 @@ use std::mem;
 
 use wgpu;
 
-use crate::graphics::{DrawParameters, Transformation};
+use crate::graphics::{Quad, Transformation};
 
 pub struct Pipeline {
     pipeline: wgpu::RenderPipeline,
@@ -328,16 +328,18 @@ pub struct Instance {
 
 impl Instance {
     const MAX: u32 = 100_000;
+}
 
-    pub fn from_parameters(parameters: DrawParameters) -> Instance {
-        let source = parameters.source;
-        let position = parameters.position;
-        let scale = parameters.scale;
+impl From<Quad> for Instance {
+    fn from(quad: Quad) -> Instance {
+        let source = quad.source;
+        let position = quad.position;
+        let (width, height) = quad.size;
 
         Instance {
             source: [source.x, source.y, source.width, source.height],
             translation: [position.x, position.y],
-            scale: [scale.x, scale.y],
+            scale: [width, height],
             layer: 0,
         }
     }

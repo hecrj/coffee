@@ -53,7 +53,7 @@ impl Canvas {
     pub fn draw(&self, quad: Quad, target: &mut Target) {
         target.draw_texture_quads(
             &self.drawable.texture(),
-            &[gpu::Instance::from_quad(quad)],
+            &[gpu::Instance::from(quad)],
         );
     }
 }
