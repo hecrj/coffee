@@ -6,6 +6,9 @@ use crate::load::Task;
 pub struct Font(gpu::Font);
 
 impl Font {
+    pub(crate) const DEFAULT: &'static [u8] =
+        include_bytes!("../../resources/font/Inconsolata-Regular.ttf");
+
     /// Load a font from raw data.
     pub fn from_bytes(gpu: &mut Gpu, bytes: &'static [u8]) -> Font {
         Font(gpu.upload_font(bytes))

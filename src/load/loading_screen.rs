@@ -138,10 +138,7 @@ impl ProgressBar {
     /// Create the loading screen.
     pub fn new(gpu: &mut graphics::Gpu) -> Self {
         Self {
-            font: graphics::Font::from_bytes(
-                gpu,
-                include_bytes!("../debug/font/Inconsolata-Regular.ttf"),
-            ),
+            font: graphics::Font::from_bytes(gpu, graphics::Font::DEFAULT),
             pencil: graphics::Image::from_colors(
                 gpu,
                 &[graphics::Color::WHITE],
@@ -179,7 +176,7 @@ impl LoadingScreen for ProgressBar {
         if let Some(stage) = progress.stage() {
             self.font.add(graphics::Text {
                 content: stage.clone(),
-                position: graphics::Vector::new(
+                position: graphics::Point::new(
                     50.0,
                     frame.height() / 2.0 - 80.0,
                 ),
@@ -191,7 +188,7 @@ impl LoadingScreen for ProgressBar {
 
         self.font.add(graphics::Text {
             content: format!("{:.0}", progress.percentage()) + "%",
-            position: graphics::Vector::new(50.0, frame.height() / 2.0 + 50.0),
+            position: graphics::Point::new(50.0, frame.height() / 2.0 + 50.0),
             size: 30.0,
             bounds: (frame.width(), frame.height()),
             color: graphics::Color::WHITE,

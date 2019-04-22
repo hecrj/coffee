@@ -1,9 +1,10 @@
 use rand::Rng;
 use rayon::prelude::*;
+use std::{thread, time};
 
 use coffee::graphics::{
-    Batch, Color, Gpu, Image, Point, Rectangle, Result, Sprite, Vector, Window,
-    WindowSettings,
+    Batch, Color, Font, Gpu, Image, Point, Rectangle, Result, Sprite, Text,
+    Vector, Window, WindowSettings,
 };
 use coffee::input;
 use coffee::load::{loading_screen, Join, LoadingScreen, Task};
@@ -48,7 +49,7 @@ impl Game for Particles {
     type View = View;
     type Input = Input;
 
-    // We set it low, so graphics interpolation is noticeable
+    // Low, so graphics interpolation is really noticeable
     const TICKS_PER_SECOND: u16 = 20;
 
     fn new(window: &mut Window) -> (Particles, View, Input) {
@@ -58,11 +59,15 @@ impl Game for Particles {
                 Particles::generate(window.width(), window.height()),
             ),
             Task::stage("Loading assets...", View::load()),
+            Task::stage(
+                "Showing off the loading screen for a bit...",
+                Task::new(|| thread::sleep(time::Duration::from_secs(2))),
+            ),
         )
             .join();
 
         let mut loading_screen = loading_screen::ProgressBar::new(window.gpu());
-        let (particles, view) = loading_screen.run(task, window);
+        let (particles, view, _) = loading_screen.run(task, window);
 
         (particles, view, Input::new())
     }
@@ -118,16 +123,17 @@ impl Game for Particles {
         window: &mut Window,
         timer: &Timer,
     ) -> Result<()> {
+        let mut frame = window.frame();
+        frame.clear(Color::BLACK);
+
+        // Draw particles all at once!
+        let mut batch = Batch::new(view.palette.clone());
+
         let delta_factor = if view.interpolate {
             timer.next_tick_proximity()
         } else {
             0.0
         };
-
-        let mut frame = window.frame();
-        frame.clear(Color::BLACK);
-
-        let mut batch = Batch::new(view.palette.clone());
 
         for particle in &self.particles {
             let velocity =
@@ -135,7 +141,7 @@ impl Game for Particles {
 
             batch.add(Sprite {
                 source: Rectangle {
-                    x: View::particle_color(velocity) as u16,
+                    x: View::particle_color(velocity),
                     y: 0,
                     width: 1,
                     height: 1,
@@ -145,6 +151,41 @@ impl Game for Particles {
         }
 
         batch.draw(Point::new(0.0, 0.0), &mut frame.as_target());
+
+        // Draw simple text UI
+        view.font.add(Text {
+            content: String::from("Graphics interpolation:"),
+            position: Point::new(10.0, frame.height() - 50.0),
+            bounds: (frame.width(), frame.height()),
+            size: 20.0,
+            color: Color::WHITE,
+        });
+
+        view.font.add(Text {
+            content: if view.interpolate {
+                String::from("ON")
+            } else {
+                String::from("OFF")
+            },
+            position: Point::new(250.0, frame.height() - 50.0),
+            bounds: (frame.width(), frame.height()),
+            size: 20.0,
+            color: if view.interpolate {
+                Color::new(0.0, 1.0, 0.0, 1.0)
+            } else {
+                Color::new(1.0, 0.0, 0.0, 1.0)
+            },
+        });
+
+        view.font.add(Text {
+            content: String::from("Press I to toggle."),
+            position: Point::new(10.0, frame.height() - 25.0),
+            bounds: (frame.width(), frame.height()),
+            size: 16.0,
+            color: Color::WHITE,
+        });
+
+        view.font.draw(&mut frame);
 
         Ok(())
     }
@@ -172,6 +213,7 @@ impl Particle {
 
 struct View {
     palette: Image,
+    font: Font,
     interpolate: bool,
 }
 
@@ -213,19 +255,34 @@ impl View {
             b: 0.9,
             a: 1.0,
         },
-        Color::WHITE,
+        Color {
+            r: 0.8,
+            g: 0.8,
+            b: 1.0,
+            a: 1.0,
+        },
     ];
 
     fn load() -> Task<View> {
-        Task::using_gpu(|gpu| Image::from_colors(gpu, &Self::COLORS).unwrap())
-            .map(|palette| View {
+        (
+            Task::using_gpu(|gpu| {
+                Image::from_colors(gpu, &Self::COLORS).unwrap()
+            }),
+            Font::load(include_bytes!(
+                "../resources/font/Inconsolata-Regular.ttf"
+            )),
+        )
+            .join()
+            .map(|(palette, font)| View {
                 palette,
+                font,
                 interpolate: true,
             })
     }
 
-    fn particle_color(velocity: Vector) -> u8 {
-        ((velocity.norm() * 2.0).round() as u8).min(View::COLORS.len() as u8)
+    fn particle_color(velocity: Vector) -> u16 {
+        ((velocity.norm() * 2.0).round() as usize).min(View::COLORS.len())
+            as u16
     }
 }
 

@@ -1,5 +1,4 @@
 use image;
-use log::debug;
 use std::fs::File;
 use std::io::Read;
 use std::path::{Path, PathBuf};
@@ -26,8 +25,6 @@ impl Image {
     ///
     /// [`Image`]: struct.Image.html
     pub fn new<P: AsRef<Path>>(gpu: &mut Gpu, path: P) -> Option<Image> {
-        debug!("Loading image: {:?}", path.as_ref());
-
         let image = {
             let mut buf = Vec::new();
             let mut reader = File::open(path).unwrap();

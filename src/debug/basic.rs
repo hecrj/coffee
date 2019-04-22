@@ -39,10 +39,7 @@ impl Debug {
         let now = time::Instant::now();
 
         Self {
-            font: graphics::Font::from_bytes(
-                gpu,
-                include_bytes!("font/Inconsolata-Regular.ttf"),
-            ),
+            font: graphics::Font::from_bytes(gpu, graphics::Font::DEFAULT),
             enabled: false,
             load_start: now,
             load_duration: time::Duration::from_secs(0),
@@ -183,7 +180,7 @@ impl Debug {
         let fps = (1_000_000.0 / frame_micros as f32).round() as u32;
         let rows = [
             ("Load:", self.load_duration, None),
-            ("Interaction:", self.event_loop_duration, None),
+            ("Interact:", self.event_loop_duration, None),
             ("Update:", self.update_durations.average(), None),
             ("Draw:", self.draw_durations.average(), None),
             ("Frame:", frame_duration, Some(fps.to_string() + " fps")),
@@ -214,7 +211,7 @@ impl Debug {
         [
             graphics::Text {
                 content: String::from(title),
-                position: graphics::Vector::new(
+                position: graphics::Point::new(
                     Self::MARGIN + Self::SHADOW_OFFSET,
                     Self::MARGIN + y + Self::SHADOW_OFFSET,
                 ),
@@ -224,14 +221,14 @@ impl Debug {
             },
             graphics::Text {
                 content: String::from(title),
-                position: graphics::Vector::new(Self::MARGIN, Self::MARGIN + y),
+                position: graphics::Point::new(Self::MARGIN, Self::MARGIN + y),
                 bounds,
                 size: 20.0,
                 color: graphics::Color::WHITE,
             },
             graphics::Text {
                 content: formatted_duration.clone(),
-                position: graphics::Vector::new(
+                position: graphics::Point::new(
                     Self::MARGIN + Self::TITLE_WIDTH + Self::SHADOW_OFFSET,
                     Self::MARGIN + y + Self::SHADOW_OFFSET,
                 ),
@@ -241,7 +238,7 @@ impl Debug {
             },
             graphics::Text {
                 content: formatted_duration,
-                position: graphics::Vector::new(
+                position: graphics::Point::new(
                     Self::MARGIN + Self::TITLE_WIDTH,
                     Self::MARGIN + y,
                 ),

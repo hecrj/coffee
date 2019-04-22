@@ -1,4 +1,4 @@
-use crate::graphics::{Color, Vector};
+use crate::graphics::{Color, Point};
 
 /// A section of text.
 #[derive(Clone, PartialEq, Debug)]
@@ -7,7 +7,7 @@ pub struct Text {
     pub content: String,
 
     /// Text position.
-    pub position: Vector,
+    pub position: Point,
 
     /// Text bounds, in screen coordinates.
     pub bounds: (f32, f32),
