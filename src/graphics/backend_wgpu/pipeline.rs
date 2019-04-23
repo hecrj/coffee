@@ -183,7 +183,7 @@ impl Pipeline {
             .fill_from_slice(&QUAD_INDICES);
 
         let instances = device.create_buffer(&wgpu::BufferDescriptor {
-            size: mem::size_of::<Instance>() as u32 * Instance::MAX,
+            size: mem::size_of::<Instance>() as u32 * Instance::MAX as u32,
             usage: wgpu::BufferUsageFlags::VERTEX
                 | wgpu::BufferUsageFlags::TRANSFER_DST,
         });
@@ -229,13 +229,6 @@ impl Pipeline {
             .create_buffer_mapped(16, wgpu::BufferUsageFlags::TRANSFER_SRC)
             .fill_from_slice(&matrix[..]);
 
-        let instance_buffer = device
-            .create_buffer_mapped(
-                instances.len(),
-                wgpu::BufferUsageFlags::TRANSFER_SRC,
-            )
-            .fill_from_slice(instances);
-
         let mut encoder =
             device.create_command_encoder(&wgpu::CommandEncoderDescriptor {
                 todo: 0,
@@ -249,47 +242,63 @@ impl Pipeline {
             16 * 4,
         );
 
-        encoder.copy_buffer_to_buffer(
-            &instance_buffer,
-            0,
-            &self.instances,
-            0,
-            (mem::size_of::<Instance>() * instances.len()) as u32,
-        );
+        let mut i = 0;
+        let total = instances.len();
 
-        {
-            let mut render_pass =
-                encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
-                    color_attachments: &[
-                        wgpu::RenderPassColorAttachmentDescriptor {
-                            attachment: target,
-                            load_op: wgpu::LoadOp::Load,
-                            store_op: wgpu::StoreOp::Store,
-                            clear_color: wgpu::Color {
-                                r: 0.0,
-                                g: 0.0,
-                                b: 0.0,
-                                a: 0.0,
-                            },
-                        },
-                    ],
-                    depth_stencil_attachment: None,
-                });
+        while i < total {
+            let end = (i + Instance::MAX).min(total);
+            let amount = end - i;
 
-            render_pass.set_pipeline(&self.pipeline);
-            render_pass.set_bind_group(0, &self.constants);
-            render_pass.set_bind_group(1, &texture.0);
-            render_pass.set_index_buffer(&self.indices, 0);
-            render_pass.set_vertex_buffers(&[
-                (&self.vertices, 0),
-                (&self.instances, 0),
-            ]);
+            let instance_buffer = device
+                .create_buffer_mapped(
+                    amount,
+                    wgpu::BufferUsageFlags::TRANSFER_SRC,
+                )
+                .fill_from_slice(&instances[i..end]);
 
-            render_pass.draw_indexed(
-                0..QUAD_INDICES.len() as u32,
+            encoder.copy_buffer_to_buffer(
+                &instance_buffer,
                 0,
-                0..instances.len() as u32,
+                &self.instances,
+                0,
+                (mem::size_of::<Instance>() * amount) as u32,
             );
+            {
+                let mut render_pass =
+                    encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+                        color_attachments: &[
+                            wgpu::RenderPassColorAttachmentDescriptor {
+                                attachment: target,
+                                load_op: wgpu::LoadOp::Load,
+                                store_op: wgpu::StoreOp::Store,
+                                clear_color: wgpu::Color {
+                                    r: 0.0,
+                                    g: 0.0,
+                                    b: 0.0,
+                                    a: 0.0,
+                                },
+                            },
+                        ],
+                        depth_stencil_attachment: None,
+                    });
+
+                render_pass.set_pipeline(&self.pipeline);
+                render_pass.set_bind_group(0, &self.constants);
+                render_pass.set_bind_group(1, &texture.0);
+                render_pass.set_index_buffer(&self.indices, 0);
+                render_pass.set_vertex_buffers(&[
+                    (&self.vertices, 0),
+                    (&self.instances, 0),
+                ]);
+
+                render_pass.draw_indexed(
+                    0..QUAD_INDICES.len() as u32,
+                    0,
+                    0..amount as u32,
+                );
+            }
+
+            i += Instance::MAX;
         }
 
         device.get_queue().submit(&[encoder.finish()]);
@@ -327,7 +336,7 @@ pub struct Instance {
 }
 
 impl Instance {
-    const MAX: u32 = 100_000;
+    const MAX: usize = 100_000;
 }
 
 impl From<Quad> for Instance {

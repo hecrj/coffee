@@ -6,7 +6,7 @@ use super::format;
 use super::texture::Texture;
 use crate::graphics::{Quad, Transformation};
 
-const MAX_POINTS: u32 = 100_000;
+const MAX_INSTANCES: u32 = 100_000;
 const QUAD_INDICES: [u16; 6] = [0, 1, 2, 0, 2, 3];
 
 const QUAD_VERTS: [Vertex; 4] = [
@@ -71,7 +71,7 @@ impl Pipeline {
         // Create point buffer
         let instances = factory
             .create_buffer(
-                MAX_POINTS as usize,
+                MAX_INSTANCES as usize,
                 gfx::buffer::Role::Vertex,
                 gfx::memory::Usage::Dynamic,
                 gfx::memory::Bind::SHADER_RESOURCE,
@@ -155,13 +155,22 @@ impl Pipeline {
 
         self.data.out = view.clone();
 
-        encoder
-            .update_buffer(&self.data.instances, instances, 0)
-            .expect("Instance upload");
+        let mut i = 0;
+        let total = instances.len();
 
-        self.slice.instances = Some((instances.len() as u32, 0));
+        while i < total {
+            let end = (i + MAX_INSTANCES as usize).min(total);
 
-        encoder.draw(&self.slice, &self.shader.state, &self.data)
+            encoder
+                .update_buffer(&self.data.instances, &instances[i..end], 0)
+                .expect("Instance upload");
+
+            self.slice.instances = Some((end as u32 - i as u32, 0));
+
+            encoder.draw(&self.slice, &self.shader.state, &self.data);
+
+            i += MAX_INSTANCES as usize;
+        }
     }
 }
 

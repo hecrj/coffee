@@ -25,7 +25,7 @@ struct Particles {
 }
 
 impl Particles {
-    const AMOUNT: u16 = 50_000;
+    const AMOUNT: u32 = 50_000;
     const G: f32 = 6.674;
     const MASS: f32 = 200.0;
 
