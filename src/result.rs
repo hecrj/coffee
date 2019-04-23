@@ -4,7 +4,9 @@ use std::io;
 
 use crate::graphics::texture_array;
 
-/// A convenient result type.
+/// A convenient result with a locked [`Error`] type.
+///
+/// [`Error`]: enum.Error.html
 pub type Result<T> = std::result::Result<T, Error>;
 
 /// An error in the engine.

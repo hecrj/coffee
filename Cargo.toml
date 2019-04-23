@@ -18,7 +18,6 @@ debug = []
 [dependencies]
 image = "0.21"
 nalgebra = "0.18"
-log = "0.4"
 
 # gfx (OpenGL)
 gfx = { version = "0.18", optional = true }

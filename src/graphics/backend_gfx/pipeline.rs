@@ -76,7 +76,7 @@ impl Pipeline {
                 gfx::memory::Usage::Dynamic,
                 gfx::memory::Bind::SHADER_RESOURCE,
             )
-            .expect("Instance buffer creation failed");
+            .expect("Instance buffer creation");
 
         let (quads, slice) = factory
             .create_vertex_buffer_with_slice(&QUAD_VERTS, &QUAD_INDICES[..]);
@@ -121,7 +121,7 @@ impl Pipeline {
 
         encoder
             .update_buffer(&data.globals, &[globals], 0)
-            .expect("Globals initialization failed");
+            .expect("Globals initialization");
 
         Pipeline {
             slice,
@@ -150,14 +150,14 @@ impl Pipeline {
 
             encoder
                 .update_buffer(&self.data.globals, &[self.globals], 0)
-                .expect("Globals upload failed");
+                .expect("Globals upload");
         }
 
         self.data.out = view.clone();
 
         encoder
             .update_buffer(&self.data.instances, instances, 0)
-            .expect("Instance upload failed");
+            .expect("Instance upload");
 
         self.slice.instances = Some((instances.len() as u32, 0));
 
@@ -176,7 +176,7 @@ impl Shader {
                 include_bytes!("shader/basic.vert"),
                 include_bytes!("shader/basic.frag"),
             )
-            .expect("Shader set creation failed");
+            .expect("Shader set creation");
 
         let rasterizer = gfx::state::Rasterizer {
             front_face: gfx::state::FrontFace::CounterClockwise,
@@ -193,7 +193,7 @@ impl Shader {
                 rasterizer,
                 init,
             )
-            .expect("Pipeline state creation failed");
+            .expect("Pipeline state creation");
 
         Shader { state }
     }

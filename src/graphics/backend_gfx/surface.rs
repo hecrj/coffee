@@ -74,7 +74,7 @@ impl Surface {
 
     pub fn swap_buffers(&mut self, gpu: &mut Gpu) {
         gpu.flush();
-        self.context.swap_buffers().expect("Buffer swap failed");
+        self.context.swap_buffers().expect("Buffer swap");
         gpu.cleanup();
     }
 }

@@ -125,7 +125,7 @@ impl Drawable {
 
         let target = factory
             .view_texture_as_render_target_raw(texture.handle(), render_desc)
-            .expect("Could not view texture as render target");
+            .expect("View texture as render target");
 
         Drawable { texture, target }
     }
@@ -174,7 +174,7 @@ fn create_texture_array(
             Some(channel_type),
             layers.map(|l| (l, gfx::texture::Mipmap::Provided)),
         )
-        .expect("Texture array creation failed");
+        .expect("Texture array creation");
 
     let descriptor = gfx::texture::ResourceDesc {
         channel: channel_type,
@@ -186,7 +186,7 @@ fn create_texture_array(
 
     let view = factory
         .view_texture_as_shader_resource_raw(&texture, descriptor)
-        .expect("Could not view texture as a shader resource");
+        .expect("View texture as a shader resource");
 
     let typed_view: gfx::handle::ShaderResourceView<
         _,
