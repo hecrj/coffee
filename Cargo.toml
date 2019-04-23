@@ -12,7 +12,7 @@ features = ["opengl"]
 [features]
 default = []
 opengl = ["gfx", "gfx_core", "glutin", "gfx_device_gl", "gfx_window_glutin", "gfx_glyph", "gfx_winit"]
-vulkan = ["wgpu", "wgpu/vulkan", "wgpu_winit"]
+vulkan = ["wgpu", "wgpu/vulkan"]
 debug = []
 
 [dependencies]
@@ -30,7 +30,6 @@ gfx_winit = { package = "winit", version = "0.19", optional = true }
 
 # wgpu (Vulkan, Metal, D3D)
 wgpu = { version = "0.2", optional = true }
-wgpu_winit = { package = "winit", version = "0.18", optional = true }
 
 [dev-dependencies]
 rand = "0.6"

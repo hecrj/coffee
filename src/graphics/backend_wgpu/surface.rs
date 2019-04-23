@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use super::{DepthView, Gpu, TargetView};
-pub use wgpu_winit as winit;
+pub use wgpu::winit;
 
 pub struct Surface {
     window: winit::Window,

@@ -96,6 +96,9 @@
 //! [`Font`]: struct.Font.html
 //! [`Game::draw`]: ../trait.Game.html#tymethod.draw
 //! [`Game::new`]: ../trait.Game.html#tymethod.new
+#[cfg(not(any(feature = "opengl", feature = "vulkan")))]
+compile_error!("You need to enable a graphics backend feature");
+
 #[cfg(feature = "opengl")]
 mod backend_gfx;
 #[cfg(feature = "opengl")]
