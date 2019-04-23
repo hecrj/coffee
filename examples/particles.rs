@@ -25,7 +25,11 @@ struct Particles {
 }
 
 impl Particles {
+    // Try increasing this value! I (@hecrj) can render 350k particles at 100fps
+    // on my system. I have not tried going above that, yet...
     const AMOUNT: u32 = 50_000;
+
+    // Play with these values to alter the way gravity works.
     const G: f32 = 6.674;
     const MASS: f32 = 200.0;
 

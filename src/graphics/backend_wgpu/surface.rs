@@ -57,9 +57,14 @@ impl Surface {
 
     pub fn swap_buffers(&mut self, gpu: &mut Gpu) {
         let output = self.swap_chain.get_next_texture();
-        let mut encoder = gpu.device.create_command_encoder(
+
+        let new_encoder = gpu.device.create_command_encoder(
             &wgpu::CommandEncoderDescriptor { todo: 0 },
         );
+
+        // We swap the current decoder by a new one here, so we can finish the
+        // current frame
+        let mut encoder = std::mem::replace(&mut gpu.encoder, new_encoder);
 
         encoder.copy_texture_to_texture(
             wgpu::TextureCopyView {

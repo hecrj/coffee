@@ -17,6 +17,7 @@ use pipeline::Pipeline;
 pub struct Gpu {
     device: wgpu::Device,
     pipeline: Pipeline,
+    encoder: wgpu::CommandEncoder,
 }
 
 impl Gpu {
@@ -43,17 +44,25 @@ impl Gpu {
             .map_err(|error| Error::WindowCreation(error.to_string()))?;
         let surface = Surface::new(window, &instance, &device);
 
-        Ok((Gpu { device, pipeline }, surface))
+        let encoder =
+            device.create_command_encoder(&wgpu::CommandEncoderDescriptor {
+                todo: 0,
+            });
+
+        Ok((
+            Gpu {
+                device,
+                pipeline,
+                encoder,
+            },
+            surface,
+        ))
     }
 
     pub(super) fn clear(&mut self, view: &TargetView, color: Color) {
         let [r, g, b, a]: [f32; 4] = color.into();
 
-        let mut encoder = self.device.create_command_encoder(
-            &wgpu::CommandEncoderDescriptor { todo: 0 },
-        );
-
-        encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+        self.encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
             color_attachments: &[wgpu::RenderPassColorAttachmentDescriptor {
                 attachment: &view,
                 load_op: wgpu::LoadOp::Clear,
@@ -62,8 +71,6 @@ impl Gpu {
             }],
             depth_stencil_attachment: None,
         });
-
-        self.device.get_queue().submit(&[encoder.finish()]);
     }
 
     pub(super) fn upload_texture(
@@ -101,6 +108,7 @@ impl Gpu {
     ) {
         self.pipeline.draw_texture_quads(
             &mut self.device,
+            &mut self.encoder,
             texture.binding(),
             instances,
             &transformation,

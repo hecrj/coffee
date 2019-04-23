@@ -218,6 +218,7 @@ impl Pipeline {
     pub fn draw_texture_quads(
         &mut self,
         device: &mut wgpu::Device,
+        encoder: &mut wgpu::CommandEncoder,
         texture: &TextureBinding,
         instances: &[Instance],
         transformation: &Transformation,
@@ -228,11 +229,6 @@ impl Pipeline {
         let transform_buffer = device
             .create_buffer_mapped(16, wgpu::BufferUsageFlags::TRANSFER_SRC)
             .fill_from_slice(&matrix[..]);
-
-        let mut encoder =
-            device.create_command_encoder(&wgpu::CommandEncoderDescriptor {
-                todo: 0,
-            });
 
         encoder.copy_buffer_to_buffer(
             &transform_buffer,
@@ -300,8 +296,6 @@ impl Pipeline {
 
             i += Instance::MAX;
         }
-
-        device.get_queue().submit(&[encoder.finish()]);
     }
 }
 
