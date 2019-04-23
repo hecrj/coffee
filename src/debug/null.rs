@@ -35,10 +35,5 @@ impl Debug {
         false
     }
 
-    pub fn draw(
-        &mut self,
-        _frame: &mut graphics::Frame,
-    ) -> graphics::Result<()> {
-        Ok(())
-    }
+    pub fn draw(&mut self, _frame: &mut graphics::Frame) {}
 }

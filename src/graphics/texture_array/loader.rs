@@ -2,7 +2,8 @@ use std::collections::VecDeque;
 use std::path::PathBuf;
 
 use super::{Builder, Index, TextureArray};
-use crate::load;
+use crate::load::Task;
+use crate::{Error, Result};
 
 /// A [`TextureArray`] builder that produces a [`Task`].
 ///
@@ -33,13 +34,13 @@ use crate::load;
 ///         let building = loader.add("building.png");
 ///         let items = loader.add("items.png");
 ///
-///         loader.finish(move |texture, indices| Assets {
-///             player: indices.get(player),
-///             enemy: indices.get(enemy),
-///             building: indices.get(building),
-///             items: indices.get(items),
+///         loader.finish(move |texture, indices| Ok(Assets {
+///             player: indices.get(player)?,
+///             enemy: indices.get(enemy)?,
+///             building: indices.get(building)?,
+///             items: indices.get(items)?,
 ///             texture,
-///         })
+///         }))
 ///     }
 /// }
 /// ```
@@ -90,29 +91,30 @@ impl Loader {
     /// [`Task`]: ../../load/struct.Task.html
     /// [`TextureArray`]: struct.TextureArray.html
     /// [`Indices`]: struct.Indices.html
-    pub fn finish<F, R>(self, on_completion: F) -> load::Task<R>
+    pub fn finish<F, T>(self, on_completion: F) -> Task<T>
     where
-        F: 'static + Fn(TextureArray, Indices) -> R,
+        F: 'static + Fn(TextureArray, Indices) -> Result<T>,
     {
         let total_work = self.paths.len() as u32 + 1;
 
-        load::Task::sequence(total_work, move |task| {
+        Task::sequence(total_work, move |task| {
             let mut builder = Builder::new(self.width, self.height);
             let mut work_todo = VecDeque::from(self.paths.clone());
             let mut indices = Vec::new();
 
             while let Some(next) = work_todo.pop_front() {
-                indices.push(builder.add(next).unwrap());
+                let index = builder.add(next)?;
+                indices.push(index);
 
                 task.notify_progress(1);
             }
 
             let result =
-                on_completion(builder.build(task.gpu()), Indices(indices));
+                on_completion(builder.build(task.gpu()), Indices(indices))?;
 
             task.notify_progress(1);
 
-            result
+            Ok(result)
         })
     }
 }
@@ -135,7 +137,10 @@ pub struct Key(usize);
 pub struct Indices(Vec<Index>);
 
 impl Indices {
-    pub fn get(&self, key: Key) -> Index {
-        self.0[key.0]
+    pub fn get(&self, key: Key) -> Result<Index> {
+        self.0
+            .get(key.0)
+            .cloned()
+            .ok_or(Error::TextureArray(super::Error::KeyNotFound(key.0)))
     }
 }

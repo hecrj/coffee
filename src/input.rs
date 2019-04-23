@@ -6,12 +6,15 @@ pub use winit::VirtualKeyCode as KeyCode;
 
 /// An input event.
 ///
+/// You can listen to this type of events by implementing [`Game::on_input`].
+///
 /// There are many events still missing here! Controllers are also not supported
 /// _yet_!
 ///
 /// Feel free to [open an issue] if you need a particular event.
 /// [PRs are also appreciated!]
 ///
+/// [`Game::on_input`]: ../trait.Game.html#method.on_input
 /// [open an issue]: https://github.com/hecrj/coffee/issues
 /// [PRS are also appreciated!]: https://github.com/hecrj/coffee/pulls
 #[derive(PartialEq, Clone, Copy, Debug)]

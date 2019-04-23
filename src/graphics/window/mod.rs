@@ -2,12 +2,14 @@ mod event;
 mod frame;
 mod settings;
 
+pub(crate) use crate::graphics::gpu::winit;
 pub(crate) use event::{Event, EventLoop};
+
 pub use frame::Frame;
 pub use settings::Settings;
 
-pub(crate) use crate::graphics::gpu::winit;
 use crate::graphics::gpu::{self, Gpu};
+use crate::Result;
 
 /// An open window.
 ///
@@ -25,7 +27,7 @@ impl Window {
     pub(crate) fn new(
         mut settings: Settings,
         event_loop: &EventLoop,
-    ) -> Window {
+    ) -> Result<Window> {
         let (mut width, mut height) = settings.size;
 
         // Try to revert DPI
@@ -37,7 +39,7 @@ impl Window {
         settings.size = (width, height);
 
         let (gpu, surface) =
-            Gpu::for_window(settings.into_builder(), event_loop.raw());
+            Gpu::for_window(settings.into_builder(), event_loop.raw())?;
 
         let window = surface.window();
 
@@ -52,12 +54,12 @@ impl Window {
             })
             .unwrap_or((width as f32, height as f32));
 
-        Window {
+        Ok(Window {
             gpu,
             surface,
             width,
             height,
-        }
+        })
     }
 
     /// Get the [`Gpu`] linked to the [`Window`].

@@ -2,7 +2,7 @@ use std::time;
 
 use crate::graphics;
 
-/// A bunch of performance information about a [`Game`]. It can be drawn!
+/// A bunch of performance information about your game. It can be drawn!
 ///
 /// ![Debug information][debug]
 ///
@@ -39,7 +39,8 @@ impl Debug {
         let now = time::Instant::now();
 
         Self {
-            font: graphics::Font::from_bytes(gpu, graphics::Font::DEFAULT),
+            font: graphics::Font::from_bytes(gpu, graphics::Font::DEFAULT)
+                .expect("Load debug font"),
             enabled: false,
             load_start: now,
             load_duration: time::Duration::from_secs(0),
@@ -145,10 +146,7 @@ impl Debug {
     }
 
     /// Draw the debug information.
-    pub fn draw(
-        &mut self,
-        frame: &mut graphics::Frame,
-    ) -> graphics::Result<()> {
+    pub fn draw(&mut self, frame: &mut graphics::Frame) {
         if self.frames_until_refresh <= 0 {
             self.text.clear();
             self.refresh_text(frame);
@@ -161,8 +159,6 @@ impl Debug {
 
         self.font.draw(frame);
         self.frames_until_refresh -= 1;
-
-        Ok(())
     }
 
     const MARGIN: f32 = 20.0;

@@ -1,11 +1,11 @@
-use image;
 use std::fs::File;
 use std::io::Read;
 use std::path::{Path, PathBuf};
 
 use crate::graphics::gpu::{self, Texture};
 use crate::graphics::{Color, Gpu, IntoQuad, Target};
-use crate::load;
+use crate::load::Task;
+use crate::Result;
 
 /// A loaded image.
 ///
@@ -24,12 +24,12 @@ impl Image {
     /// Load an [`Image`] from the given path.
     ///
     /// [`Image`]: struct.Image.html
-    pub fn new<P: AsRef<Path>>(gpu: &mut Gpu, path: P) -> Option<Image> {
+    pub fn new<P: AsRef<Path>>(gpu: &mut Gpu, path: P) -> Result<Image> {
         let image = {
             let mut buf = Vec::new();
-            let mut reader = File::open(path).unwrap();
-            let _ = reader.read_to_end(&mut buf).unwrap();
-            image::load_from_memory(&buf).unwrap()
+            let mut reader = File::open(path)?;
+            let _ = reader.read_to_end(&mut buf)?;
+            image::load_from_memory(&buf)?
         };
 
         Image::from_image(gpu, image)
@@ -39,10 +39,10 @@ impl Image {
     ///
     /// [`Task`]: ../load/struct.Task.html
     /// [`Image`]: struct.Image.html
-    pub fn load<P: Into<PathBuf>>(path: P) -> load::Task<Image> {
+    pub fn load<P: Into<PathBuf>>(path: P) -> Task<Image> {
         let p = path.into();
 
-        load::Task::using_gpu(move |gpu| Image::new(gpu, &p).unwrap())
+        Task::using_gpu(move |gpu| Image::new(gpu, &p))
     }
 
     /// Create an [`Image`] from a [`DynamicImage`] of the [`image` crate].
@@ -53,10 +53,10 @@ impl Image {
     pub fn from_image(
         gpu: &mut Gpu,
         image: image::DynamicImage,
-    ) -> Option<Image> {
+    ) -> Result<Image> {
         let texture = gpu.upload_texture(&image);
 
-        Some(Image { texture })
+        Ok(Image { texture })
     }
 
     /// Create an [`Image`] representing a color palette.
@@ -65,7 +65,7 @@ impl Image {
     ///
     /// [`Image`]: struct.Image.html
     /// [`Color`]: struct.Color.html
-    pub fn from_colors(gpu: &mut Gpu, colors: &[Color]) -> Option<Image> {
+    pub fn from_colors(gpu: &mut Gpu, colors: &[Color]) -> Result<Image> {
         let colors: Vec<[u8; 4]> =
             colors.iter().map(|color| color.to_rgba()).collect();
 

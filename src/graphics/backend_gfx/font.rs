@@ -51,6 +51,6 @@ impl Font {
 
         self.glyphs
             .draw_queued(encoder, &typed_target, &typed_depth)
-            .unwrap();
+            .expect("gfx_glyph draw_queued failed");
     }
 }

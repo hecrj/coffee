@@ -10,9 +10,8 @@ pub use surface::{winit, Surface};
 pub use texture::Texture;
 pub use types::{DepthView, TargetView};
 
-use wgpu;
-
 use crate::graphics::{Color, Transformation};
+use crate::{Error, Result};
 use pipeline::Pipeline;
 
 pub struct Gpu {
@@ -24,7 +23,7 @@ impl Gpu {
     pub(super) fn for_window(
         builder: winit::WindowBuilder,
         events_loop: &winit::EventsLoop,
-    ) -> (Gpu, Surface) {
+    ) -> Result<(Gpu, Surface)> {
         let instance = wgpu::Instance::new();
 
         let adapter = instance.get_adapter(&wgpu::AdapterDescriptor {
@@ -39,10 +38,12 @@ impl Gpu {
 
         let pipeline = Pipeline::new(&mut device);
 
-        let window = builder.build(events_loop).unwrap();
+        let window = builder
+            .build(events_loop)
+            .map_err(|error| Error::WindowCreation(error.to_string()))?;
         let surface = Surface::new(window, &instance, &device);
 
-        (Gpu { device, pipeline }, surface)
+        Ok((Gpu { device, pipeline }, surface))
     }
 
     pub(super) fn clear(&mut self, view: &TargetView, color: Color) {

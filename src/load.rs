@@ -1,5 +1,5 @@
-//! Load your game assets with type-safety and build loading screens that can
-//! keep track of progress consistently.
+//! Load your game assets with type-safety and build loading screens with
+//! consistent progress tracking.
 //!
 //! # Tasks
 //! The generic [`Task`] struct represents a lazy loading operation that can
@@ -23,6 +23,7 @@ pub mod loading_screen;
 pub use loading_screen::LoadingScreen;
 
 use crate::graphics;
+use crate::Result;
 
 /// A `Task<T>` represents an operation that produces a value of type `T`.
 ///
@@ -93,7 +94,7 @@ use crate::graphics;
 /// [`map`]: #method.map
 pub struct Task<T> {
     total_work: u32,
-    function: Box<Fn(&mut Worker) -> T>,
+    function: Box<Fn(&mut Worker) -> Result<T>>,
 }
 
 impl<T> Task<T> {
@@ -128,7 +129,7 @@ impl<T> Task<T> {
 
                 worker.notify_progress(1);
 
-                result
+                Ok(result)
             }),
         }
     }
@@ -148,7 +149,7 @@ impl<T> Task<T> {
     /// [`Font::load`]: ../graphics/struct.Font.html#method.load
     pub fn using_gpu<F>(f: F) -> Task<T>
     where
-        F: 'static + Fn(&mut graphics::Gpu) -> T,
+        F: 'static + Fn(&mut graphics::Gpu) -> Result<T>,
     {
         Task::sequence(1, move |worker| {
             let result = f(worker.gpu());
@@ -161,7 +162,7 @@ impl<T> Task<T> {
 
     pub(crate) fn sequence<F>(total_work: u32, f: F) -> Task<T>
     where
-        F: 'static + Fn(&mut Worker) -> T,
+        F: 'static + Fn(&mut Worker) -> Result<T>,
     {
         Task {
             total_work,
@@ -234,7 +235,10 @@ impl<T> Task<T> {
     {
         Task {
             total_work: self.total_work,
-            function: Box::new(move |worker| f((self.function)(worker))),
+            function: Box::new(move |worker| match (self.function)(worker) {
+                Ok(value) => Ok(f(value)),
+                Err(error) => Err(error),
+            }),
         }
     }
 
@@ -251,7 +255,11 @@ impl<T> Task<T> {
     /// [`Progress`]: struct.Progress.html
     /// [`Window`]: ../graphics/window/struct.Window.html
     /// [open an issue]: https://github.com/hecrj/coffee/issues
-    pub fn run<F>(self, window: &mut graphics::Window, mut on_progress: F) -> T
+    pub fn run<F>(
+        self,
+        window: &mut graphics::Window,
+        mut on_progress: F,
+    ) -> Result<T>
     where
         F: FnMut(&Progress, &mut graphics::Window) -> (),
     {
@@ -357,7 +365,10 @@ impl<A: 'static, B: 'static> Join for (Task<A>, Task<B>) {
 
         Task::sequence(
             loader_a.total_work() + loader_b.total_work(),
-            move |task| ((loader_a.function)(task), (loader_b.function)(task)),
+            move |task| {
+                ((loader_a.function)(task)
+                    .and_then(|a| (loader_b.function)(task).map(|b| (a, b))))
+            },
         )
     }
 }

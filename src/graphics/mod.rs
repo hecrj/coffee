@@ -41,7 +41,8 @@
 //! ```
 //! use coffee::{Game, Timer};
 //! use coffee::graphics::{Window, Color};
-//! # use coffee::graphics::{Result, Gpu};
+//! # use coffee::Result;
+//! # use coffee::graphics::Gpu;
 //! #
 //! # struct MyGame;
 //!
@@ -51,8 +52,8 @@
 //! #
 //! #   const TICKS_PER_SECOND: u16 = 60;
 //! #
-//! #   fn new(window: &mut Window) -> (MyGame, Self::View, Self::Input) {
-//! #       (MyGame, (), ())
+//! #   fn new(window: &mut Window) -> Result<(MyGame, Self::View, Self::Input)> {
+//! #       Ok((MyGame, (), ()))
 //! #   }
 //! #
 //!     // ...
@@ -67,14 +68,12 @@
 //!         _view: &mut Self::View,
 //!         window: &mut Window,
 //!         _timer: &Timer,
-//!     ) -> Result<()> {
+//!     ) {
 //!         let mut frame = window.frame();
 //!         frame.clear(Color::BLACK);
 //!
 //!         // Use your resources here...
 //!         // view.image.draw(Sprite { ... }, &mut frame.as_target());
-//!
-//!         Ok(())
 //!     }
 //! }
 //! ```
@@ -140,8 +139,3 @@ pub use texture_array::TextureArray;
 pub use transformation::Transformation;
 pub use vector::Vector;
 pub use window::{Frame, Settings as WindowSettings, Window};
-
-pub type Result<T> = std::result::Result<T, Error>;
-
-#[derive(Debug)]
-pub enum Error {}

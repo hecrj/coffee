@@ -3,12 +3,12 @@ use rayon::prelude::*;
 use std::{thread, time};
 
 use coffee::graphics::{
-    Batch, Color, Font, Gpu, Image, Point, Rectangle, Result, Sprite, Text,
-    Vector, Window, WindowSettings,
+    Batch, Color, Font, Gpu, Image, Point, Rectangle, Sprite, Text, Vector,
+    Window, WindowSettings,
 };
 use coffee::input;
 use coffee::load::{loading_screen, Join, LoadingScreen, Task};
-use coffee::{Game, Timer};
+use coffee::{Game, Result, Timer};
 
 fn main() {
     Particles::run(WindowSettings {
@@ -16,7 +16,7 @@ fn main() {
         size: (1280, 1024),
         resizable: false,
     })
-    .unwrap();
+    .expect("Run example");
 }
 
 struct Particles {
@@ -53,7 +53,7 @@ impl Game for Particles {
     // This way, graphics interpolation is really noticeable when toggled!
     const TICKS_PER_SECOND: u16 = 20;
 
-    fn new(window: &mut Window) -> (Particles, View, Input) {
+    fn new(window: &mut Window) -> Result<(Particles, View, Input)> {
         let task = (
             Task::stage(
                 "Generating particles...",
@@ -68,9 +68,9 @@ impl Game for Particles {
             .join();
 
         let mut loading_screen = loading_screen::ProgressBar::new(window.gpu());
-        let (particles, view, _) = loading_screen.run(task, window);
+        let (particles, view, _) = loading_screen.run(task, window)?;
 
-        (particles, view, Input::new())
+        Ok((particles, view, Input::new()))
     }
 
     fn on_input(&self, input: &mut Input, event: input::Event) {
@@ -119,12 +119,7 @@ impl Game for Particles {
         });
     }
 
-    fn draw(
-        &self,
-        view: &mut View,
-        window: &mut Window,
-        timer: &Timer,
-    ) -> Result<()> {
+    fn draw(&self, view: &mut View, window: &mut Window, timer: &Timer) {
         let mut frame = window.frame();
         frame.clear(Color::BLACK);
 
@@ -188,8 +183,6 @@ impl Game for Particles {
         });
 
         view.font.draw(&mut frame);
-
-        Ok(())
     }
 }
 
@@ -267,9 +260,7 @@ impl View {
 
     fn load() -> Task<View> {
         (
-            Task::using_gpu(|gpu| {
-                Image::from_colors(gpu, &Self::COLORS).unwrap()
-            }),
+            Task::using_gpu(|gpu| Image::from_colors(gpu, &Self::COLORS)),
             Font::load(include_bytes!(
                 "../resources/font/Inconsolata-Regular.ttf"
             )),

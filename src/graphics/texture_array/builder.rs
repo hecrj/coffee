@@ -1,12 +1,11 @@
 use std::fs::File;
 use std::io::Read;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::sync::Arc;
-
-use log::debug;
 
 use super::{Index, Offset, TextureArray};
 use crate::graphics::Gpu;
+use crate::{Error, Result};
 
 /// A [`TextureArray`] builder.
 ///
@@ -47,27 +46,24 @@ impl Builder {
     ///
     /// [`TextureArray`]: struct.TextureArray.html
     /// [`Builder`]: struct.Builder.html
-    pub fn add<P: AsRef<Path>>(&mut self, path: P) -> Option<Index> {
-        debug!("Loading image: {:?}", path.as_ref());
-
+    pub fn add<P: AsRef<Path>>(&mut self, path: P) -> Result<Index> {
         let img = {
             let mut buf = Vec::new();
-            let mut reader = File::open(path).unwrap();
-            reader.read_to_end(&mut buf).unwrap();
-            let rgba = image::load_from_memory(&buf).unwrap().to_rgba();
+            let mut reader = File::open(&path)?;
+            reader.read_to_end(&mut buf)?;
+            let rgba = image::load_from_memory(&buf)?.to_rgba();
             Arc::new(rgba)
         };
 
         if img.width() > self.width || img.height() > self.height {
-            None
-        //Err(GameError::ResourceLoadError(String::from(
-        //    "Image is too big",
-        //)))
+            Err(Error::TextureArray(super::Error::ImageIsTooBig(
+                PathBuf::from(path.as_ref()),
+            )))
         } else {
             let offset = self.current.add(img.clone());
 
             match offset {
-                Some(offset) => Some(Index {
+                Some(offset) => Ok(Index {
                     layer: self.layers.len() as u16,
                     offset,
                 }),
@@ -76,9 +72,12 @@ impl Builder {
                     self.current =
                         Layer::new(self.width as u16, self.height as u16);
 
-                    Some(Index {
+                    Ok(Index {
                         layer: self.layers.len() as u16,
-                        offset: self.current.add(img).unwrap(),
+                        offset: self
+                            .current
+                            .add(img)
+                            .expect("Image should fit layer"),
                     })
                 }
             }
@@ -189,7 +188,7 @@ impl Layer {
             self.max_height,
             values,
         )
-        .unwrap();
+        .expect("Image buffer creation");
 
         if !self.current_row.is_empty() {
             self.images.push(self.current_row.clone());

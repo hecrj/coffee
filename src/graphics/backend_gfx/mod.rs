@@ -15,6 +15,7 @@ use gfx::{self, Device};
 use gfx_device_gl as gl;
 
 use crate::graphics::{Color, Transformation};
+use crate::Result;
 use pipeline::Pipeline;
 
 /// A link between your game and a graphics processor.
@@ -40,8 +41,9 @@ impl Gpu {
     pub(super) fn for_window(
         builder: winit::WindowBuilder,
         events_loop: &winit::EventsLoop,
-    ) -> (Gpu, Surface) {
-        let (surface, device, mut factory) = Surface::new(builder, events_loop);
+    ) -> Result<(Gpu, Surface)> {
+        let (surface, device, mut factory) =
+            Surface::new(builder, events_loop)?;
 
         let mut encoder: gfx::Encoder<gl::Resources, gl::CommandBuffer> =
             factory.create_command_buffer().into();
@@ -49,7 +51,7 @@ impl Gpu {
         let pipeline =
             Pipeline::new(&mut factory, &mut encoder, surface.target());
 
-        (
+        Ok((
             Gpu {
                 device,
                 factory,
@@ -57,7 +59,7 @@ impl Gpu {
                 pipeline,
             },
             surface,
-        )
+        ))
     }
 
     pub(super) fn clear(&mut self, view: &TargetView, color: Color) {

@@ -1,6 +1,7 @@
 use crate::graphics::gpu::{self, texture, Gpu};
 use crate::graphics::{Quad, Target};
 use crate::load::Task;
+use crate::Result;
 
 /// An off-screen rendering target.
 ///
@@ -16,10 +17,10 @@ impl Canvas {
     /// Create a new [`Canvas`] with the given size.
     ///
     /// [`Canvas`]: struct.Canvas.html
-    pub fn new(gpu: &mut Gpu, width: u16, height: u16) -> Canvas {
-        Canvas {
+    pub fn new(gpu: &mut Gpu, width: u16, height: u16) -> Result<Canvas> {
+        Ok(Canvas {
             drawable: gpu.create_drawable_texture(width, height),
-        }
+        })
     }
 
     /// Create a [`Task`] that produces a new [`Canvas`] with the given size.

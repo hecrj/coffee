@@ -7,6 +7,9 @@ pub use batch::Batch;
 pub use builder::Builder;
 pub use loader::{Indices, Key, Loader};
 
+use std::fmt;
+use std::path::PathBuf;
+
 use crate::graphics::gpu::Texture;
 
 /// A collection of different textures with the same size.
@@ -47,4 +50,22 @@ pub struct Index {
 struct Offset {
     x: f32,
     y: f32,
+}
+
+/// A texture array loading error.
+#[derive(Debug, Clone)]
+pub enum Error {
+    KeyNotFound(usize),
+    ImageIsTooBig(PathBuf),
+}
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Error::KeyNotFound(key) => write!(f, "Key not found: {}", key),
+            Error::ImageIsTooBig(path) => {
+                write!(f, "Image is too big: {}", path.display())
+            }
+        }
+    }
 }

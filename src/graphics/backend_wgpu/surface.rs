@@ -96,7 +96,12 @@ fn new_swap_chain(
 ) -> (wgpu::SwapChain, wgpu::Extent3d, wgpu::Texture, TargetView) {
     let size = window
         .get_inner_size()
-        .unwrap()
+        // TODO: Find out when and why the "inner size" might not be available
+        // and do something smarter here.
+        .unwrap_or(winit::dpi::LogicalSize {
+            width: 1280.0,
+            height: 1024.0,
+        })
         .to_physical(window.get_hidpi_factor());
 
     let swap_chain = device.create_swap_chain(

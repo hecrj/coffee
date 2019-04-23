@@ -4,6 +4,7 @@ pub use gfx_winit as winit;
 use glutin;
 
 use super::{format, DepthView, Gpu, TargetView};
+use crate::{Error, Result};
 
 pub struct Surface {
     context: glutin::WindowedContext,
@@ -15,7 +16,7 @@ impl Surface {
     pub(super) fn new(
         builder: winit::WindowBuilder,
         events_loop: &winit::EventsLoop,
-    ) -> (Self, gl::Device, gl::Factory) {
+    ) -> Result<(Self, gl::Device, gl::Factory)> {
         let gl_builder = glutin::ContextBuilder::new()
             .with_gl(glutin::GlRequest::Latest)
             .with_gl_profile(glutin::GlProfile::Core)
@@ -32,9 +33,9 @@ impl Surface {
                 format::COLOR,
                 format::DEPTH,
             )
-            .unwrap();
+            .map_err(|error| Error::WindowCreation(error.to_string()))?;
 
-        (
+        Ok((
             Self {
                 context,
                 target,
@@ -42,7 +43,7 @@ impl Surface {
             },
             device,
             factory,
-        )
+        ))
     }
 
     pub fn window(&self) -> &winit::Window {
@@ -73,7 +74,7 @@ impl Surface {
 
     pub fn swap_buffers(&mut self, gpu: &mut Gpu) {
         gpu.flush();
-        self.context.swap_buffers().unwrap();
+        self.context.swap_buffers().expect("Buffer swap failed");
         gpu.cleanup();
     }
 }

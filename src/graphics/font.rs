@@ -1,6 +1,7 @@
 use crate::graphics::gpu;
 use crate::graphics::{Frame, Gpu, Text};
 use crate::load::Task;
+use crate::Result;
 
 /// A collection of text with the same font.
 pub struct Font(gpu::Font);
@@ -10,8 +11,8 @@ impl Font {
         include_bytes!("../../resources/font/Inconsolata-Regular.ttf");
 
     /// Load a font from raw data.
-    pub fn from_bytes(gpu: &mut Gpu, bytes: &'static [u8]) -> Font {
-        Font(gpu.upload_font(bytes))
+    pub fn from_bytes(gpu: &mut Gpu, bytes: &'static [u8]) -> Result<Font> {
+        Ok(Font(gpu.upload_font(bytes)))
     }
 
     /// Create a task that loads a font from raw data.

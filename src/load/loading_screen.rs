@@ -15,6 +15,7 @@
 //! [`ProgressBar`]: struct.ProgressBar.html
 use super::{Progress, Task};
 use crate::graphics;
+use crate::Result;
 
 /// A loading screen keeps track of the progress of a task and provides feedback
 /// to the user.
@@ -25,12 +26,12 @@ use crate::graphics;
 /// game:
 ///
 /// ```
-/// use coffee::Game;
+/// use coffee::{Game, Result};
 /// use coffee::load::{Task, Join, LoadingScreen};
 /// use coffee::load::loading_screen::ProgressBar;
 /// use coffee::graphics::Window;
 /// # use coffee::Timer;
-/// # use coffee::graphics::{Result, Gpu};
+/// # use coffee::graphics::Gpu;
 /// #
 /// # struct State;
 /// # impl State {
@@ -58,7 +59,7 @@ use crate::graphics;
 /// #
 ///     // ...
 ///
-///     fn new(window: &mut Window) -> (MyGame, View, Input) {
+///     fn new(window: &mut Window) -> Result<(MyGame, View, Input)> {
 ///         let load =
 ///             (
 ///                 Task::stage("Loading state...", State::load()),
@@ -68,9 +69,9 @@ use crate::graphics;
 ///
 ///         // Create the loading screen and use `run`
 ///         let mut progress_bar = ProgressBar::new(window.gpu());
-///         let (state, view) = progress_bar.run(load, window);
+///         let (state, view) = progress_bar.run(load, window)?;
 ///
-///         (MyGame { state }, view, Input::new())
+///         Ok((MyGame { state }, view, Input::new()))
 ///     }
 ///
 ///     // ...
@@ -78,7 +79,7 @@ use crate::graphics;
 ///     #             _view: &mut Self::View, _gpu: &mut Gpu) {}
 ///     # fn update(&mut self, _view: &View, window: &Window) {}
 ///     # fn draw(&self, _view: &mut Self::View, _window: &mut Window,
-///     #         _timer: &Timer) -> Result<()> { Ok(()) }
+///     #         _timer: &Timer) {}
 /// }
 /// ```
 ///
@@ -107,15 +108,19 @@ pub trait LoadingScreen {
         &mut self,
         progress: &Progress,
         window: &mut graphics::Window,
-    ) -> graphics::Result<()>;
+    );
 
     /// Run the loading screen with a task and obtain its result.
     ///
     /// By default, it runs the task and refreshes the window when there is
     /// progress.
-    fn run<T>(&mut self, task: Task<T>, window: &mut graphics::Window) -> T {
+    fn run<T>(
+        &mut self,
+        task: Task<T>,
+        window: &mut graphics::Window,
+    ) -> Result<T> {
         task.run(window, |progress, window| {
-            self.on_progress(progress, window).unwrap();
+            self.on_progress(progress, window);
             window.swap_buffers();
         })
     }
@@ -138,12 +143,13 @@ impl ProgressBar {
     /// Create the loading screen.
     pub fn new(gpu: &mut graphics::Gpu) -> Self {
         Self {
-            font: graphics::Font::from_bytes(gpu, graphics::Font::DEFAULT),
+            font: graphics::Font::from_bytes(gpu, graphics::Font::DEFAULT)
+                .expect("Load progress bar font"),
             pencil: graphics::Image::from_colors(
                 gpu,
                 &[graphics::Color::WHITE],
             )
-            .unwrap(),
+            .expect("Load progress bar"),
         }
     }
 }
@@ -153,7 +159,7 @@ impl LoadingScreen for ProgressBar {
         &mut self,
         progress: &Progress,
         window: &mut graphics::Window,
-    ) -> graphics::Result<()> {
+    ) {
         let mut frame = window.frame();
 
         frame.clear(graphics::Color::BLACK);
@@ -195,7 +201,5 @@ impl LoadingScreen for ProgressBar {
         });
 
         self.font.draw(&mut frame);
-
-        Ok(())
     }
 }

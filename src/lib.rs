@@ -1,6 +1,7 @@
 //! `coffee` is an opinionated 2D game engine focused on simplicity,
 //! explicitness, and safety.
 mod debug;
+mod result;
 mod timer;
 
 pub mod graphics;
@@ -8,6 +9,7 @@ pub mod input;
 pub mod load;
 
 pub use debug::Debug;
+pub use result::{Error, Result};
 pub use timer::Timer;
 
 use graphics::window::{self, Window};
@@ -59,10 +61,12 @@ pub trait Game {
     ///
     /// It is recommended to load your game assets right here. You can use
     /// the [`load`] module to declaratively describe how to load your
-    /// assets and easily get a _consistent_ loading screen for free!
+    /// assets and get a _consistent_ loading screen for free!
     ///
     /// [`load`]: load/index.html
-    fn new(window: &mut graphics::Window) -> (Self, Self::View, Self::Input)
+    fn new(
+        window: &mut graphics::Window,
+    ) -> Result<(Self, Self::View, Self::Input)>
     where
         Self: Sized;
 
@@ -118,7 +122,7 @@ pub trait Game {
         view: &mut Self::View,
         window: &mut graphics::Window,
         timer: &Timer,
-    ) -> graphics::Result<()>;
+    );
 
     /// Process an input event and keep track of it in your [`Input`] type.
     ///
@@ -149,7 +153,7 @@ pub trait Game {
         _view: &Self::View,
         window: &mut graphics::Window,
         debug: &mut Debug,
-    ) -> graphics::Result<()> {
+    ) {
         debug.draw(&mut window.frame())
     }
 
@@ -157,18 +161,18 @@ pub trait Game {
     ///
     /// [`Game`]: trait.Game.html
     /// [`WindowSettings`]: graphics/struct.WindowSettings.html
-    fn run(window_settings: graphics::WindowSettings) -> graphics::Result<()>
+    fn run(window_settings: graphics::WindowSettings) -> Result<()>
     where
         Self: Sized,
     {
         // Set up window
         let mut event_loop = window::EventLoop::new();
-        let window = &mut Window::new(window_settings, &event_loop);
+        let window = &mut Window::new(window_settings, &event_loop)?;
         let mut debug = Debug::new(window.gpu(), Self::TICKS_PER_SECOND);
 
         // Load game
         debug.loading_started();
-        let (game, view, input) = &mut Self::new(window);
+        let (game, view, input) = &mut Self::new(window)?;
         debug.loading_finished();
 
         // Game loop
@@ -256,11 +260,11 @@ pub trait Game {
             }
 
             debug.draw_started();
-            game.draw(view, window, &timer)?;
+            game.draw(view, window, &timer);
             debug.draw_finished();
 
             if debug.is_enabled() {
-                game.debug(input, view, window, &mut debug).unwrap();
+                game.debug(input, view, window, &mut debug);
             }
 
             window.swap_buffers();
