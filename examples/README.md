@@ -10,7 +10,7 @@ cargo run --example <example> --features opengl
 
 ## Particles
 
-A particle gravity simulator that showcases loading screens, input handling,
+A particle gravity simulator that showcases a loading screen, input handling,
 and graphics interpolation with batched drawing and font rendering. Move the
 mouse around to attract the particles.
 

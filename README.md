@@ -6,7 +6,7 @@
 [![License](https://img.shields.io/crates/l/coffee.svg)](https://github.com/hecrj/coffee/blob/master/LICENSE)
 
 An opinionated 2D game engine for Rust focused on simplicity, explicitness, and
-safety.
+type-safety.
 
 __Coffee is in a very early stage of development.__ Active development is
 planned during 2019 (and hopefully beyond that!). Many [basic features are still
@@ -37,6 +37,15 @@ feature (`opengl`, `vulkan`, `metal`, `dx11`, or `dx12`):
 
 ```
 coffee = { version = "0.1", features = ["opengl"] }
+```
+
+Rust is _pretty_ slow in debug mode. If you experience performance issues when
+drawing hundreds of sprites, enable compiler optimizations in your `Cargo.toml`.
+I recommend level 2 optimizations to be closer to `--release` performance:
+
+```
+[profile.dev]
+opt-level = 2
 ```
 
 ## Overview

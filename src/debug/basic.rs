@@ -13,7 +13,7 @@ use crate::graphics;
 /// implement your own debug view.
 ///
 /// [`Game`]: trait.Game.html
-/// [debug]: https://github.com/hecrj/coffee/blob/ee73432533e6f3162c942c9e2b474d3b0b524ad0/images/debug.png?raw=true
+/// [debug]: https://github.com/hecrj/coffee/blob/50c9a857e476266d8bd37f705266bd66b77c0f2d/images/debug.png?raw=true
 /// [`Game::DEBUG_KEY`]: trait.Game.html#associatedconstant.DEBUG_KEY
 /// [`Game::debug`]: trait.Game.html#method.debug
 pub struct Debug {

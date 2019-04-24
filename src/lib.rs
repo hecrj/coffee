@@ -1,5 +1,5 @@
 //! Coffee is an opinionated 2D game engine focused on simplicity, explicitness,
-//! and safety.
+//! and type-safety.
 //!
 //! # Features
 //!   * Declarative, type-safe asset loading
