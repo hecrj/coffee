@@ -41,7 +41,8 @@ coffee = { version = "0.1", features = ["opengl"] }
 
 Rust is quite slow in debug mode. If you experience performance issues when
 drawing hundreds of sprites, enable compiler optimizations in your `Cargo.toml`.
-I recommend level 2 optimizations to be closer to `--release` performance:
+I recommend level 2 optimizations in order to stay closer to `--release`
+performance:
 
 ```toml
 [profile.dev]
