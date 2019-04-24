@@ -14,6 +14,8 @@ use crate::graphics::{Color, Transformation};
 use crate::{Error, Result};
 use pipeline::Pipeline;
 
+#[allow(missing_debug_implementations)]
+#[allow(missing_docs)]
 pub struct Gpu {
     device: wgpu::Device,
     pipeline: Pipeline,
@@ -62,7 +64,7 @@ impl Gpu {
     pub(super) fn clear(&mut self, view: &TargetView, color: Color) {
         let [r, g, b, a]: [f32; 4] = color.into();
 
-        self.encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+        let _ = self.encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
             color_attachments: &[wgpu::RenderPassColorAttachmentDescriptor {
                 attachment: &view,
                 load_op: wgpu::LoadOp::Clear,

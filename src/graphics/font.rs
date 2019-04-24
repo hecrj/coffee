@@ -4,6 +4,7 @@ use crate::load::Task;
 use crate::Result;
 
 /// A collection of text with the same font.
+#[allow(missing_debug_implementations)]
 pub struct Font(gpu::Font);
 
 impl Font {

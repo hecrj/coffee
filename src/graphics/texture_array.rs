@@ -55,7 +55,13 @@ struct Offset {
 /// A texture array loading error.
 #[derive(Debug, Clone)]
 pub enum Error {
+    /// A texture array [`Index`] could not be found for the given [`Key`].
+    ///
+    /// [`Key`]: struct.Key.html
+    /// [`Index`]: struct.Index.html
     KeyNotFound(usize),
+
+    /// A provided image did not fit in a texture array layer.
     ImageIsTooBig(PathBuf),
 }
 

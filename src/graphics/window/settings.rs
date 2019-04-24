@@ -1,6 +1,7 @@
 use super::winit;
 
 /// A window configuration.
+#[derive(Debug, Eq, PartialEq, Clone)]
 pub struct Settings {
     /// A title for the window.
     pub title: String,

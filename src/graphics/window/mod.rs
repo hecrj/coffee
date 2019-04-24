@@ -110,3 +110,13 @@ impl Window {
         self.height = physical_size.height as f32;
     }
 }
+
+impl std::fmt::Debug for Window {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "Window {{ width: {}, height: {} }}",
+            self.width, self.height
+        )
+    }
+}

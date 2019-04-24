@@ -50,7 +50,7 @@ impl Builder {
         let img = {
             let mut buf = Vec::new();
             let mut reader = File::open(&path)?;
-            reader.read_to_end(&mut buf)?;
+            let _ = reader.read_to_end(&mut buf)?;
             let rgba = image::load_from_memory(&buf)?.to_rgba();
             Arc::new(rgba)
         };

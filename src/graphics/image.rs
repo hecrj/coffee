@@ -110,3 +110,14 @@ impl Image {
         );
     }
 }
+
+impl std::fmt::Debug for Image {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "Image {{ width: {}, height: {} }}",
+            self.width(),
+            self.height()
+        )
+    }
+}

@@ -7,6 +7,7 @@ use crate::graphics::{IntoQuad, Point, Quad, Rectangle};
 ///
 /// [`Quad`]: struct.Quad.html
 /// [`Sprite`]: struct.Sprite.html
+#[derive(Debug, PartialEq, Clone)]
 pub struct Sprite {
     /// The portion of a resource that contains the sprite, in absolute
     /// coordinates.

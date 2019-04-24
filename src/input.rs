@@ -22,16 +22,28 @@ pub use winit::VirtualKeyCode as KeyCode;
 pub enum Event {
     /// A keyboard key was pressed or released.
     KeyboardInput {
+        /// The state of the key
         state: ButtonState,
+
+        /// The key identifier
         key_code: KeyCode,
     },
 
-    /// The mouse cursor was moved.
-    CursorMoved { x: f32, y: f32 },
+    /// The mouse cursor was moved
+    CursorMoved {
+        /// The X coordinate of the mouse position
+        x: f32,
+
+        /// The Y coordinate of the mouse position
+        y: f32,
+    },
 
     /// A mouse button was pressed or released.
     MouseInput {
+        /// The state of the button
         state: ButtonState,
+
+        /// The button identifier
         button: MouseButton,
     },
 }

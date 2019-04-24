@@ -134,6 +134,7 @@ pub trait LoadingScreen {
 ///
 /// [progress_bar]: https://github.com/hecrj/coffee/blob/e079e7205a53f92ac6614382b5cdd250fed64a98/images/loading_screen/progress_bar.png?raw=true
 /// [`LoadingScreen`]: trait.LoadingScreen.html
+#[allow(missing_debug_implementations)]
 pub struct ProgressBar {
     font: graphics::Font,
     pencil: graphics::Image,

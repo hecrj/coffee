@@ -51,3 +51,9 @@ impl Batch {
         translated.draw_texture_quads(&self.image.texture, &self.instances[..]);
     }
 }
+
+impl std::fmt::Debug for Batch {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "Batch {{ image: {:?} }}", self.image,)
+    }
+}

@@ -1,9 +1,16 @@
 /// An RGBA color in the sRGB color space.
 #[derive(PartialEq, Clone, Copy, Debug)]
 pub struct Color {
+    /// Red component.
     pub r: f32,
+
+    /// Green component.
     pub g: f32,
+
+    /// Blue component.
     pub b: f32,
+
+    /// Alpha component.
     pub a: f32,
 }
 

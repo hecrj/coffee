@@ -2,7 +2,7 @@ use crate::graphics::point::Point;
 use crate::graphics::rectangle::Rectangle;
 
 /// A textured quad.
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Quad {
     /// The region of the resource that should be shown on the quad, in relative
     /// coordinates: [0.0, 1.0].

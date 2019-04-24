@@ -31,6 +31,20 @@ impl Canvas {
         Task::using_gpu(move |gpu| Canvas::new(gpu, width, height))
     }
 
+    /// Get the width of the [`Canvas`].
+    ///
+    /// [`Canvas`]: struct.Canvas.html
+    pub fn width(&self) -> u16 {
+        self.drawable.texture().width()
+    }
+
+    /// Get the height of the [`Canvas`].
+    ///
+    /// [`Canvas`]: struct.Canvas.html
+    pub fn height(&self) -> u16 {
+        self.drawable.texture().height()
+    }
+
     /// View the [`Canvas`] as a [`Target`].
     ///
     /// [`Canvas`]: struct.Canvas.html
@@ -56,5 +70,16 @@ impl Canvas {
             &self.drawable.texture(),
             &[gpu::Instance::from(quad)],
         );
+    }
+}
+
+impl std::fmt::Debug for Canvas {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "Canvas {{ width: {}, height: {} }}",
+            self.width(),
+            self.height()
+        )
     }
 }

@@ -279,6 +279,12 @@ impl<T> Task<T> {
     }
 }
 
+impl<T> std::fmt::Debug for Task<T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "Task {{ total_work: {} }}", self.total_work)
+    }
+}
+
 pub(crate) struct Worker<'a> {
     window: &'a mut graphics::Window,
     listener: &'a mut FnMut(&Progress, &mut graphics::Window) -> (),
@@ -312,6 +318,7 @@ impl<'a> Worker<'a> {
 }
 
 /// The progress of a task.
+#[derive(Debug, Eq, PartialEq)]
 pub struct Progress {
     total_work: u32,
     work_completed: u32,
@@ -352,8 +359,12 @@ impl Progress {
 ///
 /// [`Task`]: struct.Task.html#composition
 pub trait Join {
+    /// The resulting output of the [`Task`] after joining.
+    ///
+    /// [`Task`]: struct.Task.html#composition
     type Type;
 
+    /// Join tasks into a new one that collects the results.
     fn join(self) -> Task<Self::Type>;
 }
 

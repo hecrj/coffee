@@ -271,6 +271,20 @@ fn format_duration(duration: &time::Duration) -> String {
     }
 }
 
+impl std::fmt::Debug for Debug {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "Debug {{ load: {:?}, interact: {:?}, update: {:?}, draw: {:?}, frame: {:?} }}",
+            self.load_duration(),
+            self.interact_duration(),
+            self.update_duration(),
+            self.draw_duration(),
+            self.frame_duration(),
+        )
+    }
+}
+
 struct TimeBuffer {
     head: usize,
     size: usize,

@@ -13,6 +13,7 @@ use crate::graphics::{gpu, Color, Target};
 /// [`Frame`]: struct.Frame.html
 /// [`Window::frame`]: struct.Window.html#method.frame
 /// [`Target`]: struct.Target.html
+#[derive(Debug)]
 pub struct Frame<'a> {
     window: &'a mut Window,
 }

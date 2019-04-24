@@ -137,6 +137,10 @@ pub struct Key(usize);
 pub struct Indices(Vec<Index>);
 
 impl Indices {
+    /// Get an [`Index`] for the given [`Key`].
+    ///
+    /// [`Key`]: struct.Key.html
+    /// [`Index`]: struct.Index.html
     pub fn get(&self, key: Key) -> Result<Index> {
         self.0
             .get(key.0)

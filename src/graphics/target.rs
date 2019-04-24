@@ -105,3 +105,9 @@ impl<'a> Target<'a> {
         );
     }
 }
+
+impl<'a> std::fmt::Debug for Target<'a> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "Target {{ transformation: {:?} }}", self.transformation)
+    }
+}

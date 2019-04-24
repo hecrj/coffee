@@ -30,6 +30,7 @@ use pipeline::Pipeline;
 /// [`Game`]: ../trait.Game.html
 /// [`interact`]: ../trait.Game.html#tymethod.interact
 /// [`Window`]: struct.Window.html
+#[allow(missing_debug_implementations)]
 pub struct Gpu {
     device: gl::Device,
     factory: gl::Factory,

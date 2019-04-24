@@ -7,6 +7,7 @@ use std::time;
 ///
 /// [`Timer`]: struct.Timer.html
 /// [`Game::TICKS_PER_SECOND`]: trait.Game.html#associatedconstant.TICKS_PER_SECOND
+#[derive(Debug)]
 pub struct Timer {
     target_ticks: u16,
     target_delta: time::Duration,
