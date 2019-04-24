@@ -1,0 +1,18 @@
+language: rust
+rust:
+  - stable
+  - beta
+  - nightly
+  - 1.31.0
+os:
+  - linux
+  - osx
+  - windows
+cache: cargo
+matrix:
+  allow_failures:
+    - rust: nightly
+  fast_finish: true
+script:
+  - cargo test --verbose --features opengl
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cargo test --verbose --features vulkan; fi

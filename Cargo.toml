@@ -3,7 +3,7 @@ name = "coffee"
 version = "0.1.0"
 authors = ["Héctor Ramón Jiménez <hector0193@gmail.com>"]
 edition = "2018"
-description = "An opinionated 2D game engine"
+description = "An opinionated 2D game engine focused on simplicity, explicitness, and type-safety"
 license = "MIT"
 repository = "https://github.com/hecrj/coffee"
 documentation = "https://docs.rs/coffee"
@@ -15,7 +15,7 @@ categories = ["game-engines"]
 maintenance = { status = "actively-developed" }
 
 [package.metadata.docs.rs]
-features = ["opengl"]
+features = ["opengl", "debug"]
 
 [features]
 default = []
