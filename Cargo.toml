@@ -10,6 +10,7 @@ documentation = "https://docs.rs/coffee"
 readme = "README.md"
 keywords = ["game", "engine", "2D", "graphics", "coffee"]
 categories = ["game-engines"]
+exclude = ["images/*"]
 
 [badges]
 maintenance = { status = "actively-developed" }
