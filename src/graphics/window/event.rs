@@ -40,6 +40,12 @@ impl EventLoop {
                             key_code,
                         }));
                     }
+                    winit::WindowEvent::MouseInput {
+                        state, button, ..
+                    } => f(Event::Input(input::Event::MouseInput {
+                        state,
+                        button,
+                    })),
                     winit::WindowEvent::CursorMoved { position, .. } => {
                         f(Event::CursorMoved(position))
                     }

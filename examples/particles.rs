@@ -86,7 +86,7 @@ impl Game for Particles {
             }
             input::Event::KeyboardInput {
                 key_code,
-                state: input::KeyState::Released,
+                state: input::ButtonState::Released,
             } => {
                 input.released_keys.push(key_code);
             }

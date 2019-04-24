@@ -266,7 +266,7 @@ pub trait Game {
                     if cfg!(any(debug_assertions, feature = "debug")) {
                         match input_event {
                             input::Event::KeyboardInput {
-                                state: input::KeyState::Released,
+                                state: input::ButtonState::Released,
                                 key_code,
                             } if Some(key_code) == G::DEBUG_KEY => {
                                 debug.toggle();
