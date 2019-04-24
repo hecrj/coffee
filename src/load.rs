@@ -384,3 +384,143 @@ impl<A: 'static, B: 'static, C: 'static> Join for (Task<A>, Task<B>, Task<C>) {
             .map(|((a, b), c)| (a, b, c))
     }
 }
+
+impl<A: 'static, B: 'static, C: 'static, D: 'static> Join
+    for (Task<A>, Task<B>, Task<C>, Task<D>)
+{
+    type Type = (A, B, C, D);
+
+    fn join(self) -> Task<(A, B, C, D)> {
+        let (loader_a, loader_b, loader_c, loader_d) = self;
+
+        ((loader_a, loader_b, loader_c).join(), loader_d)
+            .join()
+            .map(|((a, b, c), d)| (a, b, c, d))
+    }
+}
+
+impl<A: 'static, B: 'static, C: 'static, D: 'static, E: 'static> Join
+    for (Task<A>, Task<B>, Task<C>, Task<D>, Task<E>)
+{
+    type Type = (A, B, C, D, E);
+
+    fn join(self) -> Task<(A, B, C, D, E)> {
+        let (loader_a, loader_b, loader_c, loader_d, loader_e) = self;
+
+        ((loader_a, loader_b, loader_c, loader_d).join(), loader_e)
+            .join()
+            .map(|((a, b, c, d), e)| (a, b, c, d, e))
+    }
+}
+
+impl<
+        A: 'static,
+        B: 'static,
+        C: 'static,
+        D: 'static,
+        E: 'static,
+        F: 'static,
+    > Join for (Task<A>, Task<B>, Task<C>, Task<D>, Task<E>, Task<F>)
+{
+    type Type = (A, B, C, D, E, F);
+
+    fn join(self) -> Task<(A, B, C, D, E, F)> {
+        let (loader_a, loader_b, loader_c, loader_d, loader_e, loader_f) = self;
+
+        (
+            (loader_a, loader_b, loader_c, loader_d, loader_e).join(),
+            loader_f,
+        )
+            .join()
+            .map(|((a, b, c, d, e), f)| (a, b, c, d, e, f))
+    }
+}
+
+impl<
+        A: 'static,
+        B: 'static,
+        C: 'static,
+        D: 'static,
+        E: 'static,
+        F: 'static,
+        G: 'static,
+    > Join
+    for (
+        Task<A>,
+        Task<B>,
+        Task<C>,
+        Task<D>,
+        Task<E>,
+        Task<F>,
+        Task<G>,
+    )
+{
+    type Type = (A, B, C, D, E, F, G);
+
+    fn join(self) -> Task<(A, B, C, D, E, F, G)> {
+        let (
+            loader_a,
+            loader_b,
+            loader_c,
+            loader_d,
+            loader_e,
+            loader_f,
+            loader_g,
+        ) = self;
+
+        (
+            (loader_a, loader_b, loader_c, loader_d, loader_e, loader_f).join(),
+            loader_g,
+        )
+            .join()
+            .map(|((a, b, c, d, e, f), g)| (a, b, c, d, e, f, g))
+    }
+}
+
+impl<
+        A: 'static,
+        B: 'static,
+        C: 'static,
+        D: 'static,
+        E: 'static,
+        F: 'static,
+        G: 'static,
+        H: 'static,
+    > Join
+    for (
+        Task<A>,
+        Task<B>,
+        Task<C>,
+        Task<D>,
+        Task<E>,
+        Task<F>,
+        Task<G>,
+        Task<H>,
+    )
+{
+    type Type = (A, B, C, D, E, F, G, H);
+
+    fn join(self) -> Task<(A, B, C, D, E, F, G, H)> {
+        let (
+            loader_a,
+            loader_b,
+            loader_c,
+            loader_d,
+            loader_e,
+            loader_f,
+            loader_g,
+            loader_h,
+        ) = self;
+
+        (
+            (
+                loader_a, loader_b, loader_c, loader_d, loader_e, loader_f,
+                loader_g,
+            )
+                .join(),
+            loader_h,
+        )
+            .join()
+            .map(|((a, b, c, d, e, f, g), h)| (a, b, c, d, e, f, g, h))
+    }
+}
