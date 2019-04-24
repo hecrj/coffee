@@ -1,5 +1,73 @@
-//! `coffee` is an opinionated 2D game engine focused on simplicity,
-//! explicitness, and safety.
+//! Coffee is an opinionated 2D game engine focused on simplicity, explicitness,
+//! and safety.
+//!
+//! # Features
+//!   * Declarative, type-safe asset loading
+//!   * Loading screens with progress tracking
+//!   * Built-in [debug view with performance metrics]
+//!   * Fixed timestep
+//!   * Explicit, easy to use, hardware-accelerated 2D graphics API
+//!   * Multiplatform support leveraging OpenGL, Vulkan, Metal, D3D11, and D3D12
+//!   * Texture array support
+//!   * Explicit and efficient batched draws
+//!   * Off-screen rendering
+//!   * TrueType font rendering
+//!
+//! Check out the [repository] for more details!
+//!
+//! # Usage
+//! To get started, simply implement the [`Game`] trait. Then, call
+//! [`Game::run`] with some [`WindowSettings`] to run your game.
+//!
+//! Here is a minimal example that will open a window:
+//!
+//! ```no_run
+//! use coffee::{Game, Result, Timer};
+//! use coffee::graphics::{Color, Window, WindowSettings};
+//!
+//! fn main() {
+//!     MyGame::run(WindowSettings {
+//!         title: String::from("A caffeinated game"),
+//!         size: (1280, 1024),
+//!         resizable: true,
+//!     })
+//!     .expect("Run game");
+//! }
+//!
+//! struct MyGame {
+//!     // Your game state goes here...
+//! }
+//!
+//! impl Game for MyGame {
+//!     type View = (); // No view data. Change this!
+//!     type Input = (); // No input data. Change this!
+//!
+//!     const TICKS_PER_SECOND: u16 = 60; // Update rate
+//!
+//!     fn new(_window: &mut Window) -> Result<(MyGame, Self::View, Self::Input)> {
+//!         // Load your game assets here. Check out the `load` module!
+//!         Ok((MyGame { /* ... */ }, (), ()))
+//!     }
+//!
+//!     fn update(&mut self, _view: &Self::View, _window: &Window) {
+//!         // Update your game here
+//!     }
+//!
+//!     fn draw(&self, _view: &mut Self::View, window: &mut Window, _timer: &Timer) {
+//!         // Clear the current frame
+//!         let mut frame = window.frame();
+//!         frame.clear(Color::BLACK);
+//!
+//!         // Draw your game here. Check out the `graphics` module!
+//!     }
+//! }
+//! ```
+//!
+//! [debug view with performance metrics]: struct.Debug.html
+//! [repository]: https://github.com/hecrj/coffee
+//! [`Game`]: trait.Game.html
+//! [`Game::run`]: trait.Game.html#method.run
+//! [`WindowSettings`]: graphics/struct.WindowSettings.html
 mod debug;
 mod result;
 mod timer;
@@ -70,30 +138,6 @@ pub trait Game {
     where
         Self: Sized;
 
-    /// Consume your [`Input`] to let users interact with your game here.
-    ///
-    /// Right before an [`update`], input events will be processed and this
-    /// function will be called. This reduces latency when multiple updates need
-    /// to happen during a single frame.
-    ///
-    /// If no [`update`] is needed during a frame, it will still be called once,
-    /// right after processing input events and before drawing. This allows you
-    /// to keep your view updated every frame in order to offer a smooth user
-    /// experience independently of the [`TICKS_PER_SECOND`] setting.
-    ///
-    /// You can access the GPU if, as a consequence of the interaction, you need
-    /// to prepare some assets before rendering.
-    ///
-    /// [`Input`]: #associatedtype.Input
-    /// [`update`]: #tymethod.update
-    /// [`TICKS_PER_SECOND`]: #associatedconstant.TICKS_PER_SECOND
-    fn interact(
-        &mut self,
-        input: &mut Self::Input,
-        view: &mut Self::View,
-        gpu: &mut graphics::Gpu,
-    );
-
     /// Update your game state here.
     ///
     /// The [`TICKS_PER_SECOND`] constant defines how many times this function
@@ -132,8 +176,35 @@ pub trait Game {
     /// By default, it does nothing.
     ///
     /// [`Input`]: #associatedtype.Input
-    /// [`interact`]: #tymethod.interact
+    /// [`interact`]: #method.interact
     fn on_input(&self, _input: &mut Self::Input, _event: input::Event) {}
+
+    /// Consume your [`Input`] to let users interact with your game here.
+    ///
+    /// Right before an [`update`], input events will be processed and this
+    /// function will be called. This reduces latency when multiple updates need
+    /// to happen during a single frame.
+    ///
+    /// If no [`update`] is needed during a frame, it will still be called once,
+    /// right after processing input events and before drawing. This allows you
+    /// to keep your view updated every frame in order to offer a smooth user
+    /// experience independently of the [`TICKS_PER_SECOND`] setting.
+    ///
+    /// You can access the GPU if, as a consequence of the interaction, you need
+    /// to prepare some assets before rendering.
+    ///
+    /// By default, it does nothing.
+    ///
+    /// [`Input`]: #associatedtype.Input
+    /// [`update`]: #tymethod.update
+    /// [`TICKS_PER_SECOND`]: #associatedconstant.TICKS_PER_SECOND
+    fn interact(
+        &mut self,
+        _input: &mut Self::Input,
+        _view: &mut Self::View,
+        _gpu: &mut graphics::Gpu,
+    ) {
+    }
 
     /// Implement this function to display debug information.
     ///

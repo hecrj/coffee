@@ -1,10 +1,15 @@
 [package]
 name = "coffee"
-version = "0.0.0"
+version = "0.1.0"
 authors = ["Héctor Ramón Jiménez <hector0193@gmail.com>"]
 edition = "2018"
 description = "An opinionated 2D game engine"
 license = "MIT"
+repository = "https://github.com/hecrj/coffee"
+documentation = "https://docs.rs/coffee"
+readme = "README.md"
+keywords = ["game", "engine", "2D", "graphics", "coffee"]
+categories = ["game-engines"]
 
 [package.metadata.docs.rs]
 features = ["opengl"]
@@ -13,6 +18,9 @@ features = ["opengl"]
 default = []
 opengl = ["gfx", "gfx_core", "glutin", "gfx_device_gl", "gfx_window_glutin", "gfx_glyph", "gfx_winit"]
 vulkan = ["wgpu", "wgpu/vulkan"]
+metal = ["wgpu", "wgpu/metal"]
+dx11 = ["wgpu", "wgpu/dx11"]
+dx12 = ["wgpu", "wgpu/dx12"]
 debug = []
 
 [dependencies]
@@ -32,5 +40,6 @@ gfx_winit = { package = "winit", version = "0.19", optional = true }
 wgpu = { version = "0.2", optional = true }
 
 [dev-dependencies]
+# Example dependencies
 rand = "0.6"
 rayon = "1.0"
