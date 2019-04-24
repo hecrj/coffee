@@ -103,12 +103,14 @@ Coffee builds upon
   * [`winit`] for windowing and mouse/keyboard events.
   * [`gfx` pre-ll] for OpenGL support, based heavily on the [`ggez`] codebase.
   * [`wgpu`] for _experimental_ Vulkan, Metal, D3D11 and D3D12 support.
+  * [`glyph_brush`] for TrueType font rendering.
   * [`nalgebra`] for the `Point`, `Vector`, and `Transformation` types.
   * [`image`] for image loading and texture array building.
 
 [`winit`]: https://github.com/rust-windowing/winit
 [`gfx` pre-ll]: https://github.com/gfx-rs/gfx/tree/pre-ll
 [`wgpu`]: https://github.com/gfx-rs/wgpu
+[`glyph_brush`]: https://github.com/alexheretic/glyph-brush/tree/master/glyph-brush
 [`nalgebra`]: https://github.com/rustsim/nalgebra
 [`image`]: https://github.com/image-rs/image
 
