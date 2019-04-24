@@ -47,6 +47,34 @@ impl<'a> Target<'a> {
     /// This is equivalent to multiplying to current [`Target`] transform by the
     /// provided transform.
     ///
+    /// You can use blocks to emulate a transformation stack! Imagine we want to
+    /// apply a camera translation with some zoom, but only use it to draw a
+    /// particular scene. We can simply do:
+    ///
+    /// ```
+    /// use coffee::graphics::{Frame, Transformation, Vector};
+    ///
+    /// fn draw_something(frame: &mut Frame) {
+    ///     let mut target = frame.as_target();
+    ///
+    ///     // We can draw stuff on `target` here
+    ///     // ...
+    ///
+    ///     {
+    ///         let transformation = Transformation::scale(2.0)
+    ///             * Transformation::translate(Vector::new(10.0, 10.0));
+    ///
+    ///         let mut camera = target.transform(transformation);
+    ///
+    ///         // Use `camera` to draw the particular scene here
+    ///         // ...
+    ///     }
+    ///
+    ///     // We can keep using `target` as if no transformation happened
+    ///     // ...
+    /// }
+    /// ```
+    ///
     /// [`Target`]: struct.Target.html
     pub fn transform(&mut self, transformation: Transformation) -> Target {
         Target {
