@@ -258,7 +258,7 @@ pub trait Game {
             event_loop: &mut window::EventLoop,
             alive: &mut bool,
         ) {
-            debug.event_loop_started();
+            debug.interact_started();
             event_loop.poll(|event| match event {
                 window::Event::Input(input_event) => {
                     game.on_input(input, input_event);
@@ -294,7 +294,7 @@ pub trait Game {
                 }
             });
             game.interact(input, view, window.gpu());
-            debug.event_loop_finished();
+            debug.interact_finished();
         }
 
         while alive {

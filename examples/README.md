@@ -1,0 +1,28 @@
+# Examples
+
+To try an example, clone the repository and use `cargo run`. You have to enable
+a graphics backend feature. For instance, if we want to run an example using
+OpenGL, we run:
+
+```
+cargo run --example <example> --features opengl
+```
+
+## Particles
+
+A particle gravity simulator that showcases loading screens, input handling,
+and graphics interpolation with batched drawing and font rendering. Move the
+mouse around to attract the particles.
+
+This example renders 50k independent particles every frame. Using the
+`--release` flag to run the example is recommended. Additionally, you can
+compile it with the `debug` feature if you want to enable the built-in debug
+view:
+
+```
+cargo run --example particles --features opengl,debug --release
+```
+
+![Particles example][particles]
+
+[particles]: https://github.com/hecrj/coffee/blob/master/images/examples/particles.png?raw=true

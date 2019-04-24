@@ -3,8 +3,7 @@
 [![Build Status](https://travis-ci.org/hecrj/coffee.svg?branch=master)](https://travis-ci.org/hecrj/coffee)
 [![Documentation](https://docs.rs/coffee/badge.svg)](https://docs.rs/coffee)
 [![Crates.io](https://img.shields.io/crates/v/coffee.svg)](https://crates.io/crates/coffee)
-[![License](https://img.shields.io/crates/l/coffee.svg)](LICENSE)
-[![Gitter chat](https://badges.gitter.im/hecrj/coffee.png)](https://gitter.im/hecrj/coffee)
+[![License](https://img.shields.io/crates/l/coffee.svg)](https://github.com/hecrj/coffee/blob/master/LICENSE)
 
 An opinionated 2D game engine for Rust focused on simplicity, explicitness, and
 safety.
@@ -106,8 +105,8 @@ Coffee builds upon
 
 ## Contributing / Feedback
 I am quite new to Rust, systems programming, and computer graphics. I am
-learning along the way as I build the engine. I am always glad to to learn from
-anyone.
+learning along the way as I build the engine for a game I am currently
+developing. I am always glad to to learn from anyone.
 
 If you want to contribute, you are more than welcome to be a part of the
 project! Check out the current [issues] if you want to find something to work
@@ -122,8 +121,8 @@ the [Rust Community Discord]. I go by `@lone_scientist` there.
 [Rust Community Discord]: https://bit.ly/rust-community
 
 ## Credits / Thank you
-  * [`ggez`], an awesome easy-to-use game engine that introduced me to Rust. Its
-    graphics implementation served as a guide to implement OpenGL support for
-    Coffee.
+  * [`ggez`], an awesome, easy-to-use, good game engine that introduced me to
+    Rust a month ago. Its graphics implementation served me as a guide to
+    implement OpenGL support for Coffee.
 
 [`ggez`]: https://github.com/ggez/ggez

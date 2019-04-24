@@ -1,5 +1,6 @@
 //! A particle gravity simulator that showcases loading screens, input handling,
-//! and graphics interpolation with batched drawing and font rendering.
+//! and graphics interpolation with batched drawing and font rendering. Move the
+//! mouse around to attract the particles.
 use rand::Rng;
 use rayon::prelude::*;
 use std::{thread, time};
