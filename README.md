@@ -13,7 +13,7 @@ planned during 2019 (and hopefully beyond that!). Many [basic features are still
 missing], some [dependencies are experimental], and there are probably _many_
 bugs. [Feel free to contribute!]
 
-[basic features are still missing]: https://github.com/hecrj/coffee/issues
+[basic features are still missing]: https://github.com/hecrj/coffee/issues?q=is%3Aissue+is%3Aopen+label%3Afeature
 [dependencies are experimental]: #implementation-details
 [Feel free to contribute!]: #contributing--feedback
 
@@ -35,7 +35,7 @@ bugs. [Feel free to contribute!]
 Add `coffee` as a dependency in your `Cargo.toml` and enable a graphics backend
 feature (`opengl`, `vulkan`, `metal`, `dx11`, or `dx12`):
 
-```
+```toml
 coffee = { version = "0.1", features = ["opengl"] }
 ```
 
@@ -43,7 +43,7 @@ Rust is _pretty_ slow in debug mode. If you experience performance issues when
 drawing hundreds of sprites, enable compiler optimizations in your `Cargo.toml`.
 I recommend level 2 optimizations to be closer to `--release` performance:
 
-```
+```toml
 [profile.dev]
 opt-level = 2
 ```
