@@ -9,14 +9,14 @@
 An opinionated 2D game engine for Rust focused on simplicity, explicitness, and
 safety.
 
-__Coffee is in very early stages of development.__ Active development is planned
-during 2019 (and hopefully beyond that!). [Many basic features are still missing],
-[some of its dependencies are experimental], and there are probably _many_ bugs.
-[Feel free to contribute!]
+__Coffee is in a very early stage of development.__ Active development is
+planned during 2019 (and hopefully beyond that!). Many [basic features are still
+missing], some [dependencies are experimental], and there are probably _many_
+bugs. [Feel free to contribute!]
 
-[Many basic features are still missing]: https://github.com/hecrj/coffee/issues
-[some of its dependencies are experimental]: #implementation-details
-[Feel free to contribute!]: https://github.com/hecrj/coffee/issues
+[basic features are still missing]: https://github.com/hecrj/coffee/issues
+[dependencies are experimental]: #implementation-details
+[Feel free to contribute!]: #contributing--feedback
 
 ## Features
   * Declarative, type-safe asset loading
@@ -32,21 +32,27 @@ during 2019 (and hopefully beyond that!). [Many basic features are still missing
 
 [debug view with performance metrics]: https://github.com/hecrj/coffee/blob/master/images/debug.png
 
-## Overview
+## Usage
+Add `coffee` as a dependency in your `Cargo.toml` and enable a graphics backend
+feature (`opengl`, `vulkan`, `metal`, `dx11`, or `dx12`):
 
+```
+coffee = { version = "0.1", features = ["opengl"] }
+```
+
+## Overview
 Here is a minimal example that will open a window:
 
 ```rust
 use coffee::{Game, Result, Timer};
 use coffee::graphics::{Color, Window, WindowSettings};
 
-fn main() {
+fn main() -> Result<()> {
     MyGame::run(WindowSettings {
         title: String::from("A caffeinated game"),
         size: (1280, 1024),
         resizable: true,
     })
-    .expect("Run game");
 }
 
 struct MyGame {
@@ -54,8 +60,8 @@ struct MyGame {
 }
 
 impl Game for MyGame {
-    type View = (); // No view data. Change this!
-    type Input = (); // No input data. Change this!
+    type View = (); // No view data.
+    type Input = (); // No input data.
 
     const TICKS_PER_SECOND: u16 = 60; // Update rate
 
@@ -87,9 +93,8 @@ Check out the [documentation] and the [examples] to learn more!
 Coffee builds upon
 
   * [`winit`] for windowing and mouse/keyboard events.
-  * [`gfx` pre-ll] for OpenGL support, based heavily on the [`ggez`]
-    codebase.
-  * [`wgpu`] for Vulkan, Metal, D3D11 and D3D12 support.
+  * [`gfx` pre-ll] for OpenGL support, based heavily on the [`ggez`] codebase.
+  * [`wgpu`] for _experimental_ Vulkan, Metal, D3D11 and D3D12 support.
   * [`nalgebra`] for the `Point`, `Vector`, and `Transformation` types.
   * [`image`] for image loading and texture array building.
 
@@ -106,8 +111,8 @@ anyone.
 
 If you want to contribute, you are more than welcome to be a part of the
 project! Check out the current [issues] if you want to find something to work
-on. I would like to hear about you first, though! Feel free to open a new issue
-if you want to discuss new ideas.
+on. Try to share you thoughts first! Feel free to open a new issue if you want
+to discuss new ideas.
 
 Any kind of feedback is welcome! You can open an issue or, if you want to talk,
 you can find me (and a bunch of awesome folks) over the `#game-dev` channel in
@@ -117,8 +122,8 @@ the [Rust Community Discord]. I go by `@lone_scientist` there.
 [Rust Community Discord]: https://bit.ly/rust-community
 
 ## Credits / Thank you
-  * [`ggez`], an awesome easy-to-use game engine that introduced me to Rust
-    a month ago. Its graphics implementation served as a guide to implement
-    OpenGL support for Coffee.
+  * [`ggez`], an awesome easy-to-use game engine that introduced me to Rust. Its
+    graphics implementation served as a guide to implement OpenGL support for
+    Coffee.
 
 [`ggez`]: https://github.com/ggez/ggez

@@ -11,6 +11,9 @@ readme = "README.md"
 keywords = ["game", "engine", "2D", "graphics", "coffee"]
 categories = ["game-engines"]
 
+[badges]
+maintenance = { status = "actively-developed" }
+
 [package.metadata.docs.rs]
 features = ["opengl"]
 

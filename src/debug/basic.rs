@@ -23,8 +23,8 @@ pub struct Debug {
     load_duration: time::Duration,
     frame_start: time::Instant,
     frame_durations: TimeBuffer,
-    event_loop_start: time::Instant,
-    event_loop_duration: time::Duration,
+    interact_start: time::Instant,
+    interact_duration: time::Duration,
     update_start: time::Instant,
     update_durations: TimeBuffer,
     draw_start: time::Instant,
@@ -46,8 +46,8 @@ impl Debug {
             load_duration: time::Duration::from_secs(0),
             frame_start: now,
             frame_durations: TimeBuffer::new(200),
-            event_loop_start: now,
-            event_loop_duration: time::Duration::from_secs(0),
+            interact_start: now,
+            interact_duration: time::Duration::from_secs(0),
             update_start: now,
             update_durations: TimeBuffer::new(200),
             draw_start: now,
@@ -88,17 +88,20 @@ impl Debug {
         self.frame_durations.average()
     }
 
-    pub(crate) fn event_loop_started(&mut self) {
-        self.event_loop_start = time::Instant::now();
+    pub(crate) fn interact_started(&mut self) {
+        self.interact_start = time::Instant::now();
     }
 
-    pub(crate) fn event_loop_finished(&mut self) {
-        self.event_loop_duration = time::Instant::now() - self.event_loop_start;
+    pub(crate) fn interact_finished(&mut self) {
+        self.interact_duration = time::Instant::now() - self.interact_start;
     }
 
-    /// Get the average time spent processing window events.
-    pub fn event_loop_duration(&self) -> time::Duration {
-        self.event_loop_duration
+    /// Get the average time spent processing events and running
+    /// [`Game::interact`].
+    ///
+    /// [`Game::interact`]: trait.Game.html#method.interact
+    pub fn interact_duration(&self) -> time::Duration {
+        self.interact_duration
     }
 
     pub(crate) fn update_started(&mut self) {
@@ -176,7 +179,7 @@ impl Debug {
         let fps = (1_000_000.0 / frame_micros as f32).round() as u32;
         let rows = [
             ("Load:", self.load_duration, None),
-            ("Interact:", self.event_loop_duration, None),
+            ("Interact:", self.interact_duration, None),
             ("Update:", self.update_durations.average(), None),
             ("Draw:", self.draw_durations.average(), None),
             ("Frame:", frame_duration, Some(fps.to_string() + " fps")),

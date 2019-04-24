@@ -1,3 +1,5 @@
+//! A particle gravity simulator that showcases loading screens, input handling,
+//! and graphics interpolation with batched drawing and font rendering.
 use rand::Rng;
 use rayon::prelude::*;
 use std::{thread, time};
@@ -10,13 +12,12 @@ use coffee::input;
 use coffee::load::{loading_screen, Join, LoadingScreen, Task};
 use coffee::{Game, Result, Timer};
 
-fn main() {
+fn main() -> Result<()> {
     Particles::run(WindowSettings {
         title: String::from("Particles - Coffee"),
         size: (1280, 1024),
         resizable: false,
     })
-    .expect("Run example");
 }
 
 struct Particles {
@@ -54,7 +55,7 @@ impl Game for Particles {
     type Input = Input;
 
     // Low update rate.
-    // This way, graphics interpolation is really noticeable when toggled!
+    // This makes graphics interpolation really noticeable when toggled.
     const TICKS_PER_SECOND: u16 = 20;
 
     fn new(window: &mut Window) -> Result<(Particles, View, Input)> {

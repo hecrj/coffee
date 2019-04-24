@@ -25,13 +25,12 @@
 //! use coffee::{Game, Result, Timer};
 //! use coffee::graphics::{Color, Window, WindowSettings};
 //!
-//! fn main() {
+//! fn main() -> Result<()> {
 //!     MyGame::run(WindowSettings {
 //!         title: String::from("A caffeinated game"),
 //!         size: (1280, 1024),
 //!         resizable: true,
 //!     })
-//!     .expect("Run game");
 //! }
 //!
 //! struct MyGame {
@@ -39,8 +38,8 @@
 //! }
 //!
 //! impl Game for MyGame {
-//!     type View = (); // No view data. Change this!
-//!     type Input = (); // No input data. Change this!
+//!     type View = (); // No view data.
+//!     type Input = (); // No input data.
 //!
 //!     const TICKS_PER_SECOND: u16 = 60; // Update rate
 //!
@@ -152,7 +151,7 @@ pub trait Game {
     /// [`View`]: #associatedtype.View
     fn update(&mut self, view: &Self::View, window: &Window);
 
-    /// Here is where you draw your game!
+    /// Draw your game here.
     ///
     /// Check out the [`graphics`] module to learn more about rendering in
     /// Coffee.
@@ -179,7 +178,7 @@ pub trait Game {
     /// [`interact`]: #method.interact
     fn on_input(&self, _input: &mut Self::Input, _event: input::Event) {}
 
-    /// Consume your [`Input`] to let users interact with your game here.
+    /// Consume your [`Input`] to let users interact with your game.
     ///
     /// Right before an [`update`], input events will be processed and this
     /// function will be called. This reduces latency when multiple updates need
