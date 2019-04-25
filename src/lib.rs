@@ -86,6 +86,8 @@ pub use timer::Timer;
 
 use graphics::window::{self, Window};
 
+use gilrs::Gilrs;
+
 /// The entrypoint of the engine. It describes your game logic.
 ///
 /// Implementors of this trait should hold the game state.
@@ -254,6 +256,20 @@ pub trait Game {
         let mut timer = Timer::new(Self::TICKS_PER_SECOND);
         let mut alive = true;
 
+        // Controller events
+        let mut gilrs = match Gilrs::new() {
+            Ok(context) => Some(context),
+            // use the dummy context as a fallback on platforms that are unsupported.
+            Err(gilrs::Error::NotImplemented(dummy_context)) => {
+                Some(dummy_context)
+            }
+            // Either [gilrs::error::InvalidAxisToBtn](https://docs.rs/gilrs/latest/gilrs/enum.Error.html#variant.InvalidAxisToBtn)
+            // has occured, or a platform specific error has occured.
+            // In either case, disable controller support instead of throwing an error.
+            _ => None,
+        };
+
+        #[cfg_attr(feature = "cargo-clippy", allow(clippy::too_many_arguments))]
         fn process_events<G: Game>(
             game: &mut G,
             input: &mut G::Input,
@@ -261,9 +277,22 @@ pub trait Game {
             debug: &mut Debug,
             window: &mut Window,
             event_loop: &mut window::EventLoop,
+            gilrs: Option<&mut Gilrs>,
             alive: &mut bool,
         ) {
             debug.interact_started();
+            if let Some(gilrs) = gilrs {
+                while let Some(event) = gilrs.next_event() {
+                    game.on_input(
+                        input,
+                        input::Event::GamepadEvent {
+                            id: event.id,
+                            event: event.event,
+                            time: event.time,
+                        },
+                    )
+                }
+            }
             event_loop.poll(|event| match event {
                 window::Event::Input(input_event) => {
                     game.on_input(input, input_event);
@@ -314,6 +343,7 @@ pub trait Game {
                     &mut debug,
                     window,
                     &mut event_loop,
+                    gilrs.as_mut(),
                     &mut alive,
                 );
 
@@ -330,6 +360,7 @@ pub trait Game {
                     &mut debug,
                     window,
                     &mut event_loop,
+                    gilrs.as_mut(),
                     &mut alive,
                 );
             }

@@ -5,12 +5,15 @@ pub use winit::ElementState as ButtonState;
 pub use winit::MouseButton;
 pub use winit::VirtualKeyCode as KeyCode;
 
+pub use gilrs::ev::EventType;
+pub use gilrs::GamepadId;
+use std::time::SystemTime;
+
 /// An input event.
 ///
 /// You can listen to this type of events by implementing [`Game::on_input`].
 ///
-/// There are many events still missing here! Controllers are also not supported
-/// _yet_!
+/// There are many events still missing here!
 ///
 /// Feel free to [open an issue] if you need a particular event.
 /// [PRs are also appreciated!]
@@ -45,5 +48,15 @@ pub enum Event {
 
         /// The button identifier
         button: MouseButton,
+    },
+    /// An event from a gamepad was emitted.
+    /// Maps to [gilrs::ev::Event](https://docs.rs/gilrs/0.7.1/gilrs/ev/struct.Event.html)
+    GamepadEvent {
+        /// Id of gamepad.
+        id: GamepadId,
+        /// Event's data.
+        event: EventType,
+        /// Time when event was emitted.
+        time: SystemTime,
     },
 }
