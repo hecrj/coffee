@@ -19,7 +19,7 @@ maintenance = { status = "actively-developed" }
 features = ["opengl", "debug"]
 
 [features]
-default = []
+default = ["opengl"]
 opengl = ["gfx", "gfx_core", "glutin", "gfx_device_gl", "gfx_window_glutin", "gfx_glyph", "gfx_winit"]
 vulkan = ["wgpu", "wgpu/vulkan"]
 metal = ["wgpu", "wgpu/metal"]
@@ -42,6 +42,9 @@ gfx_winit = { package = "winit", version = "0.19", optional = true }
 
 # wgpu (Vulkan, Metal, D3D)
 wgpu = { version = "0.2", optional = true }
+
+# controller support
+gilrs = "0.7.1"
 
 [dev-dependencies]
 # Example dependencies
