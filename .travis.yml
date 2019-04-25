@@ -15,3 +15,4 @@ matrix:
 script:
   - cargo test --verbose --features opengl
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cargo test --verbose --features vulkan; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cargo test --verbose --features vulkan --release; fi
