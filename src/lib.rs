@@ -183,6 +183,16 @@ pub trait Game {
     /// [`interact`]: #method.interact
     fn on_input(&self, _input: &mut Self::Input, _event: input::Event) {}
 
+    /// Handles a request to close the window.
+    ///
+    /// This function should return true to allow the game loop to end,
+    /// otherwise false.
+    ///
+    /// By default, it does nothing and returns true.
+    fn on_close_request(&self) -> bool {
+        true
+    }
+
     /// Consume your [`Input`] to let users interact with your game.
     ///
     /// Right before an [`update`], input events will be processed and this
@@ -292,7 +302,9 @@ pub trait Game {
                     )
                 }
                 window::Event::CloseRequested => {
-                    *alive = false;
+                    if game.on_close_request() {
+                        *alive = false;
+                    }
                 }
                 window::Event::Resized(new_size) => {
                     window.resize(new_size);
