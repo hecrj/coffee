@@ -46,15 +46,50 @@ impl EventLoop {
                         state,
                         button,
                     })),
+                    winit::WindowEvent::MouseWheel { delta, .. } => match delta
+                    {
+                        winit::MouseScrollDelta::LineDelta(x, y) => {
+                            f(Event::Input(input::Event::MouseWheel {
+                                delta_x: x,
+                                delta_y: y,
+                            }))
+                        }
+                        _ => {}
+                    },
+
+                    winit::WindowEvent::ReceivedCharacter(codepoint) => {
+                        f(Event::Input(input::Event::TextInput {
+                            character: codepoint,
+                        }))
+                    }
                     winit::WindowEvent::CursorMoved { position, .. } => {
                         f(Event::CursorMoved(position))
                     }
-                    winit::WindowEvent::CloseRequested => {
+                    winit::WindowEvent::CursorEntered { .. } => {
+                        f(Event::Input(input::Event::CursorEntered))
+                    }
+                    winit::WindowEvent::CursorLeft { .. } => {
+                        f(Event::Input(input::Event::CursorLeft))
+                    }
+                    winit::WindowEvent::CloseRequested { .. } => {
                         f(Event::CloseRequested)
                     }
                     winit::WindowEvent::Resized(logical_size) => {
                         f(Event::Resized(logical_size))
                     }
+                    winit::WindowEvent::Focused(focus) => {
+                        f(Event::Input(if focus == true {
+                            input::Event::WindowFocused
+                        } else {
+                            input::Event::WindowUnfocused
+                        }))
+                    }
+                    winit::WindowEvent::Moved(
+                        winit::dpi::LogicalPosition { x, y },
+                    ) => f(Event::Input(input::Event::WindowMoved {
+                        x: x as f32,
+                        y: y as f32,
+                    })),
                     _ => {}
                 },
                 _ => (),
