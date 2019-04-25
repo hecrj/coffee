@@ -183,13 +183,13 @@ pub trait Game {
     /// [`interact`]: #method.interact
     fn on_input(&self, _input: &mut Self::Input, _event: input::Event) {}
 
-    /// Handles a request to close the window.
+    /// Handle a close request from the operating system to the game window.
     ///
     /// This function should return true to allow the game loop to end,
     /// otherwise false.
     ///
     /// By default, it does nothing and returns true.
-    fn on_close_request(&self) -> bool {
+    fn on_close_request(&self, _input: &mut Self::Input) -> bool {
         true
     }
 
@@ -302,7 +302,7 @@ pub trait Game {
                     )
                 }
                 window::Event::CloseRequested => {
-                    if game.on_close_request() {
+                    if game.on_close_request(input) {
                         *alive = false;
                     }
                 }
