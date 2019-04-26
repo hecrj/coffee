@@ -41,7 +41,7 @@ impl Debug {
         Self {
             font: graphics::Font::from_bytes(gpu, graphics::Font::DEFAULT)
                 .expect("Load debug font"),
-            enabled: false,
+            enabled: cfg!(feature = "debug"),
             load_start: now,
             load_duration: time::Duration::from_secs(0),
             frame_start: now,
