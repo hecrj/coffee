@@ -301,6 +301,17 @@ pub trait Game {
                         },
                     )
                 }
+                window::Event::Moved(logical_position) => {
+                    let position = logical_position.to_physical(window.dpi());
+
+                    game.on_input(
+                        input,
+                        input::Event::WindowMoved {
+                            x: position.x as f32,
+                            y: position.y as f32,
+                        },
+                    )
+                }
                 window::Event::CloseRequested => {
                     if game.on_close_request(input) {
                         *alive = false;

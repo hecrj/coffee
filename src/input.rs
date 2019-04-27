@@ -29,6 +29,12 @@ pub enum Event {
         key_code: KeyCode,
     },
 
+    /// Text was entered.
+    TextInput {
+        /// The character entered
+        character: char,
+    },
+
     /// The mouse cursor was moved
     CursorMoved {
         /// The X coordinate of the mouse position
@@ -38,6 +44,12 @@ pub enum Event {
         y: f32,
     },
 
+    /// The mouse cursor entered the game window.
+    CursorEntered,
+
+    /// The mouse cursor left the game window.
+    CursorLeft,
+
     /// A mouse button was pressed or released.
     MouseInput {
         /// The state of the button
@@ -45,5 +57,29 @@ pub enum Event {
 
         /// The button identifier
         button: MouseButton,
+    },
+
+    /// The mouse wheel was scrolled.
+    MouseWheel {
+        /// The number of horizontal lines scrolled
+        delta_x: f32,
+
+        /// The number of vertical lines scrolled
+        delta_y: f32,
+    },
+
+    /// The game window gained focus.
+    WindowFocused,
+
+    /// The game window lost focus.
+    WindowUnfocused,
+
+    /// The game window was moved.
+    WindowMoved {
+        /// The new X coordinate of the window
+        x: f32,
+
+        /// The new Y coordinate of the window
+        y: f32,
     },
 }

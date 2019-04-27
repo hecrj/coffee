@@ -6,6 +6,7 @@ pub(crate) enum Event {
     Resized(winit::dpi::LogicalSize),
     Input(input::Event),
     CursorMoved(winit::dpi::LogicalPosition),
+    Moved(winit::dpi::LogicalPosition),
 }
 
 pub struct EventLoop(winit::EventsLoop);
@@ -46,14 +47,46 @@ impl EventLoop {
                         state,
                         button,
                     })),
+                    winit::WindowEvent::MouseWheel { delta, .. } => match delta
+                    {
+                        winit::MouseScrollDelta::LineDelta(x, y) => {
+                            f(Event::Input(input::Event::MouseWheel {
+                                delta_x: x,
+                                delta_y: y,
+                            }))
+                        }
+                        _ => {}
+                    },
+
+                    winit::WindowEvent::ReceivedCharacter(codepoint) => {
+                        f(Event::Input(input::Event::TextInput {
+                            character: codepoint,
+                        }))
+                    }
                     winit::WindowEvent::CursorMoved { position, .. } => {
                         f(Event::CursorMoved(position))
                     }
-                    winit::WindowEvent::CloseRequested => {
+                    winit::WindowEvent::CursorEntered { .. } => {
+                        f(Event::Input(input::Event::CursorEntered))
+                    }
+                    winit::WindowEvent::CursorLeft { .. } => {
+                        f(Event::Input(input::Event::CursorLeft))
+                    }
+                    winit::WindowEvent::CloseRequested { .. } => {
                         f(Event::CloseRequested)
                     }
                     winit::WindowEvent::Resized(logical_size) => {
                         f(Event::Resized(logical_size))
+                    }
+                    winit::WindowEvent::Focused(focus) => {
+                        f(Event::Input(if focus == true {
+                            input::Event::WindowFocused
+                        } else {
+                            input::Event::WindowUnfocused
+                        }))
+                    }
+                    winit::WindowEvent::Moved(position) => {
+                        f(Event::Moved(position))
                     }
                     _ => {}
                 },
