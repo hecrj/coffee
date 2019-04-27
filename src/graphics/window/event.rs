@@ -6,6 +6,7 @@ pub(crate) enum Event {
     Resized(winit::dpi::LogicalSize),
     Input(input::Event),
     CursorMoved(winit::dpi::LogicalPosition),
+    Moved(winit::dpi::LogicalPosition),
 }
 
 pub struct EventLoop(winit::EventsLoop);
@@ -84,12 +85,9 @@ impl EventLoop {
                             input::Event::WindowUnfocused
                         }))
                     }
-                    winit::WindowEvent::Moved(
-                        winit::dpi::LogicalPosition { x, y },
-                    ) => f(Event::Input(input::Event::WindowMoved {
-                        x: x as f32,
-                        y: y as f32,
-                    })),
+                    winit::WindowEvent::Moved(position) => {
+                        f(Event::Moved(position))
+                    }
                     _ => {}
                 },
                 _ => (),
