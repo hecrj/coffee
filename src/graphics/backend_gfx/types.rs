@@ -1,4 +1,3 @@
-use gfx;
 use gfx_device_gl as gl;
 
 use super::format;

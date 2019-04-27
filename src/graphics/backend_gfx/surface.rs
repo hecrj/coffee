@@ -1,7 +1,5 @@
 use gfx_device_gl as gl;
-use gfx_window_glutin;
 pub use gfx_winit as winit;
-use glutin;
 
 use super::{format, DepthView, Gpu, TargetView};
 use crate::{Error, Result};

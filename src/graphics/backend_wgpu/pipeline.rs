@@ -1,7 +1,5 @@
 use std::mem;
 
-use wgpu;
-
 use crate::graphics::{Quad, Transformation};
 
 pub struct Pipeline {

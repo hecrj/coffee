@@ -1,6 +1,4 @@
-use gfx;
 use gfx_device_gl as gl;
-use gfx_glyph;
 
 use crate::graphics::gpu::{DepthView, TargetView};
 use crate::graphics::Text;

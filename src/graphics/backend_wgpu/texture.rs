@@ -1,6 +1,3 @@
-use image;
-use wgpu;
-
 use std::fmt;
 use std::rc::Rc;
 
