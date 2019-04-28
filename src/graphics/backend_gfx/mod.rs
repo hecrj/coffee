@@ -128,6 +128,8 @@ impl Gpu {
         font: &mut Font,
         target: &TargetView,
         depth: &DepthView,
+        _target_width: u32,
+        _target_height: u32,
     ) {
         font.draw(&mut self.encoder, target, depth);
     }

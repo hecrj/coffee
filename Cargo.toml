@@ -21,10 +21,10 @@ features = ["opengl", "debug"]
 [features]
 default = []
 opengl = ["gfx", "gfx_core", "glutin", "gfx_device_gl", "gfx_window_glutin", "gfx_glyph", "gfx_winit"]
-vulkan = ["wgpu", "wgpu/vulkan"]
-metal = ["wgpu", "wgpu/metal"]
-dx11 = ["wgpu", "wgpu/dx11"]
-dx12 = ["wgpu", "wgpu/dx12"]
+vulkan = ["wgpu", "wgpu/vulkan", "wgpu_glyph"]
+metal = ["wgpu", "wgpu/metal", "wgpu_glyph"]
+dx11 = ["wgpu", "wgpu/dx11", "wgpu_glyph"]
+dx12 = ["wgpu", "wgpu/dx12", "wgpu_glyph"]
 debug = []
 
 [dependencies]
@@ -42,6 +42,7 @@ gfx_winit = { package = "winit", version = "0.19", optional = true }
 
 # wgpu (Vulkan, Metal, D3D)
 wgpu = { version = "0.2", optional = true }
+wgpu_glyph = { version = "0.1", optional = true }
 
 [dev-dependencies]
 # Example dependencies
