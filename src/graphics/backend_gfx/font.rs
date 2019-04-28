@@ -25,7 +25,7 @@ impl Font {
                 x: text.size,
                 y: text.size,
             },
-            color: text.color.into(),
+            color: text.color.into_linear(),
             bounds: text.bounds,
             ..Default::default()
         });

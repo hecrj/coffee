@@ -10,7 +10,7 @@ impl Font {
         Font {
             glyphs: wgpu_glyph::GlyphBrushBuilder::using_font_bytes(bytes)
                 .texture_filter_method(wgpu::FilterMode::Nearest)
-                .build(device),
+                .build(device, wgpu::TextureFormat::Bgra8UnormSrgb),
         }
     }
 
@@ -22,7 +22,7 @@ impl Font {
                 x: text.size,
                 y: text.size,
             },
-            color: text.color.into(),
+            color: text.color.into_linear(),
             bounds: text.bounds,
             ..Default::default()
         });

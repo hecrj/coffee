@@ -174,7 +174,7 @@ fn create_texture_array(
         size: extent,
         array_size: layer_count,
         dimension: wgpu::TextureDimension::D2,
-        format: wgpu::TextureFormat::Bgra8Unorm,
+        format: wgpu::TextureFormat::Bgra8UnormSrgb,
         usage,
     });
 
@@ -220,7 +220,7 @@ fn create_texture_array(
     }
 
     let view = texture.create_view(&wgpu::TextureViewDescriptor {
-        format: wgpu::TextureFormat::Bgra8Unorm,
+        format: wgpu::TextureFormat::Bgra8UnormSrgb,
         dimension: wgpu::TextureViewDimension::D2Array,
         aspect: wgpu::TextureAspectFlags::COLOR,
         base_mip_level: 0,

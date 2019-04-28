@@ -130,7 +130,7 @@ fn new_swap_chain(
         size: extent,
         dimension: wgpu::TextureDimension::D2,
         array_size: 1,
-        format: wgpu::TextureFormat::Bgra8Unorm,
+        format: wgpu::TextureFormat::Bgra8UnormSrgb,
         usage: wgpu::TextureUsageFlags::OUTPUT_ATTACHMENT
             | wgpu::TextureUsageFlags::TRANSFER_SRC,
     });

@@ -62,7 +62,7 @@ impl Gpu {
     }
 
     pub(super) fn clear(&mut self, view: &TargetView, color: Color) {
-        let [r, g, b, a]: [f32; 4] = color.into();
+        let [r, g, b, a]: [f32; 4] = color.into_linear();
 
         let _ = self.encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
             color_attachments: &[wgpu::RenderPassColorAttachmentDescriptor {
