@@ -69,7 +69,8 @@ impl Gpu {
             gfx::format::Srgba8,
         > = gfx::memory::Typed::new(view.clone());
 
-        self.encoder.clear(&typed_render_target, color.into())
+        self.encoder
+            .clear(&typed_render_target, color.into_linear())
     }
 
     fn flush(&mut self) {
