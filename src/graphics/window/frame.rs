@@ -58,6 +58,8 @@ impl<'a> Frame<'a> {
             font,
             &self.window.surface.target(),
             &self.window.surface.depth(),
+            self.width().round() as u32,
+            self.height().round() as u32,
         );
     }
 }

@@ -98,7 +98,7 @@ impl Gpu {
     }
 
     pub(super) fn upload_font(&mut self, bytes: &'static [u8]) -> Font {
-        Font::from_bytes(bytes)
+        Font::from_bytes(&mut self.device, bytes)
     }
 
     pub(super) fn draw_texture_quads(
@@ -120,9 +120,18 @@ impl Gpu {
 
     pub(super) fn draw_font(
         &mut self,
-        _font: &mut Font,
-        _target: &TargetView,
+        font: &mut Font,
+        target: &TargetView,
         _depth: &DepthView,
+        target_width: u32,
+        target_height: u32,
     ) {
+        font.draw(
+            &mut self.device,
+            &mut self.encoder,
+            target,
+            target_width,
+            target_height,
+        );
     }
 }
