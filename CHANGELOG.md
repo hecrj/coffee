@@ -43,25 +43,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.1] - 2019-04-25
 ### Changed
-- Improve wording in `README`.
+- The wording in the `README` has been improved.
 
 ### Fixed
-- Fix compilation failing when `debug_assertions` and the `debug` feature were
+- Compilation failing when `debug_assertions` and the `debug` feature were
   disabled.
 
 
 ## [0.1.0] - 2019-04-25
 ### Added
-- Release the first version of the crate :tada:
+- First release! :tada:
 
 ## 0.0.0 - 2019-04-02
 ### Changed
-- Reserve name on https://crates.io
-- Start the crate
+- The name of the crate has been reserved on [crates.io]
+- Coffee starts being developed.
 
 
 [Unreleased]: https://github.com/hecrj/coffee/compare/0.1.1...HEAD
 [0.1.1]: https://github.com/hecrj/coffee/compare/0.1.0...0.1.1
 [0.1.0]: https://github.com/hecrj/coffee/releases/tag/0.1.0
 
+[crates.io]: https//crates.io
 [`wgpu`]: https://github.com/gfx-rs/wgpu
