@@ -2,8 +2,8 @@
 use std::collections::HashSet;
 
 use coffee::graphics::{
-    Batch, Color, Font, Gpu, Image, Point, Rectangle, Sprite, Text, Vector,
-    Window, WindowSettings,
+    Color, Font, Gpu, Image, Point, Rectangle, Sprite, Text, Vector, Window,
+    WindowSettings,
 };
 use coffee::input;
 use coffee::load::{loading_screen, Join, LoadingScreen, Task};
@@ -226,17 +226,18 @@ impl Game for InputExample {
 
         view.font.draw(&mut frame);
 
-        let mut batch = Batch::new(view.palette.clone());
         // Draw a small square at the mouse cursor's position.
-        batch.add(Sprite {
-            source: Rectangle {
-                x: 0,
-                y: 0,
-                width: 6,
-                height: 6,
+        view.palette.draw(
+            Sprite {
+                source: Rectangle {
+                    x: 0,
+                    y: 0,
+                    width: 6,
+                    height: 6,
+                },
+                position: self.cursor_position - Vector::new(3.0, 3.0),
             },
-            position: self.cursor_position - Vector::new(3.0, 3.0),
-        });
-        batch.draw(Point::new(0.0, 0.0), &mut frame.as_target());
+            &mut frame.as_target(),
+        );
     }
 }
