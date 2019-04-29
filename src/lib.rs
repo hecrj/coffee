@@ -278,16 +278,15 @@ pub trait Game {
                 window::Event::Input(input_event) => {
                     game.on_input(input, input_event);
 
-                    if cfg!(any(debug_assertions, feature = "debug")) {
-                        match input_event {
-                            input::Event::KeyboardInput {
-                                state: input::ButtonState::Released,
-                                key_code,
-                            } if Some(key_code) == G::DEBUG_KEY => {
-                                debug.toggle();
-                            }
-                            _ => {}
+                    #[cfg(any(debug_assertions, feature = "debug"))]
+                    match input_event {
+                        input::Event::KeyboardInput {
+                            state: input::ButtonState::Released,
+                            key_code,
+                        } if Some(key_code) == G::DEBUG_KEY => {
+                            debug.toggle();
                         }
+                        _ => {}
                     }
                 }
                 window::Event::CursorMoved(logical_position) => {
