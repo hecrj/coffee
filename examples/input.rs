@@ -1,17 +1,17 @@
 //! A simple example that demonstrates capturing window and input events.
+use std::collections::HashSet;
+
 use coffee::graphics::{
-    Batch, Color, Font, Gpu, Image, Point, Rectangle, Sprite, Text, Window,
-    WindowSettings,
+    Batch, Color, Font, Gpu, Image, Point, Rectangle, Sprite, Text, Vector,
+    Window, WindowSettings,
 };
 use coffee::input;
 use coffee::load::{loading_screen, Join, LoadingScreen, Task};
 use coffee::{Game, Result, Timer};
 
-use std::collections::HashMap;
-
 fn main() -> Result<()> {
     InputExample::run(WindowSettings {
-        title: String::from("Input Example - Coffee"),
+        title: String::from("Input - Coffee"),
         size: (720, 240),
         resizable: false,
     })
@@ -20,8 +20,8 @@ fn main() -> Result<()> {
 struct Input {
     cursor_position: Point,
     mouse_wheel: Point,
-    key_state: HashMap<input::KeyCode, bool>,
-    mouse_state: HashMap<input::MouseButton, bool>,
+    keys_pressed: HashSet<input::KeyCode>,
+    mouse_buttons_pressed: HashSet<input::MouseButton>,
     text_buffer: String,
 }
 
@@ -30,8 +30,8 @@ impl Input {
         Input {
             cursor_position: Point::new(0.0, 0.0),
             mouse_wheel: Point::new(0.0, 0.0),
-            key_state: HashMap::new(),
-            mouse_state: HashMap::new(),
+            keys_pressed: HashSet::new(),
+            mouse_buttons_pressed: HashSet::new(),
             text_buffer: String::new(),
         }
     }
@@ -63,13 +63,11 @@ impl View {
 }
 
 struct InputExample {
-    mouse_x: f32,
-    mouse_y: f32,
-    wheel_x: f32,
-    wheel_y: f32,
+    cursor_position: Point,
+    mouse_wheel: Point,
+    keys_pressed: HashSet<input::KeyCode>,
+    mouse_buttons_pressed: HashSet<input::MouseButton>,
     text_buffer: String,
-    keys_down: String,
-    mousebuttons_down: String,
 }
 
 impl InputExample {
@@ -92,13 +90,11 @@ impl Game for InputExample {
 
         Ok((
             InputExample {
-                mouse_x: 0.0,
-                mouse_y: 0.0,
-                wheel_x: 0.0,
-                wheel_y: 0.0,
+                cursor_position: Point::new(0.0, 0.0),
+                mouse_wheel: Point::new(0.0, 0.0),
+                keys_pressed: HashSet::new(),
+                mouse_buttons_pressed: HashSet::new(),
                 text_buffer: String::with_capacity(Self::MAX_TEXTSIZE),
-                keys_down: String::new(),
-                mousebuttons_down: String::new(),
             },
             view,
             Input::new(),
@@ -116,24 +112,22 @@ impl Game for InputExample {
             input::Event::MouseWheel { delta_x, delta_y } => {
                 input.mouse_wheel = Point::new(delta_x, delta_y);
             }
-            input::Event::KeyboardInput { key_code, state } => {
-                input.key_state.insert(
-                    key_code,
-                    match state {
-                        input::ButtonState::Pressed => true,
-                        input::ButtonState::Released => false,
-                    },
-                );
-            }
-            input::Event::MouseInput { state, button } => {
-                input.mouse_state.insert(
-                    button,
-                    match state {
-                        input::ButtonState::Pressed => true,
-                        input::ButtonState::Released => false,
-                    },
-                );
-            }
+            input::Event::KeyboardInput { key_code, state } => match state {
+                input::ButtonState::Pressed => {
+                    input.keys_pressed.insert(key_code);
+                }
+                input::ButtonState::Released => {
+                    input.keys_pressed.remove(&key_code);
+                }
+            },
+            input::Event::MouseInput { state, button } => match state {
+                input::ButtonState::Pressed => {
+                    input.mouse_buttons_pressed.insert(button);
+                }
+                input::ButtonState::Released => {
+                    input.mouse_buttons_pressed.remove(&button);
+                }
+            },
             _ => {}
         }
     }
@@ -146,11 +140,10 @@ impl Game for InputExample {
         _view: &mut View,
         _gpu: &mut Gpu,
     ) {
-        self.mouse_x = input.cursor_position.x;
-        self.mouse_y = input.cursor_position.y;
-
-        self.wheel_x = input.mouse_wheel.x;
-        self.wheel_y = input.mouse_wheel.y;
+        self.cursor_position = input.cursor_position;
+        self.mouse_wheel = input.mouse_wheel;
+        self.keys_pressed = input.keys_pressed.clone();
+        self.mouse_buttons_pressed = input.mouse_buttons_pressed.clone();
 
         if !input.text_buffer.is_empty() {
             for c in input.text_buffer.chars() {
@@ -169,22 +162,6 @@ impl Game for InputExample {
             }
             input.text_buffer.clear();
         }
-
-        self.keys_down = input
-            .key_state
-            .iter()
-            .filter(|(_, &v)| v == true)
-            .map(|(k, _)| format!("{:?}", k))
-            .collect::<Vec<_>>()
-            .join(", ");
-
-        self.mousebuttons_down = input
-            .mouse_state
-            .iter()
-            .filter(|(_, &v)| v == true)
-            .map(|(k, _)| format!("{:?}", k))
-            .collect::<Vec<_>>()
-            .join(", ");
     }
 
     fn draw(&self, view: &mut Self::View, window: &mut Window, _timer: &Timer) {
@@ -210,12 +187,21 @@ impl Game for InputExample {
                 });
             };
 
-        add_aligned_text(
-            String::from("Pressed keys:"),
-            self.keys_down.clone(),
-            20.0,
-            20.0,
-        );
+        let keys = self
+            .keys_pressed
+            .iter()
+            .map(|key| format!("{:?}", key))
+            .collect::<Vec<_>>()
+            .join(", ");
+
+        let mouse_buttons = self
+            .mouse_buttons_pressed
+            .iter()
+            .map(|button| format!("{:?}", button))
+            .collect::<Vec<_>>()
+            .join(", ");
+
+        add_aligned_text(String::from("Pressed keys:"), keys, 20.0, 20.0);
 
         add_aligned_text(
             String::from("Text Buffer (type):"),
@@ -226,14 +212,14 @@ impl Game for InputExample {
 
         add_aligned_text(
             String::from("Pressed mouse buttons:"),
-            self.mousebuttons_down.clone(),
+            mouse_buttons,
             20.0,
             80.0,
         );
 
         add_aligned_text(
             String::from("Last mouse wheel scroll:"),
-            format!("{}, {}", self.wheel_x, self.wheel_y),
+            format!("{}, {}", self.mouse_wheel.x, self.mouse_wheel.y),
             20.0,
             110.0,
         );
@@ -249,7 +235,7 @@ impl Game for InputExample {
                 width: 6,
                 height: 6,
             },
-            position: Point::new(self.mouse_x - 3.0, self.mouse_y - 3.0),
+            position: self.cursor_position - Vector::new(3.0, 3.0),
         });
         batch.draw(Point::new(0.0, 0.0), &mut frame.as_target());
     }

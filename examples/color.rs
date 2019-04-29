@@ -6,7 +6,7 @@ use coffee::{Game, Result, Timer};
 
 fn main() -> Result<()> {
     Colors::run(WindowSettings {
-        title: String::from("Colors - Coffee"),
+        title: String::from("Color - Coffee"),
         size: (1280, 1024),
         resizable: false,
     })
