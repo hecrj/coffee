@@ -2,7 +2,7 @@
 use std::collections::HashSet;
 
 use coffee::graphics::{
-    Color, Font, Gpu, Image, Point, Rectangle, Sprite, Text, Vector, Window,
+    Color, Font, Gpu, Image, Point, Quad, Rectangle, Text, Vector, Window,
     WindowSettings,
 };
 use coffee::input;
@@ -228,14 +228,15 @@ impl Game for InputExample {
 
         // Draw a small square at the mouse cursor's position.
         view.palette.draw(
-            Sprite {
+            Quad {
                 source: Rectangle {
-                    x: 0,
-                    y: 0,
-                    width: 6,
-                    height: 6,
+                    x: 0.0,
+                    y: 0.0,
+                    width: 1.0,
+                    height: 1.0,
                 },
                 position: self.cursor_position - Vector::new(3.0, 3.0),
+                size: (6.0, 6.0),
             },
             &mut frame.as_target(),
         );
