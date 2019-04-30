@@ -188,7 +188,7 @@ impl Game for Particles {
             color: Color::WHITE,
         });
 
-        view.font.draw(&mut frame);
+        view.font.draw(&mut frame.as_target());
     }
 }
 

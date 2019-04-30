@@ -1,6 +1,6 @@
 use gfx_device_gl as gl;
 
-use crate::graphics::gpu::{DepthView, TargetView};
+use crate::graphics::gpu::{TargetView, Transformation};
 use crate::graphics::Text;
 
 pub struct Font {
@@ -35,20 +35,22 @@ impl Font {
         &mut self,
         encoder: &mut gfx::Encoder<gl::Resources, gl::CommandBuffer>,
         target: &TargetView,
-        depth: &DepthView,
+        transformation: Transformation,
     ) {
         let typed_target: gfx::handle::RenderTargetView<
             gl::Resources,
             gfx::format::Srgba8,
         > = gfx::memory::Typed::new(target.clone());
 
-        let typed_depth: gfx::handle::DepthStencilView<
-            gl::Resources,
-            gfx::format::Depth,
-        > = gfx::memory::Typed::new(depth.clone());
-
         self.glyphs
-            .draw_queued(encoder, &typed_target, &typed_depth)
+            .draw_queued_with_transform(
+                transformation.into(),
+                encoder,
+                &typed_target,
+                None,
+                // TODO: Does not compile
+                // Wait for https://github.com/alexheretic/glyph-brush/issues/65
+            )
             .expect("Font draw");
     }
 }

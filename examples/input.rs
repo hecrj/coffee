@@ -224,7 +224,7 @@ impl Game for InputExample {
             110.0,
         );
 
-        view.font.draw(&mut frame);
+        view.font.draw(&mut frame.as_target());
 
         // Draw a small square at the mouse cursor's position.
         view.palette.draw(

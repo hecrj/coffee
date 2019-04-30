@@ -37,12 +37,12 @@ gfx_core = { version = "0.9", optional = true }
 glutin = { version = "0.20", optional = true }
 gfx_device_gl = { version = "0.16", optional = true }
 gfx_window_glutin = { version = "0.30", optional = true }
-gfx_glyph = { version = "0.14", optional = true }
+gfx_glyph = { version = "0.14", optional = true, path = "../glyph-brush/gfx-glyph" }
 gfx_winit = { package = "winit", version = "0.19", optional = true }
 
 # wgpu (Vulkan, Metal, D3D)
 wgpu = { version = "0.2", optional = true }
-wgpu_glyph = { version = "0.2", optional = true }
+wgpu_glyph = { version = "0.2", optional = true, path = "../wgpu_glyph" }
 
 [dev-dependencies]
 # Example dependencies
