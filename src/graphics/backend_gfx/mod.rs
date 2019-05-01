@@ -9,7 +9,7 @@ pub use font::Font;
 pub use pipeline::Instance;
 pub use surface::{winit, Surface};
 pub use texture::Texture;
-pub use types::{DepthView, TargetView};
+pub use types::TargetView;
 
 use gfx::{self, Device};
 use gfx_device_gl as gl;

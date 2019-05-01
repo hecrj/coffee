@@ -4,8 +4,6 @@ use super::format;
 
 pub type TargetView = gfx::handle::RawRenderTargetView<gl::Resources>;
 
-pub type DepthView = gfx::handle::RawDepthStencilView<gl::Resources>;
-
 pub type RawTexture = gfx::handle::RawTexture<gl::Resources>;
 
 pub type ShaderResource =

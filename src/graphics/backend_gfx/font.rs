@@ -43,14 +43,9 @@ impl Font {
         > = gfx::memory::Typed::new(target.clone());
 
         self.glyphs
-            .draw_queued_with_transform(
-                transformation.into(),
-                encoder,
-                &typed_target,
-                None,
-                // TODO: Does not compile
-                // Wait for https://github.com/alexheretic/glyph-brush/issues/65
-            )
+            .use_queue()
+            .transform(transformation)
+            .draw(encoder, &typed_target)
             .expect("Font draw");
     }
 }
