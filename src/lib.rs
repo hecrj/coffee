@@ -361,7 +361,9 @@ pub trait Game {
             debug.draw_finished();
 
             if debug.is_enabled() {
+                debug.debug_started();
                 game.debug(input, view, window, &mut debug);
+                debug.debug_finished();
             }
 
             window.swap_buffers();
