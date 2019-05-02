@@ -13,24 +13,19 @@ impl Debug {
     }
 
     pub(crate) fn loading_started(&mut self) {}
-
     pub(crate) fn loading_finished(&mut self) {}
-
     pub(crate) fn frame_started(&mut self) {}
     pub(crate) fn frame_finished(&mut self) {}
-
     pub(crate) fn interact_started(&mut self) {}
-
     pub(crate) fn interact_finished(&mut self) {}
-
     pub(crate) fn update_started(&mut self) {}
-
     pub(crate) fn update_finished(&mut self) {}
-
     pub(crate) fn draw_started(&mut self) {}
-
     pub(crate) fn draw_finished(&mut self) {}
+    pub(crate) fn debug_started(&mut self) {}
+    pub(crate) fn debug_finished(&mut self) {}
 
+    #[allow(dead_code)]
     pub(crate) fn toggle(&mut self) {}
 
     pub(crate) fn is_enabled(&self) -> bool {
