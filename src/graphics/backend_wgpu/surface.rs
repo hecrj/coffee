@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use super::{DepthView, Gpu, TargetView};
+use super::{Gpu, TargetView};
 pub use wgpu::winit;
 
 pub struct Surface {
@@ -39,10 +39,6 @@ impl Surface {
 
     pub fn target(&self) -> &TargetView {
         &self.target
-    }
-
-    pub fn depth(&self) -> &DepthView {
-        &()
     }
 
     pub fn update_viewport(&mut self, gpu: &mut Gpu) {

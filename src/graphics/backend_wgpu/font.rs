@@ -1,5 +1,5 @@
 use crate::graphics::gpu::TargetView;
-use crate::graphics::Text;
+use crate::graphics::{Text, Transformation};
 
 pub struct Font {
     glyphs: wgpu_glyph::GlyphBrush<'static>,
@@ -33,11 +33,15 @@ impl Font {
         device: &mut wgpu::Device,
         encoder: &mut wgpu::CommandEncoder,
         target: &TargetView,
-        target_width: u32,
-        target_height: u32,
+        transformation: Transformation,
     ) {
         self.glyphs
-            .draw_queued(device, encoder, target, target_width, target_height)
+            .draw_queued_with_transform(
+                transformation.into(),
+                device,
+                encoder,
+                target,
+            )
             .expect("Draw font");
     }
 }

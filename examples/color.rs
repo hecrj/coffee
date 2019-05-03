@@ -35,6 +35,8 @@ impl Game for Colors {
         let mut frame = window.frame();
         frame.clear(Color::new(0.5, 0.5, 0.5, 1.0));
 
+        let target = &mut frame.as_target();
+
         view.palette.draw(
             Quad {
                 source: Rectangle {
@@ -46,18 +48,18 @@ impl Game for Colors {
                 position: Point::new(0.0, 0.0),
                 size: (500.0, 500.0),
             },
-            &mut frame.as_target(),
+            target,
         );
 
         view.font.add(Text {
             content: String::from("Prussian blue"),
             position: Point::new(20.0, 500.0),
             size: 50.0,
-            bounds: (frame.width(), frame.height()),
             color: View::PRUSSIAN_BLUE,
+            ..Text::default()
         });
 
-        view.font.draw(&mut frame);
+        view.font.draw(target);
     }
 }
 

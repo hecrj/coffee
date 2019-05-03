@@ -9,7 +9,7 @@ pub use font::Font;
 pub use pipeline::Instance;
 pub use surface::{winit, Surface};
 pub use texture::Texture;
-pub use types::{DepthView, TargetView};
+pub use types::TargetView;
 
 use gfx::{self, Device};
 use gfx_device_gl as gl;
@@ -128,10 +128,8 @@ impl Gpu {
         &mut self,
         font: &mut Font,
         target: &TargetView,
-        depth: &DepthView,
-        _target_width: u32,
-        _target_height: u32,
+        transformation: Transformation,
     ) {
-        font.draw(&mut self.encoder, target, depth);
+        font.draw(&mut self.encoder, target, transformation);
     }
 }

@@ -180,7 +180,7 @@ impl Debug {
             self.font.add(text.clone());
         }
 
-        self.font.draw(frame);
+        self.font.draw(&mut frame.as_target());
         self.frames_until_refresh -= 1;
     }
 
