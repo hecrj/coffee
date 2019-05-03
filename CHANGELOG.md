@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- The built-in debug view now shows the time spent in `Game::debug`. [#26]
+- Trait `Default` for `Text` was implemented. [#25]
+- `Font::draw` now supports a `Target` instead of a `Frame`. [#25]
+
+[#25]: https://github.com/hecrj/coffee/pull/25
+[#26]: https://github.com/hecrj/coffee/pull/26
+
 
 ## [0.2.0] - 2019-04-28
 ### Added
