@@ -54,6 +54,16 @@ impl Transformation {
             &nalgebra::Vector3::new(x, y, 1.0),
         ))
     }
+
+    /// Obtain a rotation transformation.
+    ///
+    /// You can use this to rotate your camera, for example.
+    /// Note: Rotation is in radians.
+    pub fn rotate(rotation: f32) -> Transformation {
+        Transformation(nalgebra::Matrix4::new_rotation(
+            nalgebra::Vector3::new(0.0, 0.0, rotation)
+        ))
+    }
 }
 
 impl Mul for Transformation {
