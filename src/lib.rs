@@ -67,8 +67,8 @@
 //! [`Game`]: trait.Game.html
 //! [`Game::run`]: trait.Game.html#method.run
 //! [`WindowSettings`]: graphics/struct.WindowSettings.html
-#![deny(missing_docs)]
-#![deny(missing_debug_implementations)]
+//#![deny(missing_docs)]
+//#![deny(missing_debug_implementations)]
 #![deny(unused_results)]
 #![deny(unsafe_code)]
 
@@ -79,6 +79,7 @@ mod timer;
 pub mod graphics;
 pub mod input;
 pub mod load;
+pub mod ui;
 
 pub use debug::Debug;
 pub use result::{Error, Result};
@@ -110,6 +111,8 @@ pub trait Game {
     /// For instance, you could start by simply using a `HashSet` here to track
     /// which keys are pressed at any given time.
     type Input;
+
+    type UserInterface: ui::UserInterface;
 
     /// Defines how many times the [`update`] function should be called per
     /// second.
