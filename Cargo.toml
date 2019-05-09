@@ -19,7 +19,7 @@ maintenance = { status = "actively-developed" }
 features = ["opengl", "debug"]
 
 [features]
-default = ["opengl"]
+default = []
 opengl = ["gfx", "gfx_core", "glutin", "gfx_device_gl", "gfx_window_glutin", "gfx_glyph", "gfx_winit"]
 vulkan = ["wgpu", "wgpu/vulkan"]
 metal = ["wgpu", "wgpu/metal"]
