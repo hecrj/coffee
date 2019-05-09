@@ -141,7 +141,7 @@ impl Game for Particles {
         frame.clear(Color::BLACK);
 
         // Draw particles all at once!
-        let mut batch = Batch::new(view.palette.clone());
+        view.batch.clear();
 
         let delta_factor = if view.interpolate {
             timer.next_tick_proximity()
@@ -153,7 +153,7 @@ impl Game for Particles {
             let velocity =
                 particle.velocity + particle.acceleration * delta_factor;
 
-            batch.add(Sprite {
+            view.batch.add(Sprite {
                 source: Rectangle {
                     x: View::particle_color(velocity),
                     y: 0,
@@ -164,7 +164,8 @@ impl Game for Particles {
             });
         }
 
-        batch.draw(Point::new(0.0, 0.0), &mut frame.as_target());
+        view.batch
+            .draw(Point::new(0.0, 0.0), &mut frame.as_target());
 
         // Draw simple text UI
         view.font.add(Text {
@@ -224,7 +225,7 @@ impl Particle {
 }
 
 struct View {
-    palette: Image,
+    batch: Batch,
     font: Font,
     interpolate: bool,
 }
@@ -284,15 +285,14 @@ impl View {
         )
             .join()
             .map(|(palette, font)| View {
-                palette,
+                batch: Batch::new(palette),
                 font,
                 interpolate: true,
             })
     }
 
     fn particle_color(velocity: Vector) -> u16 {
-        ((velocity.norm() * 2.0).round() as usize).min(View::COLORS.len())
-            as u16
+        ((velocity.norm() * 2.0) as usize).min(View::COLORS.len()) as u16
     }
 }
 
