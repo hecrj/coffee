@@ -45,7 +45,7 @@ impl Particles {
 
             Particles {
                 particles,
-                gravity_centers: Vec::new(),
+                gravity_centers: vec![Point::new(0.0, 0.0)],
             }
         })
     }
@@ -99,6 +99,8 @@ impl Game for Particles {
     }
 
     fn interact(&mut self, input: &mut Input, view: &mut View, _gpu: &mut Gpu) {
+        self.gravity_centers[0] = input.cursor_position;
+
         for point in &input.points_clicked {
             self.gravity_centers.push(*point);
         }
