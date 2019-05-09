@@ -1,17 +1,8 @@
 //! An example that showcases gamepad events
-use rand::Rng;
-use rayon::prelude::*;
-use std::{thread, time};
-
-use coffee::graphics::{
-    Batch, Color, Font, Gpu, Image, Point, Rectangle, Sprite, Text, Vector,
-    Window, WindowSettings,
-};
+use coffee::graphics::{Color, Font, Gpu, Point, Text, Window, WindowSettings};
 use coffee::load::{loading_screen, Join, LoadingScreen, Task};
 use coffee::{input, input::Event};
 use coffee::{Game, Result, Timer};
-
-use gilrs::ev::EventType;
 
 fn main() -> Result<()> {
     GamepadExample::run(WindowSettings {
@@ -69,7 +60,7 @@ impl Game for GamepadExample {
 
     fn update(&mut self, _view: &View, _window: &Window) {}
 
-    fn draw(&self, view: &mut View, window: &mut Window, timer: &Timer) {
+    fn draw(&self, view: &mut View, window: &mut Window, _timer: &Timer) {
         let mut frame = window.frame();
         frame.clear(Color::BLACK);
 
