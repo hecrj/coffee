@@ -124,7 +124,7 @@ impl Game for Particles {
         // Update particles in parallel! <3 rayon
         self.particles.par_iter_mut().for_each(move |particle| {
             particle.acceleration = gravity_centers
-                .par_iter()
+                .iter()
                 .map(|gravity_center| {
                     let distance = particle.position - gravity_center;
                     -((Self::G * Self::MASS) * distance.normalize())
