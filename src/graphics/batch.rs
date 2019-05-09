@@ -50,6 +50,15 @@ impl Batch {
 
         translated.draw_texture_quads(&self.image.texture, &self.instances[..]);
     }
+
+    /// Clear the [`Batch`] contents.
+    ///
+    /// This is useful to avoid creating a new batch every frame and
+    /// reallocating the same memory.
+    /// [`Batch`]: struct.Batch.html
+    pub fn clear(&mut self) {
+        self.instances.clear();
+    }
 }
 
 impl std::fmt::Debug for Batch {
