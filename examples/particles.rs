@@ -23,7 +23,7 @@ fn main() -> Result<()> {
 
 struct Particles {
     particles: Vec<Particle>,
-    gravity_center: Point,
+    gravity_centers: Vec<Point>,
 }
 
 impl Particles {
@@ -45,7 +45,7 @@ impl Particles {
 
             Particles {
                 particles,
-                gravity_center: Point::new(0.0, 0.0),
+                gravity_centers: vec![Point::new(0.0, 0.0)],
             }
         })
     }
@@ -84,6 +84,10 @@ impl Game for Particles {
             input::Event::CursorMoved { x, y } => {
                 input.cursor_position = Point::new(x, y);
             }
+            input::Event::MouseInput {
+                button: input::MouseButton::Left,
+                state: input::ButtonState::Released,
+            } => input.points_clicked.push(input.cursor_position),
             input::Event::KeyboardInput {
                 key_code,
                 state: input::ButtonState::Released,
@@ -95,7 +99,11 @@ impl Game for Particles {
     }
 
     fn interact(&mut self, input: &mut Input, view: &mut View, _gpu: &mut Gpu) {
-        self.gravity_center = input.cursor_position;
+        self.gravity_centers[0] = input.cursor_position;
+
+        for point in &input.points_clicked {
+            self.gravity_centers.push(*point);
+        }
 
         for key in &input.released_keys {
             match key {
@@ -106,20 +114,23 @@ impl Game for Particles {
             }
         }
 
+        input.points_clicked.clear();
         input.released_keys.clear();
     }
 
     fn update(&mut self, _view: &View, _window: &Window) {
-        let gravity_center = self.gravity_center.clone();
+        let gravity_centers = self.gravity_centers.clone();
 
         // Update particles in parallel! <3 rayon
         self.particles.par_iter_mut().for_each(move |particle| {
-            let distance = particle.position - gravity_center;
-
-            particle.acceleration = -((Self::G * Self::MASS)
-                * distance.normalize())
-                / distance.norm_squared().max(1000.0);
-
+            particle.acceleration = gravity_centers
+                .iter()
+                .map(|gravity_center| {
+                    let distance = particle.position - gravity_center;
+                    -((Self::G * Self::MASS) * distance.normalize())
+                        / distance.norm_squared().max(1000.0)
+                })
+                .sum();
             particle.velocity += particle.acceleration;
             particle.position += particle.velocity;
         });
@@ -130,7 +141,7 @@ impl Game for Particles {
         frame.clear(Color::BLACK);
 
         // Draw particles all at once!
-        let mut batch = Batch::new(view.palette.clone());
+        view.batch.clear();
 
         let delta_factor = if view.interpolate {
             timer.next_tick_proximity()
@@ -142,7 +153,7 @@ impl Game for Particles {
             let velocity =
                 particle.velocity + particle.acceleration * delta_factor;
 
-            batch.add(Sprite {
+            view.batch.add(Sprite {
                 source: Rectangle {
                     x: View::particle_color(velocity),
                     y: 0,
@@ -153,7 +164,8 @@ impl Game for Particles {
             });
         }
 
-        batch.draw(Point::new(0.0, 0.0), &mut frame.as_target());
+        view.batch
+            .draw(Point::new(0.0, 0.0), &mut frame.as_target());
 
         // Draw simple text UI
         view.font.add(Text {
@@ -213,7 +225,7 @@ impl Particle {
 }
 
 struct View {
-    palette: Image,
+    batch: Batch,
     font: Font,
     interpolate: bool,
 }
@@ -273,20 +285,20 @@ impl View {
         )
             .join()
             .map(|(palette, font)| View {
-                palette,
+                batch: Batch::new(palette),
                 font,
                 interpolate: true,
             })
     }
 
     fn particle_color(velocity: Vector) -> u16 {
-        ((velocity.norm() * 2.0).round() as usize).min(View::COLORS.len())
-            as u16
+        ((velocity.norm() * 2.0) as usize).min(View::COLORS.len()) as u16
     }
 }
 
 struct Input {
     cursor_position: Point,
+    points_clicked: Vec<Point>,
     released_keys: Vec<input::KeyCode>,
 }
 
@@ -294,6 +306,7 @@ impl Input {
     fn new() -> Input {
         Input {
             cursor_position: Point::new(0.0, 0.0),
+            points_clicked: Vec::new(),
             released_keys: Vec::new(),
         }
     }
