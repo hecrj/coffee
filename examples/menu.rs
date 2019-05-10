@@ -56,8 +56,6 @@ impl UserInterface for Ui {
     fn layout(&mut self) -> Layout<Msg> {
         Layout::new(
             Column::new()
-                .center_x()
-                .center_y()
                 .width(Length::Px(200))
                 .spacing(20)
                 .push(
@@ -76,6 +74,8 @@ impl UserInterface for Ui {
                         .on_click(Msg::ColorPressed),
                 ),
         )
+        .center_x()
+        .center_y()
     }
 
     fn update(&mut self, msg: Msg) {}

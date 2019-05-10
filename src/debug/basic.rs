@@ -29,6 +29,8 @@ pub struct Debug {
     update_durations: TimeBuffer,
     draw_start: time::Instant,
     draw_durations: TimeBuffer,
+    ui_start: time::Instant,
+    ui_durations: TimeBuffer,
     debug_start: time::Instant,
     debug_durations: TimeBuffer,
     text: Vec<graphics::Text>,
@@ -54,6 +56,8 @@ impl Debug {
             update_durations: TimeBuffer::new(200),
             draw_start: now,
             draw_durations: TimeBuffer::new(200),
+            ui_start: now,
+            ui_durations: TimeBuffer::new(200),
             debug_start: now,
             debug_durations: TimeBuffer::new(200),
             text: Vec::new(),
@@ -143,6 +147,21 @@ impl Debug {
         self.draw_durations.average()
     }
 
+    /// Get the average time spent rendering the UI.
+    pub(crate) fn ui_started(&mut self) {
+        self.ui_start = time::Instant::now();
+    }
+
+    pub(crate) fn ui_finished(&mut self) {
+        self.ui_durations.push(time::Instant::now() - self.ui_start);
+    }
+
+    /// Get the average time spent render the UI.
+    ///
+    pub fn ui_duration(&self) -> time::Duration {
+        self.ui_durations.average()
+    }
+
     pub(crate) fn toggle(&mut self) {
         self.enabled = !self.enabled;
         self.frames_until_refresh = 0;
@@ -161,7 +180,7 @@ impl Debug {
     ///
     /// [`Game::debug`]: trait.Game.html#tymethod.debug
     pub fn debug_duration(&self) -> time::Duration {
-        self.draw_durations.average()
+        self.debug_durations.average()
     }
 
     pub(crate) fn is_enabled(&self) -> bool {
@@ -200,9 +219,10 @@ impl Debug {
         let rows = [
             ("Load:", self.load_duration, None),
             ("Interact:", self.interact_duration, None),
-            ("Update:", self.update_durations.average(), None),
-            ("Draw:", self.draw_durations.average(), None),
-            ("Debug:", self.debug_durations.average(), None),
+            ("Update:", self.update_duration(), None),
+            ("Draw:", self.draw_duration(), None),
+            ("UI:", self.ui_duration(), None),
+            ("Debug:", self.debug_duration(), None),
             ("Frame:", frame_duration, Some(fps.to_string() + " fps")),
         ];
 
