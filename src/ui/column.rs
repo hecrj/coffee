@@ -1,9 +1,7 @@
-use crate::ui::{Length, Widget};
+use crate::ui::{Node, Style, Widget};
 
 pub struct Column<'a, M> {
-    center_x: bool,
-    center_y: bool,
-    width: Length,
+    style: Style,
     spacing: u32,
     children: Vec<Box<Widget<Msg = M> + 'a>>,
 }
@@ -11,31 +9,29 @@ pub struct Column<'a, M> {
 impl<'a, M> Column<'a, M> {
     pub fn new() -> Self {
         Column {
-            center_x: false,
-            center_y: false,
-            width: Length::Shrink,
+            style: Style::default(),
             spacing: 0,
             children: Vec::new(),
         }
     }
 
-    pub fn center_x(mut self) -> Self {
-        self.center_x = true;
+    pub fn width(mut self, width: f32) -> Self {
+        self.style = self.style.width(width);
         self
     }
 
-    pub fn center_y(mut self) -> Self {
-        self.center_y = true;
-        self
-    }
-
-    pub fn width(mut self, length: Length) -> Self {
-        self.width = length;
+    pub fn height(mut self, height: f32) -> Self {
+        self.style = self.style.height(height);
         self
     }
 
     pub fn spacing(mut self, px: u32) -> Self {
         self.spacing = px;
+        self
+    }
+
+    pub fn center_children(mut self) -> Self {
+        self.style = self.style.center_children();
         self
     }
 
@@ -48,43 +44,32 @@ impl<'a, M> Column<'a, M> {
 impl<'a, M> Widget for Column<'a, M> {
     type Msg = M;
 
-    fn node(&self) -> stretch::node::Node {
-        let mut children: Vec<stretch::node::Node> = self
+    fn node(&self) -> Node {
+        let mut children: Vec<Node> = self
             .children
             .iter()
             .map(|child| {
                 let mut node = child.node();
 
-                let mut style = node.style();
+                let mut style = node.0.style();
                 style.margin.bottom =
                     stretch::style::Dimension::Points(self.spacing as f32);
 
-                node.set_style(style);
+                node.0.set_style(style);
                 node
             })
             .collect();
 
         if let Some(node) = children.last_mut() {
-            let mut style = node.style();
-            style.margin.bottom = stretch::style::Dimension::Auto;
+            let mut style = node.0.style();
+            style.margin.bottom = stretch::style::Dimension::Undefined;
 
-            node.set_style(style);
+            node.0.set_style(style);
         }
 
-        let mut style = stretch::style::Style::default();
-        style.flex_direction = stretch::style::FlexDirection::Column;
+        let mut style = self.style;
+        style.0.flex_direction = stretch::style::FlexDirection::Column;
 
-        match self.width {
-            Length::Shrink => {}
-            Length::Fill => {
-                style.flex_grow = 1.0;
-            }
-            Length::Px(width) => {
-                style.size.width =
-                    stretch::style::Dimension::Points(width as f32);
-            }
-        }
-
-        stretch::node::Node::new(style, children.iter().collect())
+        Node::new(style, children)
     }
 }

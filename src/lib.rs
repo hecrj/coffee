@@ -265,8 +265,8 @@ pub trait Game {
         let ui = &mut Self::UserInterface::new();
 
         {
-            let layout = ui.layout();
-            let result = layout.compute(window.width(), window.height());
+            let root = ui.layout(window);
+            let result = root.layout();
         }
         debug.loading_finished();
 
@@ -371,8 +371,8 @@ pub trait Game {
             debug.draw_finished();
 
             debug.ui_started();
-            let layout = ui.layout();
-            let result = layout.compute(window.width(), window.height());
+            let root = ui.layout(window);
+            let result = root.layout();
             debug.ui_finished();
 
             println!("{:#?}", result);

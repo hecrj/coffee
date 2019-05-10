@@ -1,9 +1,9 @@
-use crate::ui::{Length, Widget};
+use crate::ui::{Node, Style, Widget};
 
 pub struct Button<'a, M> {
     state: &'a mut State,
     label: String,
-    width: Length,
+    style: Style,
     on_click: Option<M>,
 }
 
@@ -12,13 +12,13 @@ impl<'a, M> Button<'a, M> {
         Button {
             state,
             label: String::from(label),
-            width: Length::Shrink,
+            style: Style::default(),
             on_click: None,
         }
     }
 
-    pub fn width(mut self, length: Length) -> Self {
-        self.width = length;
+    pub fn width(mut self, width: u32) -> Self {
+        self.style = self.style.width(width as f32);
         self
     }
 
@@ -31,22 +31,8 @@ impl<'a, M> Button<'a, M> {
 impl<'a, M> Widget for Button<'a, M> {
     type Msg = M;
 
-    fn node(&self) -> stretch::node::Node {
-        let mut style = stretch::style::Style::default();
-        style.size.height = stretch::style::Dimension::Points(40.0);
-
-        match self.width {
-            Length::Shrink => {}
-            Length::Fill => {
-                style.flex_grow = 1.0;
-            }
-            Length::Px(width) => {
-                style.size.width =
-                    stretch::style::Dimension::Points(width as f32);
-            }
-        }
-
-        stretch::node::Node::new(style, Vec::new())
+    fn node(&self) -> Node {
+        Node::new(self.style.height(40.0).grow(), Vec::new())
     }
 }
 

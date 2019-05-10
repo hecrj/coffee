@@ -1,5 +1,5 @@
 use coffee::graphics::{Color, Window, WindowSettings};
-use coffee::ui::{button, Button, Column, Layout, Length, UserInterface};
+use coffee::ui::{button, Button, Column, Length, Root, UserInterface};
 use coffee::{Game, Result, Timer};
 
 fn main() -> Result<()> {
@@ -32,7 +32,7 @@ impl Game for Menu {
         _timer: &Timer,
     ) {
         let mut frame = window.frame();
-        frame.clear(Color::WHITE);
+        frame.clear(Color::BLACK);
     }
 }
 
@@ -53,29 +53,33 @@ impl UserInterface for Ui {
         }
     }
 
-    fn layout(&mut self) -> Layout<Msg> {
-        Layout::new(
+    fn layout(&mut self, window: &Window) -> Root<Msg> {
+        Root::new(
             Column::new()
-                .width(Length::Px(200))
-                .spacing(20)
+                .width(window.width())
+                .height(window.height())
+                .center_children()
                 .push(
-                    Button::new(&mut self.particles_button, "Particles")
-                        .width(Length::Fill)
-                        .on_click(Msg::ParticlesPressed),
-                )
-                .push(
-                    Button::new(&mut self.input_button, "Input")
-                        .width(Length::Fill)
-                        .on_click(Msg::InputPressed),
-                )
-                .push(
-                    Button::new(&mut self.color_button, "Color")
-                        .width(Length::Fill)
-                        .on_click(Msg::ColorPressed),
+                    Column::new()
+                        .width(200.0)
+                        .spacing(20)
+                        .push(
+                            Button::new(
+                                &mut self.particles_button,
+                                "Particles",
+                            )
+                            .on_click(Msg::ParticlesPressed),
+                        )
+                        .push(
+                            Button::new(&mut self.input_button, "Input")
+                                .on_click(Msg::InputPressed),
+                        )
+                        .push(
+                            Button::new(&mut self.color_button, "Color")
+                                .on_click(Msg::ColorPressed),
+                        ),
                 ),
         )
-        .center_x()
-        .center_y()
     }
 
     fn update(&mut self, msg: Msg) {}
