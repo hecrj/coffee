@@ -45,7 +45,10 @@ impl<'a, M, R> Column<'a, M, R> {
     }
 }
 
-impl<'a, M, R> Widget<'a> for Column<'a, M, R> {
+impl<'a, M, R> Widget<'a> for Column<'a, M, R>
+where
+    R: Renderer,
+{
     type Msg = M;
     type Renderer = R;
 
@@ -87,9 +90,14 @@ impl<'a, M, R> Widget<'a> for Column<'a, M, R> {
     fn draw(
         &self,
         renderer: &mut Self::Renderer,
-        location: Point,
+        position: Point,
         width: f32,
         height: f32,
     ) {
+        renderer.draw(position, width, height);
     }
+}
+
+pub trait Renderer {
+    fn draw(&mut self, position: Point, width: f32, height: f32);
 }
