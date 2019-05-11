@@ -6,11 +6,13 @@ mod style;
 mod widget;
 
 pub mod button;
+pub mod renderer;
 
 pub use button::Button;
 pub use column::Column;
 pub use layout::Layout;
 pub use node::Node;
+pub use renderer::Renderer;
 pub use root::Root;
 pub use style::Style;
 pub use widget::Widget;
@@ -19,14 +21,15 @@ use crate::graphics::Window;
 
 pub trait UserInterface {
     type Msg;
+    type Renderer: Renderer;
 
-    fn new() -> Self;
+    fn new(window: &mut Window) -> (Self, Self::Renderer)
+    where
+        Self: Sized;
 
-    fn layout(&mut self, window: &Window) -> Root<Self::Msg>;
+    fn layout(&mut self, window: &Window) -> Root<Self::Msg, Self::Renderer>;
 
     fn update(&mut self, msg: Self::Msg);
-
-    fn draw(&self, window: &mut Window);
 }
 
 pub enum Length {

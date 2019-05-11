@@ -1,5 +1,5 @@
 use coffee::graphics::{Color, Window, WindowSettings};
-use coffee::ui::{button, Button, Column, Length, Root, UserInterface};
+use coffee::ui::{button, renderer, Button, Column, Root, UserInterface};
 use coffee::{Game, Result, Timer};
 
 fn main() -> Result<()> {
@@ -44,16 +44,20 @@ struct Ui {
 
 impl UserInterface for Ui {
     type Msg = Msg;
+    type Renderer = renderer::Basic;
 
-    fn new() -> Ui {
-        Ui {
-            particles_button: button::State::new(),
-            input_button: button::State::new(),
-            color_button: button::State::new(),
-        }
+    fn new(window: &mut Window) -> (Ui, Self::Renderer) {
+        (
+            Ui {
+                particles_button: button::State::new(),
+                input_button: button::State::new(),
+                color_button: button::State::new(),
+            },
+            renderer::Basic::new(window.gpu()),
+        )
     }
 
-    fn layout(&mut self, window: &Window) -> Root<Msg> {
+    fn layout(&mut self, window: &Window) -> Root<Msg, Self::Renderer> {
         Root::new(
             Column::new()
                 .width(window.width())
@@ -61,8 +65,8 @@ impl UserInterface for Ui {
                 .center_children()
                 .push(
                     Column::new()
-                        .width(200.0)
-                        .spacing(20)
+                        .width(300.0)
+                        .spacing(30)
                         .push(
                             Button::new(
                                 &mut self.particles_button,
@@ -83,10 +87,9 @@ impl UserInterface for Ui {
     }
 
     fn update(&mut self, msg: Msg) {}
-
-    fn draw(&self, window: &mut Window) {}
 }
 
+#[derive(Debug)]
 enum Msg {
     ParticlesPressed,
     InputPressed,

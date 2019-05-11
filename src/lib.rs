@@ -86,7 +86,7 @@ pub use result::{Error, Result};
 pub use timer::Timer;
 
 use graphics::window::{self, Window};
-use ui::UserInterface;
+use ui::{Renderer, UserInterface};
 
 /// The entrypoint of the engine. It describes your game logic.
 ///
@@ -262,11 +262,11 @@ pub trait Game {
         // Load game
         debug.loading_started();
         let (game, view, input) = &mut Self::new(window)?;
-        let ui = &mut Self::UserInterface::new();
+        let (ui, ui_renderer) = &mut Self::UserInterface::new(window);
 
         {
             let root = ui.layout(window);
-            let result = root.layout();
+            let _ = ui::Layout::new(root);
         }
         debug.loading_finished();
 
@@ -371,11 +371,14 @@ pub trait Game {
             debug.draw_finished();
 
             debug.ui_started();
-            let root = ui.layout(window);
-            let result = root.layout();
-            debug.ui_finished();
+            {
+                let root = ui.layout(window);
+                let layout = ui::Layout::new(root);
+                layout.draw(ui_renderer);
+            }
 
-            println!("{:#?}", result);
+            ui_renderer.draw(window);
+            debug.ui_finished();
 
             if debug.is_enabled() {
                 debug.debug_started();

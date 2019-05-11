@@ -1,17 +1,29 @@
-use crate::ui::{Layout, Widget};
+use crate::ui::{Node, Widget};
 
-pub struct Root<'a, M> {
-    root: Box<Widget<Msg = M> + 'a>,
+pub struct Root<'a, M, R> {
+    widget: Box<Widget<'a, Msg = M, Renderer = R> + 'a>,
 }
 
-impl<'a, M> Root<'a, M> {
-    pub fn new(root: impl Widget<Msg = M> + 'a) -> Root<'a, M> {
+impl<'a, M, R> Root<'a, M, R> {
+    pub fn new(
+        widget: impl Widget<'a, Msg = M, Renderer = R> + 'a,
+    ) -> Root<'a, M, R> {
         Root {
-            root: Box::new(root),
+            widget: Box::new(widget),
         }
     }
 
-    pub fn layout(&self) -> Layout {
-        self.root.node().layout()
+    pub fn node(&self) -> Node {
+        self.widget.node()
+    }
+
+    pub fn widget(&self) -> &Box<Widget<'a, Msg = M, Renderer = R> + 'a> {
+        &self.widget
+    }
+}
+
+impl<'a, M, A> std::fmt::Debug for Root<'a, M, A> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "Root")
     }
 }

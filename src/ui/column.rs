@@ -1,12 +1,13 @@
+use crate::graphics::Point;
 use crate::ui::{Node, Style, Widget};
 
-pub struct Column<'a, M> {
+pub struct Column<'a, M, R> {
     style: Style,
     spacing: u32,
-    children: Vec<Box<Widget<Msg = M> + 'a>>,
+    children: Vec<Box<Widget<'a, Msg = M, Renderer = R> + 'a>>,
 }
 
-impl<'a, M> Column<'a, M> {
+impl<'a, M, R> Column<'a, M, R> {
     pub fn new() -> Self {
         Column {
             style: Style::default(),
@@ -35,14 +36,18 @@ impl<'a, M> Column<'a, M> {
         self
     }
 
-    pub fn push(mut self, child: impl Widget<Msg = M> + 'a) -> Column<'a, M> {
+    pub fn push(
+        mut self,
+        child: impl Widget<'a, Msg = M, Renderer = R> + 'a,
+    ) -> Column<'a, M, R> {
         self.children.push(Box::new(child));
         self
     }
 }
 
-impl<'a, M> Widget for Column<'a, M> {
+impl<'a, M, R> Widget<'a> for Column<'a, M, R> {
     type Msg = M;
+    type Renderer = R;
 
     fn node(&self) -> Node {
         let mut children: Vec<Node> = self
@@ -71,5 +76,20 @@ impl<'a, M> Widget for Column<'a, M> {
         style.0.flex_direction = stretch::style::FlexDirection::Column;
 
         Node::new(style, children)
+    }
+
+    fn children(
+        &self,
+    ) -> Option<&Vec<Box<Widget<'a, Msg = M, Renderer = R> + 'a>>> {
+        Some(&self.children)
+    }
+
+    fn draw(
+        &self,
+        renderer: &mut Self::Renderer,
+        location: Point,
+        width: f32,
+        height: f32,
+    ) {
     }
 }
