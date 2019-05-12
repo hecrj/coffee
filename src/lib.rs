@@ -86,6 +86,7 @@ pub use result::{Error, Result};
 pub use timer::Timer;
 
 use graphics::window::{self, Window};
+use graphics::Point;
 use ui::{Renderer, UserInterface};
 
 /// The entrypoint of the engine. It describes your game logic.
@@ -263,15 +264,11 @@ pub trait Game {
         debug.loading_started();
         let (game, view, input) = &mut Self::new(window)?;
         let (ui, ui_renderer) = &mut Self::UserInterface::new(window);
-
-        {
-            let root = ui.layout(window);
-            let _ = ui::Layout::new(root);
-        }
         debug.loading_finished();
 
         // Game loop
         let mut timer = Timer::new(Self::TICKS_PER_SECOND);
+        let mut cursor_position = Point::new(0.0, 0.0);
         let mut alive = true;
 
         fn process_events<G: Game>(
@@ -281,6 +278,11 @@ pub trait Game {
             debug: &mut Debug,
             window: &mut Window,
             event_loop: &mut window::EventLoop,
+            layout: &mut ui::Layout<
+                <G::UserInterface as UserInterface>::Msg,
+                <G::UserInterface as UserInterface>::Renderer,
+            >,
+            cursor_position: &mut Point,
             alive: &mut bool,
         ) {
             debug.interact_started();
@@ -298,9 +300,16 @@ pub trait Game {
                         }
                         _ => {}
                     }
+
+                    if let Some(ui_event) = ui::Event::from_input(input_event) {
+                        layout.on_event(ui_event, *cursor_position);
+                    }
                 }
                 window::Event::CursorMoved(logical_position) => {
                     let position = logical_position.to_physical(window.dpi());
+
+                    *cursor_position =
+                        Point::new(position.x as f32, position.y as f32);
 
                     game.on_input(
                         input,
@@ -338,6 +347,11 @@ pub trait Game {
             debug.frame_started();
             timer.update();
 
+            debug.ui_started();
+            let root = ui.layout(window);
+            let mut layout = ui::Layout::new(root);
+            debug.ui_finished();
+
             while timer.tick() {
                 process_events(
                     game,
@@ -346,6 +360,8 @@ pub trait Game {
                     &mut debug,
                     window,
                     &mut event_loop,
+                    &mut layout,
+                    &mut cursor_position,
                     &mut alive,
                 );
 
@@ -362,23 +378,17 @@ pub trait Game {
                     &mut debug,
                     window,
                     &mut event_loop,
+                    &mut layout,
+                    &mut cursor_position,
                     &mut alive,
                 );
             }
 
             debug.draw_started();
             game.draw(view, window, &timer);
-            debug.draw_finished();
-
-            debug.ui_started();
-            {
-                let root = ui.layout(window);
-                let layout = ui::Layout::new(root);
-                layout.draw(ui_renderer);
-            }
-
+            layout.draw(ui_renderer);
             ui_renderer.draw(window);
-            debug.ui_finished();
+            debug.draw_finished();
 
             if debug.is_enabled() {
                 debug.debug_started();

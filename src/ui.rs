@@ -1,4 +1,5 @@
 mod column;
+mod event;
 mod layout;
 mod node;
 mod root;
@@ -10,6 +11,7 @@ pub mod renderer;
 
 pub use button::Button;
 pub use column::Column;
+pub use event::Event;
 pub use layout::Layout;
 pub use node::Node;
 pub use renderer::Renderer;

@@ -1,5 +1,5 @@
-use crate::graphics::Point;
-use crate::ui::{Node, Style, Widget};
+use crate::graphics::{Point, Rectangle};
+use crate::ui::{Event, Node, Style, Widget};
 
 pub struct Button<'a, M, R> {
     state: &'a mut State,
@@ -42,10 +42,30 @@ where
         Node::new(self.style.height(50.0).grow(), Vec::new())
     }
 
-    fn children(
-        &self,
-    ) -> Option<&Vec<Box<Widget<'a, Msg = M, Renderer = Self::Renderer> + 'a>>>
-    {
+    fn on_event(
+        &mut self,
+        event: Event,
+        position: Point,
+        width: f32,
+        height: f32,
+        cursor_position: Point,
+    ) -> Option<M> {
+        match event {
+            Event::MouseInput { .. } => {
+                let bounds = Rectangle {
+                    x: position.x,
+                    y: position.y,
+                    width,
+                    height,
+                };
+
+                if bounds.contains(cursor_position) {
+                    println!("{}", self.label);
+                }
+            }
+            _ => {}
+        }
+
         None
     }
 

@@ -82,9 +82,9 @@ where
     }
 
     fn children(
-        &self,
-    ) -> Option<&Vec<Box<Widget<'a, Msg = M, Renderer = R> + 'a>>> {
-        Some(&self.children)
+        &mut self,
+    ) -> Option<&mut Vec<Box<Widget<'a, Msg = M, Renderer = R> + 'a>>> {
+        Some(&mut self.children)
     }
 
     fn draw(

@@ -1,7 +1,7 @@
 use crate::ui::{Node, Widget};
 
 pub struct Root<'a, M, R> {
-    widget: Box<Widget<'a, Msg = M, Renderer = R> + 'a>,
+    pub(crate) widget: Box<Widget<'a, Msg = M, Renderer = R> + 'a>,
 }
 
 impl<'a, M, R> Root<'a, M, R> {
@@ -15,10 +15,6 @@ impl<'a, M, R> Root<'a, M, R> {
 
     pub fn node(&self) -> Node {
         self.widget.node()
-    }
-
-    pub fn widget(&self) -> &Box<Widget<'a, Msg = M, Renderer = R> + 'a> {
-        &self.widget
     }
 }
 
