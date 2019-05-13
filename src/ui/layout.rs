@@ -1,7 +1,7 @@
 use stretch::{geometry, result};
 
-use crate::graphics::{Point, Vector};
-use crate::ui::{Event, Root, Widget};
+use crate::graphics::{Point, Vector, Window};
+use crate::ui::{Event, Renderer, Root, Widget};
 
 pub struct Layout<'a, M, R> {
     root: Root<'a, M, R>,
@@ -29,13 +29,18 @@ impl<'a, M, R> Layout<'a, M, R> {
         );
     }
 
-    pub(crate) fn draw(&mut self, renderer: &mut R) {
+    pub(crate) fn draw(&mut self, renderer: &mut R, window: &mut Window)
+    where
+        R: Renderer,
+    {
         draw_recursively(
             renderer,
             &mut self.root.widget,
             &self.layout,
             Point::new(0.0, 0.0),
         );
+
+        renderer.draw(window);
     }
 }
 

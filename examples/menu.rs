@@ -1,33 +1,39 @@
 use coffee::graphics::{Color, Window, WindowSettings};
+use coffee::input::KeyboardAndMouse;
+use coffee::load::{loading_screen::ProgressBar, Task};
 use coffee::ui::{button, renderer, Button, Column, Root, UserInterface};
 use coffee::{Game, Result, Timer};
 
 fn main() -> Result<()> {
-    Menu::run(WindowSettings {
+    <Menu as UserInterface>::run(WindowSettings {
         title: String::from("Examples menu - Coffee"),
         size: (1280, 1024),
         resizable: false,
     })
 }
 
-struct Menu {}
+struct Menu {
+    particles_button: button::State,
+    input_button: button::State,
+    color_button: button::State,
+}
 
 impl Game for Menu {
-    type Input = ();
-    type View = ();
-    type UserInterface = Ui;
+    type Input = KeyboardAndMouse;
+    type State = ();
+    type LoadingScreen = ProgressBar;
 
-    const TICKS_PER_SECOND: u16 = 10;
-
-    fn new(_window: &mut Window) -> Result<(Menu, Self::Input, Self::View)> {
-        Ok((Menu {}, (), ()))
+    fn load(_window: &Window) -> Task<Menu> {
+        Task::new(|| Menu {
+            particles_button: button::State::new(),
+            input_button: button::State::new(),
+            color_button: button::State::new(),
+        })
     }
 
-    fn update(&mut self, _view: &Self::View, _window: &Window) {}
-
     fn draw(
-        &self,
-        _view: &mut Self::View,
+        &mut self,
+        _state: &Self::State,
         window: &mut Window,
         _timer: &Timer,
     ) {
@@ -36,28 +42,15 @@ impl Game for Menu {
     }
 }
 
-struct Ui {
-    particles_button: button::State,
-    input_button: button::State,
-    color_button: button::State,
-}
-
-impl UserInterface for Ui {
-    type Msg = Msg;
+impl UserInterface for Menu {
+    type Event = Event;
     type Renderer = renderer::Basic;
 
-    fn new(window: &mut Window) -> (Ui, Self::Renderer) {
-        (
-            Ui {
-                particles_button: button::State::new(),
-                input_button: button::State::new(),
-                color_button: button::State::new(),
-            },
-            renderer::Basic::new(window.gpu()),
-        )
-    }
-
-    fn layout(&mut self, window: &Window) -> Root<Msg, Self::Renderer> {
+    fn layout(
+        &mut self,
+        _state: &Self::State,
+        window: &Window,
+    ) -> Root<Event, Self::Renderer> {
         Root::new(
             Column::new()
                 .width(window.width())
@@ -72,25 +65,25 @@ impl UserInterface for Ui {
                                 &mut self.particles_button,
                                 "Particles",
                             )
-                            .on_click(Msg::ParticlesPressed),
+                            .on_click(Event::ParticlesPressed),
                         )
                         .push(
                             Button::new(&mut self.input_button, "Input")
-                                .on_click(Msg::InputPressed),
+                                .on_click(Event::InputPressed),
                         )
                         .push(
                             Button::new(&mut self.color_button, "Color")
-                                .on_click(Msg::ColorPressed),
+                                .on_click(Event::ColorPressed),
                         ),
                 ),
         )
     }
 
-    fn update(&mut self, msg: Msg) {}
+    fn update(&mut self, _state: &mut Self::State, _event: Event) {}
 }
 
 #[derive(Debug)]
-enum Msg {
+enum Event {
     ParticlesPressed,
     InputPressed,
     ColorPressed,

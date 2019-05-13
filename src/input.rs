@@ -1,85 +1,100 @@
 //! Allow players to interact with your game.
-use crate::graphics::window::winit;
 
-pub use winit::ElementState as ButtonState;
-pub use winit::MouseButton;
-pub use winit::VirtualKeyCode as KeyCode;
+mod event;
 
-/// An input event.
-///
-/// You can listen to this type of events by implementing [`Game::on_input`].
-///
-/// There are many events still missing here! Controllers are also not supported
-/// _yet_!
-///
-/// Feel free to [open an issue] if you need a particular event.
-/// [PRs are also appreciated!]
-///
-/// [`Game::on_input`]: ../trait.Game.html#method.on_input
-/// [open an issue]: https://github.com/hecrj/coffee/issues
-/// [PRS are also appreciated!]: https://github.com/hecrj/coffee/pulls
-#[derive(PartialEq, Clone, Copy, Debug)]
-pub enum Event {
-    /// A keyboard key was pressed or released.
-    KeyboardInput {
-        /// The state of the key
-        state: ButtonState,
+pub use event::{ButtonState, Event, KeyCode, MouseButton};
 
-        /// The key identifier
-        key_code: KeyCode,
-    },
+use std::collections::HashSet;
 
-    /// Text was entered.
-    TextInput {
-        /// The character entered
-        character: char,
-    },
+use crate::graphics::Point;
 
-    /// The mouse cursor was moved
-    CursorMoved {
-        /// The X coordinate of the mouse position
-        x: f32,
+pub trait Input {
+    fn new() -> Self;
 
-        /// The Y coordinate of the mouse position
-        y: f32,
-    },
+    /// Process an input event and keep track of it in your [`Input`] type.
+    ///
+    /// This function may be called multiple times during event processing,
+    /// before [`Game::interact`].
+    ///
+    /// [`Input`]: #associatedtype.Input
+    /// [`interact`]: #method.interact
+    fn update(&mut self, event: Event);
 
-    /// The mouse cursor entered the game window.
-    CursorEntered,
+    fn clear(&mut self);
+}
 
-    /// The mouse cursor left the game window.
-    CursorLeft,
+impl Input for () {
+    fn new() -> () {
+        ()
+    }
 
-    /// A mouse button was pressed or released.
-    MouseInput {
-        /// The state of the button
-        state: ButtonState,
+    fn update(&mut self, _event: Event) {}
 
-        /// The button identifier
-        button: MouseButton,
-    },
+    fn clear(&mut self) {}
+}
 
-    /// The mouse wheel was scrolled.
-    MouseWheel {
-        /// The number of horizontal lines scrolled
-        delta_x: f32,
+pub trait HasCursorPosition {
+    fn cursor_position(&self) -> Point;
+}
 
-        /// The number of vertical lines scrolled
-        delta_y: f32,
-    },
+pub struct KeyboardAndMouse {
+    cursor_position: Point,
+    points_clicked: Vec<Point>,
+    released_keys: HashSet<KeyCode>,
+}
 
-    /// The game window gained focus.
-    WindowFocused,
+impl KeyboardAndMouse {
+    pub fn cursor_position(&self) -> Point {
+        self.cursor_position
+    }
 
-    /// The game window lost focus.
-    WindowUnfocused,
+    pub fn clicks(&self) -> &Vec<Point> {
+        &self.points_clicked
+    }
 
-    /// The game window was moved.
-    WindowMoved {
-        /// The new X coordinate of the window
-        x: f32,
+    pub fn was_key_released(&self, key_code: &KeyCode) -> bool {
+        self.released_keys.contains(&key_code)
+    }
+}
 
-        /// The new Y coordinate of the window
-        y: f32,
-    },
+impl Input for KeyboardAndMouse {
+    fn new() -> KeyboardAndMouse {
+        KeyboardAndMouse {
+            cursor_position: Point::new(0.0, 0.0),
+            points_clicked: Vec::new(),
+            released_keys: HashSet::new(),
+        }
+    }
+
+    fn update(&mut self, event: Event) {
+        match event {
+            Event::CursorMoved { x, y } => {
+                self.cursor_position = Point::new(x, y);
+            }
+            Event::MouseInput {
+                button: MouseButton::Left,
+                state: ButtonState::Released,
+            } => {
+                self.points_clicked.push(self.cursor_position);
+            }
+            Event::KeyboardInput {
+                key_code,
+                state: ButtonState::Released,
+            } => {
+                let _ = self.released_keys.insert(key_code);
+            }
+            _ => {}
+        }
+    }
+
+    fn clear(&mut self) {
+        self.points_clicked.clear();
+        self.released_keys.clear();
+    }
+}
+
+impl HasCursorPosition for KeyboardAndMouse {
+    fn cursor_position(&self) -> Point {
+        self.cursor_position
+    }
 }

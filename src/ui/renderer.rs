@@ -1,10 +1,12 @@
-use crate::graphics::{
-    Batch, Color, Gpu, Image, Point, Quad, Rectangle, Window,
-};
-use crate::ui::button;
-use crate::ui::column;
+use crate::graphics::{Batch, Color, Image, Point, Quad, Rectangle, Window};
+use crate::load::Task;
+use crate::ui::{button, column};
 
 pub trait Renderer {
+    fn load() -> Task<Self>
+    where
+        Self: Sized;
+
     fn draw(&mut self, window: &mut Window);
 }
 
@@ -12,34 +14,33 @@ pub struct Basic {
     batch: Batch,
 }
 
-impl Basic {
-    pub fn new(gpu: &mut Gpu) -> Basic {
-        let image = Image::from_colors(
-            gpu,
-            &[
-                Color {
-                    r: 1.0,
-                    g: 1.0,
-                    b: 1.0,
-                    a: 0.02,
-                },
-                Color {
-                    r: 0.2,
-                    g: 0.2,
-                    b: 0.5,
-                    a: 1.0,
-                },
-            ],
-        )
-        .unwrap();
-
-        Basic {
-            batch: Batch::new(image),
-        }
-    }
-}
-
 impl Renderer for Basic {
+    fn load() -> Task<Basic> {
+        Task::using_gpu(|gpu| {
+            let image = Image::from_colors(
+                gpu,
+                &[
+                    Color {
+                        r: 1.0,
+                        g: 1.0,
+                        b: 1.0,
+                        a: 0.02,
+                    },
+                    Color {
+                        r: 0.2,
+                        g: 0.2,
+                        b: 0.5,
+                        a: 1.0,
+                    },
+                ],
+            )?;
+
+            Ok(Basic {
+                batch: Batch::new(image),
+            })
+        })
+    }
+
     fn draw(&mut self, window: &mut Window) {
         let mut frame = window.frame();
 

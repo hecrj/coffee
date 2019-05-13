@@ -97,6 +97,10 @@ use crate::Result;
 /// [create an issue]: https://github.com/hecrj/coffee/issues
 /// [open a pull request]: https://github.com/hecrj/coffee/pulls
 pub trait LoadingScreen {
+    fn new(gpu: &mut graphics::Gpu) -> Result<Self>
+    where
+        Self: Sized;
+
     /// React to task progress.
     ///
     /// You should provide feedback to the user here. You can draw on the given
@@ -140,22 +144,18 @@ pub struct ProgressBar {
     pencil: graphics::Image,
 }
 
-impl ProgressBar {
+impl LoadingScreen for ProgressBar {
     /// Create the loading screen.
-    pub fn new(gpu: &mut graphics::Gpu) -> Self {
-        Self {
-            font: graphics::Font::from_bytes(gpu, graphics::Font::DEFAULT)
-                .expect("Load progress bar font"),
+    fn new(gpu: &mut graphics::Gpu) -> Result<Self> {
+        Ok(Self {
+            font: graphics::Font::from_bytes(gpu, graphics::Font::DEFAULT)?,
             pencil: graphics::Image::from_colors(
                 gpu,
                 &[graphics::Color::WHITE],
-            )
-            .expect("Load progress bar"),
-        }
+            )?,
+        })
     }
-}
 
-impl LoadingScreen for ProgressBar {
     fn on_progress(
         &mut self,
         progress: &Progress,
