@@ -1,4 +1,4 @@
-use crate::graphics::Point;
+use crate::graphics::{Point, Rectangle};
 use crate::ui::{Node, Style, Widget};
 
 pub struct Column<'a, M, R> {
@@ -90,14 +90,13 @@ where
     fn draw(
         &self,
         renderer: &mut Self::Renderer,
-        position: Point,
-        width: f32,
-        height: f32,
+        bounds: Rectangle<f32>,
+        _cursor_position: Point,
     ) {
-        renderer.draw(position, width, height);
+        renderer.draw(bounds);
     }
 }
 
 pub trait Renderer {
-    fn draw(&mut self, position: Point, width: f32, height: f32);
+    fn draw(&mut self, bounds: Rectangle<f32>);
 }

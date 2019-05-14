@@ -1,5 +1,7 @@
-use crate::graphics::{Batch, Color, Image, Point, Quad, Rectangle, Window};
-use crate::load::Task;
+use crate::graphics::{
+    Batch, Color, Font, Image, Point, Quad, Rectangle, Text, Window,
+};
+use crate::load::{Join, Task};
 use crate::ui::{button, column};
 
 pub trait Renderer {
@@ -12,11 +14,12 @@ pub trait Renderer {
 
 pub struct Basic {
     batch: Batch,
+    font: Font,
 }
 
 impl Renderer for Basic {
     fn load() -> Task<Basic> {
-        Task::using_gpu(|gpu| {
+        let load_batch = Task::using_gpu(|gpu| {
             let image = Image::from_colors(
                 gpu,
                 &[
@@ -35,23 +38,31 @@ impl Renderer for Basic {
                 ],
             )?;
 
-            Ok(Basic {
-                batch: Batch::new(image),
-            })
-        })
+            Ok(Batch::new(image))
+        });
+
+        let load_font = Font::load(include_bytes!(
+            "../../resources/font/Inconsolata-Regular.ttf"
+        ));
+
+        (load_batch, load_font)
+            .join()
+            .map(|(batch, font)| Basic { batch, font })
     }
 
     fn draw(&mut self, window: &mut Window) {
         let mut frame = window.frame();
+        let target = &mut frame.as_target();
 
-        self.batch
-            .draw(Point::new(0.0, 0.0), &mut frame.as_target());
+        self.batch.draw(Point::new(0.0, 0.0), target);
         self.batch.clear();
+
+        self.font.draw(target);
     }
 }
 
 impl column::Renderer for Basic {
-    fn draw(&mut self, position: Point, width: f32, height: f32) {
+    fn draw(&mut self, bounds: Rectangle<f32>) {
         self.batch.add(Quad {
             source: Rectangle {
                 x: 0.0,
@@ -59,8 +70,8 @@ impl column::Renderer for Basic {
                 width: 0.5,
                 height: 1.0,
             },
-            position,
-            size: (width, height),
+            position: Point::new(bounds.x, bounds.y),
+            size: (bounds.width, bounds.height),
         });
     }
 }
@@ -68,10 +79,10 @@ impl column::Renderer for Basic {
 impl button::Renderer for Basic {
     fn draw(
         &mut self,
-        state: &button::State,
-        position: Point,
-        width: f32,
-        height: f32,
+        _state: &button::State,
+        label: &str,
+        bounds: Rectangle<f32>,
+        cursor_position: Point,
     ) {
         self.batch.add(Quad {
             source: Rectangle {
@@ -80,8 +91,21 @@ impl button::Renderer for Basic {
                 width: 0.5,
                 height: 1.0,
             },
-            position,
-            size: (width, height),
+            position: Point::new(bounds.x, bounds.y),
+            size: (bounds.width, bounds.height),
+        });
+
+        self.font.add(Text {
+            content: String::from(label),
+            position: Point::new(bounds.x, bounds.y),
+            bounds: (bounds.width, bounds.height),
+            color: if bounds.contains(cursor_position) {
+                Color::BLACK
+            } else {
+                Color::WHITE
+            },
+            size: 20.0,
+            ..Text::default()
         });
     }
 }

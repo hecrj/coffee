@@ -45,20 +45,11 @@ where
     fn on_event(
         &mut self,
         event: Event,
-        position: Point,
-        width: f32,
-        height: f32,
+        bounds: Rectangle<f32>,
         cursor_position: Point,
     ) -> Option<M> {
         match event {
             Event::MouseInput { .. } => {
-                let bounds = Rectangle {
-                    x: position.x,
-                    y: position.y,
-                    width,
-                    height,
-                };
-
                 if bounds.contains(cursor_position) {
                     println!("{}", self.label);
                 }
@@ -69,13 +60,24 @@ where
         None
     }
 
-    fn draw(&self, renderer: &mut R, location: Point, width: f32, height: f32) {
-        renderer.draw(self.state, location, width, height);
+    fn draw(
+        &self,
+        renderer: &mut R,
+        bounds: Rectangle<f32>,
+        cursor_position: Point,
+    ) {
+        renderer.draw(self.state, &self.label, bounds, cursor_position);
     }
 }
 
 pub trait Renderer {
-    fn draw(&mut self, state: &State, location: Point, width: f32, height: f32);
+    fn draw(
+        &mut self,
+        state: &State,
+        label: &str,
+        bounds: Rectangle<f32>,
+        cursor_position: Point,
+    );
 }
 
 pub struct State {}

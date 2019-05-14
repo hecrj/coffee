@@ -117,7 +117,7 @@ pub trait UserInterface: Game {
                         layout.on_event(event, input.cursor_position())
                     });
 
-                layout.draw(renderer, window);
+                layout.draw(renderer, window, input.cursor_position());
             }
             debug.ui_finished();
 

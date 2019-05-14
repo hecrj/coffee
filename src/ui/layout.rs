@@ -1,6 +1,6 @@
 use stretch::{geometry, result};
 
-use crate::graphics::{Point, Vector, Window};
+use crate::graphics::{Point, Rectangle, Vector, Window};
 use crate::ui::{Event, Renderer, Root, Widget};
 
 pub struct Layout<'a, M, R> {
@@ -29,14 +29,19 @@ impl<'a, M, R> Layout<'a, M, R> {
         );
     }
 
-    pub(crate) fn draw(&mut self, renderer: &mut R, window: &mut Window)
-    where
+    pub(crate) fn draw(
+        &mut self,
+        renderer: &mut R,
+        window: &mut Window,
+        cursor_position: Point,
+    ) where
         R: Renderer,
     {
         draw_recursively(
             renderer,
             &mut self.root.widget,
             &self.layout,
+            cursor_position,
             Point::new(0.0, 0.0),
         );
 
@@ -62,14 +67,14 @@ fn notify_recursively<'a, M, R>(
     position: Point,
 ) {
     let position = position + Vector::new(layout.location.x, layout.location.y);
+    let bounds = Rectangle {
+        x: position.x,
+        y: position.y,
+        width: layout.size.width,
+        height: layout.size.height,
+    };
 
-    let _ = widget.on_event(
-        event,
-        position,
-        layout.size.width,
-        layout.size.height,
-        cursor_position,
-    );
+    let _ = widget.on_event(event, bounds, cursor_position);
 
     if let Some(children) = widget.children() {
         for (widget, layout) in children.iter_mut().zip(&layout.children) {
@@ -88,15 +93,28 @@ fn draw_recursively<'a, M, R>(
     renderer: &mut R,
     widget: &mut Box<Widget<Msg = M, Renderer = R> + 'a>,
     layout: &result::Layout,
-    location: Point,
+    cursor_position: Point,
+    position: Point,
 ) {
-    let location = location + Vector::new(layout.location.x, layout.location.y);
+    let position = position + Vector::new(layout.location.x, layout.location.y);
+    let bounds = Rectangle {
+        x: position.x,
+        y: position.y,
+        width: layout.size.width,
+        height: layout.size.height,
+    };
 
-    widget.draw(renderer, location, layout.size.width, layout.size.height);
+    widget.draw(renderer, bounds, cursor_position);
 
     if let Some(children) = widget.children() {
         for (widget, layout) in children.iter_mut().zip(&layout.children) {
-            draw_recursively(renderer, widget, layout, location);
+            draw_recursively(
+                renderer,
+                widget,
+                layout,
+                cursor_position,
+                position,
+            );
         }
     }
 }

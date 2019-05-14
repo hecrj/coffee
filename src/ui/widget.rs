@@ -1,4 +1,4 @@
-use crate::graphics::Point;
+use crate::graphics::{Point, Rectangle};
 use crate::ui::{Event, Node};
 
 pub trait Widget<'a> {
@@ -20,9 +20,7 @@ pub trait Widget<'a> {
     fn on_event(
         &mut self,
         _event: Event,
-        _position: Point,
-        _width: f32,
-        _height: f32,
+        _bounds: Rectangle<f32>,
         _cursor_position: Point,
     ) -> Option<Self::Msg> {
         None
@@ -31,8 +29,7 @@ pub trait Widget<'a> {
     fn draw(
         &self,
         renderer: &mut Self::Renderer,
-        location: Point,
-        width: f32,
-        height: f32,
+        bounds: Rectangle<f32>,
+        cursor_position: Point,
     );
 }
