@@ -1,5 +1,5 @@
 use crate::graphics::gpu::{self, texture, Gpu};
-use crate::graphics::{Quad, Target};
+use crate::graphics::{Target, IntoQuad};
 use crate::load::Task;
 use crate::Result;
 
@@ -65,10 +65,12 @@ impl Canvas {
     ///
     /// [`Canvas`]: struct.Canvas.html
     /// [`Target`]: struct.Target.html
-    pub fn draw(&self, quad: Quad, target: &mut Target) {
+    pub fn draw<T: IntoQuad>(&self, quad: T, target: &mut Target, x_unit: f32, y_unit: f32) {
+        let converted_quad = quad.into_quad(x_unit, y_unit);
+
         target.draw_texture_quads(
             &self.drawable.texture(),
-            &[gpu::Instance::from(quad)],
+            &[gpu::Instance::from(converted_quad)],
         );
     }
 }
