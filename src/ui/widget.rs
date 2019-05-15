@@ -1,5 +1,5 @@
 use crate::graphics::{Point, Rectangle};
-use crate::ui::{Event, Node};
+use crate::ui::{Event, MouseCursor, Node};
 
 pub trait Widget<'a> {
     type Msg;
@@ -31,5 +31,5 @@ pub trait Widget<'a> {
         renderer: &mut Self::Renderer,
         bounds: Rectangle<f32>,
         cursor_position: Point,
-    );
+    ) -> MouseCursor;
 }

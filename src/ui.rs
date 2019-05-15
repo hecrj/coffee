@@ -1,6 +1,7 @@
 mod column;
 mod event;
 mod layout;
+mod mouse_cursor;
 mod node;
 mod root;
 mod style;
@@ -13,6 +14,7 @@ pub use button::Button;
 pub use column::Column;
 pub use event::Event;
 pub use layout::Layout;
+pub use mouse_cursor::MouseCursor;
 pub use node::Node;
 pub use renderer::Renderer;
 pub use root::Root;
@@ -65,6 +67,8 @@ pub trait UserInterface: Game {
         let mut timer = Timer::new(Self::State::TICKS_PER_SECOND);
         let mut alive = true;
         let events = &mut Vec::new();
+        let triggered_events = &mut Vec::new();
+        let mut mouse_cursor = MouseCursor::Default;
 
         while alive {
             debug.frame_started();
@@ -114,10 +118,24 @@ pub trait UserInterface: Game {
                     .cloned()
                     .filter_map(Event::from_input)
                     .for_each(|event| {
-                        layout.on_event(event, input.cursor_position())
+                        layout.on_event(
+                            triggered_events,
+                            event,
+                            input.cursor_position(),
+                        )
                     });
 
-                layout.draw(renderer, window, input.cursor_position());
+                let new_cursor =
+                    layout.draw(renderer, window, input.cursor_position());
+
+                if new_cursor != mouse_cursor {
+                    window.update_cursor(new_cursor.into());
+                    mouse_cursor = new_cursor;
+                }
+            }
+
+            for event in triggered_events.drain(..) {
+                game.update(state, event);
             }
             debug.ui_finished();
 

@@ -1,5 +1,5 @@
 use crate::graphics::{Point, Rectangle};
-use crate::ui::{Node, Style, Widget};
+use crate::ui::{MouseCursor, Node, Style, Widget};
 
 pub struct Column<'a, M, R> {
     style: Style,
@@ -92,8 +92,10 @@ where
         renderer: &mut Self::Renderer,
         bounds: Rectangle<f32>,
         _cursor_position: Point,
-    ) {
+    ) -> MouseCursor {
         renderer.draw(bounds);
+
+        MouseCursor::Default
     }
 }
 

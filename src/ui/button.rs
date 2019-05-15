@@ -1,5 +1,6 @@
 use crate::graphics::{Point, Rectangle};
-use crate::ui::{Event, Node, Style, Widget};
+use crate::input::{ButtonState, MouseButton};
+use crate::ui::{Event, MouseCursor, Node, Style, Widget};
 
 pub struct Button<'a, M, R> {
     state: &'a mut State,
@@ -34,6 +35,7 @@ impl<'a, M, R> Button<'a, M, R> {
 impl<'a, M, R> Widget<'a> for Button<'a, M, R>
 where
     R: Renderer,
+    M: Copy,
 {
     type Msg = M;
     type Renderer = R;
@@ -49,11 +51,25 @@ where
         cursor_position: Point,
     ) -> Option<M> {
         match event {
-            Event::MouseInput { .. } => {
-                if bounds.contains(cursor_position) {
-                    println!("{}", self.label);
+            Event::MouseInput {
+                button: MouseButton::Left,
+                state,
+            } => match state {
+                ButtonState::Pressed => {
+                    self.state.is_pressed = bounds.contains(cursor_position);
                 }
-            }
+                ButtonState::Released => {
+                    let is_clicked = self.state.is_pressed
+                        && bounds.contains(cursor_position);
+
+                    self.state.is_pressed = false;
+
+                    if is_clicked {
+                        println!("{}", self.label);
+                        return self.on_click;
+                    }
+                }
+            },
             _ => {}
         }
 
@@ -65,8 +81,8 @@ where
         renderer: &mut R,
         bounds: Rectangle<f32>,
         cursor_position: Point,
-    ) {
-        renderer.draw(self.state, &self.label, bounds, cursor_position);
+    ) -> MouseCursor {
+        renderer.draw(self.state, &self.label, bounds, cursor_position)
     }
 }
 
@@ -77,13 +93,15 @@ pub trait Renderer {
         label: &str,
         bounds: Rectangle<f32>,
         cursor_position: Point,
-    );
+    ) -> MouseCursor;
 }
 
-pub struct State {}
+pub struct State {
+    is_pressed: bool,
+}
 
 impl State {
     pub fn new() -> State {
-        State {}
+        State { is_pressed: false }
     }
 }

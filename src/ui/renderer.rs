@@ -2,7 +2,7 @@ use crate::graphics::{
     Batch, Color, Font, Image, Point, Quad, Rectangle, Text, Window,
 };
 use crate::load::{Join, Task};
-use crate::ui::{button, column};
+use crate::ui::{button, column, MouseCursor};
 
 pub trait Renderer {
     fn load() -> Task<Self>
@@ -41,9 +41,7 @@ impl Renderer for Basic {
             Ok(Batch::new(image))
         });
 
-        let load_font = Font::load(include_bytes!(
-            "../../resources/font/Inconsolata-Regular.ttf"
-        ));
+        let load_font = Font::load(Font::DEFAULT);
 
         (load_batch, load_font)
             .join()
@@ -83,7 +81,9 @@ impl button::Renderer for Basic {
         label: &str,
         bounds: Rectangle<f32>,
         cursor_position: Point,
-    ) {
+    ) -> MouseCursor {
+        let mouse_over = bounds.contains(cursor_position);
+
         self.batch.add(Quad {
             source: Rectangle {
                 x: 0.5,
@@ -99,7 +99,7 @@ impl button::Renderer for Basic {
             content: String::from(label),
             position: Point::new(bounds.x, bounds.y),
             bounds: (bounds.width, bounds.height),
-            color: if bounds.contains(cursor_position) {
+            color: if mouse_over {
                 Color::BLACK
             } else {
                 Color::WHITE
@@ -107,5 +107,11 @@ impl button::Renderer for Basic {
             size: 20.0,
             ..Text::default()
         });
+
+        if mouse_over {
+            MouseCursor::Pointer
+        } else {
+            MouseCursor::Default
+        }
     }
 }

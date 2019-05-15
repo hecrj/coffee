@@ -13,9 +13,7 @@ fn main() -> Result<()> {
 }
 
 struct Menu {
-    particles_button: button::State,
-    input_button: button::State,
-    color_button: button::State,
+    state: State,
 }
 
 impl Game for Menu {
@@ -25,9 +23,7 @@ impl Game for Menu {
 
     fn load(_window: &Window) -> Task<Menu> {
         Task::new(|| Menu {
-            particles_button: button::State::new(),
-            input_button: button::State::new(),
-            color_button: button::State::new(),
+            state: State::new(),
         })
     }
 
@@ -56,33 +52,69 @@ impl UserInterface for Menu {
                 .width(window.width())
                 .height(window.height())
                 .center_children()
-                .push(
-                    Column::new()
-                        .width(300.0)
-                        .spacing(30)
-                        .push(
-                            Button::new(
-                                &mut self.particles_button,
-                                "Particles",
-                            )
-                            .on_click(Event::ParticlesPressed),
-                        )
-                        .push(
-                            Button::new(&mut self.input_button, "Input")
-                                .on_click(Event::InputPressed),
-                        )
-                        .push(
-                            Button::new(&mut self.color_button, "Color")
-                                .on_click(Event::ColorPressed),
-                        ),
-                ),
+                .push(match &mut self.state {
+                    State::Selection(selection) => selection.layout(),
+                    State::Particles => Column::new(),
+                }),
         )
     }
 
-    fn update(&mut self, _state: &mut Self::State, _event: Event) {}
+    fn update(&mut self, _state: &mut Self::State, event: Event) {
+        match event {
+            Event::ParticlesPressed => {
+                self.state = State::Particles;
+            }
+            _ => {}
+        }
+    }
 }
 
-#[derive(Debug)]
+struct Selection {
+    particles_button: button::State,
+    input_button: button::State,
+    color_button: button::State,
+}
+
+impl Selection {
+    fn new() -> Selection {
+        Selection {
+            particles_button: button::State::new(),
+            input_button: button::State::new(),
+            color_button: button::State::new(),
+        }
+    }
+
+    fn layout(&mut self) -> Column<Event, renderer::Basic> {
+        Column::new()
+            .width(300.0)
+            .spacing(30)
+            .push(
+                Button::new(&mut self.particles_button, "Particles")
+                    .on_click(Event::ParticlesPressed),
+            )
+            .push(
+                Button::new(&mut self.input_button, "Input")
+                    .on_click(Event::InputPressed),
+            )
+            .push(
+                Button::new(&mut self.color_button, "Color")
+                    .on_click(Event::ColorPressed),
+            )
+    }
+}
+
+enum State {
+    Selection(Selection),
+    Particles,
+}
+
+impl State {
+    fn new() -> State {
+        State::Selection(Selection::new())
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
 enum Event {
     ParticlesPressed,
     InputPressed,
