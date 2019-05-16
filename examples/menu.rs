@@ -47,21 +47,25 @@ impl UserInterface for Menu {
         _state: &Self::State,
         window: &Window,
     ) -> Root<Event, Self::Renderer> {
+        let content = match &mut self.state {
+            State::Selection(selection) => {
+                selection.layout().map(Event::SelectionEvent)
+            }
+            State::Particles => Column::new().map(Event::SelectionEvent),
+        };
+
         Root::new(
             Column::new()
                 .width(window.width())
                 .height(window.height())
                 .center_children()
-                .push(match &mut self.state {
-                    State::Selection(selection) => selection.layout(),
-                    State::Particles => Column::new(),
-                }),
+                .push(content),
         )
     }
 
     fn update(&mut self, _state: &mut Self::State, event: Event) {
         match event {
-            Event::ParticlesPressed => {
+            Event::SelectionEvent(SelectionEvent::ParticlesPressed) => {
                 self.state = State::Particles;
             }
             _ => {}
@@ -84,21 +88,21 @@ impl Selection {
         }
     }
 
-    fn layout(&mut self) -> Column<Event, renderer::Basic> {
+    fn layout(&mut self) -> Column<SelectionEvent, renderer::Basic> {
         Column::new()
             .width(300.0)
             .spacing(30)
             .push(
                 Button::new(&mut self.particles_button, "Particles")
-                    .on_click(Event::ParticlesPressed),
+                    .on_click(SelectionEvent::ParticlesPressed),
             )
             .push(
                 Button::new(&mut self.input_button, "Input")
-                    .on_click(Event::InputPressed),
+                    .on_click(SelectionEvent::InputPressed),
             )
             .push(
                 Button::new(&mut self.color_button, "Color")
-                    .on_click(Event::ColorPressed),
+                    .on_click(SelectionEvent::ColorPressed),
             )
     }
 }
@@ -116,6 +120,11 @@ impl State {
 
 #[derive(Debug, Clone, Copy)]
 enum Event {
+    SelectionEvent(SelectionEvent),
+}
+
+#[derive(Debug, Clone, Copy)]
+enum SelectionEvent {
     ParticlesPressed,
     InputPressed,
     ColorPressed,
