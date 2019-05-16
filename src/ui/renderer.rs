@@ -9,7 +9,7 @@ pub trait Renderer {
     where
         Self: Sized;
 
-    fn draw(&mut self, window: &mut Window);
+    fn flush(&mut self, window: &mut Window);
 }
 
 pub struct Basic {
@@ -48,7 +48,7 @@ impl Renderer for Basic {
             .map(|(batch, font)| Basic { batch, font })
     }
 
-    fn draw(&mut self, window: &mut Window) {
+    fn flush(&mut self, window: &mut Window) {
         let mut frame = window.frame();
         let target = &mut frame.as_target();
 

@@ -1,5 +1,5 @@
-use crate::graphics::{Point, Rectangle};
-use crate::ui::{Event, MouseCursor, Node};
+use crate::graphics::Point;
+use crate::ui::{Event, Layout, MouseCursor, Node};
 
 pub trait Widget<'a> {
     type Msg;
@@ -7,29 +7,18 @@ pub trait Widget<'a> {
 
     fn node(&self) -> Node;
 
-    fn children(
-        &mut self,
-    ) -> Option<
-        &mut Vec<
-            Box<Widget<'a, Msg = Self::Msg, Renderer = Self::Renderer> + 'a>,
-        >,
-    > {
-        None
-    }
-
     fn on_event(
         &mut self,
         _event: Event,
-        _bounds: Rectangle<f32>,
+        _layout: Layout,
         _cursor_position: Point,
-    ) -> Option<Self::Msg> {
-        None
-    }
+        _messages: &mut Vec<Self::Msg>,
+    );
 
     fn draw(
         &self,
         renderer: &mut Self::Renderer,
-        bounds: Rectangle<f32>,
+        layout: Layout,
         cursor_position: Point,
     ) -> MouseCursor;
 }

@@ -1,4 +1,6 @@
-use crate::ui::{Node, Widget};
+use stretch::{geometry, result};
+
+use crate::ui::Widget;
 
 pub struct Root<'a, M, R> {
     pub(crate) widget: Box<Widget<'a, Msg = M, Renderer = R> + 'a>,
@@ -13,8 +15,10 @@ impl<'a, M, R> Root<'a, M, R> {
         }
     }
 
-    pub fn node(&self) -> Node {
-        self.widget.node()
+    pub(crate) fn compute_layout(&self) -> result::Layout {
+        let node = self.widget.node();
+
+        node.0.compute_layout(geometry::Size::undefined()).unwrap()
     }
 }
 

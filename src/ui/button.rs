@@ -1,6 +1,6 @@
 use crate::graphics::{Point, Rectangle};
 use crate::input::{ButtonState, MouseButton};
-use crate::ui::{Event, MouseCursor, Node, Style, Widget};
+use crate::ui::{Event, Layout, MouseCursor, Node, Style, Widget};
 
 pub struct Button<'a, M, R> {
     state: &'a mut State,
@@ -47,42 +47,48 @@ where
     fn on_event(
         &mut self,
         event: Event,
-        bounds: Rectangle<f32>,
+        layout: Layout,
         cursor_position: Point,
-    ) -> Option<M> {
+        messages: &mut Vec<M>,
+    ) {
+        let bounds = layout.bounds();
+
         match event {
             Event::MouseInput {
                 button: MouseButton::Left,
                 state,
-            } => match state {
-                ButtonState::Pressed => {
-                    self.state.is_pressed = bounds.contains(cursor_position);
-                }
-                ButtonState::Released => {
-                    let is_clicked = self.state.is_pressed
-                        && bounds.contains(cursor_position);
+            } => {
+                if let Some(on_click) = self.on_click {
+                    match state {
+                        ButtonState::Pressed => {
+                            self.state.is_pressed =
+                                bounds.contains(cursor_position);
+                        }
+                        ButtonState::Released => {
+                            let is_clicked = self.state.is_pressed
+                                && bounds.contains(cursor_position);
 
-                    self.state.is_pressed = false;
+                            self.state.is_pressed = false;
 
-                    if is_clicked {
-                        println!("{}", self.label);
-                        return self.on_click;
+                            if is_clicked {
+                                println!("{}", self.label);
+                                messages.push(on_click);
+                            }
+                        }
                     }
                 }
-            },
+            }
             _ => {}
         }
-
-        None
     }
 
     fn draw(
         &self,
         renderer: &mut R,
-        bounds: Rectangle<f32>,
+        layout: Layout,
         cursor_position: Point,
     ) -> MouseCursor {
-        renderer.draw(self.state, &self.label, bounds, cursor_position)
+        renderer.draw(self.state, &self.label, layout.bounds(), cursor_position)
     }
 }
 

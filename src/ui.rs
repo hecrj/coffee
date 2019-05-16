@@ -1,6 +1,8 @@
 mod column;
 mod event;
+mod interface;
 mod layout;
+mod map;
 mod mouse_cursor;
 mod node;
 mod root;
@@ -14,6 +16,7 @@ pub use button::Button;
 pub use column::Column;
 pub use event::Event;
 pub use layout::Layout;
+pub use map::Map;
 pub use mouse_cursor::MouseCursor;
 pub use node::Node;
 pub use renderer::Renderer;
@@ -27,6 +30,7 @@ use crate::input::{HasCursorPosition, Input};
 use crate::load::{Join, LoadingScreen};
 use crate::Debug;
 use crate::{Game, Result, State, Timer};
+use interface::Interface;
 
 pub trait UserInterface: Game {
     type Event;
@@ -111,22 +115,23 @@ pub trait UserInterface: Game {
 
             debug.ui_started();
             {
-                let mut layout = Layout::new(game.layout(state, window));
+                let mut interface =
+                    Interface::compute(game.layout(state, window));
 
                 events
                     .iter()
                     .cloned()
                     .filter_map(Event::from_input)
                     .for_each(|event| {
-                        layout.on_event(
-                            triggered_events,
+                        interface.on_event(
                             event,
                             input.cursor_position(),
+                            triggered_events,
                         )
                     });
 
                 let new_cursor =
-                    layout.draw(renderer, window, input.cursor_position());
+                    interface.draw(renderer, window, input.cursor_position());
 
                 if new_cursor != mouse_cursor {
                     window.update_cursor(new_cursor.into());

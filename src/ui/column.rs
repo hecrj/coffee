@@ -1,5 +1,5 @@
 use crate::graphics::{Point, Rectangle};
-use crate::ui::{MouseCursor, Node, Style, Widget};
+use crate::ui::{Event, Layout, MouseCursor, Node, Style, Widget};
 
 pub struct Column<'a, M, R> {
     style: Style,
@@ -81,21 +81,41 @@ where
         Node::new(style, children)
     }
 
-    fn children(
+    fn on_event(
         &mut self,
-    ) -> Option<&mut Vec<Box<Widget<'a, Msg = M, Renderer = R> + 'a>>> {
-        Some(&mut self.children)
+        event: Event,
+        layout: Layout,
+        cursor_position: Point,
+        messages: &mut Vec<Self::Msg>,
+    ) {
+        self.children.iter_mut().zip(layout.children()).for_each(
+            |(child, layout)| {
+                child.on_event(event, layout, cursor_position, messages)
+            },
+        );
     }
 
     fn draw(
         &self,
         renderer: &mut Self::Renderer,
-        bounds: Rectangle<f32>,
-        _cursor_position: Point,
+        layout: Layout,
+        cursor_position: Point,
     ) -> MouseCursor {
-        renderer.draw(bounds);
+        let mut cursor = MouseCursor::Default;
 
-        MouseCursor::Default
+        renderer.draw(layout.bounds());
+
+        self.children.iter().zip(layout.children()).for_each(
+            |(child, layout)| {
+                let new_cursor = child.draw(renderer, layout, cursor_position);
+
+                if new_cursor != MouseCursor::Default {
+                    cursor = new_cursor;
+                }
+            },
+        );
+
+        cursor
     }
 }
 
