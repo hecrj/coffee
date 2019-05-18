@@ -15,8 +15,8 @@ impl<'a, M, R> Root<'a, M, R> {
         }
     }
 
-    pub(crate) fn compute_layout(&self) -> result::Layout {
-        let node = self.widget.node();
+    pub(crate) fn compute_layout(&self, renderer: &R) -> result::Layout {
+        let node = self.widget.node(renderer);
 
         node.0.compute_layout(geometry::Size::undefined()).unwrap()
     }

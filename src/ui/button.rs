@@ -40,7 +40,7 @@ where
     type Msg = M;
     type Renderer = R;
 
-    fn node(&self) -> Node {
+    fn node(&self, _renderer: &R) -> Node {
         Node::new(self.style.height(50.0).grow(), Vec::new())
     }
 

@@ -9,8 +9,8 @@ pub struct Interface<'a, M, R> {
 }
 
 impl<'a, M, R: Renderer> Interface<'a, M, R> {
-    pub fn compute(root: Root<'a, M, R>) -> Interface<'a, M, R> {
-        let layout = root.compute_layout();
+    pub fn compute(root: Root<'a, M, R>, renderer: &R) -> Interface<'a, M, R> {
+        let layout = root.compute_layout(renderer);
 
         Interface { root, layout }
     }

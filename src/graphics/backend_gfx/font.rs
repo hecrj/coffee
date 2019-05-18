@@ -1,4 +1,5 @@
 use gfx_device_gl as gl;
+use gfx_glyph::GlyphCruncher;
 
 use crate::graphics::gpu::{TargetView, Transformation};
 use crate::graphics::Text;
@@ -29,6 +30,25 @@ impl Font {
             bounds: text.bounds,
             ..Default::default()
         });
+    }
+
+    pub fn measure(&mut self, text: Text) -> (f32, f32) {
+        let bounds = self.glyphs.pixel_bounds(gfx_glyph::Section {
+            text: &text.content,
+            screen_position: (text.position.x, text.position.y),
+            scale: gfx_glyph::Scale {
+                x: text.size,
+                y: text.size,
+            },
+            color: text.color.into_linear(),
+            bounds: text.bounds,
+            ..Default::default()
+        });
+
+        match bounds {
+            Some(bounds) => (bounds.width() as f32, bounds.height() as f32),
+            None => (0.0, 0.0),
+        }
     }
 
     pub fn draw(

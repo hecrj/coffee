@@ -5,7 +5,7 @@ pub trait Widget<'a> {
     type Msg;
     type Renderer;
 
-    fn node(&self) -> Node;
+    fn node(&self, renderer: &Self::Renderer) -> Node;
 
     fn on_event(
         &mut self,

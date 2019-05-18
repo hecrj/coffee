@@ -26,8 +26,18 @@ impl<'a, M, R> Column<'a, M, R> {
         self
     }
 
+    pub fn max_width(mut self, max_width: f32) -> Self {
+        self.style = self.style.max_width(max_width);
+        self
+    }
+
     pub fn spacing(mut self, px: u32) -> Self {
         self.spacing = px;
+        self
+    }
+
+    pub fn padding(mut self, px: u32) -> Self {
+        self.style = self.style.padding(px);
         self
     }
 
@@ -61,12 +71,12 @@ where
     type Msg = M;
     type Renderer = R;
 
-    fn node(&self) -> Node {
+    fn node(&self, renderer: &R) -> Node {
         let mut children: Vec<Node> = self
             .children
             .iter()
             .map(|child| {
-                let mut node = child.node();
+                let mut node = child.node(renderer);
 
                 let mut style = node.0.style();
                 style.margin.bottom =

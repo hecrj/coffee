@@ -1,6 +1,8 @@
 use crate::graphics::gpu::TargetView;
 use crate::graphics::{Text, Transformation};
 
+use wgpu_glyph::GlyphCruncher;
+
 pub struct Font {
     glyphs: wgpu_glyph::GlyphBrush<'static>,
 }
@@ -26,6 +28,25 @@ impl Font {
             bounds: text.bounds,
             ..Default::default()
         });
+    }
+
+    pub fn measure(&mut self, text: Text) -> (f32, f32) {
+        let bounds = self.glyphs.pixel_bounds(wgpu_glyph::Section {
+            text: &text.content,
+            screen_position: (text.position.x, text.position.y),
+            scale: wgpu_glyph::Scale {
+                x: text.size,
+                y: text.size,
+            },
+            color: text.color.into_linear(),
+            bounds: text.bounds,
+            ..Default::default()
+        });
+
+        match bounds {
+            Some(bounds) => (bounds.width() as f32, bounds.height() as f32),
+            None => (0.0, 0.0),
+        }
     }
 
     pub fn draw(

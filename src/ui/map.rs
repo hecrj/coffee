@@ -28,8 +28,8 @@ where
     type Msg = B;
     type Renderer = R;
 
-    fn node(&self) -> Node {
-        self.widget.node()
+    fn node(&self, renderer: &R) -> Node {
+        self.widget.node(renderer)
     }
 
     fn on_event(

@@ -1,7 +1,7 @@
 use coffee::graphics::{Color, Window, WindowSettings};
 use coffee::input::KeyboardAndMouse;
 use coffee::load::{loading_screen::ProgressBar, Task};
-use coffee::ui::{button, renderer, Button, Column, Root, UserInterface};
+use coffee::ui::{button, renderer, Button, Column, Root, Text, UserInterface};
 use coffee::{Game, Result, Timer};
 
 fn main() -> Result<()> {
@@ -51,13 +51,27 @@ impl UserInterface for Menu {
             State::Selection(selection) => {
                 selection.layout().map(Event::SelectionEvent)
             }
-            State::Particles => Column::new().map(Event::SelectionEvent),
+            State::Particles => Column::new()
+                .max_width(500.0)
+                .padding(20)
+                .spacing(20)
+                .push(Text::new(
+                    "A particle gravity simulator that showcases a \
+                     loading screen, input handling, and graphics \
+                     interpolation with batched drawing and font \
+                     rendering.",
+                ))
+                .push(Text::new(
+                    "Move the mouse around to attract the particles!",
+                ))
+                .map(Event::SelectionEvent),
         };
 
         Root::new(
             Column::new()
                 .width(window.width())
                 .height(window.height())
+                .padding(20)
                 .center_children()
                 .push(content),
         )

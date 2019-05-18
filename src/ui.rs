@@ -11,6 +11,10 @@ mod widget;
 
 pub mod button;
 pub mod renderer;
+pub mod text;
+
+pub use stretch::geometry::Size;
+pub use stretch::number::Number;
 
 pub use button::Button;
 pub use column::Column;
@@ -22,6 +26,7 @@ pub use node::Node;
 pub use renderer::Renderer;
 pub use root::Root;
 pub use style::Style;
+pub use text::Text;
 pub use widget::Widget;
 
 use crate::game;
@@ -116,7 +121,7 @@ pub trait UserInterface: Game {
             debug.ui_started();
             {
                 let mut interface =
-                    Interface::compute(game.layout(state, window));
+                    Interface::compute(game.layout(state, window), &renderer);
 
                 events
                     .iter()

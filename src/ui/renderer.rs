@@ -2,7 +2,11 @@ use crate::graphics::{
     Batch, Color, Font, Image, Point, Quad, Rectangle, Text, Window,
 };
 use crate::load::{Join, Task};
-use crate::ui::{button, column, MouseCursor};
+use crate::ui::{button, column, text, MouseCursor, Node, Number, Size, Style};
+
+use std::cell::RefCell;
+use std::f32;
+use std::rc::Rc;
 
 pub trait Renderer {
     fn load() -> Task<Self>
@@ -14,7 +18,7 @@ pub trait Renderer {
 
 pub struct Basic {
     batch: Batch,
-    font: Font,
+    font: Rc<RefCell<Font>>,
 }
 
 impl Renderer for Basic {
@@ -43,9 +47,10 @@ impl Renderer for Basic {
 
         let load_font = Font::load(Font::DEFAULT);
 
-        (load_batch, load_font)
-            .join()
-            .map(|(batch, font)| Basic { batch, font })
+        (load_batch, load_font).join().map(|(batch, font)| Basic {
+            batch,
+            font: Rc::new(RefCell::new(font)),
+        })
     }
 
     fn flush(&mut self, window: &mut Window) {
@@ -55,7 +60,7 @@ impl Renderer for Basic {
         self.batch.draw(Point::new(0.0, 0.0), target);
         self.batch.clear();
 
-        self.font.draw(target);
+        self.font.borrow_mut().draw(target);
     }
 }
 
@@ -95,7 +100,7 @@ impl button::Renderer for Basic {
             size: (bounds.width, bounds.height),
         });
 
-        self.font.add(Text {
+        self.font.borrow_mut().add(Text {
             content: String::from(label),
             position: Point::new(bounds.x, bounds.y),
             bounds: (bounds.width, bounds.height),
@@ -113,5 +118,59 @@ impl button::Renderer for Basic {
         } else {
             MouseCursor::Default
         }
+    }
+}
+
+impl text::Renderer for Basic {
+    fn node(&self, style: Style, content: &str) -> Node {
+        let content = String::from(content);
+        let font = self.font.clone();
+
+        Node::new_leaf(style, move |size| {
+            let bounds = (
+                match size.width {
+                    Number::Undefined => f32::INFINITY,
+                    Number::Defined(w) => w,
+                },
+                match size.height {
+                    Number::Undefined => f32::INFINITY,
+                    Number::Defined(h) => h,
+                },
+            );
+
+            let text = Text {
+                content: content.clone(),
+                position: Point::new(0.0, 0.0),
+                color: Color::WHITE,
+                size: 20.0,
+                bounds,
+                ..Text::default()
+            };
+
+            let (width, height) = font.borrow_mut().measure(text);
+
+            Size {
+                width,
+                height: height + 5.0,
+            }
+        })
+    }
+
+    fn draw(
+        &mut self,
+        content: &str,
+        bounds: Rectangle<f32>,
+        _cursor_position: Point,
+    ) -> MouseCursor {
+        self.font.borrow_mut().add(Text {
+            content: String::from(content),
+            position: Point::new(bounds.x, bounds.y),
+            bounds: (bounds.width, bounds.height),
+            color: Color::WHITE,
+            size: 20.0,
+            ..Text::default()
+        });
+
+        MouseCursor::Default
     }
 }

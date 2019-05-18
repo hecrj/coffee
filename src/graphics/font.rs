@@ -26,6 +26,10 @@ impl Font {
         self.0.add(text)
     }
 
+    pub fn measure(&mut self, text: Text) -> (f32, f32) {
+        self.0.measure(text)
+    }
+
     /// Render and flush all the text added to this [`Font`].
     ///
     /// [`Font`]: struct.Font.html
