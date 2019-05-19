@@ -1,7 +1,9 @@
 use coffee::graphics::{Color, Window, WindowSettings};
 use coffee::input::KeyboardAndMouse;
 use coffee::load::{loading_screen::ProgressBar, Task};
-use coffee::ui::{button, renderer, Button, Column, Root, Text, UserInterface};
+use coffee::ui::{
+    button, renderer, Button, Column, Panel, Root, Text, UserInterface,
+};
 use coffee::{Game, Result, Timer};
 
 fn main() -> Result<()> {
@@ -34,7 +36,12 @@ impl Game for Menu {
         _timer: &Timer,
     ) {
         let mut frame = window.frame();
-        frame.clear(Color::BLACK);
+        frame.clear(Color {
+            r: 0.4,
+            g: 0.4,
+            b: 0.6,
+            a: 1.0,
+        });
     }
 }
 
@@ -51,46 +58,30 @@ impl UserInterface for Menu {
             State::Selection(selection) => {
                 selection.layout().map(Event::SelectionEvent)
             }
-            State::Particles => Column::new()
-                .max_width(500.0)
-                .padding(20)
-                .spacing(20)
-                .push(Text::new(
-                    "A particle gravity simulator that showcases a \
-                     loading screen, input handling, and graphics \
-                     interpolation with batched drawing and font \
-                     rendering.",
-                ))
-                .push(Text::new(
-                    "Move the mouse around to attract the particles!",
-                ))
-                .push(Text::new(
-                    "A particle gravity simulator that showcases a \
-                     loading screen, input handling, and graphics \
-                     interpolation with batched drawing and font \
-                     rendering.",
-                ))
-                .push(Text::new(
-                    "Move the mouse around to attract the particles!",
-                ))
-                .push(Text::new(
-                    "A particle gravity simulator that showcases a \
-                     loading screen, input handling, and graphics \
-                     interpolation with batched drawing and font \
-                     rendering.",
-                ))
-                .push(Text::new(
-                    "Move the mouse around to attract the particles!",
-                ))
-                .map(Event::SelectionEvent),
+            State::Particles => Panel::new(
+                Column::new()
+                    .fill_width()
+                    .spacing(10)
+                    .push(Text::new(
+                        "A particle gravity simulator that showcases a \
+                         loading screen, input handling, and graphics \
+                         interpolation with batched drawing and font \
+                         rendering.",
+                    ))
+                    .push(Text::new(
+                        "Move the mouse around to attract the particles!",
+                    )),
+            )
+            .max_width(500)
+            .map(Event::SelectionEvent),
         };
 
         Root::new(
             Column::new()
                 .width(window.width())
                 .height(window.height())
-                .padding(20)
                 .center_children()
+                .padding(20)
                 .push(content),
         )
     }

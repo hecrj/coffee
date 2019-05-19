@@ -15,8 +15,12 @@ impl Style {
     }
 
     pub fn max_width(mut self, max_width: f32) -> Self {
-        self.0.size.width = stretch::style::Dimension::Percent(1.0);
         self.0.max_size.width = style::Dimension::Points(max_width);
+        self.fill_width()
+    }
+
+    pub fn fill_width(mut self) -> Self {
+        self.0.size.width = stretch::style::Dimension::Percent(1.0);
         self
     }
 
@@ -32,6 +36,12 @@ impl Style {
             top: style::Dimension::Points(px as f32),
             bottom: style::Dimension::Points(px as f32),
         };
+
+        self
+    }
+
+    pub fn padding_top(mut self, px: u32) -> Self {
+        self.0.padding.top = style::Dimension::Points(px as f32);
 
         self
     }

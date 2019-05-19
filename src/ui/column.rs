@@ -31,6 +31,11 @@ impl<'a, M, R> Column<'a, M, R> {
         self
     }
 
+    pub fn fill_width(mut self) -> Self {
+        self.style = self.style.fill_width();
+        self
+    }
+
     pub fn spacing(mut self, px: u32) -> Self {
         self.spacing = px;
         self

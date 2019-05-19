@@ -10,6 +10,7 @@ mod style;
 mod widget;
 
 pub mod button;
+pub mod panel;
 pub mod renderer;
 pub mod text;
 
@@ -23,6 +24,7 @@ pub use layout::Layout;
 pub use map::Map;
 pub use mouse_cursor::MouseCursor;
 pub use node::Node;
+pub use panel::Panel;
 pub use renderer::Renderer;
 pub use root::Root;
 pub use style::Style;
