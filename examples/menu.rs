@@ -64,6 +64,24 @@ impl UserInterface for Menu {
                 .push(Text::new(
                     "Move the mouse around to attract the particles!",
                 ))
+                .push(Text::new(
+                    "A particle gravity simulator that showcases a \
+                     loading screen, input handling, and graphics \
+                     interpolation with batched drawing and font \
+                     rendering.",
+                ))
+                .push(Text::new(
+                    "Move the mouse around to attract the particles!",
+                ))
+                .push(Text::new(
+                    "A particle gravity simulator that showcases a \
+                     loading screen, input handling, and graphics \
+                     interpolation with batched drawing and font \
+                     rendering.",
+                ))
+                .push(Text::new(
+                    "Move the mouse around to attract the particles!",
+                ))
                 .map(Event::SelectionEvent),
         };
 

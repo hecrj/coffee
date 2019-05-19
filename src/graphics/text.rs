@@ -4,9 +4,9 @@ use crate::graphics::{Color, Point};
 
 /// A section of text.
 #[derive(Clone, PartialEq, Debug)]
-pub struct Text {
+pub struct Text<'a> {
     /// Text content.
-    pub content: String,
+    pub content: &'a str,
 
     /// Text position.
     pub position: Point,
@@ -21,10 +21,10 @@ pub struct Text {
     pub color: Color,
 }
 
-impl Default for Text {
-    fn default() -> Text {
+impl Default for Text<'static> {
+    fn default() -> Text<'static> {
         Text {
-            content: String::from(""),
+            content: "",
             position: Point::new(0.0, 0.0),
             bounds: (f32::INFINITY, f32::INFINITY),
             size: 16.0,

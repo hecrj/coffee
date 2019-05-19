@@ -171,7 +171,7 @@ impl Game for Particles {
 
         // Draw simple text UI
         self.font.add(Text {
-            content: String::from("Graphics interpolation:"),
+            content: "Graphics interpolation:",
             position: Point::new(10.0, frame.height() - 50.0),
             bounds: (frame.width(), frame.height()),
             size: 20.0,
@@ -179,11 +179,7 @@ impl Game for Particles {
         });
 
         self.font.add(Text {
-            content: if self.interpolate {
-                String::from("ON")
-            } else {
-                String::from("OFF")
-            },
+            content: if self.interpolate { "ON" } else { "OFF" },
             position: Point::new(250.0, frame.height() - 50.0),
             bounds: (frame.width(), frame.height()),
             size: 20.0,
@@ -195,7 +191,7 @@ impl Game for Particles {
         });
 
         self.font.add(Text {
-            content: String::from("Press I to toggle."),
+            content: "Press I to toggle.",
             position: Point::new(10.0, frame.height() - 25.0),
             bounds: (frame.width(), frame.height()),
             size: 16.0,

@@ -69,7 +69,7 @@ impl Game for Colors {
         );
 
         self.font.add(Text {
-            content: String::from("Prussian blue"),
+            content: "Prussian blue",
             position: Point::new(20.0, 500.0),
             size: 50.0,
             color: Self::PRUSSIAN_BLUE,

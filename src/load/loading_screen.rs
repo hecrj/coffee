@@ -182,7 +182,7 @@ impl LoadingScreen for ProgressBar {
 
         if let Some(stage) = progress.stage() {
             self.font.add(graphics::Text {
-                content: stage.clone(),
+                content: stage,
                 position: graphics::Point::new(
                     50.0,
                     frame.height() / 2.0 - 80.0,
@@ -194,7 +194,7 @@ impl LoadingScreen for ProgressBar {
         }
 
         self.font.add(graphics::Text {
-            content: format!("{:.0}", progress.percentage()) + "%",
+            content: &(format!("{:.0}", progress.percentage()) + "%"),
             position: graphics::Point::new(50.0, frame.height() / 2.0 + 50.0),
             size: 30.0,
             bounds: (frame.width(), frame.height()),

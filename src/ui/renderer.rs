@@ -101,7 +101,7 @@ impl button::Renderer for Basic {
         });
 
         self.font.borrow_mut().add(Text {
-            content: String::from(label),
+            content: label,
             position: Point::new(bounds.x, bounds.y),
             bounds: (bounds.width, bounds.height),
             color: if mouse_over {
@@ -123,8 +123,8 @@ impl button::Renderer for Basic {
 
 impl text::Renderer for Basic {
     fn node(&self, style: Style, content: &str) -> Node {
-        let content = String::from(content);
         let font = self.font.clone();
+        let content = String::from(content);
 
         Node::new_leaf(style, move |size| {
             let bounds = (
@@ -139,7 +139,7 @@ impl text::Renderer for Basic {
             );
 
             let text = Text {
-                content: content.clone(),
+                content: &content,
                 position: Point::new(0.0, 0.0),
                 color: Color::WHITE,
                 size: 20.0,
@@ -163,7 +163,7 @@ impl text::Renderer for Basic {
         _cursor_position: Point,
     ) -> MouseCursor {
         self.font.borrow_mut().add(Text {
-            content: String::from(content),
+            content,
             position: Point::new(bounds.x, bounds.y),
             bounds: (bounds.width, bounds.height),
             color: Color::WHITE,

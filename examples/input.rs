@@ -155,26 +155,23 @@ impl Game for InputExample {
         frame.clear(Color::BLACK);
 
         // This closure simplifies some of the boilerplate.
-        let add_aligned_text = |font: &mut Font,
-                                label: String,
-                                content: String,
-                                x: f32,
-                                y: f32| {
-            font.add(Text {
-                content: label,
-                position: Point::new(x, y),
-                bounds: (frame.width(), frame.height()),
-                size: 20.0,
-                color: Color::WHITE,
-            });
-            font.add(Text {
-                content: content,
-                position: Point::new(x + 260.0, y),
-                bounds: (frame.width(), frame.height()),
-                size: 20.0,
-                color: Color::WHITE,
-            });
-        };
+        let add_aligned_text =
+            |font: &mut Font, label: &str, content: &str, x: f32, y: f32| {
+                font.add(Text {
+                    content: label,
+                    position: Point::new(x, y),
+                    bounds: (frame.width(), frame.height()),
+                    size: 20.0,
+                    color: Color::WHITE,
+                });
+                font.add(Text {
+                    content: content,
+                    position: Point::new(x + 260.0, y),
+                    bounds: (frame.width(), frame.height()),
+                    size: 20.0,
+                    color: Color::WHITE,
+                });
+            };
 
         let keys = self
             .keys_pressed
@@ -190,34 +187,28 @@ impl Game for InputExample {
             .collect::<Vec<_>>()
             .join(", ");
 
-        add_aligned_text(
-            &mut self.font,
-            String::from("Pressed keys:"),
-            keys,
-            20.0,
-            20.0,
-        );
+        add_aligned_text(&mut self.font, "Pressed keys:", &keys, 20.0, 20.0);
 
         add_aligned_text(
             &mut self.font,
-            String::from("Text Buffer (type):"),
-            self.text_buffer.clone(),
+            "Text Buffer (type):",
+            &self.text_buffer,
             20.0,
             50.0,
         );
 
         add_aligned_text(
             &mut self.font,
-            String::from("Pressed mouse buttons:"),
-            mouse_buttons,
+            "Pressed mouse buttons:",
+            &mouse_buttons,
             20.0,
             80.0,
         );
 
         add_aligned_text(
             &mut self.font,
-            String::from("Last mouse wheel scroll:"),
-            format!("{}, {}", self.mouse_wheel.x, self.mouse_wheel.y),
+            "Last mouse wheel scroll:",
+            &format!("{}, {}", self.mouse_wheel.x, self.mouse_wheel.y),
             20.0,
             110.0,
         );

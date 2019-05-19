@@ -33,7 +33,7 @@ pub struct Debug {
     ui_durations: TimeBuffer,
     debug_start: time::Instant,
     debug_durations: TimeBuffer,
-    text: Vec<graphics::Text>,
+    text: Vec<(String, String)>,
     draw_rate: u16,
     frames_until_refresh: u16,
 }
@@ -195,11 +195,7 @@ impl Debug {
             self.frames_until_refresh = self.draw_rate.max(1);
         }
 
-        for text in &self.text {
-            self.font.add(text.clone());
-        }
-
-        self.font.draw(&mut frame.as_target());
+        self.draw_text(frame);
         self.frames_until_refresh -= 1;
     }
 
@@ -227,66 +223,64 @@ impl Debug {
         ];
 
         for (i, (title, duration, extra)) in rows.iter().enumerate() {
-            for text in
-                Self::duration_row(i, bounds, title, duration, extra).iter()
-            {
-                self.text.push(text.clone());
-            }
+            let formatted_duration = match extra {
+                Some(string) => {
+                    format_duration(duration) + " (" + &string + ")"
+                }
+                None => format_duration(duration),
+            };
+
+            self.text.push((String::from(*title), formatted_duration));
         }
     }
 
-    fn duration_row(
-        row: usize,
-        bounds: (f32, f32),
-        title: &str,
-        duration: &time::Duration,
-        extra: &Option<String>,
-    ) -> [graphics::Text; 4] {
-        let y = row as f32 * Self::ROW_HEIGHT;
-        let formatted_duration = match extra {
-            Some(string) => format_duration(duration) + " (" + &string + ")",
-            None => format_duration(duration),
-        };
+    fn draw_text(&mut self, frame: &mut graphics::Frame) {
+        for (row, (key, value)) in self.text.iter().enumerate() {
+            let y = row as f32 * Self::ROW_HEIGHT;
 
-        [
-            graphics::Text {
-                content: String::from(title),
+            self.font.add(graphics::Text {
+                content: key,
                 position: graphics::Point::new(
                     Self::MARGIN + Self::SHADOW_OFFSET,
                     Self::MARGIN + y + Self::SHADOW_OFFSET,
                 ),
-                bounds,
                 size: 20.0,
                 color: graphics::Color::BLACK,
-            },
-            graphics::Text {
-                content: String::from(title),
+                ..graphics::Text::default()
+            });
+
+            self.font.add(graphics::Text {
+                content: key,
                 position: graphics::Point::new(Self::MARGIN, Self::MARGIN + y),
-                bounds,
                 size: 20.0,
                 color: graphics::Color::WHITE,
-            },
-            graphics::Text {
-                content: formatted_duration.clone(),
+                ..graphics::Text::default()
+            });
+
+            self.font.add(graphics::Text {
+                content: value,
                 position: graphics::Point::new(
                     Self::MARGIN + Self::TITLE_WIDTH + Self::SHADOW_OFFSET,
                     Self::MARGIN + y + Self::SHADOW_OFFSET,
                 ),
-                bounds,
                 size: 20.0,
                 color: graphics::Color::BLACK,
-            },
-            graphics::Text {
-                content: formatted_duration,
+                ..graphics::Text::default()
+            });
+
+            self.font.add(graphics::Text {
+                content: value,
                 position: graphics::Point::new(
                     Self::MARGIN + Self::TITLE_WIDTH,
                     Self::MARGIN + y,
                 ),
-                bounds,
                 size: 20.0,
                 color: graphics::Color::WHITE,
-            },
-        ]
+                ..graphics::Text::default()
+            });
+        }
+
+        self.font.draw(&mut frame.as_target());
     }
 }
 
