@@ -9,6 +9,7 @@ pub struct Text<M, R> {
 }
 
 impl<M, R> Text<M, R> {
+    #[inline]
     pub fn new(label: &str) -> Self {
         Text {
             content: String::from(label),
@@ -18,6 +19,7 @@ impl<M, R> Text<M, R> {
         }
     }
 
+    #[inline]
     pub fn width(mut self, width: u32) -> Self {
         self.style = self.style.width(width as f32);
         self

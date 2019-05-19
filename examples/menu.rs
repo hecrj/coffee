@@ -37,8 +37,8 @@ impl Game for Menu {
     ) {
         let mut frame = window.frame();
         frame.clear(Color {
-            r: 0.4,
-            g: 0.4,
+            r: 0.5,
+            g: 0.5,
             b: 0.6,
             a: 1.0,
         });
@@ -62,6 +62,7 @@ impl UserInterface for Menu {
                 Column::new()
                     .fill_width()
                     .spacing(10)
+                    .push(Text::new("Particles"))
                     .push(Text::new(
                         "A particle gravity simulator that showcases a \
                          loading screen, input handling, and graphics \
@@ -69,7 +70,7 @@ impl UserInterface for Menu {
                          rendering.",
                     ))
                     .push(Text::new(
-                        "Move the mouse around to attract the particles!",
+                        "The mouse cursor will attract the particles!",
                     )),
             )
             .max_width(500)

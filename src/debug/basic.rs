@@ -191,7 +191,7 @@ impl Debug {
     pub fn draw(&mut self, frame: &mut graphics::Frame) {
         if self.frames_until_refresh <= 0 {
             self.text.clear();
-            self.refresh_text(frame);
+            self.refresh_text();
             self.frames_until_refresh = self.draw_rate.max(1);
         }
 
@@ -204,8 +204,7 @@ impl Debug {
     const TITLE_WIDTH: f32 = 150.0;
     const SHADOW_OFFSET: f32 = 2.0;
 
-    fn refresh_text(&mut self, frame: &mut graphics::Frame) {
-        let bounds = (frame.width(), frame.height());
+    fn refresh_text(&mut self) {
         let frame_duration = self.frame_durations.average();
         let frame_micros = (frame_duration.as_secs() as u32 * 1_000_000
             + frame_duration.subsec_micros())
@@ -222,7 +221,7 @@ impl Debug {
             ("Frame:", frame_duration, Some(fps.to_string() + " fps")),
         ];
 
-        for (i, (title, duration, extra)) in rows.iter().enumerate() {
+        for (title, duration, extra) in &rows {
             let formatted_duration = match extra {
                 Some(string) => {
                     format_duration(duration) + " (" + &string + ")"

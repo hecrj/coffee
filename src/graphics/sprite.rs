@@ -20,6 +20,7 @@ pub struct Sprite {
 }
 
 impl Default for Sprite {
+    #[inline]
     fn default() -> Sprite {
         Sprite {
             source: Rectangle {
