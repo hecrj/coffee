@@ -68,7 +68,7 @@ impl Renderer for Basic {
         let mut frame = window.frame();
         let target = &mut frame.as_target();
 
-        self.debug.draw(Point::new(0.0, 0.0), target);
+        //self.debug.draw(Point::new(0.0, 0.0), target);
         self.debug.clear();
 
         self.sprites.draw(Point::new(0.0, 0.0), target);
@@ -93,12 +93,33 @@ impl column::Renderer for Basic {
     }
 }
 
+const BUTTON_LEFT: Rectangle<u16> = Rectangle {
+    x: 0,
+    y: BOTTOM_LEFT.y + BOTTOM_LEFT.height,
+    width: 6,
+    height: 49,
+};
+
+const BUTTON_BACKGROUND: Rectangle<u16> = Rectangle {
+    x: BUTTON_LEFT.width,
+    y: BUTTON_LEFT.y,
+    width: 1,
+    height: BUTTON_LEFT.height,
+};
+
+const BUTTON_RIGHT: Rectangle<u16> = Rectangle {
+    x: BUTTON_LEFT.height - BUTTON_LEFT.width,
+    y: BUTTON_LEFT.y,
+    width: BUTTON_LEFT.width,
+    height: BUTTON_LEFT.height,
+};
+
 impl button::Renderer for Basic {
     fn draw(
         &mut self,
-        _state: &button::State,
+        state: &button::State,
         label: &str,
-        bounds: Rectangle<f32>,
+        mut bounds: Rectangle<f32>,
         cursor_position: Point,
     ) -> MouseCursor {
         let mouse_over = bounds.contains(cursor_position);
@@ -114,17 +135,66 @@ impl button::Renderer for Basic {
             size: (bounds.width, bounds.height),
         });
 
+        let mut offset = 0;
+
+        if mouse_over {
+            if state.is_pressed() {
+                bounds.y += 4.0;
+                offset = BUTTON_RIGHT.x + BUTTON_RIGHT.width;
+            } else {
+                bounds.y -= 1.0;
+            }
+        }
+
+        self.sprites.add(Sprite {
+            source: Rectangle {
+                x: BUTTON_LEFT.x + offset,
+                ..BUTTON_LEFT
+            },
+            position: Point::new(bounds.x, bounds.y),
+            scale: (1.0, 1.0),
+        });
+
+        self.sprites.add(Sprite {
+            source: Rectangle {
+                x: BUTTON_BACKGROUND.x + offset,
+                ..BUTTON_BACKGROUND
+            },
+            position: Point::new(bounds.x + BUTTON_LEFT.width as f32, bounds.y),
+            scale: (
+                bounds.width - (BUTTON_LEFT.width + BUTTON_RIGHT.width) as f32,
+                1.0,
+            ),
+        });
+
+        self.sprites.add(Sprite {
+            source: Rectangle {
+                x: BUTTON_RIGHT.x + offset,
+                ..BUTTON_RIGHT
+            },
+            position: Point::new(
+                bounds.x + bounds.width - BUTTON_RIGHT.width as f32,
+                bounds.y,
+            ),
+            scale: (1.0, 1.0),
+        });
+
         self.font.borrow_mut().add(Text {
             content: label,
             position: Point::new(
                 bounds.x + bounds.width / 2.0,
-                bounds.y + bounds.height / 2.0,
+                bounds.y + bounds.height / 2.0 - 4.0,
             ),
             bounds: (bounds.width, bounds.height),
             color: if mouse_over {
-                Color::BLACK
-            } else {
                 Color::WHITE
+            } else {
+                Color {
+                    r: 0.9,
+                    g: 0.9,
+                    b: 0.9,
+                    a: 1.0,
+                }
             },
             size: 20.0,
             horizontal_alignment: HorizontalAlignment::Center,

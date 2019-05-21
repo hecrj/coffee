@@ -115,4 +115,8 @@ impl State {
     pub fn new() -> State {
         State { is_pressed: false }
     }
+
+    pub fn is_pressed(&self) -> bool {
+        self.is_pressed
+    }
 }
