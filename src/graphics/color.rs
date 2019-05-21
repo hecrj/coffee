@@ -76,6 +76,12 @@ impl Color {
     }
 }
 
+impl Default for Color {
+    fn default() -> Color {
+        Color::WHITE
+    }
+}
+
 impl From<[u8; 3]> for Color {
     fn from(values: [u8; 3]) -> Color {
         let [r, g, b] = values;

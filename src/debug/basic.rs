@@ -221,11 +221,9 @@ impl Debug {
             ("Frame:", frame_duration, Some(fps.to_string() + " fps")),
         ];
 
-        for (title, duration, extra) in &rows {
+        for (title, duration, extra) in rows.iter() {
             let formatted_duration = match extra {
-                Some(string) => {
-                    format_duration(duration) + " (" + &string + ")"
-                }
+                Some(string) => format_duration(duration) + " (" + string + ")",
                 None => format_duration(duration),
             };
 

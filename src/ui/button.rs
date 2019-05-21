@@ -15,7 +15,7 @@ impl<'a, M, R> Button<'a, M, R> {
         Button {
             state,
             label: String::from(label),
-            style: Style::default(),
+            style: Style::default().min_width(100.0),
             on_click: None,
             renderer: std::marker::PhantomData,
         }
@@ -23,6 +23,11 @@ impl<'a, M, R> Button<'a, M, R> {
 
     pub fn width(mut self, width: u32) -> Self {
         self.style = self.style.width(width as f32);
+        self
+    }
+
+    pub fn align_right(mut self) -> Self {
+        self.style = self.style.align_right();
         self
     }
 

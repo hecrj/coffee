@@ -14,9 +14,19 @@ impl Style {
         self
     }
 
+    pub fn min_width(mut self, min_width: f32) -> Self {
+        self.0.min_size.width = style::Dimension::Points(min_width);
+        self
+    }
+
     pub fn max_width(mut self, max_width: f32) -> Self {
         self.0.max_size.width = style::Dimension::Points(max_width);
         self.fill_width()
+    }
+
+    pub fn max_height(mut self, max_height: f32) -> Self {
+        self.0.max_size.height = style::Dimension::Points(max_height);
+        self
     }
 
     pub fn fill_width(mut self) -> Self {
@@ -26,6 +36,11 @@ impl Style {
 
     pub fn grow(mut self) -> Self {
         self.0.flex_grow = 1.0;
+        self
+    }
+
+    pub fn align_right(mut self) -> Self {
+        self.0.align_self = style::AlignSelf::FlexEnd;
         self
     }
 
@@ -56,6 +71,8 @@ impl Style {
 impl Default for Style {
     fn default() -> Style {
         Style(style::Style {
+            align_items: style::AlignItems::Stretch,
+            justify_content: style::JustifyContent::FlexStart,
             ..style::Style::default()
         })
     }

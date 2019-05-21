@@ -6,6 +6,7 @@ mod map;
 mod mouse_cursor;
 mod node;
 mod root;
+mod row;
 mod style;
 mod widget;
 
@@ -27,6 +28,7 @@ pub use node::Node;
 pub use panel::Panel;
 pub use renderer::Renderer;
 pub use root::Root;
+pub use row::Row;
 pub use style::Style;
 pub use text::Text;
 pub use widget::Widget;

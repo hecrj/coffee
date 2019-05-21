@@ -1,27 +1,34 @@
-use crate::graphics::{Point, Rectangle};
+use crate::graphics::{Color, Point, Rectangle};
 use crate::ui::{Event, Layout, MouseCursor, Node, Style, Widget};
 
 pub struct Text<M, R> {
     content: String,
+    size: f32,
+    color: Color,
     style: Style,
     message: std::marker::PhantomData<M>,
     renderer: std::marker::PhantomData<R>,
 }
 
 impl<M, R> Text<M, R> {
-    #[inline]
     pub fn new(label: &str) -> Self {
         Text {
             content: String::from(label),
+            size: 20.0,
+            color: Color::default(),
             style: Style::default(),
             message: std::marker::PhantomData,
             renderer: std::marker::PhantomData,
         }
     }
 
-    #[inline]
-    pub fn width(mut self, width: u32) -> Self {
-        self.style = self.style.width(width as f32);
+    pub fn size(mut self, size: f32) -> Self {
+        self.size = size;
+        self
+    }
+
+    pub fn color(mut self, color: Color) -> Self {
+        self.color = color;
         self
     }
 }
@@ -35,7 +42,7 @@ where
     type Renderer = R;
 
     fn node(&self, renderer: &R) -> Node {
-        renderer.node(self.style, &self.content)
+        renderer.node(self.style, &self.content, self.size)
     }
 
     fn on_event(
@@ -53,16 +60,24 @@ where
         layout: Layout,
         cursor_position: Point,
     ) -> MouseCursor {
-        renderer.draw(&self.content, layout.bounds(), cursor_position)
+        renderer.draw(
+            &self.content,
+            self.size,
+            self.color,
+            layout.bounds(),
+            cursor_position,
+        )
     }
 }
 
 pub trait Renderer {
-    fn node(&self, style: Style, content: &str) -> Node;
+    fn node(&self, style: Style, content: &str, size: f32) -> Node;
 
     fn draw(
         &mut self,
         content: &str,
+        size: f32,
+        color: Color,
         bounds: Rectangle<f32>,
         cursor_position: Point,
     ) -> MouseCursor;

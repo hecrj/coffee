@@ -67,7 +67,7 @@ impl Renderer for Basic {
         let mut frame = window.frame();
         let target = &mut frame.as_target();
 
-        //self.debug.draw(Point::new(0.0, 0.0), target);
+        self.debug.draw(Point::new(0.0, 0.0), target);
         self.debug.clear();
 
         self.sprites.draw(Point::new(0.0, 0.0), target);
@@ -135,12 +135,12 @@ impl button::Renderer for Basic {
 }
 
 impl text::Renderer for Basic {
-    fn node(&self, style: Style, content: &str) -> Node {
+    fn node(&self, style: Style, content: &str, size: f32) -> Node {
         let font = self.font.clone();
         let content = String::from(content);
         let measure = RefCell::new(None);
 
-        Node::new_leaf(style, move |size| {
+        Node::new_leaf(style, move |bounds| {
             // TODO: Investigate why stretch tries to measure this MANY times
             // with every ancestor's bounds.
             // Bug? Using the library wrong? I should probably open an issue on
@@ -152,11 +152,11 @@ impl text::Renderer for Basic {
 
             if measure.is_none() {
                 let bounds = (
-                    match size.width {
+                    match bounds.width {
                         Number::Undefined => f32::INFINITY,
                         Number::Defined(w) => w,
                     },
-                    match size.height {
+                    match bounds.height {
                         Number::Undefined => f32::INFINITY,
                         Number::Defined(h) => h,
                     },
@@ -164,17 +164,25 @@ impl text::Renderer for Basic {
 
                 let text = Text {
                     content: &content,
-                    size: 20.0,
+                    size,
                     bounds,
                     ..Text::default()
                 };
 
                 let (width, height) = font.borrow_mut().measure(text);
 
-                *measure = Some(Size {
+                let size = Size {
                     width,
-                    height: height + 5.0,
-                });
+                    height: height + size / 4.0,
+                };
+
+                // If the text has no width boundary we avoid caching as the
+                // layout engine may just be measuring text in a row.
+                if bounds.0 == f32::INFINITY {
+                    return size;
+                } else {
+                    *measure = Some(size);
+                }
             }
 
             measure.unwrap()
@@ -184,6 +192,8 @@ impl text::Renderer for Basic {
     fn draw(
         &mut self,
         content: &str,
+        size: f32,
+        color: Color,
         bounds: Rectangle<f32>,
         _cursor_position: Point,
     ) -> MouseCursor {
@@ -191,8 +201,8 @@ impl text::Renderer for Basic {
             content,
             position: Point::new(bounds.x, bounds.y),
             bounds: (bounds.width, bounds.height),
-            color: Color::WHITE,
-            size: 20.0,
+            color,
+            size,
             ..Text::default()
         });
 
