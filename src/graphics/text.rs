@@ -19,6 +19,10 @@ pub struct Text<'a> {
 
     /// Text color.
     pub color: Color,
+
+    pub horizontal_alignment: HorizontalAlignment,
+
+    pub vertical_alignment: VerticalAlignment,
 }
 
 impl Default for Text<'static> {
@@ -29,6 +33,22 @@ impl Default for Text<'static> {
             bounds: (f32::INFINITY, f32::INFINITY),
             size: 16.0,
             color: Color::BLACK,
+            horizontal_alignment: HorizontalAlignment::Left,
+            vertical_alignment: VerticalAlignment::Top,
         }
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HorizontalAlignment {
+    Left,
+    Center,
+    Right,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum VerticalAlignment {
+    Top,
+    Center,
+    Bottom,
 }

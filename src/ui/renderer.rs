@@ -1,5 +1,6 @@
 use crate::graphics::{
-    Batch, Color, Font, Image, Point, Quad, Rectangle, Sprite, Text, Window,
+    Batch, Color, Font, HorizontalAlignment, Image, Point, Quad, Rectangle,
+    Sprite, Text, VerticalAlignment, Window,
 };
 use crate::load::{Join, Task};
 use crate::ui::{
@@ -115,7 +116,10 @@ impl button::Renderer for Basic {
 
         self.font.borrow_mut().add(Text {
             content: label,
-            position: Point::new(bounds.x, bounds.y),
+            position: Point::new(
+                bounds.x + bounds.width / 2.0,
+                bounds.y + bounds.height / 2.0,
+            ),
             bounds: (bounds.width, bounds.height),
             color: if mouse_over {
                 Color::BLACK
@@ -123,6 +127,8 @@ impl button::Renderer for Basic {
                 Color::WHITE
             },
             size: 20.0,
+            horizontal_alignment: HorizontalAlignment::Center,
+            vertical_alignment: VerticalAlignment::Center,
             ..Text::default()
         });
 

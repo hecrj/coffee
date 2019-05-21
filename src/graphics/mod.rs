@@ -156,7 +156,7 @@ pub use quad::{IntoQuad, Quad};
 pub use rectangle::Rectangle;
 pub use sprite::Sprite;
 pub use target::Target;
-pub use text::Text;
+pub use text::{HorizontalAlignment, Text, VerticalAlignment};
 pub use texture_array::TextureArray;
 pub use transformation::Transformation;
 pub use vector::Vector;

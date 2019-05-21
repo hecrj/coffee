@@ -188,8 +188,8 @@ impl LoadingScreen for ProgressBar {
                     frame.height() / 2.0 - 80.0,
                 ),
                 size: 30.0,
-                bounds: (frame.width(), frame.height()),
                 color: graphics::Color::WHITE,
+                ..graphics::Text::default()
             });
         }
 
@@ -197,8 +197,8 @@ impl LoadingScreen for ProgressBar {
             content: &(format!("{:.0}", progress.percentage()) + "%"),
             position: graphics::Point::new(50.0, frame.height() / 2.0 + 50.0),
             size: 30.0,
-            bounds: (frame.width(), frame.height()),
             color: graphics::Color::WHITE,
+            ..graphics::Text::default()
         });
 
         self.font.draw(&mut frame.as_target());
