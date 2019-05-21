@@ -1,5 +1,7 @@
 use crate::graphics::gpu::TargetView;
-use crate::graphics::{Text, Transformation};
+use crate::graphics::{
+    HorizontalAlignment, Text, Transformation, VerticalAlignment,
+};
 
 use wgpu_glyph::GlyphCruncher;
 
@@ -17,31 +19,13 @@ impl Font {
     }
 
     pub fn add(&mut self, text: Text) {
-        self.glyphs.queue(wgpu_glyph::Section {
-            text: &text.content,
-            screen_position: (text.position.x, text.position.y),
-            scale: wgpu_glyph::Scale {
-                x: text.size,
-                y: text.size,
-            },
-            color: text.color.into_linear(),
-            bounds: text.bounds,
-            ..Default::default()
-        });
+        let section: wgpu_glyph::Section = text.into();
+        self.glyphs.queue(section);
     }
 
     pub fn measure(&mut self, text: Text) -> (f32, f32) {
-        let bounds = self.glyphs.pixel_bounds(wgpu_glyph::Section {
-            text: &text.content,
-            screen_position: (text.position.x, text.position.y),
-            scale: wgpu_glyph::Scale {
-                x: text.size,
-                y: text.size,
-            },
-            color: text.color.into_linear(),
-            bounds: text.bounds,
-            ..Default::default()
-        });
+        let section: wgpu_glyph::Section = text.into();
+        let bounds = self.glyphs.pixel_bounds(section);
 
         match bounds {
             Some(bounds) => (bounds.width() as f32, bounds.height() as f32),
@@ -64,5 +48,44 @@ impl Font {
                 target,
             )
             .expect("Draw font");
+    }
+}
+
+impl<'a> From<Text<'a>> for wgpu_glyph::Section<'a> {
+    fn from(text: Text<'a>) -> wgpu_glyph::Section<'a> {
+        wgpu_glyph::Section {
+            text: &text.content,
+            screen_position: (text.position.x, text.position.y),
+            scale: wgpu_glyph::Scale {
+                x: text.size,
+                y: text.size,
+            },
+            color: text.color.into_linear(),
+            bounds: text.bounds,
+            layout: wgpu_glyph::Layout::default()
+                .h_align(text.horizontal_alignment.into())
+                .v_align(text.vertical_alignment.into()),
+            ..Default::default()
+        }
+    }
+}
+
+impl From<HorizontalAlignment> for wgpu_glyph::HorizontalAlign {
+    fn from(alignment: HorizontalAlignment) -> wgpu_glyph::HorizontalAlign {
+        match alignment {
+            HorizontalAlignment::Left => wgpu_glyph::HorizontalAlign::Left,
+            HorizontalAlignment::Center => wgpu_glyph::HorizontalAlign::Center,
+            HorizontalAlignment::Right => wgpu_glyph::HorizontalAlign::Right,
+        }
+    }
+}
+
+impl From<VerticalAlignment> for wgpu_glyph::VerticalAlign {
+    fn from(alignment: VerticalAlignment) -> wgpu_glyph::VerticalAlign {
+        match alignment {
+            VerticalAlignment::Top => wgpu_glyph::VerticalAlign::Top,
+            VerticalAlignment::Center => wgpu_glyph::VerticalAlign::Center,
+            VerticalAlignment::Bottom => wgpu_glyph::VerticalAlign::Bottom,
+        }
     }
 }
