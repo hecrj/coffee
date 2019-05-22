@@ -167,23 +167,23 @@ impl Step {
     }
 
     fn layout(&mut self) -> Column<Event, <Tour as UserInterface>::Renderer> {
-        let content = match self {
-            Step::Welcome => Self::welcome(),
-            Step::Buttons => Self::buttons(),
-            Step::Text => Self::text(),
-            Step::RowsAndColumns => Self::rows_and_columns(),
-        };
+        match self {
+            Step::Welcome => self.welcome(),
+            Step::Buttons => self.buttons(),
+            Step::Text => self.text(),
+            Step::RowsAndColumns => self.rows_and_columns(),
+        }
+    }
 
+    fn container(&self) -> Column<Event, <Tour as UserInterface>::Renderer> {
         Column::new()
             .max_width(500.0)
             .spacing(20)
             .push(Text::new(self.title()).size(50.0))
-            .push(content)
     }
 
-    fn welcome<'a>() -> Column<'a, Event, <Tour as UserInterface>::Renderer> {
-        Column::new()
-            .spacing(20)
+    fn welcome(&self) -> Column<Event, <Tour as UserInterface>::Renderer> {
+        self.container()
             .push(Text::new(
                 "This example introduces some of the different UI \
                  widgets that are built into Coffee.",
@@ -193,13 +193,12 @@ impl Step {
             ))
     }
 
-    fn buttons<'a>() -> Column<'a, Event, <Tour as UserInterface>::Renderer> {
-        Column::new()
+    fn buttons(&self) -> Column<Event, <Tour as UserInterface>::Renderer> {
+        self.container()
     }
 
-    fn text<'a>() -> Column<'a, Event, <Tour as UserInterface>::Renderer> {
-        Column::new()
-            .spacing(20)
+    fn text(&self) -> Column<Event, <Tour as UserInterface>::Renderer> {
+        self.container()
             .push(Text::new(
                 "Text is probably the most essential widget for your UI. \
                  It will automatically adapt to the width of its \
@@ -219,10 +218,10 @@ impl Step {
             )
     }
 
-    fn rows_and_columns<'a>(
-    ) -> Column<'a, Event, <Tour as UserInterface>::Renderer> {
-        Column::new()
-            .spacing(20)
+    fn rows_and_columns(
+        &self,
+    ) -> Column<Event, <Tour as UserInterface>::Renderer> {
+        self.container()
             .push(Text::new(
                 "Rows and columns can be used to distribute content \
                  horizontally or vertically, respectively.",

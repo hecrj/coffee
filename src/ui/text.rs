@@ -45,15 +45,6 @@ where
         renderer.node(self.style, &self.content, self.size)
     }
 
-    fn on_event(
-        &mut self,
-        event: Event,
-        layout: Layout,
-        cursor_position: Point,
-        messages: &mut Vec<M>,
-    ) {
-    }
-
     fn draw(
         &self,
         renderer: &mut R,

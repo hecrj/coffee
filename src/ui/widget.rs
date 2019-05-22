@@ -13,7 +13,8 @@ pub trait Widget<'a> {
         _layout: Layout,
         _cursor_position: Point,
         _messages: &mut Vec<Self::Msg>,
-    );
+    ) {
+    }
 
     fn draw(
         &self,
