@@ -5,8 +5,9 @@ use crate::ui::{Event, Layout, MouseCursor, Node, Style, Widget};
 pub struct Button<'a, M, R> {
     state: &'a mut State,
     label: String,
-    style: Style,
+    type_: Type,
     on_click: Option<M>,
+    style: Style,
     renderer: std::marker::PhantomData<R>,
 }
 
@@ -15,8 +16,9 @@ impl<'a, M, R> Button<'a, M, R> {
         Button {
             state,
             label: String::from(label),
-            style: Style::default().min_width(100.0),
+            type_: Type::Primary,
             on_click: None,
+            style: Style::default().min_width(100.0),
             renderer: std::marker::PhantomData,
         }
     }
@@ -28,6 +30,11 @@ impl<'a, M, R> Button<'a, M, R> {
 
     pub fn align_right(mut self) -> Self {
         self.style = self.style.align_right();
+        self
+    }
+
+    pub fn r#type(mut self, type_: Type) -> Self {
+        self.type_ = type_;
         self
     }
 
@@ -93,8 +100,21 @@ where
         layout: Layout,
         cursor_position: Point,
     ) -> MouseCursor {
-        renderer.draw(self.state, &self.label, layout.bounds(), cursor_position)
+        renderer.draw(
+            self.state,
+            &self.label,
+            self.type_,
+            layout.bounds(),
+            cursor_position,
+        )
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Type {
+    Primary,
+    Secondary,
+    Positive,
 }
 
 pub trait Renderer {
@@ -102,6 +122,7 @@ pub trait Renderer {
         &mut self,
         state: &State,
         label: &str,
+        type_: Type,
         bounds: Rectangle<f32>,
         cursor_position: Point,
     ) -> MouseCursor;

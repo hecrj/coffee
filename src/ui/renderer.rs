@@ -119,6 +119,7 @@ impl button::Renderer for Basic {
         &mut self,
         state: &button::State,
         label: &str,
+        type_: button::Type,
         mut bounds: Rectangle<f32>,
         cursor_position: Point,
     ) -> MouseCursor {
@@ -135,20 +136,27 @@ impl button::Renderer for Basic {
             size: (bounds.width, bounds.height),
         });
 
-        let mut offset = 0;
+        let mut state_offset = 0;
 
         if mouse_over {
             if state.is_pressed() {
                 bounds.y += 4.0;
-                offset = BUTTON_RIGHT.x + BUTTON_RIGHT.width;
+                state_offset = BUTTON_RIGHT.x + BUTTON_RIGHT.width;
             } else {
                 bounds.y -= 1.0;
             }
         }
 
+        let type_index = match type_ {
+            button::Type::Primary => 0,
+            button::Type::Secondary => 1,
+            button::Type::Positive => 2,
+        };
+
         self.sprites.add(Sprite {
             source: Rectangle {
-                x: BUTTON_LEFT.x + offset,
+                x: BUTTON_LEFT.x + state_offset,
+                y: BUTTON_LEFT.y + type_index * BUTTON_LEFT.height,
                 ..BUTTON_LEFT
             },
             position: Point::new(bounds.x, bounds.y),
@@ -157,7 +165,8 @@ impl button::Renderer for Basic {
 
         self.sprites.add(Sprite {
             source: Rectangle {
-                x: BUTTON_BACKGROUND.x + offset,
+                x: BUTTON_BACKGROUND.x + state_offset,
+                y: BUTTON_BACKGROUND.y + type_index * BUTTON_BACKGROUND.height,
                 ..BUTTON_BACKGROUND
             },
             position: Point::new(bounds.x + BUTTON_LEFT.width as f32, bounds.y),
@@ -169,7 +178,8 @@ impl button::Renderer for Basic {
 
         self.sprites.add(Sprite {
             source: Rectangle {
-                x: BUTTON_RIGHT.x + offset,
+                x: BUTTON_RIGHT.x + state_offset,
+                y: BUTTON_RIGHT.y + type_index * BUTTON_RIGHT.height,
                 ..BUTTON_RIGHT
             },
             position: Point::new(
