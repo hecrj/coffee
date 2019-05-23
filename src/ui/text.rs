@@ -1,9 +1,11 @@
+use std::hash::Hash;
+
 use crate::graphics::{Color, Point, Rectangle};
-use crate::ui::{Event, Layout, MouseCursor, Node, Style, Widget};
+use crate::ui::{Hasher, Layout, MouseCursor, Node, Style, Widget};
 
 pub struct Text<M, R> {
     content: String,
-    size: f32,
+    size: u16,
     color: Color,
     style: Style,
     message: std::marker::PhantomData<M>,
@@ -14,7 +16,7 @@ impl<M, R> Text<M, R> {
     pub fn new(label: &str) -> Self {
         Text {
             content: String::from(label),
-            size: 20.0,
+            size: 20,
             color: Color::default(),
             style: Style::default(),
             message: std::marker::PhantomData,
@@ -22,7 +24,7 @@ impl<M, R> Text<M, R> {
         }
     }
 
-    pub fn size(mut self, size: f32) -> Self {
+    pub fn size(mut self, size: u16) -> Self {
         self.size = size;
         self
     }
@@ -42,7 +44,7 @@ where
     type Renderer = R;
 
     fn node(&self, renderer: &R) -> Node {
-        renderer.node(self.style, &self.content, self.size)
+        renderer.node(self.style, &self.content, self.size as f32)
     }
 
     fn draw(
@@ -53,11 +55,18 @@ where
     ) -> MouseCursor {
         renderer.draw(
             &self.content,
-            self.size,
+            self.size as f32,
             self.color,
             layout.bounds(),
             cursor_position,
         )
+    }
+
+    fn hash(&self, state: &mut Hasher) {
+        self.style.hash(state);
+
+        self.content.hash(state);
+        self.size.hash(state);
     }
 }
 

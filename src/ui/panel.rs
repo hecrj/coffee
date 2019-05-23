@@ -1,5 +1,7 @@
+use std::hash::Hash;
+
 use crate::graphics::{Point, Rectangle};
-use crate::ui::{Event, Layout, Map, MouseCursor, Node, Style, Widget};
+use crate::ui::{Event, Hasher, Layout, Map, MouseCursor, Node, Style, Widget};
 
 pub struct Panel<'a, M, R> {
     style: Style,
@@ -80,6 +82,10 @@ where
         );
 
         cursor
+    }
+
+    fn hash(&self, state: &mut Hasher) {
+        self.style.hash(state);
     }
 }
 

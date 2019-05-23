@@ -1,5 +1,7 @@
+use std::hash::Hash;
+
 use crate::graphics::Point;
-use crate::ui::{Event, Layout, Map, MouseCursor, Node, Style, Widget};
+use crate::ui::{Event, Hasher, Layout, Map, MouseCursor, Node, Style, Widget};
 
 pub struct Row<'a, M, R> {
     style: Style,
@@ -140,5 +142,13 @@ impl<'a, M, R> Widget<'a> for Row<'a, M, R> {
         );
 
         cursor
+    }
+
+    fn hash(&self, state: &mut Hasher) {
+        self.style.hash(state);
+
+        for child in &self.children {
+            child.hash(state);
+        }
     }
 }

@@ -1,18 +1,48 @@
+use std::hash::Hasher;
 use stretch::result;
 
 use crate::graphics::{Point, Window};
 use crate::ui::{Event, Layout, MouseCursor, Renderer, Root};
 
 pub struct Interface<'a, M, R> {
+    hash: u64,
     root: Root<'a, M, R>,
+    layout: result::Layout,
+}
+
+pub struct Cache {
+    hash: u64,
     layout: result::Layout,
 }
 
 impl<'a, M, R: Renderer> Interface<'a, M, R> {
     pub fn compute(root: Root<'a, M, R>, renderer: &R) -> Interface<'a, M, R> {
+        let hasher = &mut twox_hash::XxHash::default();
+        root.hash(hasher);
+
+        let hash = hasher.finish();
         let layout = root.compute_layout(renderer);
 
-        Interface { root, layout }
+        Interface { hash, root, layout }
+    }
+
+    pub fn compute_with_cache(
+        root: Root<'a, M, R>,
+        renderer: &R,
+        cache: Cache,
+    ) -> Interface<'a, M, R> {
+        let hasher = &mut twox_hash::XxHash::default();
+        root.hash(hasher);
+
+        let hash = hasher.finish();
+
+        let layout = if hash == cache.hash {
+            cache.layout
+        } else {
+            root.compute_layout(renderer)
+        };
+
+        Interface { hash, root, layout }
     }
 
     pub fn on_event(
@@ -21,7 +51,7 @@ impl<'a, M, R: Renderer> Interface<'a, M, R> {
         cursor_position: Point,
         messages: &mut Vec<M>,
     ) {
-        let Interface { root, layout } = self;
+        let Interface { root, layout, .. } = self;
 
         root.widget.on_event(
             event,
@@ -37,7 +67,7 @@ impl<'a, M, R: Renderer> Interface<'a, M, R> {
         window: &mut Window,
         cursor_position: Point,
     ) -> MouseCursor {
-        let Interface { root, layout } = self;
+        let Interface { root, layout, .. } = self;
 
         let cursor =
             root.widget
@@ -46,6 +76,13 @@ impl<'a, M, R: Renderer> Interface<'a, M, R> {
         renderer.flush(window);
 
         cursor
+    }
+
+    pub fn cache(self) -> Cache {
+        Cache {
+            hash: self.hash,
+            layout: self.layout,
+        }
     }
 
     fn layout(layout: &result::Layout) -> Layout {

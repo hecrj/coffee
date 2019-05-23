@@ -1,5 +1,5 @@
 use crate::graphics::Point;
-use crate::ui::{Event, Layout, MouseCursor, Node, Widget};
+use crate::ui::{Event, Hasher, Layout, MouseCursor, Node, Widget};
 
 pub struct Map<'a, A, B, R> {
     widget: Box<Widget<'a, Msg = A, Renderer = R> + 'a>,
@@ -61,5 +61,9 @@ where
         cursor_position: Point,
     ) -> MouseCursor {
         self.widget.draw(renderer, layout, cursor_position)
+    }
+
+    fn hash(&self, state: &mut Hasher) {
+        self.widget.hash(state);
     }
 }

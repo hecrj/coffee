@@ -1,6 +1,8 @@
+use std::hash::Hash;
+
 use crate::graphics::{Point, Rectangle};
 use crate::input::{ButtonState, MouseButton};
-use crate::ui::{Event, Layout, MouseCursor, Node, Style, Widget};
+use crate::ui::{Event, Hasher, Layout, MouseCursor, Node, Style, Widget};
 
 pub struct Button<'a, M, R> {
     state: &'a mut State,
@@ -107,6 +109,10 @@ where
             layout.bounds(),
             cursor_position,
         )
+    }
+
+    fn hash(&self, state: &mut Hasher) {
+        self.style.hash(state);
     }
 }
 

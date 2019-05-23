@@ -1,5 +1,6 @@
 mod column;
 mod event;
+mod hasher;
 mod interface;
 mod layout;
 mod map;
@@ -21,6 +22,7 @@ pub use stretch::number::Number;
 pub use button::Button;
 pub use column::Column;
 pub use event::Event;
+pub use hasher::Hasher;
 pub use layout::Layout;
 pub use map::Map;
 pub use mouse_cursor::MouseCursor;
@@ -82,6 +84,8 @@ pub trait UserInterface: Game {
         let events = &mut Vec::new();
         let triggered_events = &mut Vec::new();
         let mut mouse_cursor = MouseCursor::Default;
+        let mut ui_cache =
+            Interface::compute(game.layout(state, window), &renderer).cache();
 
         while alive {
             debug.frame_started();
@@ -123,29 +127,32 @@ pub trait UserInterface: Game {
             debug.draw_finished();
 
             debug.ui_started();
-            {
-                let mut interface =
-                    Interface::compute(game.layout(state, window), &renderer);
+            let mut interface = Interface::compute_with_cache(
+                game.layout(state, window),
+                &renderer,
+                ui_cache,
+            );
 
-                events
-                    .iter()
-                    .cloned()
-                    .filter_map(Event::from_input)
-                    .for_each(|event| {
-                        interface.on_event(
-                            event,
-                            input.cursor_position(),
-                            triggered_events,
-                        )
-                    });
+            events
+                .iter()
+                .cloned()
+                .filter_map(Event::from_input)
+                .for_each(|event| {
+                    interface.on_event(
+                        event,
+                        input.cursor_position(),
+                        triggered_events,
+                    )
+                });
 
-                let new_cursor =
-                    interface.draw(renderer, window, input.cursor_position());
+            let new_cursor =
+                interface.draw(renderer, window, input.cursor_position());
 
-                if new_cursor != mouse_cursor {
-                    window.update_cursor(new_cursor.into());
-                    mouse_cursor = new_cursor;
-                }
+            ui_cache = interface.cache();
+
+            if new_cursor != mouse_cursor {
+                window.update_cursor(new_cursor.into());
+                mouse_cursor = new_cursor;
             }
 
             for event in triggered_events.drain(..) {

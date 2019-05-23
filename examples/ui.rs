@@ -116,7 +116,11 @@ impl Steps {
         Steps {
             steps: vec![
                 Step::Welcome,
-                Step::Buttons,
+                Step::Buttons {
+                    primary: button::State::new(),
+                    secondary: button::State::new(),
+                    positive: button::State::new(),
+                },
                 Step::Text,
                 Step::RowsAndColumns,
             ],
@@ -151,77 +155,105 @@ impl Steps {
 
 enum Step {
     Welcome,
-    Buttons,
+    Buttons {
+        primary: button::State,
+        secondary: button::State,
+        positive: button::State,
+    },
     Text,
     RowsAndColumns,
 }
 
-impl Step {
-    fn title(&self) -> &str {
-        match self {
-            Step::Welcome => "Welcome!",
-            Step::Buttons => "Buttons",
-            Step::Text => "Text",
-            Step::RowsAndColumns => "Rows and Columns",
-        }
-    }
-
+impl<'a> Step {
     fn layout(&mut self) -> Column<Event, <Tour as UserInterface>::Renderer> {
         match self {
-            Step::Welcome => self.welcome(),
-            Step::Buttons => self.buttons(),
-            Step::Text => self.text(),
-            Step::RowsAndColumns => self.rows_and_columns(),
+            Step::Welcome => Self::welcome(),
+            Step::Buttons {
+                primary,
+                secondary,
+                positive,
+            } => Self::buttons(primary, secondary, positive),
+            Step::Text => Self::text(),
+            Step::RowsAndColumns => Self::rows_and_columns(),
         }
     }
 
-    fn container(&self) -> Column<Event, <Tour as UserInterface>::Renderer> {
+    fn container(
+        title: &str,
+    ) -> Column<'a, Event, <Tour as UserInterface>::Renderer> {
         Column::new()
             .max_width(500.0)
             .spacing(20)
-            .push(Text::new(self.title()).size(50.0))
+            .push(Text::new(title).size(50))
     }
 
-    fn welcome(&self) -> Column<Event, <Tour as UserInterface>::Renderer> {
-        self.container()
+    fn welcome() -> Column<'a, Event, <Tour as UserInterface>::Renderer> {
+        Self::container("Welcome!")
             .push(Text::new(
-                "This example introduces some of the different UI \
-                 widgets that are built into Coffee.",
+                "This is a tour that introduces some of the features and \
+                 concepts related with UI development in Coffee.",
+            ))
+            .push(Text::new(
+                "We will start by taking a look at the interactive widgets \
+                 that are built into Coffee.",
+            ))
+            .push(Text::new(
+                "Then, we will learn about the layout engine and how to build \
+                 responsive UIs.",
             ))
             .push(Text::new(
                 "Press the \"Next\" button whenever you are ready!",
             ))
     }
 
-    fn buttons(&self) -> Column<Event, <Tour as UserInterface>::Renderer> {
-        self.container()
+    fn buttons(
+        primary: &'a mut button::State,
+        secondary: &'a mut button::State,
+        positive: &'a mut button::State,
+    ) -> Column<'a, Event, <Tour as UserInterface>::Renderer> {
+        Self::container("Buttons")
+            .push(Text::new("Buttons can fire actions when clicked."))
+            .push(Text::new(
+                "As of now, there are 3 different types of buttons: \
+                 primary, secondary, and positive.",
+            ))
+            .push(Button::new(primary, "Primary"))
+            .push(
+                Button::new(secondary, "Secondary")
+                    .r#type(button::Type::Secondary),
+            )
+            .push(
+                Button::new(positive, "Positive")
+                    .r#type(button::Type::Positive),
+            )
+            .push(Text::new(
+                "More types of buttons will probably be supported in the near \
+                 future! Choose each type smartly depending on the situation.",
+            ))
     }
 
-    fn text(&self) -> Column<Event, <Tour as UserInterface>::Renderer> {
-        self.container()
+    fn text() -> Column<'a, Event, <Tour as UserInterface>::Renderer> {
+        Self::container("Text")
             .push(Text::new(
                 "Text is probably the most essential widget for your UI. \
                  It will automatically adapt to the width of its \
                  container.",
             ))
             .push(Text::new("You can change its size and color:"))
-            .push(Text::new("This text is 30.0 points").size(30.0))
-            .push(
-                Text::new("This text is 40.0 points and cyan")
-                    .size(40.0)
-                    .color(Color {
-                        r: 0.0,
-                        g: 1.0,
-                        b: 1.0,
-                        a: 1.0,
-                    }),
-            )
+            .push(Text::new("This text is 30 points").size(30))
+            .push(Text::new("This text is 40 points and cyan").size(40).color(
+                Color {
+                    r: 0.0,
+                    g: 1.0,
+                    b: 1.0,
+                    a: 1.0,
+                },
+            ))
     }
 
-    fn rows_and_columns(
-        &self,
-    ) -> Column<Event, <Tour as UserInterface>::Renderer> {
-        self.container()
+    fn rows_and_columns() -> Column<'a, Event, <Tour as UserInterface>::Renderer>
+    {
+        Self::container("Rows and Columns")
             .push(Text::new(
                 "Rows and columns can be used to distribute content \
                  horizontally or vertically, respectively.",

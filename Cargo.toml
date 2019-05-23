@@ -31,6 +31,7 @@ debug = []
 image = "0.21"
 nalgebra = "0.18"
 stretch = "0.2"
+twox-hash = "1.3"
 
 # gfx (OpenGL)
 gfx = { version = "0.18", optional = true }

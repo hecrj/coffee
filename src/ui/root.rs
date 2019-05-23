@@ -1,6 +1,6 @@
 use stretch::{geometry, result};
 
-use crate::ui::Widget;
+use crate::ui::{Hasher, Widget};
 
 pub struct Root<'a, M, R> {
     pub(crate) widget: Box<Widget<'a, Msg = M, Renderer = R> + 'a>,
@@ -19,6 +19,10 @@ impl<'a, M, R> Root<'a, M, R> {
         let node = self.widget.node(renderer);
 
         node.0.compute_layout(geometry::Size::undefined()).unwrap()
+    }
+
+    pub(crate) fn hash(&self, state: &mut Hasher) {
+        self.widget.hash(state);
     }
 }
 

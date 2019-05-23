@@ -1,5 +1,5 @@
 use crate::graphics::Point;
-use crate::ui::{Event, Layout, MouseCursor, Node};
+use crate::ui::{Event, Hasher, Layout, MouseCursor, Node};
 
 pub trait Widget<'a> {
     type Msg;
@@ -22,4 +22,6 @@ pub trait Widget<'a> {
         layout: Layout,
         cursor_position: Point,
     ) -> MouseCursor;
+
+    fn hash(&self, state: &mut Hasher);
 }
