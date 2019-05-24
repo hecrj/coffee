@@ -87,7 +87,6 @@ where
                             self.state.is_pressed = false;
 
                             if is_clicked {
-                                println!("{}", self.label);
                                 messages.push(on_click);
                             }
                         }

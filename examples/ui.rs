@@ -2,7 +2,7 @@ use coffee::graphics::{Color, Window, WindowSettings};
 use coffee::input::KeyboardAndMouse;
 use coffee::load::{loading_screen::ProgressBar, Task};
 use coffee::ui::{
-    button, renderer, Button, Checkbox, Column, Element, Panel, Root, Row,
+    button, renderer, Button, Checkbox, Column, Element, Radio, Root, Row,
     Text, UserInterface,
 };
 use coffee::{Game, Result, Timer};
@@ -137,6 +137,7 @@ impl Steps {
                     positive: button::State::new(),
                 },
                 Step::Checkbox { is_checked: false },
+                Step::Radio { selection: None },
                 Step::Text,
                 Step::RowsAndColumns,
             ],
@@ -149,6 +150,11 @@ impl Steps {
             StepEvent::CheckboxToggled(value) => {
                 if let Step::Checkbox { is_checked } = self.current() {
                     *is_checked = value;
+                }
+            }
+            StepEvent::LanguageSelected(language) => {
+                if let Step::Radio { selection } = self.current() {
+                    *selection = Some(language);
                 }
             }
         };
@@ -189,6 +195,9 @@ enum Step {
     Checkbox {
         is_checked: bool,
     },
+    Radio {
+        selection: Option<Language>,
+    },
     Text,
     RowsAndColumns,
 }
@@ -196,6 +205,7 @@ enum Step {
 #[derive(Debug, Clone, Copy)]
 enum StepEvent {
     CheckboxToggled(bool),
+    LanguageSelected(Language),
 }
 
 impl<'a> Step {
@@ -210,6 +220,7 @@ impl<'a> Step {
                 positive,
             } => Self::buttons(primary, secondary, positive).into(),
             Step::Checkbox { is_checked } => Self::checkbox(*is_checked).into(),
+            Step::Radio { selection } => Self::radio(*selection).into(),
             Step::Text => Self::text().into(),
             Step::RowsAndColumns => Self::rows_and_columns().into(),
         }
@@ -276,6 +287,25 @@ impl<'a> Step {
         ))
     }
 
+    fn radio(
+        selection: Option<Language>,
+    ) -> Column<'a, StepEvent, <Tour as UserInterface>::Renderer> {
+        let container = Self::container("Radio")
+            .push(Text::new("Which is your favorite programming language?"));
+
+        Language::all().iter().cloned().fold(
+            container,
+            |container, language| {
+                container.push(Radio::new(
+                    language,
+                    language.into(),
+                    selection,
+                    StepEvent::LanguageSelected,
+                ))
+            },
+        )
+    }
+
     fn text() -> Column<'a, StepEvent, <Tour as UserInterface>::Renderer> {
         Self::container("Text")
             .push(Text::new(
@@ -312,5 +342,38 @@ impl<'a> Step {
                     .push(Text::new("This text will be shown on the left side"))
                     .push(Text::new("This is the right side")),
             )
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Language {
+    Rust,
+    Elm,
+    Ruby,
+    Haskell,
+    C,
+}
+
+impl Language {
+    fn all() -> [Language; 5] {
+        [
+            Language::Rust,
+            Language::Elm,
+            Language::Ruby,
+            Language::Haskell,
+            Language::C,
+        ]
+    }
+}
+
+impl From<Language> for &str {
+    fn from(language: Language) -> &'static str {
+        match language {
+            Language::Rust => "Rust",
+            Language::Elm => "Elm",
+            Language::Ruby => "Ruby",
+            Language::Haskell => "Haskell",
+            Language::C => "C",
+        }
     }
 }
