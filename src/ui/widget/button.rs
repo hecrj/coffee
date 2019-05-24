@@ -2,7 +2,9 @@ use std::hash::Hash;
 
 use crate::graphics::{Point, Rectangle};
 use crate::input::{ButtonState, MouseButton};
-use crate::ui::{Event, Hasher, Layout, MouseCursor, Node, Style, Widget};
+use crate::ui::{
+    Element, Event, Hasher, Layout, MouseCursor, Node, Style, Widget,
+};
 
 pub struct Button<'a, M, R> {
     state: &'a mut State,
@@ -145,5 +147,15 @@ impl State {
 
     pub fn is_pressed(&self) -> bool {
         self.is_pressed
+    }
+}
+
+impl<'a, M, R> From<Button<'a, M, R>> for Element<'a, M, R>
+where
+    R: Renderer + 'static,
+    M: Copy + 'static,
+{
+    fn from(button: Button<'a, M, R>) -> Element<'a, M, R> {
+        Element::new(button)
     }
 }

@@ -4,7 +4,8 @@ use crate::graphics::{
 };
 use crate::load::{Join, Task};
 use crate::ui::{
-    button, column, panel, text, MouseCursor, Node, Number, Size, Style,
+    button, checkbox, column, panel, text, MouseCursor, Node, Number, Size,
+    Style,
 };
 
 use std::cell::RefCell;
@@ -220,6 +221,52 @@ impl button::Renderer for Basic {
     }
 }
 
+const CHECKBOX: Rectangle<u16> = Rectangle {
+    x: 98,
+    y: 0,
+    width: 28,
+    height: 28,
+};
+
+impl checkbox::Renderer for Basic {
+    fn draw(
+        &mut self,
+        is_checked: bool,
+        bounds: Rectangle<f32>,
+        text_bounds: Rectangle<f32>,
+        cursor_position: Point,
+    ) -> MouseCursor {
+        let mouse_over = bounds.contains(cursor_position)
+            || text_bounds.contains(cursor_position);
+
+        self.sprites.add(Sprite {
+            source: Rectangle {
+                x: CHECKBOX.x + (if mouse_over { CHECKBOX.width } else { 0 }),
+                ..CHECKBOX
+            },
+            position: Point::new(bounds.x, bounds.y),
+            scale: (1.0, 1.0),
+        });
+
+        if is_checked {
+            self.sprites.add(Sprite {
+                source: Rectangle {
+                    x: CHECKBOX.x + CHECKBOX.width * 2,
+                    ..CHECKBOX
+                },
+                position: Point::new(bounds.x, bounds.y),
+                scale: (1.0, 1.0),
+            });
+        }
+
+        if mouse_over {
+            MouseCursor::Pointer
+        } else {
+            MouseCursor::Default
+        }
+    }
+}
+
 impl text::Renderer for Basic {
     fn node(&self, style: Style, content: &str, size: f32) -> Node {
         let font = self.font.clone();
@@ -281,8 +328,7 @@ impl text::Renderer for Basic {
         size: f32,
         color: Color,
         bounds: Rectangle<f32>,
-        _cursor_position: Point,
-    ) -> MouseCursor {
+    ) {
         self.font.borrow_mut().add(Text {
             content,
             position: Point::new(bounds.x, bounds.y),
@@ -291,8 +337,6 @@ impl text::Renderer for Basic {
             size,
             ..Text::default()
         });
-
-        MouseCursor::Default
     }
 }
 

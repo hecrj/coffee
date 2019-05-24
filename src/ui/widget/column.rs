@@ -1,17 +1,19 @@
 use std::hash::Hash;
 
-use crate::graphics::Point;
-use crate::ui::{Event, Hasher, Layout, Map, MouseCursor, Node, Style, Widget};
+use crate::graphics::{Point, Rectangle};
+use crate::ui::{
+    Element, Event, Hasher, Layout, MouseCursor, Node, Style, Widget,
+};
 
-pub struct Row<'a, M, R> {
+pub struct Column<'a, M, R> {
     style: Style,
-    spacing: u32,
-    children: Vec<Box<Widget<'a, Msg = M, Renderer = R> + 'a>>,
+    spacing: u16,
+    children: Vec<Element<'a, M, R>>,
 }
 
-impl<'a, M, R> Row<'a, M, R> {
+impl<'a, M, R> Column<'a, M, R> {
     pub fn new() -> Self {
-        Row {
+        Column {
             style: Style::default(),
             spacing: 0,
             children: Vec::new(),
@@ -33,17 +35,12 @@ impl<'a, M, R> Row<'a, M, R> {
         self
     }
 
-    pub fn max_height(mut self, max_height: f32) -> Self {
-        self.style = self.style.max_height(max_height);
-        self
-    }
-
     pub fn fill_width(mut self) -> Self {
         self.style = self.style.fill_width();
         self
     }
 
-    pub fn spacing(mut self, px: u32) -> Self {
+    pub fn spacing(mut self, px: u16) -> Self {
         self.spacing = px;
         self
     }
@@ -53,30 +50,29 @@ impl<'a, M, R> Row<'a, M, R> {
         self
     }
 
+    pub fn align_center(mut self) -> Self {
+        self.style = self.style.align_center();
+        self
+    }
+
     pub fn center_children(mut self) -> Self {
         self.style = self.style.center_children();
         self
     }
 
-    pub fn push(
-        mut self,
-        child: impl Widget<'a, Msg = M, Renderer = R> + 'a,
-    ) -> Row<'a, M, R> {
-        self.children.push(Box::new(child));
-        self
-    }
-
-    pub fn map<B, F>(self, f: F) -> Map<'a, M, B, R>
+    pub fn push<E>(mut self, child: E) -> Column<'a, M, R>
     where
-        F: Fn(M) -> B + 'static,
-        M: Copy + 'static,
-        R: 'static,
+        E: Into<Element<'a, M, R>>,
     {
-        Map::new(Box::new(self), f)
+        self.children.push(child.into());
+        self
     }
 }
 
-impl<'a, M, R> Widget<'a> for Row<'a, M, R> {
+impl<'a, M, R> Widget<'a> for Column<'a, M, R>
+where
+    R: Renderer,
+{
     type Msg = M;
     type Renderer = R;
 
@@ -85,10 +81,10 @@ impl<'a, M, R> Widget<'a> for Row<'a, M, R> {
             .children
             .iter()
             .map(|child| {
-                let mut node = child.node(renderer);
+                let mut node = child.widget.node(renderer);
 
                 let mut style = node.0.style();
-                style.margin.end =
+                style.margin.bottom =
                     stretch::style::Dimension::Points(self.spacing as f32);
 
                 node.0.set_style(style);
@@ -98,13 +94,13 @@ impl<'a, M, R> Widget<'a> for Row<'a, M, R> {
 
         if let Some(node) = children.last_mut() {
             let mut style = node.0.style();
-            style.margin.end = stretch::style::Dimension::Undefined;
+            style.margin.bottom = stretch::style::Dimension::Undefined;
 
             node.0.set_style(style);
         }
 
         let mut style = self.style;
-        style.0.flex_direction = stretch::style::FlexDirection::Row;
+        style.0.flex_direction = stretch::style::FlexDirection::Column;
 
         Node::new(style, children)
     }
@@ -118,7 +114,9 @@ impl<'a, M, R> Widget<'a> for Row<'a, M, R> {
     ) {
         self.children.iter_mut().zip(layout.children()).for_each(
             |(child, layout)| {
-                child.on_event(event, layout, cursor_position, messages)
+                child
+                    .widget
+                    .on_event(event, layout, cursor_position, messages)
             },
         );
     }
@@ -131,9 +129,12 @@ impl<'a, M, R> Widget<'a> for Row<'a, M, R> {
     ) -> MouseCursor {
         let mut cursor = MouseCursor::Default;
 
+        renderer.draw(layout.bounds());
+
         self.children.iter().zip(layout.children()).for_each(
             |(child, layout)| {
-                let new_cursor = child.draw(renderer, layout, cursor_position);
+                let new_cursor =
+                    child.widget.draw(renderer, layout, cursor_position);
 
                 if new_cursor != MouseCursor::Default {
                     cursor = new_cursor;
@@ -146,9 +147,24 @@ impl<'a, M, R> Widget<'a> for Row<'a, M, R> {
 
     fn hash(&self, state: &mut Hasher) {
         self.style.hash(state);
+        self.spacing.hash(state);
 
         for child in &self.children {
-            child.hash(state);
+            child.widget.hash(state);
         }
+    }
+}
+
+pub trait Renderer {
+    fn draw(&mut self, bounds: Rectangle<f32>);
+}
+
+impl<'a, M, R> From<Column<'a, M, R>> for Element<'a, M, R>
+where
+    R: Renderer + 'static,
+    M: 'static,
+{
+    fn from(column: Column<'a, M, R>) -> Element<'a, M, R> {
+        Element::new(column)
     }
 }

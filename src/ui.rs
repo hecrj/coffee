@@ -1,39 +1,29 @@
-mod column;
+mod element;
 mod event;
 mod hasher;
 mod interface;
 mod layout;
-mod map;
 mod mouse_cursor;
 mod node;
 mod root;
-mod row;
 mod style;
 mod widget;
 
-pub mod button;
-pub mod panel;
 pub mod renderer;
-pub mod text;
 
 pub use stretch::geometry::Size;
 pub use stretch::number::Number;
 
-pub use button::Button;
-pub use column::Column;
+pub use element::Element;
 pub use event::Event;
 pub use hasher::Hasher;
 pub use layout::Layout;
-pub use map::Map;
 pub use mouse_cursor::MouseCursor;
 pub use node::Node;
-pub use panel::Panel;
 pub use renderer::Renderer;
 pub use root::Root;
-pub use row::Row;
 pub use style::Style;
-pub use text::Text;
-pub use widget::Widget;
+pub use widget::*;
 
 use crate::game;
 use crate::graphics::{window, Window, WindowSettings};

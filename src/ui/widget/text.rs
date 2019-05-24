@@ -1,7 +1,7 @@
 use std::hash::Hash;
 
 use crate::graphics::{Color, Point, Rectangle};
-use crate::ui::{Hasher, Layout, MouseCursor, Node, Style, Widget};
+use crate::ui::{Element, Hasher, Layout, MouseCursor, Node, Style, Widget};
 
 pub struct Text<M, R> {
     content: String,
@@ -33,12 +33,16 @@ impl<M, R> Text<M, R> {
         self.color = color;
         self
     }
+
+    pub fn align_center(mut self) -> Self {
+        self.style = self.style.align_center();
+        self
+    }
 }
 
 impl<'a, M, R> Widget<'a> for Text<M, R>
 where
     R: Renderer,
-    M: Copy,
 {
     type Msg = M;
     type Renderer = R;
@@ -51,15 +55,16 @@ where
         &self,
         renderer: &mut R,
         layout: Layout,
-        cursor_position: Point,
+        _cursor_position: Point,
     ) -> MouseCursor {
         renderer.draw(
             &self.content,
             self.size as f32,
             self.color,
             layout.bounds(),
-            cursor_position,
-        )
+        );
+
+        MouseCursor::Default
     }
 
     fn hash(&self, state: &mut Hasher) {
@@ -79,6 +84,15 @@ pub trait Renderer {
         size: f32,
         color: Color,
         bounds: Rectangle<f32>,
-        cursor_position: Point,
-    ) -> MouseCursor;
+    );
+}
+
+impl<'a, M, R> From<Text<M, R>> for Element<'a, M, R>
+where
+    R: Renderer + 'static,
+    M: 'static,
+{
+    fn from(text: Text<M, R>) -> Element<'a, M, R> {
+        Element::new(text)
+    }
 }

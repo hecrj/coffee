@@ -40,6 +40,21 @@ impl Style {
         self
     }
 
+    pub fn shrink(mut self) -> Self {
+        self.0.align_self = style::AlignSelf::Auto;
+        self
+    }
+
+    pub fn align_left(mut self) -> Self {
+        self.0.align_self = style::AlignSelf::FlexStart;
+        self
+    }
+
+    pub fn align_center(mut self) -> Self {
+        self.0.align_self = style::AlignSelf::Center;
+        self
+    }
+
     pub fn align_right(mut self) -> Self {
         self.0.align_self = style::AlignSelf::FlexEnd;
         self
@@ -85,7 +100,6 @@ impl Hash for Style {
         hash_size(&self.0.min_size, state);
         hash_size(&self.0.max_size, state);
 
-        hash_rect(&self.0.padding, state);
         hash_rect(&self.0.margin, state);
 
         (self.0.flex_direction as u8).hash(state);

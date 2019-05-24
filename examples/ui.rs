@@ -2,7 +2,8 @@ use coffee::graphics::{Color, Window, WindowSettings};
 use coffee::input::KeyboardAndMouse;
 use coffee::load::{loading_screen::ProgressBar, Task};
 use coffee::ui::{
-    button, renderer, Button, Column, Panel, Root, Row, Text, UserInterface,
+    button, renderer, Button, Checkbox, Column, Element, Panel, Root, Row,
+    Text, UserInterface,
 };
 use coffee::{Game, Result, Timer};
 
@@ -82,7 +83,11 @@ impl UserInterface for Tour {
             );
         }
 
-        let content = steps.current().layout();
+        let content = Column::new()
+            .max_width(500.0)
+            .spacing(20)
+            .push(steps.current().layout().map(Event::StepEvent))
+            .push(controls);
 
         Root::new(
             Column::new()
@@ -90,7 +95,7 @@ impl UserInterface for Tour {
                 .height(window.height())
                 .center_children()
                 .padding(20)
-                .push(content.push(controls)),
+                .push(content),
         )
     }
 
@@ -102,8 +107,18 @@ impl UserInterface for Tour {
             Event::NextPressed => {
                 self.steps.advance();
             }
+            Event::StepEvent(step_event) => {
+                self.steps.update(step_event);
+            }
         }
     }
+}
+
+#[derive(Debug, Clone, Copy)]
+enum Event {
+    BackPressed,
+    NextPressed,
+    StepEvent(StepEvent),
 }
 
 struct Steps {
@@ -121,6 +136,7 @@ impl Steps {
                     secondary: button::State::new(),
                     positive: button::State::new(),
                 },
+                Step::Checkbox { is_checked: false },
                 Step::Text,
                 Step::RowsAndColumns,
             ],
@@ -128,8 +144,14 @@ impl Steps {
         }
     }
 
-    fn current(&mut self) -> &mut Step {
-        &mut self.steps[self.current as usize]
+    fn update(&mut self, event: StepEvent) {
+        match event {
+            StepEvent::CheckboxToggled(value) => {
+                if let Step::Checkbox { is_checked } = self.current() {
+                    *is_checked = value;
+                }
+            }
+        };
     }
 
     fn advance(&mut self) {
@@ -142,6 +164,10 @@ impl Steps {
         if self.has_started() {
             self.current -= 1;
         }
+    }
+
+    fn current(&mut self) -> &mut Step {
+        &mut self.steps[self.current as usize]
     }
 
     fn has_started(&self) -> bool {
@@ -160,34 +186,42 @@ enum Step {
         secondary: button::State,
         positive: button::State,
     },
+    Checkbox {
+        is_checked: bool,
+    },
     Text,
     RowsAndColumns,
 }
 
+#[derive(Debug, Clone, Copy)]
+enum StepEvent {
+    CheckboxToggled(bool),
+}
+
 impl<'a> Step {
-    fn layout(&mut self) -> Column<Event, <Tour as UserInterface>::Renderer> {
+    fn layout(
+        &mut self,
+    ) -> Element<StepEvent, <Tour as UserInterface>::Renderer> {
         match self {
-            Step::Welcome => Self::welcome(),
+            Step::Welcome => Self::welcome().into(),
             Step::Buttons {
                 primary,
                 secondary,
                 positive,
-            } => Self::buttons(primary, secondary, positive),
-            Step::Text => Self::text(),
-            Step::RowsAndColumns => Self::rows_and_columns(),
+            } => Self::buttons(primary, secondary, positive).into(),
+            Step::Checkbox { is_checked } => Self::checkbox(*is_checked).into(),
+            Step::Text => Self::text().into(),
+            Step::RowsAndColumns => Self::rows_and_columns().into(),
         }
     }
 
     fn container(
         title: &str,
-    ) -> Column<'a, Event, <Tour as UserInterface>::Renderer> {
-        Column::new()
-            .max_width(500.0)
-            .spacing(20)
-            .push(Text::new(title).size(50))
+    ) -> Column<'a, StepEvent, <Tour as UserInterface>::Renderer> {
+        Column::new().spacing(20).push(Text::new(title).size(50))
     }
 
-    fn welcome() -> Column<'a, Event, <Tour as UserInterface>::Renderer> {
+    fn welcome() -> Column<'a, StepEvent, <Tour as UserInterface>::Renderer> {
         Self::container("Welcome!")
             .push(Text::new(
                 "This is a tour that introduces some of the features and \
@@ -210,7 +244,7 @@ impl<'a> Step {
         primary: &'a mut button::State,
         secondary: &'a mut button::State,
         positive: &'a mut button::State,
-    ) -> Column<'a, Event, <Tour as UserInterface>::Renderer> {
+    ) -> Column<'a, StepEvent, <Tour as UserInterface>::Renderer> {
         Self::container("Buttons")
             .push(Text::new("Buttons can fire actions when clicked."))
             .push(Text::new(
@@ -232,7 +266,17 @@ impl<'a> Step {
             ))
     }
 
-    fn text() -> Column<'a, Event, <Tour as UserInterface>::Renderer> {
+    fn checkbox(
+        is_checked: bool,
+    ) -> Column<'a, StepEvent, <Tour as UserInterface>::Renderer> {
+        Self::container("Checkbox").push(Checkbox::new(
+            is_checked,
+            "Some checkbox",
+            StepEvent::CheckboxToggled,
+        ))
+    }
+
+    fn text() -> Column<'a, StepEvent, <Tour as UserInterface>::Renderer> {
         Self::container("Text")
             .push(Text::new(
                 "Text is probably the most essential widget for your UI. \
@@ -251,8 +295,8 @@ impl<'a> Step {
             ))
     }
 
-    fn rows_and_columns() -> Column<'a, Event, <Tour as UserInterface>::Renderer>
-    {
+    fn rows_and_columns(
+    ) -> Column<'a, StepEvent, <Tour as UserInterface>::Renderer> {
         Self::container("Rows and Columns")
             .push(Text::new(
                 "Rows and columns can be used to distribute content \
@@ -269,10 +313,4 @@ impl<'a> Step {
                     .push(Text::new("This is the right side")),
             )
     }
-}
-
-#[derive(Debug, Clone, Copy)]
-enum Event {
-    BackPressed,
-    NextPressed,
 }

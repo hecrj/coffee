@@ -1,7 +1,7 @@
 use std::hash::Hash;
 
 use crate::graphics::{Point, Rectangle};
-use crate::ui::{Event, Hasher, Layout, Map, MouseCursor, Node, Style, Widget};
+use crate::ui::{Event, Hasher, Layout, MouseCursor, Node, Style, Widget};
 
 pub struct Panel<'a, M, R> {
     style: Style,
@@ -24,15 +24,6 @@ impl<'a, M, R> Panel<'a, M, R> {
     pub fn max_width(mut self, max_width: u32) -> Self {
         self.style = self.style.max_width(max_width as f32);
         self
-    }
-
-    pub fn map<B, F>(self, f: F) -> Map<'a, M, B, R>
-    where
-        F: Fn(M) -> B + 'static,
-        M: Copy + 'static,
-        R: Renderer + 'static,
-    {
-        Map::new(Box::new(self), f)
     }
 }
 

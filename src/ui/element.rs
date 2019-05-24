@@ -1,6 +1,32 @@
 use crate::graphics::Point;
 use crate::ui::{Event, Hasher, Layout, MouseCursor, Node, Widget};
 
+pub struct Element<'a, M, R> {
+    pub(crate) widget: Box<Widget<'a, Msg = M, Renderer = R> + 'a>,
+}
+
+impl<'a, M, R> Element<'a, M, R> {
+    pub fn new(
+        widget: impl Widget<'a, Msg = M, Renderer = R> + 'a,
+    ) -> Element<'a, M, R> {
+        Element {
+            widget: Box::new(widget),
+        }
+    }
+
+    pub fn map<F, B>(self, f: F) -> Element<'a, B, R>
+    where
+        M: Copy + 'static,
+        B: 'static,
+        R: 'static,
+        F: Fn(M) -> B + 'static,
+    {
+        Element {
+            widget: Box::new(Map::new(self.widget, f)),
+        }
+    }
+}
+
 pub struct Map<'a, A, B, R> {
     widget: Box<Widget<'a, Msg = A, Renderer = R> + 'a>,
     mapper: Box<Fn(A) -> B>,
