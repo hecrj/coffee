@@ -6,6 +6,7 @@ pub use winit::MouseButton;
 pub use winit::VirtualKeyCode as KeyCode;
 
 pub use gilrs::ev::EventType;
+pub use gilrs::ev::state::GamepadState;
 pub use gilrs::GamepadId;
 use std::time::SystemTime;
 
@@ -70,6 +71,8 @@ pub enum Event {
         event: EventType,
         /// Time when event was emitted.
         time: SystemTime,
+        // Cached gamepad state
+        //state: Box<GamepadState>,
     },
     /// The mouse wheel was scrolled.
     MouseWheel {

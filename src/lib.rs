@@ -86,7 +86,8 @@ pub use timer::Timer;
 
 use graphics::window::{self, Window};
 
-use gilrs::Gilrs;
+use gilrs::{Gilrs};
+use gilrs::ev::state::GamepadState;
 
 /// The entrypoint of the engine. It describes your game logic.
 ///
@@ -299,6 +300,7 @@ pub trait Game {
                             id: event.id,
                             event: event.event,
                             time: event.time,
+                            //state: gilrs.gamepad(event.id).state().clone()
                         },
                     )
                 }
