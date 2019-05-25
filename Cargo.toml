@@ -1,6 +1,6 @@
 [package]
 name = "coffee"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["Héctor Ramón Jiménez <hector0193@gmail.com>"]
 edition = "2018"
 description = "An opinionated 2D game engine focused on simplicity, explicitness, and type-safety"
@@ -21,10 +21,10 @@ features = ["opengl", "debug"]
 [features]
 default = []
 opengl = ["gfx", "gfx_core", "glutin", "gfx_device_gl", "gfx_window_glutin", "gfx_glyph", "gfx_winit"]
-vulkan = ["wgpu", "wgpu/vulkan"]
-metal = ["wgpu", "wgpu/metal"]
-dx11 = ["wgpu", "wgpu/dx11"]
-dx12 = ["wgpu", "wgpu/dx12"]
+vulkan = ["wgpu", "wgpu/vulkan", "wgpu_glyph"]
+metal = ["wgpu", "wgpu/metal", "wgpu_glyph"]
+dx11 = ["wgpu", "wgpu/dx11", "wgpu_glyph"]
+dx12 = ["wgpu", "wgpu/dx12", "wgpu_glyph"]
 debug = []
 
 [dependencies]
@@ -37,11 +37,12 @@ gfx_core = { version = "0.9", optional = true }
 glutin = { version = "0.20", optional = true }
 gfx_device_gl = { version = "0.16", optional = true }
 gfx_window_glutin = { version = "0.30", optional = true }
-gfx_glyph = { version = "0.14", optional = true }
+gfx_glyph = { version = "0.15", optional = true }
 gfx_winit = { package = "winit", version = "0.19", optional = true }
 
 # wgpu (Vulkan, Metal, D3D)
 wgpu = { version = "0.2", optional = true }
+wgpu_glyph = { version = "0.3", optional = true }
 
 # controller support
 gilrs = "0.7.1"

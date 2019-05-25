@@ -1,5 +1,5 @@
 use crate::graphics::gpu;
-use crate::graphics::{Frame, Gpu, Text};
+use crate::graphics::{Gpu, Target, Text};
 use crate::load::Task;
 use crate::Result;
 
@@ -26,13 +26,11 @@ impl Font {
         self.0.add(text)
     }
 
-    /// Render and flush all the text added to this font.
-    ///
-    /// As of now, [`Font`] can only draw on-screen. This limitation should be
-    /// easy to tackle in the near future.
+    /// Render and flush all the text added to this [`Font`].
     ///
     /// [`Font`]: struct.Font.html
-    pub fn draw(&mut self, frame: &mut Frame) {
-        frame.draw_font(&mut self.0)
+    #[inline]
+    pub fn draw(&mut self, target: &mut Target) {
+        target.draw_font(&mut self.0)
     }
 }

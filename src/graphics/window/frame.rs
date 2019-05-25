@@ -1,6 +1,6 @@
 use super::Window;
 
-use crate::graphics::{gpu, Color, Target};
+use crate::graphics::{Color, Target};
 
 /// The next frame of your game.
 ///
@@ -51,13 +51,5 @@ impl<'a> Frame<'a> {
     /// [`Color`]: struct.Color.html
     pub fn clear(&mut self, color: Color) {
         self.as_target().clear(color);
-    }
-
-    pub(in crate::graphics) fn draw_font(&mut self, font: &mut gpu::Font) {
-        self.window.gpu.draw_font(
-            font,
-            &self.window.surface.target(),
-            &self.window.surface.depth(),
-        );
     }
 }

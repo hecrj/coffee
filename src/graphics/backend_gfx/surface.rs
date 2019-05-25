@@ -1,15 +1,12 @@
 use gfx_device_gl as gl;
-use gfx_window_glutin;
 pub use gfx_winit as winit;
-use glutin;
 
-use super::{format, DepthView, Gpu, TargetView};
+use super::{format, Gpu, TargetView};
 use crate::{Error, Result};
 
 pub struct Surface {
     context: glutin::WindowedContext,
     target: TargetView,
-    depth: DepthView,
 }
 
 impl Surface {
@@ -25,7 +22,7 @@ impl Surface {
             .with_pixel_format(24, 8)
             .with_vsync(true);
 
-        let (context, device, factory, target, depth) =
+        let (context, device, factory, target, _depth) =
             gfx_window_glutin::init_raw(
                 builder,
                 gl_builder,
@@ -35,15 +32,7 @@ impl Surface {
             )
             .map_err(|error| Error::WindowCreation(error.to_string()))?;
 
-        Ok((
-            Self {
-                context,
-                target,
-                depth,
-            },
-            device,
-            factory,
-        ))
+        Ok((Self { context, target }, device, factory))
     }
 
     pub fn window(&self) -> &winit::Window {
@@ -54,21 +43,16 @@ impl Surface {
         &self.target
     }
 
-    pub fn depth(&self) -> &DepthView {
-        &self.depth
-    }
-
     pub fn update_viewport(&mut self, _gpu: &mut Gpu) {
         let dimensions = self.target.get_dimensions();
 
-        if let Some((target, depth)) = gfx_window_glutin::update_views_raw(
+        if let Some((target, _depth)) = gfx_window_glutin::update_views_raw(
             &self.context,
             dimensions,
             format::COLOR,
             format::DEPTH,
         ) {
             self.target = target;
-            self.depth = depth;
         }
     }
 

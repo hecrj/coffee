@@ -8,7 +8,7 @@ pub use font::Font;
 pub use pipeline::Instance;
 pub use surface::{winit, Surface};
 pub use texture::Texture;
-pub use types::{DepthView, TargetView};
+pub use types::TargetView;
 
 use crate::graphics::{Color, Transformation};
 use crate::{Error, Result};
@@ -62,7 +62,7 @@ impl Gpu {
     }
 
     pub(super) fn clear(&mut self, view: &TargetView, color: Color) {
-        let [r, g, b, a]: [f32; 4] = color.into();
+        let [r, g, b, a]: [f32; 4] = color.into_linear();
 
         let _ = self.encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
             color_attachments: &[wgpu::RenderPassColorAttachmentDescriptor {
@@ -98,7 +98,7 @@ impl Gpu {
     }
 
     pub(super) fn upload_font(&mut self, bytes: &'static [u8]) -> Font {
-        Font::from_bytes(bytes)
+        Font::from_bytes(&mut self.device, bytes)
     }
 
     pub(super) fn draw_texture_quads(
@@ -120,9 +120,10 @@ impl Gpu {
 
     pub(super) fn draw_font(
         &mut self,
-        _font: &mut Font,
-        _target: &TargetView,
-        _depth: &DepthView,
+        font: &mut Font,
+        target: &TargetView,
+        transformation: Transformation,
     ) {
+        font.draw(&mut self.device, &mut self.encoder, target, transformation);
     }
 }

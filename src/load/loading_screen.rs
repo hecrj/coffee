@@ -201,6 +201,6 @@ impl LoadingScreen for ProgressBar {
             color: graphics::Color::WHITE,
         });
 
-        self.font.draw(&mut frame);
+        self.font.draw(&mut frame.as_target());
     }
 }

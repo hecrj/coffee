@@ -29,6 +29,8 @@ pub struct Debug {
     update_durations: TimeBuffer,
     draw_start: time::Instant,
     draw_durations: TimeBuffer,
+    debug_start: time::Instant,
+    debug_durations: TimeBuffer,
     text: Vec<graphics::Text>,
     draw_rate: u16,
     frames_until_refresh: u16,
@@ -41,7 +43,7 @@ impl Debug {
         Self {
             font: graphics::Font::from_bytes(gpu, graphics::Font::DEFAULT)
                 .expect("Load debug font"),
-            enabled: false,
+            enabled: cfg!(feature = "debug"),
             load_start: now,
             load_duration: time::Duration::from_secs(0),
             frame_start: now,
@@ -52,6 +54,8 @@ impl Debug {
             update_durations: TimeBuffer::new(200),
             draw_start: now,
             draw_durations: TimeBuffer::new(200),
+            debug_start: now,
+            debug_durations: TimeBuffer::new(200),
             text: Vec::new(),
             draw_rate,
             frames_until_refresh: 0,
@@ -144,6 +148,22 @@ impl Debug {
         self.frames_until_refresh = 0;
     }
 
+    pub(crate) fn debug_started(&mut self) {
+        self.debug_start = time::Instant::now();
+    }
+
+    pub(crate) fn debug_finished(&mut self) {
+        self.debug_durations
+            .push(time::Instant::now() - self.debug_start);
+    }
+
+    /// Get the average time spent running [`Game::debug`].
+    ///
+    /// [`Game::debug`]: trait.Game.html#tymethod.debug
+    pub fn debug_duration(&self) -> time::Duration {
+        self.draw_durations.average()
+    }
+
     pub(crate) fn is_enabled(&self) -> bool {
         self.enabled
     }
@@ -160,7 +180,7 @@ impl Debug {
             self.font.add(text.clone());
         }
 
-        self.font.draw(frame);
+        self.font.draw(&mut frame.as_target());
         self.frames_until_refresh -= 1;
     }
 
@@ -182,6 +202,7 @@ impl Debug {
             ("Interact:", self.interact_duration, None),
             ("Update:", self.update_durations.average(), None),
             ("Draw:", self.draw_durations.average(), None),
+            ("Debug:", self.debug_durations.average(), None),
             ("Frame:", frame_duration, Some(fps.to_string() + " fps")),
         ];
 

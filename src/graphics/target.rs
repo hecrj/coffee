@@ -1,4 +1,4 @@
-use crate::graphics::gpu::{Gpu, Instance, TargetView, Texture};
+use crate::graphics::gpu::{Font, Gpu, Instance, TargetView, Texture};
 use crate::graphics::{Color, Transformation};
 
 /// A rendering target.
@@ -103,6 +103,10 @@ impl<'a> Target<'a> {
             &self.view,
             &self.transformation,
         );
+    }
+
+    pub(in crate::graphics) fn draw_font(&mut self, font: &mut Font) {
+        self.gpu.draw_font(font, &self.view, self.transformation);
     }
 }
 

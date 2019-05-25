@@ -9,7 +9,7 @@ pub use font::Font;
 pub use pipeline::Instance;
 pub use surface::{winit, Surface};
 pub use texture::Texture;
-pub use types::{DepthView, TargetView};
+pub use types::TargetView;
 
 use gfx::{self, Device};
 use gfx_device_gl as gl;
@@ -69,7 +69,8 @@ impl Gpu {
             gfx::format::Srgba8,
         > = gfx::memory::Typed::new(view.clone());
 
-        self.encoder.clear(&typed_render_target, color.into())
+        self.encoder
+            .clear(&typed_render_target, color.into_linear())
     }
 
     fn flush(&mut self) {
@@ -127,8 +128,8 @@ impl Gpu {
         &mut self,
         font: &mut Font,
         target: &TargetView,
-        depth: &DepthView,
+        transformation: Transformation,
     ) {
-        font.draw(&mut self.encoder, target, depth);
+        font.draw(&mut self.encoder, target, transformation);
     }
 }

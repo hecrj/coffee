@@ -185,6 +185,16 @@ pub trait Game {
     /// [`interact`]: #method.interact
     fn on_input(&self, _input: &mut Self::Input, _event: input::Event) {}
 
+    /// Handle a close request from the operating system to the game window.
+    ///
+    /// This function should return true to allow the game loop to end,
+    /// otherwise false.
+    ///
+    /// By default, it does nothing and returns true.
+    fn on_close_request(&self, _input: &mut Self::Input) -> bool {
+        true
+    }
+
     /// Consume your [`Input`] to let users interact with your game.
     ///
     /// Right before an [`update`], input events will be processed and this
@@ -297,16 +307,15 @@ pub trait Game {
                 window::Event::Input(input_event) => {
                     game.on_input(input, input_event);
 
-                    if cfg!(any(debug_assertions, feature = "debug")) {
-                        match input_event {
-                            input::Event::KeyboardInput {
-                                state: input::ButtonState::Released,
-                                key_code,
-                            } if Some(key_code) == G::DEBUG_KEY => {
-                                debug.toggle();
-                            }
-                            _ => {}
+                    #[cfg(any(debug_assertions, feature = "debug"))]
+                    match input_event {
+                        input::Event::KeyboardInput {
+                            state: input::ButtonState::Released,
+                            key_code,
+                        } if Some(key_code) == G::DEBUG_KEY => {
+                            debug.toggle();
                         }
+                        _ => {}
                     }
                 }
                 window::Event::CursorMoved(logical_position) => {
@@ -320,8 +329,21 @@ pub trait Game {
                         },
                     )
                 }
+                window::Event::Moved(logical_position) => {
+                    let position = logical_position.to_physical(window.dpi());
+
+                    game.on_input(
+                        input,
+                        input::Event::WindowMoved {
+                            x: position.x as f32,
+                            y: position.y as f32,
+                        },
+                    )
+                }
                 window::Event::CloseRequested => {
-                    *alive = false;
+                    if game.on_close_request(input) {
+                        *alive = false;
+                    }
                 }
                 window::Event::Resized(new_size) => {
                     window.resize(new_size);
@@ -370,7 +392,9 @@ pub trait Game {
             debug.draw_finished();
 
             if debug.is_enabled() {
+                debug.debug_started();
                 game.debug(input, view, window, &mut debug);
+                debug.debug_finished();
             }
 
             window.swap_buffers();
