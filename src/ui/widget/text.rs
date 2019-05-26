@@ -34,8 +34,18 @@ impl<M, R> Text<M, R> {
         self
     }
 
+    pub fn width(mut self, width: u32) -> Self {
+        self.style = self.style.width(width as f32);
+        self
+    }
+
     pub fn align_center(mut self) -> Self {
         self.style = self.style.align_center();
+        self
+    }
+
+    pub fn align_right(mut self) -> Self {
+        self.style = self.style.align_right();
         self
     }
 }

@@ -229,11 +229,16 @@ pub(crate) fn process_events<G: Game>(
             }
             window::Event::CursorMoved(logical_position) => {
                 let position = logical_position.to_physical(window.dpi());
-
-                input.update(input::Event::CursorMoved {
+                let event = input::Event::CursorMoved {
                     x: position.x as f32,
                     y: position.y as f32,
-                })
+                };
+
+                input.update(event);
+
+                if let Some(ref mut events) = events {
+                    events.push(event);
+                }
             }
             window::Event::Moved(logical_position) => {
                 let position = logical_position.to_physical(window.dpi());

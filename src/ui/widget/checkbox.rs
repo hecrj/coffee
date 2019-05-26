@@ -51,15 +51,15 @@ where
         cursor_position: Point,
         messages: &mut Vec<M>,
     ) {
-        let mouse_over = layout
-            .children()
-            .any(|child| child.bounds().contains(cursor_position));
-
         match event {
             Event::MouseInput {
                 button: MouseButton::Left,
                 state: ButtonState::Pressed,
             } => {
+                let mouse_over = layout
+                    .children()
+                    .any(|child| child.bounds().contains(cursor_position));
+
                 if mouse_over {
                     messages.push((self.on_toggle)(!self.is_checked));
                 }

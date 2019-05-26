@@ -15,11 +15,10 @@ impl radio::Renderer for Basic {
         &mut self,
         is_selected: bool,
         bounds: Rectangle<f32>,
-        text_bounds: Rectangle<f32>,
+        bounds_with_label: Rectangle<f32>,
         cursor_position: Point,
     ) -> MouseCursor {
-        let mouse_over = bounds.contains(cursor_position)
-            || text_bounds.contains(cursor_position);
+        let mouse_over = bounds_with_label.contains(cursor_position);
 
         self.sprites.add(Sprite {
             source: Rectangle {

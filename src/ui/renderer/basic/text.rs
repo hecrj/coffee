@@ -44,7 +44,7 @@ impl text::Renderer for Basic {
                 let (width, height) = font.borrow_mut().measure(text);
 
                 let size = Size {
-                    width,
+                    width: width + 1.0,
                     height: height + size / 4.0,
                 };
 

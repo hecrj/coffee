@@ -67,14 +67,14 @@ where
         cursor_position: Point,
         messages: &mut Vec<M>,
     ) {
-        let bounds = layout.bounds();
-
         match event {
             Event::MouseInput {
                 button: MouseButton::Left,
                 state,
             } => {
                 if let Some(on_click) = self.on_click {
+                    let bounds = layout.bounds();
+
                     match state {
                         ButtonState::Pressed => {
                             self.state.is_pressed =

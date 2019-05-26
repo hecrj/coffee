@@ -52,16 +52,12 @@ where
         cursor_position: Point,
         messages: &mut Vec<M>,
     ) {
-        let mouse_over = layout
-            .children()
-            .any(|child| child.bounds().contains(cursor_position));
-
         match event {
             Event::MouseInput {
                 button: MouseButton::Left,
                 state: ButtonState::Pressed,
             } => {
-                if mouse_over {
+                if layout.bounds().contains(cursor_position) {
                     messages.push(self.on_click);
                 }
             }
@@ -90,7 +86,7 @@ where
         (renderer as &mut Renderer).draw(
             self.is_selected,
             children[0].bounds(),
-            text_bounds,
+            layout.bounds(),
             cursor_position,
         )
     }

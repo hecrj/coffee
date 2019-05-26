@@ -2,8 +2,8 @@ use coffee::graphics::{Color, Window, WindowSettings};
 use coffee::input::KeyboardAndMouse;
 use coffee::load::{loading_screen::ProgressBar, Task};
 use coffee::ui::{
-    button, renderer, Button, Checkbox, Column, Element, Radio, Root, Row,
-    Text, UserInterface,
+    button, renderer, slider, Button, Checkbox, Column, Element, Radio, Root,
+    Row, Slider, Text, UserInterface,
 };
 use coffee::{Game, Result, Timer};
 
@@ -138,6 +138,10 @@ impl Steps {
                 },
                 Step::Checkbox { is_checked: false },
                 Step::Radio { selection: None },
+                Step::Slider {
+                    state: slider::State::new(),
+                    value: 50,
+                },
                 Step::Text,
                 Step::RowsAndColumns,
             ],
@@ -155,6 +159,11 @@ impl Steps {
             StepEvent::LanguageSelected(language) => {
                 if let Step::Radio { selection } = self.current() {
                     *selection = Some(language);
+                }
+            }
+            StepEvent::SliderChanged(new_value) => {
+                if let Step::Slider { value, .. } = self.current() {
+                    *value = new_value.round() as u16;
                 }
             }
         };
@@ -198,6 +207,10 @@ enum Step {
     Radio {
         selection: Option<Language>,
     },
+    Slider {
+        state: slider::State,
+        value: u16,
+    },
     Text,
     RowsAndColumns,
 }
@@ -206,6 +219,7 @@ enum Step {
 enum StepEvent {
     CheckboxToggled(bool),
     LanguageSelected(Language),
+    SliderChanged(f32),
 }
 
 impl<'a> Step {
@@ -221,6 +235,7 @@ impl<'a> Step {
             } => Self::buttons(primary, secondary, positive).into(),
             Step::Checkbox { is_checked } => Self::checkbox(*is_checked).into(),
             Step::Radio { selection } => Self::radio(*selection).into(),
+            Step::Slider { state, value } => Self::slider(state, *value).into(),
             Step::Text => Self::text().into(),
             Step::RowsAndColumns => Self::rows_and_columns().into(),
         }
@@ -306,6 +321,20 @@ impl<'a> Step {
         )
     }
 
+    fn slider(
+        state: &'a mut slider::State,
+        value: u16,
+    ) -> Column<'a, StepEvent, <Tour as UserInterface>::Renderer> {
+        Self::container("Slider")
+            .push(Slider::new(
+                state,
+                0.0..100.0,
+                value as f32,
+                StepEvent::SliderChanged,
+            ))
+            .push(Text::new(&value.to_string()).align_center())
+    }
+
     fn text() -> Column<'a, StepEvent, <Tour as UserInterface>::Renderer> {
         Self::container("Text")
             .push(Text::new(
@@ -352,16 +381,18 @@ enum Language {
     Ruby,
     Haskell,
     C,
+    Other,
 }
 
 impl Language {
-    fn all() -> [Language; 5] {
+    fn all() -> [Language; 6] {
         [
             Language::Rust,
             Language::Elm,
             Language::Ruby,
             Language::Haskell,
             Language::C,
+            Language::Other,
         ]
     }
 }
@@ -374,6 +405,7 @@ impl From<Language> for &str {
             Language::Ruby => "Ruby",
             Language::Haskell => "Haskell",
             Language::C => "C",
+            Language::Other => "Other",
         }
     }
 }

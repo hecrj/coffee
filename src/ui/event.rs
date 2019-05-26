@@ -22,6 +22,9 @@ pub enum Event {
         character: char,
     },
 
+    /// The mouse cursor was moved.
+    CursorMoved,
+
     /// A mouse button was pressed or released.
     MouseInput {
         /// The state of the button
@@ -50,6 +53,7 @@ impl Event {
             input::Event::TextInput { character } => {
                 Some(Event::TextInput { character })
             }
+            input::Event::CursorMoved { .. } => Some(Event::CursorMoved),
             input::Event::MouseInput { state, button } => {
                 Some(Event::MouseInput { state, button })
             }
