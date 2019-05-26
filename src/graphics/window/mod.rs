@@ -84,7 +84,7 @@ impl Window {
         Frame::new(self)
     }
 
-    /// Toggles the [`Window`]'s fullscreen state
+    /// Toggles the [`Window`]'s fullscreen state.
     ///
     /// [`Window`]: struct.Window.html
     pub fn toggle_fullscreen(&mut self) {
