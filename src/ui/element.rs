@@ -1,3 +1,5 @@
+use stretch::{geometry, result};
+
 use crate::graphics::Point;
 use crate::ui::{Event, Hasher, Layout, MouseCursor, Node, Widget};
 
@@ -24,6 +26,16 @@ impl<'a, M, R> Element<'a, M, R> {
         Element {
             widget: Box::new(Map::new(self.widget, f)),
         }
+    }
+
+    pub(crate) fn compute_layout(&self, renderer: &R) -> result::Layout {
+        let node = self.widget.node(renderer);
+
+        node.0.compute_layout(geometry::Size::undefined()).unwrap()
+    }
+
+    pub(crate) fn hash(&self, state: &mut Hasher) {
+        self.widget.hash(state);
     }
 }
 

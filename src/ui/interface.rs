@@ -2,11 +2,11 @@ use std::hash::Hasher;
 use stretch::result;
 
 use crate::graphics::{Point, Window};
-use crate::ui::{Event, Layout, MouseCursor, Renderer, Root};
+use crate::ui::{Element, Event, Layout, MouseCursor, Renderer};
 
 pub struct Interface<'a, M, R> {
     hash: u64,
-    root: Root<'a, M, R>,
+    root: Element<'a, M, R>,
     layout: result::Layout,
 }
 
@@ -16,7 +16,10 @@ pub struct Cache {
 }
 
 impl<'a, M, R: Renderer> Interface<'a, M, R> {
-    pub fn compute(root: Root<'a, M, R>, renderer: &R) -> Interface<'a, M, R> {
+    pub fn compute(
+        root: Element<'a, M, R>,
+        renderer: &R,
+    ) -> Interface<'a, M, R> {
         let hasher = &mut twox_hash::XxHash::default();
         root.hash(hasher);
 
@@ -27,7 +30,7 @@ impl<'a, M, R: Renderer> Interface<'a, M, R> {
     }
 
     pub fn compute_with_cache(
-        root: Root<'a, M, R>,
+        root: Element<'a, M, R>,
         renderer: &R,
         cache: Cache,
     ) -> Interface<'a, M, R> {

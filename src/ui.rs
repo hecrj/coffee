@@ -5,7 +5,6 @@ mod interface;
 mod layout;
 mod mouse_cursor;
 mod node;
-mod root;
 mod style;
 mod widget;
 
@@ -21,7 +20,6 @@ pub use layout::Layout;
 pub use mouse_cursor::MouseCursor;
 pub use node::Node;
 pub use renderer::Renderer;
-pub use root::Root;
 pub use style::Style;
 pub use widget::*;
 
@@ -43,7 +41,7 @@ pub trait UserInterface: Game {
         &mut self,
         state: &Self::State,
         window: &Window,
-    ) -> Root<Self::Event, Self::Renderer>;
+    ) -> Element<Self::Event, Self::Renderer>;
 
     fn run(window_settings: WindowSettings) -> Result<()>
     where

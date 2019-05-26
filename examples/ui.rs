@@ -2,8 +2,8 @@ use coffee::graphics::{Color, Frame, Window, WindowSettings};
 use coffee::input::KeyboardAndMouse;
 use coffee::load::{loading_screen::ProgressBar, Task};
 use coffee::ui::{
-    button, renderer, slider, Button, Checkbox, Column, Element, Radio, Root,
-    Row, Slider, Text, UserInterface,
+    button, renderer, slider, Button, Checkbox, Column, Element, Radio, Row,
+    Slider, Text, UserInterface,
 };
 use coffee::{Game, Result, Timer};
 
@@ -58,7 +58,7 @@ impl UserInterface for Tour {
         &mut self,
         _state: &Self::State,
         window: &Window,
-    ) -> Root<Event, Self::Renderer> {
+    ) -> Element<Event, Self::Renderer> {
         let Tour {
             steps,
             back_button,
@@ -89,14 +89,13 @@ impl UserInterface for Tour {
             .push(steps.current().layout().map(Event::StepEvent))
             .push(controls);
 
-        Root::new(
-            Column::new()
-                .width(window.width())
-                .height(window.height())
-                .center_children()
-                .padding(20)
-                .push(content),
-        )
+        Column::new()
+            .width(window.width())
+            .height(window.height())
+            .center_children()
+            .padding(20)
+            .push(content)
+            .into()
     }
 
     fn update(&mut self, _state: &mut Self::State, event: Event) {
