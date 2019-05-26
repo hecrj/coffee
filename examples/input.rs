@@ -14,6 +14,7 @@ fn main() -> Result<()> {
         title: String::from("Input - Coffee"),
         size: (720, 240),
         resizable: false,
+        fullscreen: false,
     })
 }
 

@@ -9,6 +9,7 @@ fn main() -> Result<()> {
         title: String::from("Color - Coffee"),
         size: (1280, 1024),
         resizable: false,
+        fullscreen: false,
     })
 }
 
