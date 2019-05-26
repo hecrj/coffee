@@ -2,7 +2,7 @@
 use std::collections::HashSet;
 
 use coffee::graphics::{
-    Color, Font, Gpu, Image, Point, Quad, Rectangle, Text, Vector, Window,
+    Color, Font, Frame, Image, Point, Quad, Rectangle, Text, Vector, Window,
     WindowSettings,
 };
 use coffee::input;
@@ -14,6 +14,7 @@ fn main() -> Result<()> {
         title: String::from("Input - Coffee"),
         size: (720, 240),
         resizable: false,
+        fullscreen: false,
     })
 }
 
@@ -138,7 +139,7 @@ impl Game for InputExample {
         &mut self,
         input: &mut Input,
         _view: &mut View,
-        _gpu: &mut Gpu,
+        _window: &mut Window,
     ) {
         self.cursor_position = input.cursor_position;
         self.mouse_wheel = input.mouse_wheel;
@@ -164,8 +165,7 @@ impl Game for InputExample {
         }
     }
 
-    fn draw(&self, view: &mut Self::View, window: &mut Window, _timer: &Timer) {
-        let mut frame = window.frame();
+    fn draw(&self, view: &mut Self::View, frame: &mut Frame, _timer: &Timer) {
         frame.clear(Color::BLACK);
 
         // This closure simplifies some of the boilerplate.

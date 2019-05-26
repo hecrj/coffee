@@ -1,5 +1,6 @@
 use coffee::graphics::{
-    Color, Font, Image, Point, Quad, Rectangle, Text, Window, WindowSettings,
+    Color, Font, Frame, Image, Point, Quad, Rectangle, Text, Window,
+    WindowSettings,
 };
 use coffee::load::{loading_screen, Join, LoadingScreen, Task};
 use coffee::{Game, Result, Timer};
@@ -9,6 +10,7 @@ fn main() -> Result<()> {
         title: String::from("Color - Coffee"),
         size: (1280, 1024),
         resizable: false,
+        fullscreen: false,
     })
 }
 
@@ -31,8 +33,7 @@ impl Game for Colors {
 
     fn update(&mut self, _view: &Self::View, _window: &Window) {}
 
-    fn draw(&self, view: &mut Self::View, window: &mut Window, _timer: &Timer) {
-        let mut frame = window.frame();
+    fn draw(&self, view: &mut Self::View, frame: &mut Frame, _timer: &Timer) {
         frame.clear(Color::new(0.5, 0.5, 0.5, 1.0));
 
         let target = &mut frame.as_target();

@@ -23,13 +23,14 @@
 //!
 //! ```no_run
 //! use coffee::{Game, Result, Timer};
-//! use coffee::graphics::{Color, Window, WindowSettings};
+//! use coffee::graphics::{Color, Frame, Window, WindowSettings};
 //!
 //! fn main() -> Result<()> {
 //!     MyGame::run(WindowSettings {
 //!         title: String::from("A caffeinated game"),
 //!         size: (1280, 1024),
 //!         resizable: true,
+//!         fullscreen: false,
 //!     })
 //! }
 //!
@@ -52,9 +53,8 @@
 //!         // Update your game here
 //!     }
 //!
-//!     fn draw(&self, _view: &mut Self::View, window: &mut Window, _timer: &Timer) {
+//!     fn draw(&self, _view: &mut Self::View, frame: &mut Frame, _timer: &Timer) {
 //!         // Clear the current frame
-//!         let mut frame = window.frame();
 //!         frame.clear(Color::BLACK);
 //!
 //!         // Draw your game here. Check out the `graphics` module!
@@ -168,7 +168,7 @@ pub trait Game {
     fn draw(
         &self,
         view: &mut Self::View,
-        window: &mut graphics::Window,
+        frame: &mut graphics::Frame,
         timer: &Timer,
     );
 
@@ -204,7 +204,8 @@ pub trait Game {
     /// to keep your view updated every frame in order to offer a smooth user
     /// experience independently of the [`TICKS_PER_SECOND`] setting.
     ///
-    /// You can access the GPU if, as a consequence of the interaction, you need
+    /// You can access the [`Window`]. For instance, you may want to toggle
+    /// fullscreen mode based on some input, or maybe access the [`Gpu`]
     /// to prepare some assets before rendering.
     ///
     /// By default, it does nothing.
@@ -212,11 +213,13 @@ pub trait Game {
     /// [`Input`]: #associatedtype.Input
     /// [`update`]: #tymethod.update
     /// [`TICKS_PER_SECOND`]: #associatedconstant.TICKS_PER_SECOND
+    /// [`Window`]: graphics/struct.Window.html
+    /// [`Gpu`]: graphics/struct.Gpu.html
     fn interact(
         &mut self,
         _input: &mut Self::Input,
         _view: &mut Self::View,
-        _gpu: &mut graphics::Gpu,
+        _window: &mut graphics::Window,
     ) {
     }
 
@@ -320,7 +323,7 @@ pub trait Game {
                     window.resize(new_size);
                 }
             });
-            game.interact(input, view, window.gpu());
+            game.interact(input, view, window);
             debug.interact_finished();
         }
 
@@ -357,7 +360,7 @@ pub trait Game {
             }
 
             debug.draw_started();
-            game.draw(view, window, &timer);
+            game.draw(view, &mut window.frame(), &timer);
             debug.draw_finished();
 
             if debug.is_enabled() {

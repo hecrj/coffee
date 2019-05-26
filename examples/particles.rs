@@ -6,7 +6,7 @@ use rayon::prelude::*;
 use std::{thread, time};
 
 use coffee::graphics::{
-    Batch, Color, Font, Gpu, Image, Point, Rectangle, Sprite, Text, Vector,
+    Batch, Color, Font, Frame, Image, Point, Rectangle, Sprite, Text, Vector,
     Window, WindowSettings,
 };
 use coffee::input;
@@ -18,6 +18,7 @@ fn main() -> Result<()> {
         title: String::from("Particles - Coffee"),
         size: (1280, 1024),
         resizable: false,
+        fullscreen: false,
     })
 }
 
@@ -98,7 +99,12 @@ impl Game for Particles {
         }
     }
 
-    fn interact(&mut self, input: &mut Input, view: &mut View, _gpu: &mut Gpu) {
+    fn interact(
+        &mut self,
+        input: &mut Input,
+        view: &mut View,
+        window: &mut Window,
+    ) {
         self.gravity_centers[0] = input.cursor_position;
 
         for point in &input.points_clicked {
@@ -109,6 +115,9 @@ impl Game for Particles {
             match key {
                 input::KeyCode::I => {
                     view.interpolate = !view.interpolate;
+                }
+                input::KeyCode::F => {
+                    window.toggle_fullscreen();
                 }
                 _ => {}
             }
@@ -136,8 +145,7 @@ impl Game for Particles {
         });
     }
 
-    fn draw(&self, view: &mut View, window: &mut Window, timer: &Timer) {
-        let mut frame = window.frame();
+    fn draw(&self, view: &mut View, frame: &mut Frame, timer: &Timer) {
         frame.clear(Color::BLACK);
 
         // Draw particles all at once!

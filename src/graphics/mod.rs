@@ -35,12 +35,12 @@
 //! types like [`Image`], [`Font`], [`TextureArray`], etc.
 //!
 //! # Getting started
-//! You should probably start your [`Game::draw`] implementation by getting a
-//! [`Frame`] and clearing it:
+//! You should probably start your [`Game::draw`] implementation by clearing
+//! the provided [`Frame`]:
 //!
 //! ```
 //! use coffee::{Game, Timer};
-//! use coffee::graphics::{Window, Color};
+//! use coffee::graphics::{Color, Frame, Window};
 //! # use coffee::Result;
 //! # use coffee::graphics::Gpu;
 //! #
@@ -59,17 +59,16 @@
 //!     // ...
 //!
 //! #   fn interact(&mut self, _input: &mut Self::Input,
-//! #              _view: &mut Self::View, _gpu: &mut Gpu) {}
+//! #              _view: &mut Self::View, _window: &mut Window) {}
 //! #
 //! #   fn update(&mut self, _view: &Self::View, window: &Window) {}
 //! #
 //!     fn draw(
 //!         &self,
 //!         _view: &mut Self::View,
-//!         window: &mut Window,
+//!         frame: &mut Frame,
 //!         _timer: &Timer,
 //!     ) {
-//!         let mut frame = window.frame();
 //!         frame.clear(Color::BLACK);
 //!
 //!         // Use your resources here...
