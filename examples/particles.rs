@@ -18,6 +18,7 @@ fn main() -> Result<()> {
         title: String::from("Particles - Coffee"),
         size: (1280, 1024),
         resizable: false,
+        fullscreen: false,
     })
 }
 
@@ -110,6 +111,9 @@ impl Game for Particles {
                 input::KeyCode::I => {
                     view.interpolate = !view.interpolate;
                 }
+                input::KeyCode::F => {
+                    view.toggle_fullscreen = true;
+                }
                 _ => {}
             }
         }
@@ -137,6 +141,11 @@ impl Game for Particles {
     }
 
     fn draw(&self, view: &mut View, window: &mut Window, timer: &Timer) {
+        if view.toggle_fullscreen {
+            window.toggle_fullscreen();
+            view.toggle_fullscreen = false;
+        }
+
         let mut frame = window.frame();
         frame.clear(Color::BLACK);
 
@@ -228,6 +237,7 @@ struct View {
     batch: Batch,
     font: Font,
     interpolate: bool,
+    toggle_fullscreen: bool,
 }
 
 impl View {
@@ -288,6 +298,7 @@ impl View {
                 batch: Batch::new(palette),
                 font,
                 interpolate: true,
+                toggle_fullscreen: false,
             })
     }
 

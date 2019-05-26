@@ -9,12 +9,24 @@ pub struct Settings {
     /// A target size for the window.
     pub size: (u32, u32),
 
-    /// Defines whether if the window should be resizable.
+    /// Defines whether or not the window should be resizable.
     pub resizable: bool,
+
+    /// Defines whether or not the window should start fullscreen.
+    pub fullscreen: bool,
 }
 
 impl Settings {
-    pub(super) fn into_builder(self) -> winit::WindowBuilder {
+    pub(super) fn into_builder(
+        self,
+        events_loop: &winit::EventsLoop,
+    ) -> winit::WindowBuilder {
+        let monitor = if self.fullscreen {
+            Some(events_loop.get_primary_monitor())
+        } else {
+            None
+        };
+
         winit::WindowBuilder::new()
             .with_title(self.title)
             .with_dimensions(winit::dpi::LogicalSize {
@@ -22,5 +34,6 @@ impl Settings {
                 height: self.size.1 as f64,
             })
             .with_resizable(self.resizable)
+            .with_fullscreen(monitor)
     }
 }

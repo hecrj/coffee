@@ -21,6 +21,7 @@ pub struct Window {
     surface: gpu::Surface,
     width: f32,
     height: f32,
+    is_fullscreen: bool,
 }
 
 impl Window {
@@ -38,8 +39,12 @@ impl Window {
 
         settings.size = (width, height);
 
-        let (gpu, surface) =
-            Gpu::for_window(settings.into_builder(), event_loop.raw())?;
+        let is_fullscreen = settings.fullscreen;
+
+        let (gpu, surface) = Gpu::for_window(
+            settings.into_builder(event_loop.raw()),
+            event_loop.raw(),
+        )?;
 
         let window = surface.window();
 
@@ -55,6 +60,7 @@ impl Window {
             .unwrap_or((width as f32, height as f32));
 
         Ok(Window {
+            is_fullscreen,
             gpu,
             surface,
             width,
@@ -76,6 +82,23 @@ impl Window {
     /// [`Window`]: struct.Window.html
     pub fn frame(&mut self) -> Frame {
         Frame::new(self)
+    }
+
+    /// Toggles the [`Window`]'s fullscreen state
+    ///
+    /// [`Window`]: struct.Window.html
+    pub fn toggle_fullscreen(&mut self) {
+        let window = self.surface.window();
+
+        let monitor = if self.is_fullscreen {
+            None
+        } else {
+            Some(window.get_primary_monitor())
+        };
+
+        window.set_fullscreen(monitor);
+
+        self.is_fullscreen = !self.is_fullscreen;
     }
 
     /// Get the width of the [`Window`].
