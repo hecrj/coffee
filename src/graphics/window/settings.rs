@@ -12,7 +12,7 @@ pub struct Settings {
     /// Defines whether or not the window should be resizable.
     pub resizable: bool,
 
-    /// Defines whether or not the window should start fullscreen.
+    /// Defines whether or not the window should start in fullscreen mode.
     pub fullscreen: bool,
 }
 
