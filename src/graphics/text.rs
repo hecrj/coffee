@@ -26,6 +26,7 @@ pub struct Text<'a> {
 }
 
 impl Default for Text<'static> {
+    #[inline]
     fn default() -> Text<'static> {
         Text {
             content: "",

@@ -5,7 +5,7 @@ use rand::Rng;
 use rayon::prelude::*;
 
 use coffee::graphics::{
-    Batch, Color, Font, Gpu, Image, Point, Rectangle, Sprite, Text, Vector,
+    Batch, Color, Font, Frame, Image, Point, Rectangle, Sprite, Text, Vector,
     Window, WindowSettings,
 };
 use coffee::input::{KeyCode, KeyboardAndMouse};
@@ -25,6 +25,7 @@ fn main() -> Result<()> {
         title: String::from("Particles - Coffee"),
         size: (1280, 1024),
         resizable: false,
+        fullscreen: false,
     })
 }
 
@@ -125,7 +126,7 @@ impl Game for Particles {
         &mut self,
         input: &mut KeyboardAndMouse,
         state: &mut State,
-        _gpu: &mut Gpu,
+        window: &mut Window,
     ) {
         state.gravity_centers[0] = input.cursor_position();
 
@@ -136,10 +137,13 @@ impl Game for Particles {
         if input.was_key_released(&KeyCode::I) {
             self.interpolate = !self.interpolate;
         }
+
+        if input.was_key_released(&KeyCode::F) {
+            window.toggle_fullscreen();
+        }
     }
 
-    fn draw(&mut self, state: &State, window: &mut Window, timer: &Timer) {
-        let mut frame = window.frame();
+    fn draw(&mut self, state: &State, frame: &mut Frame, timer: &Timer) {
         frame.clear(Color::BLACK);
 
         // Draw particles all at once!
@@ -177,6 +181,7 @@ impl Game for Particles {
             bounds: (frame.width(), frame.height()),
             size: 20.0,
             color: Color::WHITE,
+            ..Text::default()
         });
 
         self.font.add(Text {
@@ -189,6 +194,7 @@ impl Game for Particles {
             } else {
                 Color::new(1.0, 0.0, 0.0, 1.0)
             },
+            ..Text::default()
         });
 
         self.font.add(Text {
@@ -197,6 +203,7 @@ impl Game for Particles {
             bounds: (frame.width(), frame.height()),
             size: 16.0,
             color: Color::WHITE,
+            ..Text::default()
         });
 
         self.font.draw(&mut frame.as_target());

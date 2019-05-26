@@ -11,9 +11,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Game::debug` performance tracking. Time spent on this method is now shown in
   the built-in debug view. [#26]
 - Implementation of `Default` trait for `Text`. [#25]
+- `Transformation::rotate`. Creates a transformation representing a rotation. [#28]
+- `Batch::clear`. Clears the batch contents, useful to reuse batches in different
+  frames.
+- Multiple gravity centers based on mouse clicks in the particles example. [#30]
+
+### Changed
+- The performance of the particles example has been improved on Windows.
 
 [#25]: https://github.com/hecrj/coffee/pull/25
 [#26]: https://github.com/hecrj/coffee/pull/26
+[#28]: https://github.com/hecrj/coffee/pull/28
+[#30]: https://github.com/hecrj/coffee/pull/30
 
 
 ## [0.2.0] - 2019-04-28

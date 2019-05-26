@@ -1,4 +1,4 @@
-use coffee::graphics::{Color, Window, WindowSettings};
+use coffee::graphics::{Color, Frame, Window, WindowSettings};
 use coffee::input::KeyboardAndMouse;
 use coffee::load::{loading_screen::ProgressBar, Task};
 use coffee::ui::{
@@ -12,6 +12,7 @@ fn main() -> Result<()> {
         title: String::from("User Interface - Coffee"),
         size: (1280, 1024),
         resizable: false,
+        fullscreen: false,
     })
 }
 
@@ -37,10 +38,9 @@ impl Game for Tour {
     fn draw(
         &mut self,
         _state: &Self::State,
-        window: &mut Window,
+        frame: &mut Frame,
         _timer: &Timer,
     ) {
-        let mut frame = window.frame();
         frame.clear(Color {
             r: 0.3,
             g: 0.3,

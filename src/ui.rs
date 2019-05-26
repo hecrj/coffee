@@ -113,7 +113,7 @@ pub trait UserInterface: Game {
             }
 
             debug.draw_started();
-            game.draw(state, window, &timer);
+            game.draw(state, &mut window.frame(), &timer);
             debug.draw_finished();
 
             debug.ui_started();

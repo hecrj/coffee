@@ -31,7 +31,7 @@ use crate::Result;
 /// use coffee::load::loading_screen::ProgressBar;
 /// use coffee::graphics::Window;
 /// # use coffee::Timer;
-/// # use coffee::graphics::Gpu;
+/// # use coffee::graphics::{Frame, Gpu};
 /// #
 /// # struct State;
 /// # impl State {
@@ -75,10 +75,8 @@ use crate::Result;
 ///     }
 ///
 ///     // ...
-///     # fn interact(&mut self, _input: &mut Self::Input,
-///     #             _view: &mut Self::View, _gpu: &mut Gpu) {}
 ///     # fn update(&mut self, _view: &View, window: &Window) {}
-///     # fn draw(&self, _view: &mut Self::View, _window: &mut Window,
+///     # fn draw(&self, _view: &mut Self::View, _frame: &mut Frame,
 ///     #         _timer: &Timer) {}
 /// }
 /// ```

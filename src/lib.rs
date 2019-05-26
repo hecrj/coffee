@@ -23,13 +23,14 @@
 //!
 //! ```no_run
 //! use coffee::{Game, Result, Timer};
-//! use coffee::graphics::{Color, Window, WindowSettings};
+//! use coffee::graphics::{Color, Frame, Window, WindowSettings};
 //!
 //! fn main() -> Result<()> {
 //!     MyGame::run(WindowSettings {
 //!         title: String::from("A caffeinated game"),
 //!         size: (1280, 1024),
 //!         resizable: true,
+//!         fullscreen: false,
 //!     })
 //! }
 //!
@@ -52,9 +53,8 @@
 //!         // Update your game here
 //!     }
 //!
-//!     fn draw(&self, _view: &mut Self::View, window: &mut Window, _timer: &Timer) {
+//!     fn draw(&self, _view: &mut Self::View, frame: &mut Frame, _timer: &Timer) {
 //!         // Clear the current frame
-//!         let mut frame = window.frame();
 //!         frame.clear(Color::BLACK);
 //!
 //!         // Draw your game here. Check out the `graphics` module!

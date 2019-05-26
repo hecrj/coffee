@@ -1,5 +1,5 @@
 use crate::graphics::window;
-use crate::graphics::{Gpu, Window, WindowSettings};
+use crate::graphics::{Frame, Window, WindowSettings};
 use crate::input;
 use crate::load::{Join, LoadingScreen, Task};
 use crate::{Debug, Input, Result, State, Timer};
@@ -58,7 +58,7 @@ pub trait Game {
     ///
     /// [`graphics`]: graphics/index.html
     /// [`update`]: #tymethod.update
-    fn draw(&mut self, state: &Self::State, window: &mut Window, timer: &Timer);
+    fn draw(&mut self, state: &Self::State, frame: &mut Frame, timer: &Timer);
 
     /// Handle a close request from the operating system to the game window.
     ///
@@ -81,7 +81,8 @@ pub trait Game {
     /// to keep your view updated every frame in order to offer a smooth user
     /// experience independently of the [`TICKS_PER_SECOND`] setting.
     ///
-    /// You can access the GPU if, as a consequence of the interaction, you need
+    /// You can access the [`Window`]. For instance, you may want to toggle
+    /// fullscreen mode based on some input, or maybe access the [`Gpu`]
     /// to prepare some assets before rendering.
     ///
     /// By default, it does nothing.
@@ -89,11 +90,13 @@ pub trait Game {
     /// [`Input`]: #associatedtype.Input
     /// [`update`]: #tymethod.update
     /// [`TICKS_PER_SECOND`]: #associatedconstant.TICKS_PER_SECOND
+    /// [`Window`]: graphics/struct.Window.html
+    /// [`Gpu`]: graphics/struct.Gpu.html
     fn interact(
         &mut self,
         _input: &mut Self::Input,
         _state: &mut Self::State,
-        _gpu: &mut Gpu,
+        _window: &mut Window,
     ) {
     }
 
@@ -179,7 +182,7 @@ pub trait Game {
             }
 
             debug.draw_started();
-            game.draw(state, window, &timer);
+            game.draw(state, &mut window.frame(), &timer);
             debug.draw_finished();
 
             if debug.is_enabled() {
@@ -258,7 +261,7 @@ pub(crate) fn process_events<G: Game>(
             }
         };
     });
-    game.interact(input, state, window.gpu());
+    game.interact(input, state, window);
     input.clear();
     debug.interact_finished();
 }
