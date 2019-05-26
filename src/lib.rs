@@ -23,7 +23,7 @@
 //!
 //! ```no_run
 //! use coffee::{Game, Result, Timer};
-//! use coffee::graphics::{Color, Window, WindowSettings};
+//! use coffee::graphics::{Color, Frame, Window, WindowSettings};
 //!
 //! fn main() -> Result<()> {
 //!     MyGame::run(WindowSettings {
@@ -53,9 +53,8 @@
 //!         // Update your game here
 //!     }
 //!
-//!     fn draw(&self, _view: &mut Self::View, window: &mut Window, _timer: &Timer) {
+//!     fn draw(&self, _view: &mut Self::View, frame: &mut Frame, _timer: &Timer) {
 //!         // Clear the current frame
-//!         let mut frame = window.frame();
 //!         frame.clear(Color::BLACK);
 //!
 //!         // Draw your game here. Check out the `graphics` module!
@@ -169,7 +168,7 @@ pub trait Game {
     fn draw(
         &self,
         view: &mut Self::View,
-        window: &mut graphics::Window,
+        frame: &mut graphics::Frame,
         timer: &Timer,
     );
 
@@ -217,7 +216,7 @@ pub trait Game {
         &mut self,
         _input: &mut Self::Input,
         _view: &mut Self::View,
-        _gpu: &mut graphics::Gpu,
+        _window: &mut graphics::Window,
     ) {
     }
 
@@ -321,7 +320,7 @@ pub trait Game {
                     window.resize(new_size);
                 }
             });
-            game.interact(input, view, window.gpu());
+            game.interact(input, view, window);
             debug.interact_finished();
         }
 
@@ -358,7 +357,7 @@ pub trait Game {
             }
 
             debug.draw_started();
-            game.draw(view, window, &timer);
+            game.draw(view, &mut window.frame(), &timer);
             debug.draw_finished();
 
             if debug.is_enabled() {

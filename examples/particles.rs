@@ -6,7 +6,7 @@ use rayon::prelude::*;
 use std::{thread, time};
 
 use coffee::graphics::{
-    Batch, Color, Font, Gpu, Image, Point, Rectangle, Sprite, Text, Vector,
+    Batch, Color, Font, Frame, Image, Point, Rectangle, Sprite, Text, Vector,
     Window, WindowSettings,
 };
 use coffee::input;
@@ -99,7 +99,12 @@ impl Game for Particles {
         }
     }
 
-    fn interact(&mut self, input: &mut Input, view: &mut View, _gpu: &mut Gpu) {
+    fn interact(
+        &mut self,
+        input: &mut Input,
+        view: &mut View,
+        window: &mut Window,
+    ) {
         self.gravity_centers[0] = input.cursor_position;
 
         for point in &input.points_clicked {
@@ -112,7 +117,7 @@ impl Game for Particles {
                     view.interpolate = !view.interpolate;
                 }
                 input::KeyCode::F => {
-                    view.toggle_fullscreen = true;
+                    window.toggle_fullscreen();
                 }
                 _ => {}
             }
@@ -140,13 +145,7 @@ impl Game for Particles {
         });
     }
 
-    fn draw(&self, view: &mut View, window: &mut Window, timer: &Timer) {
-        if view.toggle_fullscreen {
-            window.toggle_fullscreen();
-            view.toggle_fullscreen = false;
-        }
-
-        let mut frame = window.frame();
+    fn draw(&self, view: &mut View, frame: &mut Frame, timer: &Timer) {
         frame.clear(Color::BLACK);
 
         // Draw particles all at once!
@@ -237,7 +236,6 @@ struct View {
     batch: Batch,
     font: Font,
     interpolate: bool,
-    toggle_fullscreen: bool,
 }
 
 impl View {
@@ -298,7 +296,6 @@ impl View {
                 batch: Batch::new(palette),
                 font,
                 interpolate: true,
-                toggle_fullscreen: false,
             })
     }
 

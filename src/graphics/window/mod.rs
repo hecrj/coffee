@@ -80,7 +80,7 @@ impl Window {
     ///
     /// [`Frame`]: struct.Frame.html
     /// [`Window`]: struct.Window.html
-    pub fn frame(&mut self) -> Frame {
+    pub(crate) fn frame(&mut self) -> Frame {
         Frame::new(self)
     }
 
