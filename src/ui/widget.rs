@@ -20,7 +20,7 @@ pub use text::Text;
 use crate::graphics::Point;
 use crate::ui::{Event, Hasher, Layout, MouseCursor, Node};
 
-pub trait Widget<'a> {
+pub trait Widget {
     type Msg;
     type Renderer;
 

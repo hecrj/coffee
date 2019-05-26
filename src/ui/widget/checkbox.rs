@@ -28,7 +28,7 @@ impl<M, R> Checkbox<M, R> {
     }
 }
 
-impl<'a, M, R> Widget<'a> for Checkbox<M, R>
+impl<M, R> Widget for Checkbox<M, R>
 where
     R: Renderer + column::Renderer + text::Renderer + 'static,
     M: Copy,

@@ -48,7 +48,7 @@ impl<'a, M, R> Button<'a, M, R> {
     }
 }
 
-impl<'a, M, R> Widget<'a> for Button<'a, M, R>
+impl<'a, M, R> Widget for Button<'a, M, R>
 where
     R: Renderer,
     M: Copy,

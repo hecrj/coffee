@@ -5,11 +5,11 @@ use crate::ui::{Event, Hasher, Layout, MouseCursor, Node, Style, Widget};
 
 pub struct Panel<'a, M, R> {
     style: Style,
-    content: Box<Widget<'a, Msg = M, Renderer = R> + 'a>,
+    content: Box<Widget<Msg = M, Renderer = R> + 'a>,
 }
 
 impl<'a, M, R> Panel<'a, M, R> {
-    pub fn new(content: impl Widget<'a, Msg = M, Renderer = R> + 'a) -> Self {
+    pub fn new(content: impl Widget<Msg = M, Renderer = R> + 'a) -> Self {
         Panel {
             style: Style::default().padding(20),
             content: Box::new(content),
@@ -27,7 +27,7 @@ impl<'a, M, R> Panel<'a, M, R> {
     }
 }
 
-impl<'a, M, R> Widget<'a> for Panel<'a, M, R>
+impl<'a, M, R> Widget for Panel<'a, M, R>
 where
     R: Renderer,
 {

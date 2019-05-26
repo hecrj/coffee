@@ -2,12 +2,12 @@ use crate::graphics::Point;
 use crate::ui::{Event, Hasher, Layout, MouseCursor, Node, Widget};
 
 pub struct Element<'a, M, R> {
-    pub(crate) widget: Box<Widget<'a, Msg = M, Renderer = R> + 'a>,
+    pub(crate) widget: Box<Widget<Msg = M, Renderer = R> + 'a>,
 }
 
 impl<'a, M, R> Element<'a, M, R> {
     pub fn new(
-        widget: impl Widget<'a, Msg = M, Renderer = R> + 'a,
+        widget: impl Widget<Msg = M, Renderer = R> + 'a,
     ) -> Element<'a, M, R> {
         Element {
             widget: Box::new(widget),
@@ -28,13 +28,13 @@ impl<'a, M, R> Element<'a, M, R> {
 }
 
 pub struct Map<'a, A, B, R> {
-    widget: Box<Widget<'a, Msg = A, Renderer = R> + 'a>,
+    widget: Box<Widget<Msg = A, Renderer = R> + 'a>,
     mapper: Box<Fn(A) -> B>,
 }
 
 impl<'a, A, B, R> Map<'a, A, B, R> {
     pub fn new<F>(
-        widget: Box<Widget<'a, Msg = A, Renderer = R> + 'a>,
+        widget: Box<Widget<Msg = A, Renderer = R> + 'a>,
         mapper: F,
     ) -> Map<'a, A, B, R>
     where
@@ -47,7 +47,7 @@ impl<'a, A, B, R> Map<'a, A, B, R> {
     }
 }
 
-impl<'a, A, B, R> Widget<'a> for Map<'a, A, B, R>
+impl<'a, A, B, R> Widget for Map<'a, A, B, R>
 where
     A: Copy,
 {

@@ -50,7 +50,7 @@ impl<M, R> Text<M, R> {
     }
 }
 
-impl<'a, M, R> Widget<'a> for Text<M, R>
+impl<M, R> Widget for Text<M, R>
 where
     R: Renderer,
 {

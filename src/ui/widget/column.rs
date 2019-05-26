@@ -69,7 +69,7 @@ impl<'a, M, R> Column<'a, M, R> {
     }
 }
 
-impl<'a, M, R> Widget<'a> for Column<'a, M, R>
+impl<'a, M, R> Widget for Column<'a, M, R>
 where
     R: Renderer,
 {

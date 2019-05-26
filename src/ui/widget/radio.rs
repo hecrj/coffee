@@ -29,7 +29,7 @@ impl<M, R> Radio<M, R> {
     }
 }
 
-impl<'a, M, R> Widget<'a> for Radio<M, R>
+impl<M, R> Widget for Radio<M, R>
 where
     R: Renderer + column::Renderer + text::Renderer + 'static,
     M: Copy,

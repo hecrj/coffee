@@ -42,7 +42,7 @@ impl<'a, M, R> Slider<'a, M, R> {
     }
 }
 
-impl<'a, M, R> Widget<'a> for Slider<'a, M, R>
+impl<'a, M, R> Widget for Slider<'a, M, R>
 where
     R: Renderer,
     M: Copy,

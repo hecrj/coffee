@@ -3,12 +3,12 @@ use stretch::{geometry, result};
 use crate::ui::{Hasher, Widget};
 
 pub struct Root<'a, M, R> {
-    pub(crate) widget: Box<Widget<'a, Msg = M, Renderer = R> + 'a>,
+    pub(crate) widget: Box<Widget<Msg = M, Renderer = R> + 'a>,
 }
 
 impl<'a, M, R> Root<'a, M, R> {
     pub fn new(
-        widget: impl Widget<'a, Msg = M, Renderer = R> + 'a,
+        widget: impl Widget<Msg = M, Renderer = R> + 'a,
     ) -> Root<'a, M, R> {
         Root {
             widget: Box::new(widget),

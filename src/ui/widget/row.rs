@@ -74,7 +74,7 @@ impl<'a, M, R> Row<'a, M, R> {
     }
 }
 
-impl<'a, M, R> Widget<'a> for Row<'a, M, R> {
+impl<'a, M, R> Widget for Row<'a, M, R> {
     type Msg = M;
     type Renderer = R;
 
