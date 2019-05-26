@@ -204,7 +204,8 @@ pub trait Game {
     /// to keep your view updated every frame in order to offer a smooth user
     /// experience independently of the [`TICKS_PER_SECOND`] setting.
     ///
-    /// You can access the GPU if, as a consequence of the interaction, you need
+    /// You can access the [`Window`]. For instance, you may want to toggle
+    /// fullscreen mode based on some input, or maybe access the [`Gpu`]
     /// to prepare some assets before rendering.
     ///
     /// By default, it does nothing.
@@ -212,6 +213,8 @@ pub trait Game {
     /// [`Input`]: #associatedtype.Input
     /// [`update`]: #tymethod.update
     /// [`TICKS_PER_SECOND`]: #associatedconstant.TICKS_PER_SECOND
+    /// [`Window`]: graphics/struct.Window.html
+    /// [`Gpu`]: graphics/struct.Gpu.html
     fn interact(
         &mut self,
         _input: &mut Self::Input,

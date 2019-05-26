@@ -35,8 +35,8 @@
 //! types like [`Image`], [`Font`], [`TextureArray`], etc.
 //!
 //! # Getting started
-//! You should probably start your [`Game::draw`] implementation by getting a
-//! [`Frame`] and clearing it:
+//! You should probably start your [`Game::draw`] implementation by clearing
+//! the provided [`Frame`]:
 //!
 //! ```
 //! use coffee::{Game, Timer};
