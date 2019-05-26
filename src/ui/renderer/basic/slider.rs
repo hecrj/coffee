@@ -41,7 +41,9 @@ impl slider::Renderer for Basic {
 
         let marker_offset = (bounds.width - MARKER.width as f32)
             * ((value - range.start) / (range.end - range.start).max(1.0));
-        let is_active = state.is_dragging() || bounds.contains(cursor_position);
+
+        let mouse_over = bounds.contains(cursor_position);
+        let is_active = state.is_dragging() || mouse_over;
 
         self.sprites.add(Sprite {
             source: Rectangle {
@@ -55,6 +57,12 @@ impl slider::Renderer for Basic {
             scale: (1.0, 1.0),
         });
 
-        MouseCursor::Default
+        if state.is_dragging() {
+            MouseCursor::Grabbing
+        } else if mouse_over {
+            MouseCursor::Grab
+        } else {
+            MouseCursor::Default
+        }
     }
 }

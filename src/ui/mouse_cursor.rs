@@ -5,6 +5,8 @@ pub enum MouseCursor {
     Default,
     Pointer,
     Working,
+    Grab,
+    Grabbing,
 }
 
 impl From<MouseCursor> for winit::MouseCursor {
@@ -13,6 +15,8 @@ impl From<MouseCursor> for winit::MouseCursor {
             MouseCursor::Default => winit::MouseCursor::Default,
             MouseCursor::Pointer => winit::MouseCursor::Hand,
             MouseCursor::Working => winit::MouseCursor::Progress,
+            MouseCursor::Grab => winit::MouseCursor::Grab,
+            MouseCursor::Grabbing => winit::MouseCursor::Grabbing,
         }
     }
 }
