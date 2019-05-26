@@ -1,10 +1,7 @@
 use std::ops::Range;
 
 use super::Basic;
-use crate::graphics::{
-    Color, HorizontalAlignment, Point, Quad, Rectangle, Sprite, Text,
-    VerticalAlignment,
-};
+use crate::graphics::{Point, Rectangle, Sprite};
 use crate::ui::{slider, MouseCursor};
 
 const RAIL: Rectangle<u16> = Rectangle {
