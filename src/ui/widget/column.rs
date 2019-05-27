@@ -13,8 +13,11 @@ pub struct Column<'a, M, R> {
 
 impl<'a, M, R> Column<'a, M, R> {
     pub fn new() -> Self {
+        let mut style = Style::default();
+        style.0.flex_direction = stretch::style::FlexDirection::Column;
+
         Column {
-            style: Style::default(),
+            style,
             spacing: 0,
             children: Vec::new(),
         }
@@ -99,10 +102,7 @@ where
             node.0.set_style(style);
         }
 
-        let mut style = self.style;
-        style.0.flex_direction = stretch::style::FlexDirection::Column;
-
-        Node::new(style, children)
+        Node::new(self.style, children)
     }
 
     fn on_event(

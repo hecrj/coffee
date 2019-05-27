@@ -101,10 +101,7 @@ impl<'a, M, R> Widget for Row<'a, M, R> {
             node.0.set_style(style);
         }
 
-        let mut style = self.style;
-        style.0.flex_direction = stretch::style::FlexDirection::Row;
-
-        Node::new(style, children)
+        Node::new(self.style, children)
     }
 
     fn on_event(

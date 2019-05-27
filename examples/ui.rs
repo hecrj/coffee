@@ -67,7 +67,7 @@ impl UserInterface for Tour {
 
         let mut controls = Row::new();
 
-        if steps.has_started() {
+        if steps.has_previous() {
             controls = controls.push(
                 Button::new(back_button, "Back")
                     .on_click(Event::BackPressed)
@@ -77,7 +77,7 @@ impl UserInterface for Tour {
 
         controls = controls.push(Column::new().fill_width());
 
-        if !steps.has_finished() {
+        if steps.can_continue() {
             controls = controls.push(
                 Button::new(next_button, "Next").on_click(Event::NextPressed),
             );
@@ -86,7 +86,7 @@ impl UserInterface for Tour {
         let content = Column::new()
             .max_width(500.0)
             .spacing(20)
-            .push(steps.current().layout().map(Event::StepEvent))
+            .push(steps.layout().map(Event::StepEvent))
             .push(controls);
 
         Column::new()
@@ -141,55 +141,52 @@ impl Steps {
                     state: slider::State::new(),
                     value: 50,
                 },
-                Step::Text,
-                Step::RowsAndColumns,
+                Step::Text {
+                    size_slider: slider::State::new(),
+                    size: 30,
+                    color_sliders: [slider::State::new(); 3],
+                    color: Color::BLACK,
+                },
+                Step::RowsAndColumns {
+                    layout: Layout::Row,
+                    spacing_slider: slider::State::new(),
+                    spacing: 20,
+                },
+                Step::End,
             ],
             current: 0,
         }
     }
 
     fn update(&mut self, event: StepEvent) {
-        match event {
-            StepEvent::CheckboxToggled(value) => {
-                if let Step::Checkbox { is_checked } = self.current() {
-                    *is_checked = value;
-                }
-            }
-            StepEvent::LanguageSelected(language) => {
-                if let Step::Radio { selection } = self.current() {
-                    *selection = Some(language);
-                }
-            }
-            StepEvent::SliderChanged(new_value) => {
-                if let Step::Slider { value, .. } = self.current() {
-                    *value = new_value.round() as u16;
-                }
-            }
-        };
+        self.steps[self.current].update(event);
+    }
+
+    fn layout(
+        &mut self,
+    ) -> Element<StepEvent, <Tour as UserInterface>::Renderer> {
+        self.steps[self.current].layout()
     }
 
     fn advance(&mut self) {
-        if !self.has_finished() {
+        if self.can_continue() {
             self.current += 1;
         }
     }
 
     fn go_back(&mut self) {
-        if self.has_started() {
+        if self.has_previous() {
             self.current -= 1;
         }
     }
 
-    fn current(&mut self) -> &mut Step {
-        &mut self.steps[self.current as usize]
-    }
-
-    fn has_started(&self) -> bool {
+    fn has_previous(&self) -> bool {
         self.current > 0
     }
 
-    fn has_finished(&self) -> bool {
-        self.current + 1 >= self.steps.len()
+    fn can_continue(&self) -> bool {
+        self.current + 1 < self.steps.len()
+            && self.steps[self.current].can_continue()
     }
 }
 
@@ -210,8 +207,18 @@ enum Step {
         state: slider::State,
         value: u16,
     },
-    Text,
-    RowsAndColumns,
+    Text {
+        size_slider: slider::State,
+        size: u16,
+        color_sliders: [slider::State; 3],
+        color: Color,
+    },
+    RowsAndColumns {
+        layout: Layout,
+        spacing_slider: slider::State,
+        spacing: u16,
+    },
+    End,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -219,9 +226,66 @@ enum StepEvent {
     CheckboxToggled(bool),
     LanguageSelected(Language),
     SliderChanged(f32),
+    TextSizeChanged(f32),
+    TextColorChanged(Color),
+    LayoutChanged(Layout),
+    SpacingChanged(f32),
 }
 
 impl<'a> Step {
+    fn update(&mut self, event: StepEvent) {
+        match event {
+            StepEvent::CheckboxToggled(value) => {
+                if let Step::Checkbox { is_checked } = self {
+                    *is_checked = value;
+                }
+            }
+            StepEvent::LanguageSelected(language) => {
+                if let Step::Radio { selection } = self {
+                    *selection = Some(language);
+                }
+            }
+            StepEvent::SliderChanged(new_value) => {
+                if let Step::Slider { value, .. } = self {
+                    *value = new_value.round() as u16;
+                }
+            }
+            StepEvent::TextSizeChanged(new_size) => {
+                if let Step::Text { size, .. } = self {
+                    *size = new_size.round() as u16;
+                }
+            }
+            StepEvent::TextColorChanged(new_color) => {
+                if let Step::Text { color, .. } = self {
+                    *color = new_color;
+                }
+            }
+            StepEvent::LayoutChanged(new_layout) => {
+                if let Step::RowsAndColumns { layout, .. } = self {
+                    *layout = new_layout;
+                }
+            }
+            StepEvent::SpacingChanged(new_spacing) => {
+                if let Step::RowsAndColumns { spacing, .. } = self {
+                    *spacing = new_spacing.round() as u16;
+                }
+            }
+        };
+    }
+
+    fn can_continue(&self) -> bool {
+        match self {
+            Step::Welcome => true,
+            Step::Buttons { .. } => true,
+            Step::Checkbox { is_checked } => *is_checked,
+            Step::Radio { selection } => *selection == Some(Language::Rust),
+            Step::Slider { .. } => true,
+            Step::Text { .. } => true,
+            Step::RowsAndColumns { .. } => true,
+            Step::End => false,
+        }
+    }
+
     fn layout(
         &mut self,
     ) -> Element<StepEvent, <Tour as UserInterface>::Renderer> {
@@ -235,8 +299,20 @@ impl<'a> Step {
             Step::Checkbox { is_checked } => Self::checkbox(*is_checked).into(),
             Step::Radio { selection } => Self::radio(*selection).into(),
             Step::Slider { state, value } => Self::slider(state, *value).into(),
-            Step::Text => Self::text().into(),
-            Step::RowsAndColumns => Self::rows_and_columns().into(),
+            Step::Text {
+                size_slider,
+                size,
+                color_sliders,
+                color,
+            } => Self::text(size_slider, *size, color_sliders, *color).into(),
+            Step::RowsAndColumns {
+                layout,
+                spacing_slider,
+                spacing,
+            } => {
+                Self::rows_and_columns(*layout, spacing_slider, *spacing).into()
+            }
+            Step::End => Self::end().into(),
         }
     }
 
@@ -253,15 +329,8 @@ impl<'a> Step {
                  concepts related with UI development in Coffee.",
             ))
             .push(Text::new(
-                "We will start by taking a look at the interactive widgets \
-                 that are built into Coffee.",
-            ))
-            .push(Text::new(
-                "Then, we will learn about the layout engine and how to build \
-                 responsive UIs.",
-            ))
-            .push(Text::new(
-                "Press the \"Next\" button whenever you are ready!",
+                "You will need to interact with the UI in order to reach the \
+                 end!",
             ))
     }
 
@@ -270,8 +339,8 @@ impl<'a> Step {
         secondary: &'a mut button::State,
         positive: &'a mut button::State,
     ) -> Column<'a, StepEvent, <Tour as UserInterface>::Renderer> {
-        Self::container("Buttons")
-            .push(Text::new("Buttons can fire actions when clicked."))
+        Self::container("Button")
+            .push(Text::new("A button can fire actions when clicked."))
             .push(Text::new(
                 "As of now, there are 3 different types of buttons: \
                  primary, secondary, and positive.",
@@ -286,38 +355,54 @@ impl<'a> Step {
                     .r#type(button::Type::Positive),
             )
             .push(Text::new(
-                "More types of buttons will probably be supported in the near \
-                 future! Choose each type smartly depending on the situation.",
+                "Additional types will be added in the near future! Choose \
+                 each type smartly depending on the situation.",
             ))
     }
 
     fn checkbox(
         is_checked: bool,
     ) -> Column<'a, StepEvent, <Tour as UserInterface>::Renderer> {
-        Self::container("Checkbox").push(Checkbox::new(
-            is_checked,
-            "Some checkbox",
-            StepEvent::CheckboxToggled,
-        ))
+        Self::container("Checkbox")
+            .push(Text::new(
+                "A box that can be checked. Useful to build toggle controls.",
+            ))
+            .push(Checkbox::new(
+                is_checked,
+                "Show \"Next\" button",
+                StepEvent::CheckboxToggled,
+            ))
+            .push(Text::new(
+                "A checkbox always has a label, and both the checkbox and its \
+                 label can be clicked to toggle it.",
+            ))
     }
 
     fn radio(
         selection: Option<Language>,
     ) -> Column<'a, StepEvent, <Tour as UserInterface>::Renderer> {
-        let container = Self::container("Radio")
-            .push(Text::new("Which is your favorite programming language?"));
+        let question = Column::new()
+            .padding(20)
+            .spacing(10)
+            .push(Text::new("Coffee is written in..."))
+            .push(Language::all().iter().cloned().fold(
+                Column::new().padding(10).spacing(20),
+                |choices, language| {
+                    choices.push(Radio::new(
+                        language,
+                        language.into(),
+                        selection,
+                        StepEvent::LanguageSelected,
+                    ))
+                },
+            ));
 
-        Language::all().iter().cloned().fold(
-            container,
-            |container, language| {
-                container.push(Radio::new(
-                    language,
-                    language.into(),
-                    selection,
-                    StepEvent::LanguageSelected,
-                ))
-            },
-        )
+        Self::container("Radio button")
+            .push(Text::new(
+                "A radio button is normally used to represent a choice. Like \
+                 a checkbox, it  always has a label.",
+            ))
+            .push(question)
     }
 
     fn slider(
@@ -325,6 +410,14 @@ impl<'a> Step {
         value: u16,
     ) -> Column<'a, StepEvent, <Tour as UserInterface>::Renderer> {
         Self::container("Slider")
+            .push(Text::new(
+                "A slider allows you to smoothly select a value from a range \
+                 of values.",
+            ))
+            .push(Text::new(
+                "The following slider lets you choose an integer from \
+                 0 to 100:",
+            ))
             .push(Slider::new(
                 state,
                 0.0..100.0,
@@ -334,42 +427,120 @@ impl<'a> Step {
             .push(Text::new(&value.to_string()).align_center())
     }
 
-    fn text() -> Column<'a, StepEvent, <Tour as UserInterface>::Renderer> {
+    fn text(
+        size_slider: &'a mut slider::State,
+        size: u16,
+        color_sliders: &'a mut [slider::State; 3],
+        color: Color,
+    ) -> Column<'a, StepEvent, <Tour as UserInterface>::Renderer> {
+        let size_section = Column::new()
+            .padding(20)
+            .spacing(20)
+            .push(Text::new("You can change its size:"))
+            .push(
+                Text::new(&format!("This text is {} points", size)).size(size),
+            )
+            .push(Slider::new(
+                size_slider,
+                10.0..50.0,
+                size as f32,
+                StepEvent::TextSizeChanged,
+            ));
+
+        let [red, green, blue] = color_sliders;
+        let color_section = Column::new()
+            .padding(20)
+            .spacing(20)
+            .push(Text::new("And its color:"))
+            .push(Text::new(&format!("{:?}", color)).color(color))
+            .push(
+                Row::new()
+                    .spacing(10)
+                    .push(Slider::new(red, 0.0..1.0, color.r, move |r| {
+                        StepEvent::TextColorChanged(Color { r, ..color })
+                    }))
+                    .push(Slider::new(green, 0.0..1.0, color.g, move |g| {
+                        StepEvent::TextColorChanged(Color { g, ..color })
+                    }))
+                    .push(Slider::new(blue, 0.0..1.0, color.b, move |b| {
+                        StepEvent::TextColorChanged(Color { b, ..color })
+                    })),
+            );
+
         Self::container("Text")
             .push(Text::new(
                 "Text is probably the most essential widget for your UI. \
-                 It will automatically adapt to the width of its \
-                 container.",
+                 It will try to adapt to the dimensions of its container.",
             ))
-            .push(Text::new("You can change its size and color:"))
-            .push(Text::new("This text is 30 points").size(30))
-            .push(Text::new("This text is 40 points and cyan").size(40).color(
-                Color {
-                    r: 0.0,
-                    g: 1.0,
-                    b: 1.0,
-                    a: 1.0,
-                },
-            ))
+            .push(size_section)
+            .push(color_section)
     }
 
     fn rows_and_columns(
+        layout: Layout,
+        spacing_slider: &'a mut slider::State,
+        spacing: u16,
     ) -> Column<'a, StepEvent, <Tour as UserInterface>::Renderer> {
-        Self::container("Rows and Columns")
+        let row_radio = Radio::new(
+            Layout::Row,
+            "Row",
+            Some(layout),
+            StepEvent::LayoutChanged,
+        );
+
+        let column_radio = Radio::new(
+            Layout::Column,
+            "Column",
+            Some(layout),
+            StepEvent::LayoutChanged,
+        );
+
+        let layout_section: Element<_, _> = match layout {
+            Layout::Row => Row::new()
+                .spacing(spacing)
+                .push(row_radio)
+                .push(column_radio)
+                .into(),
+            Layout::Column => Column::new()
+                .spacing(spacing)
+                .push(row_radio)
+                .push(column_radio)
+                .into(),
+        };
+
+        let spacing_section = Column::new()
+            .spacing(10)
+            .push(Slider::new(
+                spacing_slider,
+                0.0..100.0,
+                spacing as f32,
+                StepEvent::SpacingChanged,
+            ))
+            .push(Text::new(&format!("{} px", spacing)).align_center());
+
+        Self::container("Rows and columns")
+            .spacing(spacing)
+            .push(Text::new(
+                "Coffee uses a layout model based on flexbox to position UI \
+                 elements.",
+            ))
             .push(Text::new(
                 "Rows and columns can be used to distribute content \
                  horizontally or vertically, respectively.",
             ))
+            .push(layout_section)
             .push(Text::new(
-                "All the text you have been reading until now was inside \
-                 a column. Here is a row:",
+                "You can also easily change the spacing between elements:",
             ))
-            .push(
-                Row::new()
-                    .spacing(20)
-                    .push(Text::new("This text will be shown on the left side"))
-                    .push(Text::new("This is the right side")),
-            )
+            .push(spacing_section)
+    }
+
+    fn end() -> Column<'a, StepEvent, <Tour as UserInterface>::Renderer> {
+        Self::container("You reached the end!")
+            .push(Text::new(
+                "This tour will be extended as more features are added.",
+            ))
+            .push(Text::new("Make sure to keep an eye on it!"))
     }
 }
 
@@ -386,11 +557,11 @@ enum Language {
 impl Language {
     fn all() -> [Language; 6] {
         [
-            Language::Rust,
+            Language::C,
             Language::Elm,
             Language::Ruby,
             Language::Haskell,
-            Language::C,
+            Language::Rust,
             Language::Other,
         ]
     }
@@ -407,4 +578,10 @@ impl From<Language> for &str {
             Language::Other => "Other",
         }
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Layout {
+    Row,
+    Column,
 }

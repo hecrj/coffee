@@ -139,6 +139,7 @@ pub trait Renderer {
     ) -> MouseCursor;
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct State {
     is_dragging: bool,
 }
