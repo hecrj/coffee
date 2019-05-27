@@ -65,10 +65,13 @@ impl Canvas {
     ///
     /// [`Canvas`]: struct.Canvas.html
     /// [`Target`]: struct.Target.html
-    pub fn draw<T: IntoQuad>(&self, quad: T, target: &mut Target, x_unit: f32, y_unit: f32) {
+    pub fn draw<Q: IntoQuad>(&self, quad: Q, target: &mut Target) {
         target.draw_texture_quads(
             &self.drawable.texture(),
-            &[gpu::Instance::from(quad.into_quad(x_unit, y_unit))],
+            &[gpu::Instance::from(quad.into_quad(
+                1.0 / self.width() as f32,
+                1.0 / self.height() as f32
+            ))],
         );
     }
 }
