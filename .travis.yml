@@ -9,8 +9,15 @@ os:
   - windows
 cache: cargo
 before_install:
-  - sudo apt-get update
-  - sudo apt-get install -y glslang-tools
+  - |
+    mkdir glslang
+    cd glslang
+    wget https://github.com/KhronosGroup/glslang/releases/download/master-tot/glslang-master-linux-Release.zip
+    unzip -u -q glslang-master-linux-Release.zip
+    cd ..
+    export PATH=${TRAVIS_BUILD_DIR}/glslang/bin:$PATH
+    glslangValidator --version
+
 matrix:
   allow_failures:
     - rust: nightly
