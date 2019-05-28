@@ -21,6 +21,7 @@ for file in $shader_dir; do
         if [ "$cmp" != "" ] 
         then
             echo "Error: The compiled SPIR-V differs from the compiled SPIR-V from the repository."
+            echo "Error: Compiled SPIR-V for $file differs from $existing_file"
             exit 1
         else
             echo "Compiled SPIR-V for $file matches $existing_file"
