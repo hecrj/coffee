@@ -16,13 +16,12 @@ for file in $shader_dir; do
         # Compare the newly compiled file with the compiled file from the repo.
         cmp=$(cmp $existing_file $test_file)
 
-        if [ "$cmp" != "" ] 
-        then
+        if [[ "$cmp" != "" ]]; then
             echo "Error: The compiled SPIR-V differs from the compiled SPIR-V from the repository."
-            echo "Error: Compiled SPIR-V for $file differs from $existing_file"
+            echo "Error: Compiled SPIR-V in $test_file differs from $existing_file"
             exit 1
         else
-            echo "Compiled SPIR-V for $file matches $existing_file"
+            echo "Compiled SPIR-V in $test_file matches $existing_file"
         fi
     fi
 done
