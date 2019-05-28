@@ -13,6 +13,12 @@ for file in $shader_dir; do
         # Compile the file
         res=$(glslangValidator -V110 $file -o $test_file)
 
+        if [[ $? != 0 ]]; then
+            echo "Error: Failed to compile $file"
+            echo $res
+            exit 1
+        fi
+
         # Compare the newly compiled file with the compiled file from the repo.
         cmp=$(cmp $existing_file $test_file)
 
