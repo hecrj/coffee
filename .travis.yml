@@ -19,12 +19,11 @@ before_install:
       export PATH=${TRAVIS_BUILD_DIR}/glslang/bin:$PATH
       glslangValidator --version
     fi
-
 matrix:
   allow_failures:
     - rust: nightly
   fast_finish: true
 script:
-  - chmod +x spirvtest && ./spirvtest
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; chmod +x spirvtest && ./spirvtest; fi
   - cargo test --verbose --features opengl
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cargo test --verbose --features vulkan --release; fi
