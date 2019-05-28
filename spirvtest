@@ -1,14 +1,12 @@
 #!/bin/bash
-
 # Script to ensure compiled SPIR-V matches it's source on CI.
 
 shader_dir="src/graphics/backend_wgpu/shader/*"
 
 for file in $shader_dir; do
-
     # Look for files with ".frag" or ".vert" extensions
     if [[ "$file" =~ \.(frag|vert)$ ]]; then
-        
+
         test_file="$file.test"
         existing_file="$file.spv"
 
