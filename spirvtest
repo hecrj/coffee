@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# Script to ensure compiled SPIR-V matches it's source on CI.
+
+shader_dir="src/graphics/backend_wgpu/shader/*"
+
+for file in $shader_dir; do
+
+    # Look for files with ".frag" or ".vert" extensions
+    if [[ "$file" =~ \.(frag|vert)$ ]]; then
+        
+        test_file="$file.test"
+        existing_file="$file.spv"
+
+        # Compile the file
+        res=$(glslangValidator -V110 $file -o $test_file)
+
+        # Compare the newly compiled file with the compiled file from the repo.
+        cmp=$(cmp $existing_file $test_file)
+
+        if [ "$cmp" != "" ] 
+        then
+            echo "Error: The compiled SPIR-V differs from the compiled SPIR-V from the repository."
+            exit 1
+        else
+            echo "Compiled SPIR-V for $file matches $existing_file"
+        fi
+    fi
+done
+
+

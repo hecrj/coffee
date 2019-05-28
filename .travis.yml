@@ -8,10 +8,14 @@ os:
   - osx
   - windows
 cache: cargo
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install -y glslang
 matrix:
   allow_failures:
     - rust: nightly
   fast_finish: true
-script:
+  script:
+  - chmod +x spirvtest && ./spirvtest
   - cargo test --verbose --features opengl
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cargo test --verbose --features vulkan --release; fi
