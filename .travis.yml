@@ -18,7 +18,7 @@ before_install:
       cd ..
       export PATH=${TRAVIS_BUILD_DIR}/glslang/bin:$PATH
       glslangValidator --version
-    end
+    fi
 
 matrix:
   allow_failures:
