@@ -10,7 +10,7 @@ os:
 cache: cargo
 before_install:
   - sudo apt-get update
-  - sudo apt-get install -y glslang
+  - sudo apt-get install -y glslang-tools
 matrix:
   allow_failures:
     - rust: nightly
