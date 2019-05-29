@@ -33,7 +33,7 @@ where
     R: Renderer + column::Renderer + text::Renderer + 'static,
     M: Copy,
 {
-    type Msg = M;
+    type Message = M;
     type Renderer = R;
 
     fn node(&self, renderer: &R) -> Node {

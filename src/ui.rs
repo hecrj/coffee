@@ -32,16 +32,16 @@ use crate::{Game, Result, State, Timer};
 use interface::Interface;
 
 pub trait UserInterface: Game {
-    type Event;
+    type Message;
     type Renderer: Renderer;
 
-    fn update(&mut self, state: &mut Self::State, event: Self::Event);
+    fn update(&mut self, state: &mut Self::State, message: Self::Message);
 
     fn layout(
         &mut self,
         state: &Self::State,
         window: &Window,
-    ) -> Element<Self::Event, Self::Renderer>;
+    ) -> Element<Self::Message, Self::Renderer>;
 
     fn run(window_settings: WindowSettings) -> Result<()>
     where

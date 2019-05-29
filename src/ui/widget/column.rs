@@ -76,7 +76,7 @@ impl<'a, M, R> Widget for Column<'a, M, R>
 where
     R: Renderer,
 {
-    type Msg = M;
+    type Message = M;
     type Renderer = R;
 
     fn node(&self, renderer: &R) -> Node {
@@ -110,7 +110,7 @@ where
         event: Event,
         layout: Layout,
         cursor_position: Point,
-        messages: &mut Vec<Self::Msg>,
+        messages: &mut Vec<Self::Message>,
     ) {
         self.children.iter_mut().zip(layout.children()).for_each(
             |(child, layout)| {

@@ -21,7 +21,7 @@ use crate::graphics::Point;
 use crate::ui::{Event, Hasher, Layout, MouseCursor, Node};
 
 pub trait Widget {
-    type Msg;
+    type Message;
     type Renderer;
 
     fn node(&self, renderer: &Self::Renderer) -> Node;
@@ -31,7 +31,7 @@ pub trait Widget {
         _event: Event,
         _layout: Layout,
         _cursor_position: Point,
-        _messages: &mut Vec<Self::Msg>,
+        _messages: &mut Vec<Self::Message>,
     ) {
     }
 

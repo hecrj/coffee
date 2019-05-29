@@ -54,7 +54,7 @@ impl<M, R> Widget for Text<M, R>
 where
     R: Renderer,
 {
-    type Msg = M;
+    type Message = M;
     type Renderer = R;
 
     fn node(&self, renderer: &R) -> Node {

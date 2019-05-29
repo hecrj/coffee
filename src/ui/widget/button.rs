@@ -53,7 +53,7 @@ where
     R: Renderer,
     M: Copy,
 {
-    type Msg = M;
+    type Message = M;
     type Renderer = R;
 
     fn node(&self, _renderer: &R) -> Node {
