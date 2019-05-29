@@ -2,7 +2,7 @@ use std::hash::Hasher;
 use stretch::result;
 
 use crate::graphics::{Point, Window};
-use crate::ui::{Element, Event, Layout, MouseCursor, Renderer};
+use crate::ui::core::{Element, Event, Layout, MouseCursor, Renderer};
 
 pub struct Interface<'a, M, R> {
     hash: u64,

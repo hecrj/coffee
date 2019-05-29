@@ -1,27 +1,26 @@
-mod element;
-mod event;
-mod hasher;
-mod interface;
-mod layout;
-mod mouse_cursor;
-mod node;
-mod style;
-mod widget;
+mod checkbox;
+mod panel;
+mod radio;
+mod renderer;
+mod text;
 
-pub mod renderer;
+pub mod button;
+pub mod core;
+pub mod slider;
 
-pub use stretch::geometry::Size;
-pub use stretch::number::Number;
-
-pub use element::Element;
-pub use event::Event;
-pub use hasher::Hasher;
-pub use layout::Layout;
-pub use mouse_cursor::MouseCursor;
-pub use node::Node;
+pub use button::Button;
+pub use checkbox::Checkbox;
+pub use panel::Panel;
+pub use radio::Radio;
 pub use renderer::Renderer;
-pub use style::Style;
-pub use widget::*;
+pub use slider::Slider;
+pub use text::Text;
+
+pub type Column<'a, M> = self::core::widget::Column<'a, M, Renderer>;
+pub type Row<'a, M> = self::core::widget::Row<'a, M, Renderer>;
+pub type Element<'a, M> = self::core::Element<'a, M, Renderer>;
+
+use self::core::{Event, Interface, MouseCursor, Renderer as _};
 
 use crate::game;
 use crate::graphics::{window, Window, WindowSettings};
@@ -29,11 +28,10 @@ use crate::input::{HasCursorPosition, Input};
 use crate::load::{Join, LoadingScreen};
 use crate::Debug;
 use crate::{Game, Result, State, Timer};
-use interface::Interface;
 
 pub trait UserInterface: Game {
     type Message;
-    type Renderer: Renderer;
+    type Renderer: self::core::Renderer;
 
     fn update(&mut self, state: &mut Self::State, message: Self::Message);
 
@@ -41,7 +39,7 @@ pub trait UserInterface: Game {
         &mut self,
         state: &Self::State,
         window: &Window,
-    ) -> Element<Self::Message, Self::Renderer>;
+    ) -> self::core::Element<Self::Message, Self::Renderer>;
 
     fn run(window_settings: WindowSettings) -> Result<()>
     where

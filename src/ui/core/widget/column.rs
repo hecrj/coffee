@@ -1,20 +1,23 @@
 use std::hash::Hash;
 
-use crate::graphics::Point;
-use crate::ui::{
+use crate::graphics::{Point, Rectangle};
+use crate::ui::core::{
     Element, Event, Hasher, Layout, MouseCursor, Node, Style, Widget,
 };
 
-pub struct Row<'a, M, R> {
+pub struct Column<'a, M, R> {
     style: Style,
     spacing: u16,
     children: Vec<Element<'a, M, R>>,
 }
 
-impl<'a, M, R> Row<'a, M, R> {
+impl<'a, M, R> Column<'a, M, R> {
     pub fn new() -> Self {
-        Row {
-            style: Style::default(),
+        let mut style = Style::default();
+        style.0.flex_direction = stretch::style::FlexDirection::Column;
+
+        Column {
+            style,
             spacing: 0,
             children: Vec::new(),
         }
@@ -35,16 +38,6 @@ impl<'a, M, R> Row<'a, M, R> {
         self
     }
 
-    pub fn max_height(mut self, max_height: f32) -> Self {
-        self.style = self.style.max_height(max_height);
-        self
-    }
-
-    pub fn align_left(mut self) -> Self {
-        self.style = self.style.align_left();
-        self
-    }
-
     pub fn fill_width(mut self) -> Self {
         self.style = self.style.fill_width();
         self
@@ -60,12 +53,17 @@ impl<'a, M, R> Row<'a, M, R> {
         self
     }
 
+    pub fn align_center(mut self) -> Self {
+        self.style = self.style.align_center();
+        self
+    }
+
     pub fn center_children(mut self) -> Self {
         self.style = self.style.center_children();
         self
     }
 
-    pub fn push<E>(mut self, child: E) -> Row<'a, M, R>
+    pub fn push<E>(mut self, child: E) -> Column<'a, M, R>
     where
         E: Into<Element<'a, M, R>>,
     {
@@ -74,7 +72,10 @@ impl<'a, M, R> Row<'a, M, R> {
     }
 }
 
-impl<'a, M, R> Widget for Row<'a, M, R> {
+impl<'a, M, R> Widget for Column<'a, M, R>
+where
+    R: Renderer,
+{
     type Message = M;
     type Renderer = R;
 
@@ -86,7 +87,7 @@ impl<'a, M, R> Widget for Row<'a, M, R> {
                 let mut node = child.widget.node(renderer);
 
                 let mut style = node.0.style();
-                style.margin.end =
+                style.margin.bottom =
                     stretch::style::Dimension::Points(self.spacing as f32);
 
                 node.0.set_style(style);
@@ -96,7 +97,7 @@ impl<'a, M, R> Widget for Row<'a, M, R> {
 
         if let Some(node) = children.last_mut() {
             let mut style = node.0.style();
-            style.margin.end = stretch::style::Dimension::Undefined;
+            style.margin.bottom = stretch::style::Dimension::Undefined;
 
             node.0.set_style(style);
         }
@@ -128,6 +129,8 @@ impl<'a, M, R> Widget for Row<'a, M, R> {
     ) -> MouseCursor {
         let mut cursor = MouseCursor::Default;
 
+        renderer.draw(layout.bounds());
+
         self.children.iter().zip(layout.children()).for_each(
             |(child, layout)| {
                 let new_cursor =
@@ -152,12 +155,16 @@ impl<'a, M, R> Widget for Row<'a, M, R> {
     }
 }
 
-impl<'a, M, R> From<Row<'a, M, R>> for Element<'a, M, R>
+pub trait Renderer {
+    fn draw(&mut self, bounds: Rectangle<f32>);
+}
+
+impl<'a, M, R> From<Column<'a, M, R>> for Element<'a, M, R>
 where
-    R: 'static,
+    R: Renderer + 'static,
     M: 'static,
 {
-    fn from(row: Row<'a, M, R>) -> Element<'a, M, R> {
-        Element::new(row)
+    fn from(column: Column<'a, M, R>) -> Element<'a, M, R> {
+        Element::new(column)
     }
 }

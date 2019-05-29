@@ -1,9 +1,13 @@
-use super::Basic;
+use super::Renderer;
 use crate::graphics::{
     Color, HorizontalAlignment, Point, Quad, Rectangle, Sprite, Text,
     VerticalAlignment,
 };
-use crate::ui::{button, MouseCursor};
+use crate::ui::core::{widget::button, MouseCursor};
+
+pub type Button<'a, M> = button::Button<'a, M, Renderer>;
+pub use button::State;
+pub use button::Type;
 
 const LEFT: Rectangle<u16> = Rectangle {
     x: 0,
@@ -26,7 +30,7 @@ const RIGHT: Rectangle<u16> = Rectangle {
     height: LEFT.height,
 };
 
-impl button::Renderer for Basic {
+impl button::Renderer for Renderer {
     fn draw(
         &mut self,
         state: &button::State,

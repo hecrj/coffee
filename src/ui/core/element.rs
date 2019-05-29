@@ -1,7 +1,7 @@
 use stretch::{geometry, result};
 
 use crate::graphics::Point;
-use crate::ui::{Event, Hasher, Layout, MouseCursor, Node, Widget};
+use crate::ui::core::{Event, Hasher, Layout, MouseCursor, Node, Widget};
 
 pub struct Element<'a, M, R> {
     pub(crate) widget: Box<Widget<Message = M, Renderer = R> + 'a>,

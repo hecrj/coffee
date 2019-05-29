@@ -1,25 +1,26 @@
-use super::Basic;
+use super::Renderer;
 
 use crate::graphics::{Point, Rectangle, Sprite};
-use crate::ui::{checkbox, MouseCursor};
+use crate::ui::core::{widget::radio, MouseCursor};
+
+pub type Radio<M> = radio::Radio<M, Renderer>;
 
 const SPRITE: Rectangle<u16> = Rectangle {
     x: 98,
-    y: 0,
+    y: 28,
     width: 28,
     height: 28,
 };
 
-impl checkbox::Renderer for Basic {
+impl radio::Renderer for Renderer {
     fn draw(
         &mut self,
-        is_checked: bool,
+        is_selected: bool,
         bounds: Rectangle<f32>,
-        text_bounds: Rectangle<f32>,
+        bounds_with_label: Rectangle<f32>,
         cursor_position: Point,
     ) -> MouseCursor {
-        let mouse_over = bounds.contains(cursor_position)
-            || text_bounds.contains(cursor_position);
+        let mouse_over = bounds_with_label.contains(cursor_position);
 
         self.sprites.add(Sprite {
             source: Rectangle {
@@ -30,7 +31,7 @@ impl checkbox::Renderer for Basic {
             scale: (1.0, 1.0),
         });
 
-        if is_checked {
+        if is_selected {
             self.sprites.add(Sprite {
                 source: Rectangle {
                     x: SPRITE.x + SPRITE.width * 2,

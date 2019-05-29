@@ -1,7 +1,9 @@
 use std::hash::Hash;
 
 use crate::graphics::{Color, Point, Rectangle};
-use crate::ui::{Element, Hasher, Layout, MouseCursor, Node, Style, Widget};
+use crate::ui::core::{
+    Element, Hasher, Layout, MouseCursor, Node, Style, Widget,
+};
 
 pub struct Text<M, R> {
     content: String,

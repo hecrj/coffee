@@ -3,7 +3,7 @@ use std::ops::Range;
 
 use crate::graphics::{Point, Rectangle};
 use crate::input::{ButtonState, MouseButton};
-use crate::ui::{
+use crate::ui::core::{
     Element, Event, Hasher, Layout, MouseCursor, Node, Style, Widget,
 };
 
@@ -119,13 +119,6 @@ where
     fn hash(&self, state: &mut Hasher) {
         self.style.hash(state);
     }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Type {
-    Primary,
-    Secondary,
-    Positive,
 }
 
 pub trait Renderer {

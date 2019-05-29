@@ -89,3 +89,4 @@ pub use input::Input;
 pub use result::{Error, Result};
 pub use state::State;
 pub use timer::Timer;
+pub use ui::UserInterface;

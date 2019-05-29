@@ -1,12 +1,14 @@
-use super::Basic;
+use super::Renderer;
 
-use crate::graphics::{Color, Point, Rectangle, Text};
-use crate::ui::{text, Node, Number, Size, Style};
+use crate::graphics::{self, Color, Point, Rectangle};
+use crate::ui::core::{widget::text, Node, Number, Size, Style};
 
 use std::cell::RefCell;
 use std::f32;
 
-impl text::Renderer for Basic {
+pub type Text<M> = text::Text<M, Renderer>;
+
+impl text::Renderer for Renderer {
     fn node(&self, style: Style, content: &str, size: f32) -> Node {
         let font = self.font.clone();
         let content = String::from(content);
@@ -34,11 +36,11 @@ impl text::Renderer for Basic {
                     },
                 );
 
-                let text = Text {
+                let text = graphics::Text {
                     content: &content,
                     size,
                     bounds,
-                    ..Text::default()
+                    ..graphics::Text::default()
                 };
 
                 let (width, height) = font.borrow_mut().measure(text);
@@ -68,13 +70,13 @@ impl text::Renderer for Basic {
         color: Color,
         bounds: Rectangle<f32>,
     ) {
-        self.font.borrow_mut().add(Text {
+        self.font.borrow_mut().add(graphics::Text {
             content,
             position: Point::new(bounds.x, bounds.y),
             bounds: (bounds.width, bounds.height),
             color,
             size,
-            ..Text::default()
+            ..graphics::Text::default()
         });
     }
 }

@@ -2,7 +2,7 @@ use std::hash::Hash;
 
 use crate::graphics::{Point, Rectangle};
 use crate::input::{ButtonState, MouseButton};
-use crate::ui::{
+use crate::ui::core::{
     Element, Event, Hasher, Layout, MouseCursor, Node, Style, Widget,
 };
 

@@ -1,7 +1,9 @@
-use super::Basic;
+use super::Renderer;
 
 use crate::graphics::{Point, Quad, Rectangle, Sprite};
-use crate::ui::panel;
+use crate::ui::core::widget::panel;
+
+pub type Panel<'a, M> = panel::Panel<'a, M, Renderer>;
 
 const PANEL_WIDTH: u16 = 28;
 const PANEL_HEIGHT: u16 = 34;
@@ -69,7 +71,7 @@ const BOTTOM_RIGHT: Rectangle<u16> = Rectangle {
     height: TOP_RIGHT.height,
 };
 
-impl panel::Renderer for Basic {
+impl panel::Renderer for Renderer {
     fn draw(&mut self, bounds: Rectangle<f32>) {
         self.debug.add(Quad {
             source: Rectangle {

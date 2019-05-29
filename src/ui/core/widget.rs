@@ -18,7 +18,7 @@ pub use slider::Slider;
 pub use text::Text;
 
 use crate::graphics::Point;
-use crate::ui::{Event, Hasher, Layout, MouseCursor, Node};
+use crate::ui::core::{Event, Hasher, Layout, MouseCursor, Node};
 
 pub trait Widget {
     type Message;

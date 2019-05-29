@@ -1,8 +1,11 @@
 use std::ops::Range;
 
-use super::Basic;
+use super::Renderer;
 use crate::graphics::{Point, Rectangle, Sprite};
-use crate::ui::{slider, MouseCursor};
+use crate::ui::core::{widget::slider, MouseCursor};
+
+pub type Slider<'a, M> = slider::Slider<'a, M, Renderer>;
+pub use slider::State;
 
 const RAIL: Rectangle<u16> = Rectangle {
     x: 98,
@@ -18,7 +21,7 @@ const MARKER: Rectangle<u16> = Rectangle {
     height: 24,
 };
 
-impl slider::Renderer for Basic {
+impl slider::Renderer for Renderer {
     fn draw(
         &mut self,
         state: &slider::State,

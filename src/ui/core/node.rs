@@ -1,6 +1,6 @@
 use stretch::node;
 
-use crate::ui::{Number, Size, Style};
+use crate::ui::core::{Number, Size, Style};
 
 pub struct Node(pub(super) node::Node);
 

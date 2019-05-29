@@ -2,33 +2,34 @@ use std::hash::Hash;
 
 use crate::graphics::{Color, Point, Rectangle};
 use crate::input::{ButtonState, MouseButton};
-use crate::ui::{
-    column, text, Column, Element, Event, Hasher, Layout, MouseCursor, Node,
-    Row, Text, Widget,
+use crate::ui::core::widget::{column, text, Column, Row, Text};
+use crate::ui::core::{
+    Element, Event, Hasher, Layout, MouseCursor, Node, Widget,
 };
 
-pub struct Checkbox<M, R> {
-    is_checked: bool,
-    on_toggle: Box<Fn(bool) -> M>,
+pub struct Radio<M, R> {
+    is_selected: bool,
+    on_click: M,
     label: String,
     renderer: std::marker::PhantomData<R>,
 }
 
-impl<M, R> Checkbox<M, R> {
-    pub fn new<F>(is_checked: bool, label: &str, f: F) -> Self
+impl<M, R> Radio<M, R> {
+    pub fn new<F, V>(value: V, label: &str, selected: Option<V>, f: F) -> Self
     where
-        F: Fn(bool) -> M + 'static,
+        V: Eq + Copy,
+        F: Fn(V) -> M + 'static,
     {
-        Checkbox {
-            is_checked,
-            on_toggle: Box::new(f),
+        Radio {
+            is_selected: Some(value) == selected,
+            on_click: f(value),
             label: String::from(label),
             renderer: std::marker::PhantomData,
         }
     }
 }
 
-impl<M, R> Widget for Checkbox<M, R>
+impl<M, R> Widget for Radio<M, R>
 where
     R: Renderer + column::Renderer + text::Renderer + 'static,
     M: Copy,
@@ -56,12 +57,8 @@ where
                 button: MouseButton::Left,
                 state: ButtonState::Pressed,
             } => {
-                let mouse_over = layout
-                    .children()
-                    .any(|child| child.bounds().contains(cursor_position));
-
-                if mouse_over {
-                    messages.push((self.on_toggle)(!self.is_checked));
+                if layout.bounds().contains(cursor_position) {
+                    messages.push(self.on_click);
                 }
             }
             _ => {}
@@ -87,9 +84,9 @@ where
         );
 
         (renderer as &mut Renderer).draw(
-            self.is_checked,
+            self.is_selected,
             children[0].bounds(),
-            text_bounds,
+            layout.bounds(),
             cursor_position,
         )
     }
@@ -102,19 +99,19 @@ where
 pub trait Renderer {
     fn draw(
         &mut self,
-        is_checked: bool,
+        is_selected: bool,
         bounds: Rectangle<f32>,
         label_bounds: Rectangle<f32>,
         cursor_position: Point,
     ) -> MouseCursor;
 }
 
-impl<'a, M, R> From<Checkbox<M, R>> for Element<'a, M, R>
+impl<'a, M, R> From<Radio<M, R>> for Element<'a, M, R>
 where
     R: Renderer + column::Renderer + text::Renderer + 'static,
     M: Copy + 'static,
 {
-    fn from(checkbox: Checkbox<M, R>) -> Element<'a, M, R> {
+    fn from(checkbox: Radio<M, R>) -> Element<'a, M, R> {
         Element::new(checkbox)
     }
 }

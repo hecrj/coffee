@@ -2,10 +2,10 @@ use coffee::graphics::{Color, Frame, Window, WindowSettings};
 use coffee::input::KeyboardAndMouse;
 use coffee::load::{loading_screen::ProgressBar, Task};
 use coffee::ui::{
-    button, renderer, slider, Button, Checkbox, Column, Element, Radio, Row,
-    Slider, Text, UserInterface,
+    button, slider, Button, Checkbox, Column, Element, Radio, Renderer, Row,
+    Slider, Text,
 };
-use coffee::{Game, Result, Timer};
+use coffee::{Game, Result, Timer, UserInterface};
 
 fn main() -> Result<()> {
     <Tour as UserInterface>::run(WindowSettings {
@@ -58,7 +58,7 @@ impl UserInterface for Tour {
         &mut self,
         _state: &Self::State,
         window: &Window,
-    ) -> Element<Message, Self::Renderer> {
+    ) -> Element<Message> {
         let Tour {
             steps,
             back_button,
@@ -120,8 +120,6 @@ enum Message {
     StepMessage(StepMessage),
 }
 
-type Renderer = renderer::Basic;
-
 struct Steps {
     steps: Vec<Step>,
     current: usize,
@@ -164,7 +162,7 @@ impl Steps {
         self.steps[self.current].update(msg);
     }
 
-    fn layout(&mut self) -> Element<StepMessage, Renderer> {
+    fn layout(&mut self) -> Element<StepMessage> {
         self.steps[self.current].layout()
     }
 
@@ -286,7 +284,7 @@ impl<'a> Step {
         }
     }
 
-    fn layout(&mut self) -> Element<StepMessage, Renderer> {
+    fn layout(&mut self) -> Element<StepMessage> {
         match self {
             Step::Welcome => Self::welcome().into(),
             Step::Buttons {
@@ -314,11 +312,11 @@ impl<'a> Step {
         }
     }
 
-    fn container(title: &str) -> Column<'a, StepMessage, Renderer> {
+    fn container(title: &str) -> Column<'a, StepMessage> {
         Column::new().spacing(20).push(Text::new(title).size(50))
     }
 
-    fn welcome() -> Column<'a, StepMessage, Renderer> {
+    fn welcome() -> Column<'a, StepMessage> {
         Self::container("Welcome!")
             .push(Text::new(
                 "This is a tour that introduces some of the features and \
@@ -334,7 +332,7 @@ impl<'a> Step {
         primary: &'a mut button::State,
         secondary: &'a mut button::State,
         positive: &'a mut button::State,
-    ) -> Column<'a, StepMessage, Renderer> {
+    ) -> Column<'a, StepMessage> {
         Self::container("Button")
             .push(Text::new("A button can fire actions when clicked."))
             .push(Text::new(
@@ -356,7 +354,7 @@ impl<'a> Step {
             ))
     }
 
-    fn checkbox(is_checked: bool) -> Column<'a, StepMessage, Renderer> {
+    fn checkbox(is_checked: bool) -> Column<'a, StepMessage> {
         Self::container("Checkbox")
             .push(Text::new(
                 "A box that can be checked. Useful to build toggle controls.",
@@ -372,7 +370,7 @@ impl<'a> Step {
             ))
     }
 
-    fn radio(selection: Option<Language>) -> Column<'a, StepMessage, Renderer> {
+    fn radio(selection: Option<Language>) -> Column<'a, StepMessage> {
         let question = Column::new()
             .padding(20)
             .spacing(10)
@@ -400,7 +398,7 @@ impl<'a> Step {
     fn slider(
         state: &'a mut slider::State,
         value: u16,
-    ) -> Column<'a, StepMessage, Renderer> {
+    ) -> Column<'a, StepMessage> {
         Self::container("Slider")
             .push(Text::new(
                 "A slider allows you to smoothly select a value from a range \
@@ -424,7 +422,7 @@ impl<'a> Step {
         size: u16,
         color_sliders: &'a mut [slider::State; 3],
         color: Color,
-    ) -> Column<'a, StepMessage, Renderer> {
+    ) -> Column<'a, StepMessage> {
         let size_section = Column::new()
             .padding(20)
             .spacing(20)
@@ -472,7 +470,7 @@ impl<'a> Step {
         layout: Layout,
         spacing_slider: &'a mut slider::State,
         spacing: u16,
-    ) -> Column<'a, StepMessage, Renderer> {
+    ) -> Column<'a, StepMessage> {
         let row_radio = Radio::new(
             Layout::Row,
             "Row",
@@ -487,7 +485,7 @@ impl<'a> Step {
             StepMessage::LayoutChanged,
         );
 
-        let layout_section: Element<_, _> = match layout {
+        let layout_section: Element<_> = match layout {
             Layout::Row => Row::new()
                 .spacing(spacing)
                 .push(row_radio)
@@ -527,7 +525,7 @@ impl<'a> Step {
             .push(spacing_section)
     }
 
-    fn end() -> Column<'a, StepMessage, Renderer> {
+    fn end() -> Column<'a, StepMessage> {
         Self::container("You reached the end!")
             .push(Text::new(
                 "This tour will be extended as more features are added.",

@@ -1,7 +1,9 @@
 use std::hash::Hash;
 
 use crate::graphics::{Point, Rectangle};
-use crate::ui::{Event, Hasher, Layout, MouseCursor, Node, Style, Widget};
+use crate::ui::core::{
+    Event, Hasher, Layout, MouseCursor, Node, Style, Widget,
+};
 
 pub struct Panel<'a, M, R> {
     style: Style,
