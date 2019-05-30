@@ -29,7 +29,7 @@ struct Particles {
 
 impl Particles {
     // Try increasing this value! I (@hecrj) can render 1 MILLION particles at
-    // 65 fps on my system (i7 4970k, GTX 980) using Vulkan.
+    // 90 fps on my system (i7 4970k, GTX 980, Windows 7) using Vulkan.
     const AMOUNT: u32 = 50_000;
 
     // Play with these values to alter the way gravity works.
@@ -171,14 +171,15 @@ impl Game for Particles {
             }
         });
 
-        // Create a new graphics batch
-        let mut batch = Batch::new(view.palette.clone());
+        // Clear batch contents from previous frame
+        view.batch.clear();
 
         // Use the parallel iterator to populate the batch efficiently
-        batch.par_extend(sprites);
+        view.batch.par_extend(sprites);
 
         // Draw particles all at once!
-        batch.draw(Point::new(0.0, 0.0), &mut frame.as_target());
+        view.batch
+            .draw(Point::new(0.0, 0.0), &mut frame.as_target());
 
         // Draw simple text UI
         view.font.add(Text {
@@ -238,7 +239,7 @@ impl Particle {
 }
 
 struct View {
-    palette: Image,
+    batch: Batch,
     font: Font,
     interpolate: bool,
 }
@@ -298,7 +299,7 @@ impl View {
         )
             .join()
             .map(|(palette, font)| View {
-                palette,
+                batch: Batch::new(palette),
                 font,
                 interpolate: true,
             })
