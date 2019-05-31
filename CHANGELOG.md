@@ -14,15 +14,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Transformation::rotate`. Creates a transformation representing a rotation. [#28]
 - `Batch::clear`. Clears the batch contents, useful to reuse batches in different
   frames.
+- Implementation of `Extend` for `Batch`. [#37]
+- Implementation of `ParallelExtend` for `Batch`. A `Batch` can now be populated
+  using multiple threads, useful to improve performance when dealing with many
+  thousands of quads. [#37]
 - Multiple gravity centers based on mouse clicks in the particles example. [#30]
 
 ### Changed
-- The performance of the particles example has been improved on Windows.
+- The performance of the particles example has been improved considerably on all
+  platforms. [#37]
 
 [#25]: https://github.com/hecrj/coffee/pull/25
 [#26]: https://github.com/hecrj/coffee/pull/26
 [#28]: https://github.com/hecrj/coffee/pull/28
 [#30]: https://github.com/hecrj/coffee/pull/30
+[#37]: https://github.com/hecrj/coffee/pull/37
 
 
 ## [0.2.0] - 2019-04-28

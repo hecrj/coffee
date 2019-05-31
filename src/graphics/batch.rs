@@ -1,3 +1,5 @@
+use rayon::prelude::*;
+
 use crate::graphics::gpu;
 use crate::graphics::{Image, IntoQuad, Point, Target, Transformation, Vector};
 
@@ -64,5 +66,46 @@ impl Batch {
 impl std::fmt::Debug for Batch {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "Batch {{ image: {:?} }}", self.image,)
+    }
+}
+
+impl<Q: IntoQuad> Extend<Q> for Batch {
+    fn extend<I>(&mut self, iter: I)
+    where
+        I: IntoIterator<Item = Q>,
+    {
+        let iter = iter.into_iter();
+        let x_unit = self.x_unit;
+        let y_unit = self.y_unit;
+
+        self.instances.extend(
+            iter.map(|quad| {
+                gpu::Instance::from(quad.into_quad(x_unit, y_unit))
+            }),
+        );
+    }
+}
+
+/// Extend the [`Batch`] using a parallel iterator from [`rayon`].
+///
+/// If you are dealing with many thousands of quads, `par_extend` can help you
+/// speed up your drawing by using multiple threads to populate a [`Batch`].
+///
+/// [`Batch`]: struct.Batch.html
+/// [`rayon`]: https://docs.rs/rayon/1.0/rayon/
+impl<Q: IntoQuad + Send> ParallelExtend<Q> for Batch {
+    fn par_extend<I>(&mut self, par_iter: I)
+    where
+        I: IntoParallelIterator<Item = Q>,
+    {
+        let par_iter = par_iter.into_par_iter();
+        let x_unit = self.x_unit;
+        let y_unit = self.y_unit;
+
+        self.instances.par_extend(
+            par_iter.map(|quad| {
+                gpu::Instance::from(quad.into_quad(x_unit, y_unit))
+            }),
+        );
     }
 }
