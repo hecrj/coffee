@@ -30,6 +30,7 @@ debug = []
 [dependencies]
 image = "0.21"
 nalgebra = "0.18"
+rayon = "1.0"
 
 # gfx (OpenGL)
 gfx = { version = "0.18", optional = true }
@@ -47,4 +48,3 @@ wgpu_glyph = { version = "0.3", optional = true }
 [dev-dependencies]
 # Example dependencies
 rand = "0.6"
-rayon = "1.0"

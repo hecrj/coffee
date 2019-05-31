@@ -28,8 +28,8 @@ struct Particles {
 }
 
 impl Particles {
-    // Try increasing this value! I (@hecrj) can render 350k particles at 100fps
-    // on my system. I have not tried going above that, yet...
+    // Try increasing this value! I (@hecrj) can render 1 MILLION particles at
+    // 90 fps on my system (4790k, GTX 980, Windows 7) using Vulkan.
     const AMOUNT: u32 = 50_000;
 
     // Play with these values to alter the way gravity works.
@@ -148,20 +148,19 @@ impl Game for Particles {
     fn draw(&self, view: &mut View, frame: &mut Frame, timer: &Timer) {
         frame.clear(Color::BLACK);
 
-        // Draw particles all at once!
-        view.batch.clear();
-
+        // When interpolating, we need to know how close the next tick is
         let delta_factor = if view.interpolate {
             timer.next_tick_proximity()
         } else {
             0.0
         };
 
-        for particle in &self.particles {
+        // Generate sprites in parallel! <3 rayon
+        let sprites = self.particles.par_iter().map(|particle| {
             let velocity =
                 particle.velocity + particle.acceleration * delta_factor;
 
-            view.batch.add(Sprite {
+            Sprite {
                 source: Rectangle {
                     x: View::particle_color(velocity),
                     y: 0,
@@ -169,9 +168,16 @@ impl Game for Particles {
                     height: 1,
                 },
                 position: particle.position + velocity * delta_factor,
-            });
-        }
+            }
+        });
 
+        // Clear batch contents from previous frame
+        view.batch.clear();
+
+        // Use the parallel iterator to populate the batch efficiently
+        view.batch.par_extend(sprites);
+
+        // Draw particles all at once!
         view.batch
             .draw(Point::new(0.0, 0.0), &mut frame.as_target());
 
