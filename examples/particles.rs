@@ -29,7 +29,7 @@ struct Particles {
 
 impl Particles {
     // Try increasing this value! I (@hecrj) can render 1 MILLION particles at
-    // 90 fps on my system (i7 4970k, GTX 980, Windows 7) using Vulkan.
+    // 90 fps on my system (4790k, GTX 980, Windows 7) using Vulkan.
     const AMOUNT: u32 = 50_000;
 
     // Play with these values to alter the way gravity works.
