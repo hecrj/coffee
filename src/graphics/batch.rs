@@ -88,8 +88,8 @@ impl<Q: IntoQuad> Extend<Q> for Batch {
 
 /// Extend the [`Batch`] using a parallel iterator from [`rayon`].
 ///
-/// If you are dealing with many thousands of quads, this method can help you
-/// speed up your drawing by using multiple threads to build a [`Batch`].
+/// If you are dealing with many thousands of quads, `par_extend` can help you
+/// speed up your drawing by using multiple threads to populate a [`Batch`].
 ///
 /// [`Batch`]: struct.Batch.html
 /// [`rayon`]: https://docs.rs/rayon/1.0/rayon/
