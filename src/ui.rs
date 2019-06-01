@@ -8,6 +8,7 @@ pub mod button;
 pub mod core;
 pub mod slider;
 
+pub use self::core::{Align, Justify};
 pub use button::Button;
 pub use checkbox::Checkbox;
 pub use panel::Panel;

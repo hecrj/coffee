@@ -3,7 +3,7 @@ use std::hash::Hash;
 use crate::graphics::{Point, Rectangle};
 use crate::input::{ButtonState, MouseButton};
 use crate::ui::core::{
-    Element, Event, Hasher, Layout, MouseCursor, Node, Style, Widget,
+    Align, Element, Event, Hasher, Layout, MouseCursor, Node, Style, Widget,
 };
 
 pub struct Button<'a, M, R> {
@@ -32,8 +32,8 @@ impl<'a, M, R> Button<'a, M, R> {
         self
     }
 
-    pub fn align_right(mut self) -> Self {
-        self.style = self.style.align_right();
+    pub fn align_self(mut self, align: Align) -> Self {
+        self.style = self.style.align_self(align);
         self
     }
 

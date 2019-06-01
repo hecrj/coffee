@@ -4,7 +4,7 @@ use crate::graphics::{Color, Point, Rectangle};
 use crate::input::{ButtonState, MouseButton};
 use crate::ui::core::widget::{column, text, Column, Row, Text};
 use crate::ui::core::{
-    Element, Event, Hasher, Layout, MouseCursor, Node, Widget,
+    Align, Element, Event, Hasher, Layout, MouseCursor, Node, Widget,
 };
 
 pub struct Checkbox<M, R> {
@@ -39,8 +39,9 @@ where
     fn node(&self, renderer: &R) -> Node {
         Row::<(), R>::new()
             .spacing(15)
-            .push(Column::new().width(28.0).height(28.0).align_center())
-            .push(Text::new(&self.label).align_center())
+            .align_items(Align::Center)
+            .push(Column::new().width(28.0).height(28.0))
+            .push(Text::new(&self.label))
             .node(renderer)
     }
 

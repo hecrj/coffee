@@ -21,5 +21,5 @@ pub use layout::Layout;
 pub use mouse_cursor::MouseCursor;
 pub use node::Node;
 pub use renderer::Renderer;
-pub use style::Style;
+pub use style::{Align, Justify, Style};
 pub use widget::Widget;

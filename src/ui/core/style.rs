@@ -45,18 +45,18 @@ impl Style {
         self
     }
 
-    pub fn align_left(mut self) -> Self {
-        self.0.align_self = style::AlignSelf::FlexStart;
+    pub fn align_items(mut self, align: Align) -> Self {
+        self.0.align_items = align.into();
         self
     }
 
-    pub fn align_center(mut self) -> Self {
-        self.0.align_self = style::AlignSelf::Center;
+    pub fn justify_content(mut self, justify: Justify) -> Self {
+        self.0.justify_content = justify.into();
         self
     }
 
-    pub fn align_right(mut self) -> Self {
-        self.0.align_self = style::AlignSelf::FlexEnd;
+    pub fn align_self(mut self, align: Align) -> Self {
+        self.0.align_self = align.into();
         self
     }
 
@@ -73,13 +73,6 @@ impl Style {
 
     pub fn padding_top(mut self, px: u32) -> Self {
         self.0.padding.top = style::Dimension::Points(px as f32);
-
-        self
-    }
-
-    pub fn center_children(mut self) -> Self {
-        self.0.align_items = style::AlignItems::Center;
-        self.0.justify_content = style::JustifyContent::Center;
         self
     }
 }
@@ -139,6 +132,60 @@ fn hash_dimension<H: Hasher>(dimension: style::Dimension, state: &mut H) {
         style::Dimension::Percent(percent) => {
             state.write_u8(3);
             (percent as u32).hash(state);
+        }
+    }
+}
+
+pub enum Align {
+    Start,
+    Center,
+    End,
+    Stretch,
+}
+
+#[doc(hidden)]
+impl From<Align> for style::AlignItems {
+    fn from(align: Align) -> Self {
+        match align {
+            Align::Start => style::AlignItems::FlexStart,
+            Align::Center => style::AlignItems::Center,
+            Align::End => style::AlignItems::FlexEnd,
+            Align::Stretch => style::AlignItems::Stretch,
+        }
+    }
+}
+
+#[doc(hidden)]
+impl From<Align> for style::AlignSelf {
+    fn from(align: Align) -> Self {
+        match align {
+            Align::Start => style::AlignSelf::FlexStart,
+            Align::Center => style::AlignSelf::Center,
+            Align::End => style::AlignSelf::FlexEnd,
+            Align::Stretch => style::AlignSelf::Stretch,
+        }
+    }
+}
+
+pub enum Justify {
+    Start,
+    Center,
+    End,
+    SpaceBetween,
+    SpaceAround,
+    SpaceEvenly,
+}
+
+#[doc(hidden)]
+impl From<Justify> for style::JustifyContent {
+    fn from(justify: Justify) -> Self {
+        match justify {
+            Justify::Start => style::JustifyContent::FlexStart,
+            Justify::Center => style::JustifyContent::Center,
+            Justify::End => style::JustifyContent::FlexEnd,
+            Justify::SpaceBetween => style::JustifyContent::SpaceBetween,
+            Justify::SpaceAround => style::JustifyContent::SpaceAround,
+            Justify::SpaceEvenly => style::JustifyContent::SpaceEvenly,
         }
     }
 }

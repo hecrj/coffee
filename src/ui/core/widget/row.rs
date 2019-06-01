@@ -2,7 +2,8 @@ use std::hash::Hash;
 
 use crate::graphics::Point;
 use crate::ui::core::{
-    Element, Event, Hasher, Layout, MouseCursor, Node, Style, Widget,
+    Align, Element, Event, Hasher, Justify, Layout, MouseCursor, Node, Style,
+    Widget,
 };
 
 pub struct Row<'a, M, R> {
@@ -40,13 +41,23 @@ impl<'a, M, R> Row<'a, M, R> {
         self
     }
 
-    pub fn align_left(mut self) -> Self {
-        self.style = self.style.align_left();
+    pub fn fill_width(mut self) -> Self {
+        self.style = self.style.fill_width();
         self
     }
 
-    pub fn fill_width(mut self) -> Self {
-        self.style = self.style.fill_width();
+    pub fn align_self(mut self, align: Align) -> Self {
+        self.style = self.style.align_self(align);
+        self
+    }
+
+    pub fn align_items(mut self, align: Align) -> Self {
+        self.style = self.style.align_items(align);
+        self
+    }
+
+    pub fn justify_content(mut self, justify: Justify) -> Self {
+        self.style = self.style.justify_content(justify);
         self
     }
 

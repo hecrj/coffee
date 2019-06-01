@@ -2,8 +2,8 @@ use coffee::graphics::{Color, Frame, Window, WindowSettings};
 use coffee::input::KeyboardAndMouse;
 use coffee::load::{loading_screen::ProgressBar, Task};
 use coffee::ui::{
-    button, slider, Button, Checkbox, Column, Element, Radio, Renderer, Row,
-    Slider, Text,
+    button, slider, Align, Button, Checkbox, Column, Element, Justify, Radio,
+    Renderer, Row, Slider, Text,
 };
 use coffee::{Game, Result, Timer, UserInterface};
 
@@ -92,7 +92,8 @@ impl UserInterface for Tour {
         Column::new()
             .width(window.width())
             .height(window.height())
-            .center_children()
+            .align_items(Align::Center)
+            .justify_content(Justify::Center)
             .padding(20)
             .push(content)
             .into()
@@ -414,7 +415,7 @@ impl<'a> Step {
                 value as f32,
                 StepMessage::SliderChanged,
             ))
-            .push(Text::new(&value.to_string()).align_center())
+            .push(Text::new(&value.to_string()).align_self(Align::Center))
     }
 
     fn text(
@@ -506,7 +507,9 @@ impl<'a> Step {
                 spacing as f32,
                 StepMessage::SpacingChanged,
             ))
-            .push(Text::new(&format!("{} px", spacing)).align_center());
+            .push(
+                Text::new(&format!("{} px", spacing)).align_self(Align::Center),
+            );
 
         Self::container("Rows and columns")
             .spacing(spacing)

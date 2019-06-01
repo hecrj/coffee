@@ -2,7 +2,7 @@ use std::hash::Hash;
 
 use crate::graphics::{Color, Point, Rectangle};
 use crate::ui::core::{
-    Element, Hasher, Layout, MouseCursor, Node, Style, Widget,
+    Align, Element, Hasher, Layout, MouseCursor, Node, Style, Widget,
 };
 
 pub struct Text<M, R> {
@@ -41,13 +41,8 @@ impl<M, R> Text<M, R> {
         self
     }
 
-    pub fn align_center(mut self) -> Self {
-        self.style = self.style.align_center();
-        self
-    }
-
-    pub fn align_right(mut self) -> Self {
-        self.style = self.style.align_right();
+    pub fn align_self(mut self, align: Align) -> Self {
+        self.style = self.style.align_self(align);
         self
     }
 }
