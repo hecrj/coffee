@@ -5,12 +5,13 @@ use rand::Rng;
 use rayon::prelude::*;
 
 use coffee::graphics::{
-    Batch, Color, Font, Frame, Image, Point, Rectangle, Sprite, Text, Vector,
-    Window, WindowSettings,
+    Batch, Color, Frame, Image, Point, Rectangle, Sprite, Vector, Window,
+    WindowSettings,
 };
 use coffee::input::{KeyCode, KeyboardAndMouse};
-use coffee::load::{loading_screen::ProgressBar, Join, Task};
-use coffee::{Game, Result, Timer};
+use coffee::load::{loading_screen::ProgressBar, Task};
+use coffee::ui::{Checkbox, Column, Element, Justify, Renderer};
+use coffee::{Game, Result, Timer, UserInterface};
 
 // Try increasing this value! I (@hecrj) can render 1 MILLION particles at
 // 90 fps on my system (4790k, GTX 980, Windows 7) using Vulkan.
@@ -21,7 +22,7 @@ const G: f32 = 6.674;
 const CENTER_MASS: f32 = 200.0;
 
 fn main() -> Result<()> {
-    Particles::run(WindowSettings {
+    <Particles as UserInterface>::run(WindowSettings {
         title: String::from("Particles - Coffee"),
         size: (1280, 1024),
         resizable: false,
@@ -85,27 +86,17 @@ impl coffee::State for State {
 
 struct Particles {
     batch: Batch,
-    font: Font,
     interpolate: bool,
 }
 
 impl Particles {
     fn load() -> Task<Particles> {
-        (Self::load_palette(), Self::load_font()).join().map(
-            |(palette, font)| Particles {
+        Task::using_gpu(|gpu| Image::from_colors(gpu, &COLORS)).map(|palette| {
+            Particles {
                 batch: Batch::new(palette),
-                font,
                 interpolate: true,
-            },
-        )
-    }
-
-    fn load_palette() -> Task<Image> {
-        Task::using_gpu(|gpu| Image::from_colors(gpu, &COLORS))
-    }
-
-    fn load_font() -> Task<Font> {
-        Font::load(include_bytes!("../resources/font/Inconsolata-Regular.ttf"))
+            }
+        })
     }
 
     fn particle_color(velocity: Vector) -> u16 {
@@ -132,10 +123,6 @@ impl Game for Particles {
 
         for point in input.clicks() {
             state.gravity_centers.push(*point);
-        }
-
-        if input.was_key_released(&KeyCode::I) {
-            self.interpolate = !self.interpolate;
         }
 
         if input.was_key_released(&KeyCode::F) {
@@ -179,41 +166,40 @@ impl Game for Particles {
         // Draw particles all at once!
         self.batch
             .draw(Point::new(0.0, 0.0), &mut frame.as_target());
-
-        // Draw simple text UI
-        self.font.add(Text {
-            content: "Graphics interpolation:",
-            position: Point::new(10.0, frame.height() - 50.0),
-            bounds: (frame.width(), frame.height()),
-            size: 20.0,
-            color: Color::WHITE,
-            ..Text::default()
-        });
-
-        self.font.add(Text {
-            content: if self.interpolate { "ON" } else { "OFF" },
-            position: Point::new(250.0, frame.height() - 50.0),
-            bounds: (frame.width(), frame.height()),
-            size: 20.0,
-            color: if self.interpolate {
-                Color::new(0.0, 1.0, 0.0, 1.0)
-            } else {
-                Color::new(1.0, 0.0, 0.0, 1.0)
-            },
-            ..Text::default()
-        });
-
-        self.font.add(Text {
-            content: "Press I to toggle.",
-            position: Point::new(10.0, frame.height() - 25.0),
-            bounds: (frame.width(), frame.height()),
-            size: 16.0,
-            color: Color::WHITE,
-            ..Text::default()
-        });
-
-        self.font.draw(&mut frame.as_target());
     }
+}
+
+impl UserInterface for Particles {
+    type Message = Message;
+    type Renderer = Renderer;
+
+    fn update(&mut self, _state: &mut State, msg: Message) {
+        match msg {
+            Message::ToggleInterpolation(interpolate) => {
+                self.interpolate = interpolate;
+            }
+        }
+    }
+
+    fn layout(&mut self, _state: &State, window: &Window) -> Element<Message> {
+        Column::new()
+            .padding(20)
+            .spacing(20)
+            .width(window.width())
+            .height(window.height())
+            .justify_content(Justify::End)
+            .push(Checkbox::new(
+                self.interpolate,
+                "Graphics interpolation",
+                Message::ToggleInterpolation,
+            ))
+            .into()
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum Message {
+    ToggleInterpolation(bool),
 }
 
 #[derive(Clone)]
