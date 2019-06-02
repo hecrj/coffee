@@ -61,20 +61,29 @@ where
         layout: Layout,
         cursor_position: Point,
     ) -> MouseCursor {
-        let mut cursor = MouseCursor::Default;
-        renderer.draw(layout.bounds());
+        let bounds = layout.bounds();
+        let mut cursor = MouseCursor::OutOfBounds;
+        renderer.draw(bounds);
 
         [&self.content].iter().zip(layout.children()).for_each(
             |(child, layout)| {
                 let new_cursor = child.draw(renderer, layout, cursor_position);
 
-                if new_cursor != MouseCursor::Default {
+                if new_cursor != MouseCursor::OutOfBounds {
                     cursor = new_cursor;
                 }
             },
         );
 
-        cursor
+        if cursor == MouseCursor::OutOfBounds {
+            if bounds.contains(cursor_position) {
+                MouseCursor::Idle
+            } else {
+                MouseCursor::OutOfBounds
+            }
+        } else {
+            cursor
+        }
     }
 
     fn hash(&self, state: &mut Hasher) {

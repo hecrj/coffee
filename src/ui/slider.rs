@@ -62,7 +62,7 @@ impl slider::Renderer for Renderer {
         } else if mouse_over {
             MouseCursor::Grab
         } else {
-            MouseCursor::Default
+            MouseCursor::OutOfBounds
         }
     }
 }

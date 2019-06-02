@@ -39,6 +39,8 @@ pub trait HasCursorPosition {
 
 pub struct KeyboardAndMouse {
     cursor_position: Point,
+    is_cursor_taken: bool,
+    is_mouse_pressed: bool,
     points_clicked: Vec<Point>,
     released_keys: HashSet<KeyCode>,
 }
@@ -46,6 +48,10 @@ pub struct KeyboardAndMouse {
 impl KeyboardAndMouse {
     pub fn cursor_position(&self) -> Point {
         self.cursor_position
+    }
+
+    pub fn is_cursor_taken(&self) -> bool {
+        self.is_cursor_taken
     }
 
     pub fn clicks(&self) -> &Vec<Point> {
@@ -61,6 +67,8 @@ impl Input for KeyboardAndMouse {
     fn new() -> KeyboardAndMouse {
         KeyboardAndMouse {
             cursor_position: Point::new(0.0, 0.0),
+            is_cursor_taken: false,
+            is_mouse_pressed: false,
             points_clicked: Vec::new(),
             released_keys: HashSet::new(),
         }
@@ -71,12 +79,27 @@ impl Input for KeyboardAndMouse {
             Event::CursorMoved { x, y } => {
                 self.cursor_position = Point::new(x, y);
             }
+            Event::CursorTaken => {
+                self.is_cursor_taken = true;
+            }
+            Event::CursorReturned => {
+                self.is_cursor_taken = false;
+            }
             Event::MouseInput {
                 button: MouseButton::Left,
-                state: ButtonState::Released,
-            } => {
-                self.points_clicked.push(self.cursor_position);
-            }
+                state,
+            } => match state {
+                ButtonState::Pressed => {
+                    self.is_mouse_pressed = !self.is_cursor_taken;
+                }
+                ButtonState::Released => {
+                    if !self.is_cursor_taken && self.is_mouse_pressed {
+                        self.points_clicked.push(self.cursor_position);
+                    }
+
+                    self.is_mouse_pressed = false;
+                }
+            },
             Event::KeyboardInput {
                 key_code,
                 state: ButtonState::Released,

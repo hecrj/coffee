@@ -71,7 +71,7 @@ where
             layout.bounds(),
         );
 
-        MouseCursor::Default
+        MouseCursor::OutOfBounds
     }
 
     fn hash(&self, state: &mut Hasher) {

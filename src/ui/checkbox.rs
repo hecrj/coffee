@@ -46,7 +46,7 @@ impl checkbox::Renderer for Renderer {
         if mouse_over {
             MouseCursor::Pointer
         } else {
-            MouseCursor::Default
+            MouseCursor::OutOfBounds
         }
     }
 }

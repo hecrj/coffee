@@ -132,14 +132,14 @@ impl<'a, M, R> Widget for Row<'a, M, R> {
         layout: Layout,
         cursor_position: Point,
     ) -> MouseCursor {
-        let mut cursor = MouseCursor::Default;
+        let mut cursor = MouseCursor::OutOfBounds;
 
         self.children.iter().zip(layout.children()).for_each(
             |(child, layout)| {
                 let new_cursor =
                     child.widget.draw(renderer, layout, cursor_position);
 
-                if new_cursor != MouseCursor::Default {
+                if new_cursor != MouseCursor::OutOfBounds {
                     cursor = new_cursor;
                 }
             },

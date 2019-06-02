@@ -133,7 +133,7 @@ where
         layout: Layout,
         cursor_position: Point,
     ) -> MouseCursor {
-        let mut cursor = MouseCursor::Default;
+        let mut cursor = MouseCursor::OutOfBounds;
 
         renderer.draw(layout.bounds());
 
@@ -142,7 +142,7 @@ where
                 let new_cursor =
                     child.widget.draw(renderer, layout, cursor_position);
 
-                if new_cursor != MouseCursor::Default {
+                if new_cursor != MouseCursor::OutOfBounds {
                     cursor = new_cursor;
                 }
             },

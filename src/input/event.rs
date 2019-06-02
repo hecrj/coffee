@@ -49,6 +49,17 @@ pub enum Event {
     /// The mouse cursor left the game window.
     CursorLeft,
 
+    /// The mouse cursor has been taken and is in use.
+    ///
+    /// This event is fired when the cursor is hovering or interacting with a
+    /// [`UserInterface`].
+    ///
+    /// [`UserInterface`]: ../ui/trait.UserInterface.html
+    CursorTaken,
+
+    /// The mouse cursor has been returned and is no longer in use.
+    CursorReturned,
+
     /// A mouse button was pressed or released.
     MouseInput {
         /// The state of the button

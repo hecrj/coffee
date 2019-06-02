@@ -25,7 +25,7 @@ use self::core::{Event, Interface, MouseCursor, Renderer as _};
 
 use crate::game;
 use crate::graphics::{window, Window, WindowSettings};
-use crate::input::{HasCursorPosition, Input};
+use crate::input::{self, HasCursorPosition, Input};
 use crate::load::{Join, LoadingScreen};
 use crate::Debug;
 use crate::{Game, Result, State, Timer};
@@ -70,14 +70,13 @@ pub trait UserInterface: Game {
         let mut alive = true;
         let events = &mut Vec::new();
         let triggered_events = &mut Vec::new();
-        let mut mouse_cursor = MouseCursor::Default;
+        let mut mouse_cursor = MouseCursor::OutOfBounds;
         let mut ui_cache =
             Interface::compute(game.layout(state, window), &renderer).cache();
 
         while alive {
             debug.frame_started();
             timer.update();
-            events.clear();
 
             while timer.tick() {
                 game::process_events(
@@ -121,8 +120,7 @@ pub trait UserInterface: Game {
             );
 
             events
-                .iter()
-                .cloned()
+                .drain(..)
                 .filter_map(Event::from_input)
                 .for_each(|event| {
                     interface.on_event(
@@ -138,6 +136,12 @@ pub trait UserInterface: Game {
             ui_cache = interface.cache();
 
             if new_cursor != mouse_cursor {
+                if new_cursor == MouseCursor::OutOfBounds {
+                    input.update(input::Event::CursorReturned);
+                } else if mouse_cursor == MouseCursor::OutOfBounds {
+                    input.update(input::Event::CursorTaken);
+                }
+
                 window.update_cursor(new_cursor.into());
                 mouse_cursor = new_cursor;
             }
