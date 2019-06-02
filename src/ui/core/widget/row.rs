@@ -71,11 +71,6 @@ impl<'a, M, R> Row<'a, M, R> {
         self
     }
 
-    pub fn center_children(mut self) -> Self {
-        self.style = self.style.center_children();
-        self
-    }
-
     pub fn push<E>(mut self, child: E) -> Row<'a, M, R>
     where
         E: Into<Element<'a, M, R>>,

@@ -17,7 +17,15 @@ pub struct Renderer {
 
 impl core::Renderer for Renderer {
     fn load() -> Task<Renderer> {
-        let load_sprites = Image::load("resources/ui.png").map(Batch::new);
+        let load_sprites = Task::using_gpu(|gpu| {
+            Image::from_image(
+                gpu,
+                image::load_from_memory(include_bytes!(
+                    "../../resources/ui.png"
+                ))?,
+            )
+        })
+        .map(Batch::new);
 
         let load_debug = Task::using_gpu(|gpu| {
             let image = Image::from_colors(
