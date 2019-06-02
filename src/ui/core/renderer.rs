@@ -2,7 +2,9 @@ use crate::graphics::Window;
 use crate::load::Task;
 
 pub trait Renderer {
-    fn load() -> Task<Self>
+    type Configuration: Default;
+
+    fn load(config: Self::Configuration) -> Task<Self>
     where
         Self: Sized;
 

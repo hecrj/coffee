@@ -16,19 +16,11 @@ pub struct Renderer {
 }
 
 impl core::Renderer for Renderer {
-    fn load() -> Task<Renderer> {
-        let load_sprites = Task::using_gpu(|gpu| {
-            Image::from_image(
-                gpu,
-                image::load_from_memory(include_bytes!(
-                    "../../resources/ui.png"
-                ))?,
-            )
-        })
-        .map(Batch::new);
+    type Configuration = Configuration;
 
+    fn load(config: Configuration) -> Task<Renderer> {
         let load_debug = Task::using_gpu(|gpu| {
-            let image = Image::from_colors(
+            Image::from_colors(
                 gpu,
                 &[
                     Color {
@@ -44,19 +36,13 @@ impl core::Renderer for Renderer {
                         a: 1.0,
                     },
                 ],
-            )?;
-
-            Ok(Batch::new(image))
+            )
         });
 
-        let load_font = Font::load(include_bytes!(
-            "../../resources/font/Inconsolata-Regular.ttf"
-        ));
-
-        (load_sprites, load_debug, load_font).join().map(
+        (config.sprites, load_debug, config.font).join().map(
             |(sprites, debug, font)| Renderer {
-                sprites,
-                debug,
+                sprites: Batch::new(sprites),
+                debug: Batch::new(debug),
                 font: Rc::new(RefCell::new(font)),
             },
         )
@@ -88,5 +74,28 @@ impl column::Renderer for Renderer {
             position: Point::new(bounds.x, bounds.y),
             size: (bounds.width, bounds.height),
         });
+    }
+}
+
+pub struct Configuration {
+    pub sprites: Task<Image>,
+    pub font: Task<Font>,
+}
+
+impl Default for Configuration {
+    fn default() -> Self {
+        Self {
+            sprites: Task::using_gpu(|gpu| {
+                Image::from_image(
+                    gpu,
+                    image::load_from_memory(include_bytes!(
+                        "../../resources/ui.png"
+                    ))?,
+                )
+            }),
+            font: Font::load(include_bytes!(
+                "../../resources/font/Inconsolata-Regular.ttf"
+            )),
+        }
     }
 }

@@ -1,11 +1,11 @@
 mod checkbox;
 mod panel;
 mod radio;
-mod renderer;
 mod text;
 
 pub mod button;
 pub mod core;
+pub mod renderer;
 pub mod slider;
 
 pub use self::core::{Align, Justify};
@@ -58,7 +58,7 @@ pub trait UserInterface: Game {
         let load = (
             Self::load(window),
             Self::State::load(window),
-            Self::Renderer::load(),
+            Self::Renderer::load(Self::configuration()),
         )
             .join();
         let (game, state, renderer) = &mut loading_screen.run(load, window)?;
@@ -158,5 +158,9 @@ pub trait UserInterface: Game {
         }
 
         Ok(())
+    }
+
+    fn configuration() -> <Self::Renderer as core::Renderer>::Configuration {
+        <Self::Renderer as core::Renderer>::Configuration::default()
     }
 }
