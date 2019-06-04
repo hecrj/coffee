@@ -1,4 +1,4 @@
-pub mod column; // TODO: Make private
+mod column;
 mod row;
 
 pub mod button;
