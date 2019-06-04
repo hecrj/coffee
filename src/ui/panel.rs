@@ -1,6 +1,6 @@
 use super::Renderer;
 
-use crate::graphics::{Point, Quad, Rectangle, Sprite};
+use crate::graphics::{Point, Rectangle, Sprite};
 use crate::ui::core::widget::panel;
 
 pub type Panel<'a, M> = panel::Panel<'a, M, Renderer>;
@@ -73,17 +73,6 @@ const BOTTOM_RIGHT: Rectangle<u16> = Rectangle {
 
 impl panel::Renderer for Renderer {
     fn draw(&mut self, bounds: Rectangle<f32>) {
-        self.debug.add(Quad {
-            source: Rectangle {
-                x: 0.0,
-                y: 0.0,
-                width: 0.5,
-                height: 1.0,
-            },
-            position: Point::new(bounds.x, bounds.y),
-            size: (bounds.width, bounds.height),
-        });
-
         self.sprites.add(Sprite {
             source: TOP_LEFT,
             position: Point::new(bounds.x, bounds.y),

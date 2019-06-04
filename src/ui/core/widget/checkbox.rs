@@ -2,7 +2,7 @@ use std::hash::Hash;
 
 use crate::graphics::{Color, Point, Rectangle};
 use crate::input::{ButtonState, MouseButton};
-use crate::ui::core::widget::{column, text, Column, Row, Text};
+use crate::ui::core::widget::{text, Column, Row, Text};
 use crate::ui::core::{
     Align, Element, Event, Hasher, Layout, MouseCursor, Node, Widget,
 };
@@ -30,7 +30,7 @@ impl<M, R> Checkbox<M, R> {
 
 impl<M, R> Widget for Checkbox<M, R>
 where
-    R: Renderer + column::Renderer + text::Renderer + 'static,
+    R: Renderer + text::Renderer + 'static,
     M: Copy,
 {
     type Message = M;
@@ -112,7 +112,7 @@ pub trait Renderer {
 
 impl<'a, M, R> From<Checkbox<M, R>> for Element<'a, M, R>
 where
-    R: Renderer + column::Renderer + text::Renderer + 'static,
+    R: Renderer + text::Renderer + 'static,
     M: Copy + 'static,
 {
     fn from(checkbox: Checkbox<M, R>) -> Element<'a, M, R> {

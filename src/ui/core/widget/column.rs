@@ -1,6 +1,6 @@
 use std::hash::Hash;
 
-use crate::graphics::{Point, Rectangle};
+use crate::graphics::Point;
 use crate::ui::core::{
     Align, Element, Event, Hasher, Justify, Layout, MouseCursor, Node, Style,
     Widget,
@@ -78,10 +78,7 @@ impl<'a, M, R> Column<'a, M, R> {
     }
 }
 
-impl<'a, M, R> Widget for Column<'a, M, R>
-where
-    R: Renderer,
-{
+impl<'a, M, R> Widget for Column<'a, M, R> {
     type Message = M;
     type Renderer = R;
 
@@ -135,8 +132,6 @@ where
     ) -> MouseCursor {
         let mut cursor = MouseCursor::OutOfBounds;
 
-        renderer.draw(layout.bounds());
-
         self.children.iter().zip(layout.children()).for_each(
             |(child, layout)| {
                 let new_cursor =
@@ -161,13 +156,9 @@ where
     }
 }
 
-pub trait Renderer {
-    fn draw(&mut self, bounds: Rectangle<f32>);
-}
-
 impl<'a, M, R> From<Column<'a, M, R>> for Element<'a, M, R>
 where
-    R: Renderer + 'static,
+    R: 'static,
     M: 'static,
 {
     fn from(column: Column<'a, M, R>) -> Element<'a, M, R> {

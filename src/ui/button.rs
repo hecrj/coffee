@@ -1,6 +1,6 @@
 use super::Renderer;
 use crate::graphics::{
-    Color, HorizontalAlignment, Point, Quad, Rectangle, Sprite, Text,
+    Color, HorizontalAlignment, Point, Rectangle, Sprite, Text,
     VerticalAlignment,
 };
 use crate::ui::core::{widget::button, MouseCursor};
@@ -40,17 +40,6 @@ impl button::Renderer for Renderer {
         cursor_position: Point,
     ) -> MouseCursor {
         let mouse_over = bounds.contains(cursor_position);
-
-        self.debug.add(Quad {
-            source: Rectangle {
-                x: 0.5,
-                y: 0.0,
-                width: 0.5,
-                height: 1.0,
-            },
-            position: Point::new(bounds.x, bounds.y),
-            size: (bounds.width, bounds.height),
-        });
 
         let mut state_offset = 0;
 
