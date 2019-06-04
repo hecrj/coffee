@@ -46,8 +46,8 @@ impl text::Renderer for Renderer {
                 let (width, height) = font.borrow_mut().measure(text);
 
                 let size = Size {
-                    width: width + 1.0,
-                    height: height + size / 4.0,
+                    width: width + (size / 10.0).round(),
+                    height: height + (size / 3.0).round(),
                 };
 
                 // If the text has no width boundary we avoid caching as the
