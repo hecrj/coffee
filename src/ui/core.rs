@@ -15,7 +15,7 @@ pub use stretch::number::Number;
 
 pub use element::Element;
 pub use event::Event;
-pub(crate) use hasher::Hasher;
+pub use hasher::Hasher;
 pub(crate) use interface::Interface;
 pub use layout::Layout;
 pub use mouse_cursor::MouseCursor;

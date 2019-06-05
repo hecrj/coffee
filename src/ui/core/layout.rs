@@ -2,6 +2,16 @@ use stretch::result;
 
 use crate::graphics::{Point, Rectangle, Vector};
 
+/// The bounds of a [`Node`] and its children.
+///
+/// This type is provided by the GUI runtime to [`Widget::on_event`] and
+/// [`Widget::draw`], describing the layout of the produced [`Node`] by
+/// [`Widget::node`].
+///
+/// [`Node`]: struct.Node.html
+/// [`Widget::on_event`]: widget/trait.Widget.html#method.on_event
+/// [`Widget::draw`]: widget/trait.Widget.html#tymethod.draw
+/// [`Widget::node`]: widget/trait.Widget.html#tymethod.node
 #[derive(Debug)]
 pub struct Layout<'a> {
     layout: &'a result::Layout,
@@ -19,6 +29,14 @@ impl<'a> Layout<'a> {
         Layout { layout, position }
     }
 
+    /// Gets the bounds of the [`Layout`].
+    ///
+    /// The returned [`Rectangle`] describes the position and size of a
+    /// [`Node`].
+    ///
+    /// [`Layout`]: struct.Layout.html
+    /// [`Rectangle`]: ../../graphics/struct.Rectangle.html
+    /// [`Node`]: struct.Node.html
     pub fn bounds(&self) -> Rectangle<f32> {
         Rectangle {
             x: self.position.x,
@@ -28,6 +46,10 @@ impl<'a> Layout<'a> {
         }
     }
 
+    /// Returns an iterator over the [`Layout`] of the children of a [`Node`].
+    ///
+    /// [`Layout`]: struct.Layout.html
+    /// [`Node`]: struct.Node.html
     pub fn children(&'a self) -> impl Iterator<Item = Layout<'a>> {
         self.layout
             .children
