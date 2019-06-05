@@ -1,8 +1,10 @@
 use std::hash::Hash;
 
-use crate::graphics::{Color, Point, Rectangle};
+use crate::graphics::{
+    Color, HorizontalAlignment, Point, Rectangle, VerticalAlignment,
+};
 use crate::ui::core::{
-    Align, Element, Hasher, Layout, MouseCursor, Node, Style, Widget,
+    Element, Hasher, Layout, MouseCursor, Node, Style, Widget,
 };
 
 pub struct Text<M, R> {
@@ -10,6 +12,8 @@ pub struct Text<M, R> {
     size: u16,
     color: Color,
     style: Style,
+    horizontal_alignment: HorizontalAlignment,
+    vertical_alignment: VerticalAlignment,
     message: std::marker::PhantomData<M>,
     renderer: std::marker::PhantomData<R>,
 }
@@ -20,7 +24,9 @@ impl<M, R> Text<M, R> {
             content: String::from(label),
             size: 20,
             color: Color::default(),
-            style: Style::default(),
+            style: Style::default().fill_width(),
+            horizontal_alignment: HorizontalAlignment::Left,
+            vertical_alignment: VerticalAlignment::Top,
             message: std::marker::PhantomData,
             renderer: std::marker::PhantomData,
         }
@@ -37,12 +43,20 @@ impl<M, R> Text<M, R> {
     }
 
     pub fn width(mut self, width: u32) -> Self {
-        self.style = self.style.width(width as f32);
+        self.style = self.style.width(width);
         self
     }
 
-    pub fn align_self(mut self, align: Align) -> Self {
-        self.style = self.style.align_self(align);
+    pub fn horizontal_alignment(
+        mut self,
+        alignment: HorizontalAlignment,
+    ) -> Self {
+        self.horizontal_alignment = alignment;
+        self
+    }
+
+    pub fn vertical_alignment(mut self, alignment: VerticalAlignment) -> Self {
+        self.vertical_alignment = alignment;
         self
     }
 }
@@ -68,6 +82,8 @@ where
             &self.content,
             self.size as f32,
             self.color,
+            self.horizontal_alignment,
+            self.vertical_alignment,
             layout.bounds(),
         );
 
@@ -90,6 +106,8 @@ pub trait Renderer {
         content: &str,
         size: f32,
         color: Color,
+        horizontal_alignment: HorizontalAlignment,
+        vertical_alignment: VerticalAlignment,
         bounds: Rectangle<f32>,
     );
 }

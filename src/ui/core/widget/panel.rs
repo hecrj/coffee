@@ -19,12 +19,12 @@ impl<'a, M, R> Panel<'a, M, R> {
     }
 
     pub fn width(mut self, width: u32) -> Self {
-        self.style = self.style.width(width as f32);
+        self.style = self.style.width(width);
         self
     }
 
     pub fn max_width(mut self, max_width: u32) -> Self {
-        self.style = self.style.max_width(max_width as f32);
+        self.style = self.style.max_width(max_width);
         self
     }
 }

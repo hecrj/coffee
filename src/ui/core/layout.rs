@@ -2,7 +2,7 @@ use stretch::result;
 
 use crate::graphics::{Point, Rectangle, Vector};
 
-/// The bounds of a [`Node`] and its children.
+/// The computed bounds of a [`Node`] and its children.
 ///
 /// This type is provided by the GUI runtime to [`Widget::on_event`] and
 /// [`Widget::draw`], describing the layout of the produced [`Node`] by

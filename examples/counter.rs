@@ -67,8 +67,8 @@ impl UserInterface for Counter {
 
     fn layout(&mut self, _state: &(), window: &Window) -> Element<Message> {
         Column::new()
-            .width(window.width())
-            .height(window.height())
+            .width(window.width() as u32)
+            .height(window.height() as u32)
             .align_items(Align::Center)
             .justify_content(Justify::Center)
             .spacing(20)

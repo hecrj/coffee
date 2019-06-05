@@ -54,9 +54,23 @@ impl Font {
 
 impl<'a> From<Text<'a>> for gfx_glyph::Section<'a> {
     fn from(text: Text<'a>) -> gfx_glyph::Section<'a> {
+        let x = match text.horizontal_alignment {
+            HorizontalAlignment::Left => text.position.x,
+            HorizontalAlignment::Center => {
+                text.position.x + text.bounds.0 / 2.0
+            }
+            HorizontalAlignment::Right => text.position.x + text.bounds.0,
+        };
+
+        let y = match text.vertical_alignment {
+            VerticalAlignment::Top => text.position.y,
+            VerticalAlignment::Center => text.position.y + text.bounds.1 / 2.0,
+            VerticalAlignment::Bottom => text.position.y + text.bounds.1,
+        };
+
         gfx_glyph::Section {
             text: &text.content,
-            screen_position: (text.position.x, text.position.y),
+            screen_position: (x, y),
             scale: gfx_glyph::Scale {
                 x: text.size,
                 y: text.size,

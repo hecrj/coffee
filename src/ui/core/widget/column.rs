@@ -14,7 +14,7 @@ pub struct Column<'a, M, R> {
 
 impl<'a, M, R> Column<'a, M, R> {
     pub fn new() -> Self {
-        let mut style = Style::default();
+        let mut style = Style::default().fill_width();
         style.0.flex_direction = stretch::style::FlexDirection::Column;
 
         Column {
@@ -24,17 +24,17 @@ impl<'a, M, R> Column<'a, M, R> {
         }
     }
 
-    pub fn width(mut self, width: f32) -> Self {
+    pub fn width(mut self, width: u32) -> Self {
         self.style = self.style.width(width);
         self
     }
 
-    pub fn height(mut self, height: f32) -> Self {
+    pub fn height(mut self, height: u32) -> Self {
         self.style = self.style.height(height);
         self
     }
 
-    pub fn max_width(mut self, max_width: f32) -> Self {
+    pub fn max_width(mut self, max_width: u32) -> Self {
         self.style = self.style.max_width(max_width);
         self
     }

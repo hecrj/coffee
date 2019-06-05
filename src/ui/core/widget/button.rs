@@ -22,13 +22,18 @@ impl<'a, M, R> Button<'a, M, R> {
             label: String::from(label),
             type_: Type::Primary,
             on_click: None,
-            style: Style::default().min_width(100.0),
+            style: Style::default().min_width(100),
             renderer: std::marker::PhantomData,
         }
     }
 
     pub fn width(mut self, width: u32) -> Self {
-        self.style = self.style.width(width as f32);
+        self.style = self.style.width(width);
+        self
+    }
+
+    pub fn fill_width(mut self) -> Self {
+        self.style = self.style.fill_width();
         self
     }
 
@@ -57,7 +62,7 @@ where
     type Renderer = R;
 
     fn node(&self, _renderer: &R) -> Node {
-        Node::new(self.style.height(50.0), Vec::new())
+        Node::new(self.style.height(50), Vec::new())
     }
 
     fn on_event(

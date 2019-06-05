@@ -1,6 +1,8 @@
 use std::hash::Hash;
 
-use crate::graphics::{Color, Point, Rectangle};
+use crate::graphics::{
+    Color, HorizontalAlignment, Point, Rectangle, VerticalAlignment,
+};
 use crate::input::{ButtonState, MouseButton};
 use crate::ui::core::widget::{text, Column, Row, Text};
 use crate::ui::core::{
@@ -40,7 +42,7 @@ where
         Row::<(), R>::new()
             .spacing(15)
             .align_items(Align::Center)
-            .push(Column::new().width(28.0).height(28.0))
+            .push(Column::new().width(28).height(28))
             .push(Text::new(&self.label))
             .node(renderer)
     }
@@ -84,6 +86,8 @@ where
             &self.label,
             20.0,
             Color::WHITE,
+            HorizontalAlignment::Left,
+            VerticalAlignment::Top,
             text_bounds,
         );
 

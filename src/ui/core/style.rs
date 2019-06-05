@@ -1,65 +1,105 @@
 use std::hash::{Hash, Hasher};
 use stretch::{geometry, style};
 
-#[derive(Clone, Copy)]
+/// The appearance of a [`Node`].
+///
+/// [`Node`]: struct.Node.html
+#[derive(Debug, Clone, Copy)]
 pub struct Style(pub(crate) style::Style);
 
 impl Style {
-    pub fn width(mut self, width: f32) -> Self {
-        self.0.size.width = style::Dimension::Points(width);
+    /// Defines the width of a [`Node`] in pixels.
+    ///
+    /// [`Node`]: struct.Node.html
+    pub fn width(mut self, width: u32) -> Self {
+        self.0.size.width = style::Dimension::Points(width as f32);
         self
     }
 
-    pub fn height(mut self, height: f32) -> Self {
-        self.0.size.height = style::Dimension::Points(height);
+    /// Defines the height of a [`Node`] in pixels.
+    ///
+    /// [`Node`]: struct.Node.html
+    pub fn height(mut self, height: u32) -> Self {
+        self.0.size.height = style::Dimension::Points(height as f32);
         self
     }
 
-    pub fn min_width(mut self, min_width: f32) -> Self {
-        self.0.min_size.width = style::Dimension::Points(min_width);
+    /// Defines the minimum width of a [`Node`] in pixels.
+    ///
+    /// [`Node`]: struct.Node.html
+    pub fn min_width(mut self, min_width: u32) -> Self {
+        self.0.min_size.width = style::Dimension::Points(min_width as f32);
         self
     }
 
-    pub fn max_width(mut self, max_width: f32) -> Self {
-        self.0.max_size.width = style::Dimension::Points(max_width);
+    /// Defines the maximum width of a [`Node`] in pixels.
+    ///
+    /// [`Node`]: struct.Node.html
+    pub fn max_width(mut self, max_width: u32) -> Self {
+        self.0.max_size.width = style::Dimension::Points(max_width as f32);
         self.fill_width()
     }
 
-    pub fn max_height(mut self, max_height: f32) -> Self {
-        self.0.max_size.height = style::Dimension::Points(max_height);
+    /// Defines the minimum height of a [`Node`] in pixels.
+    ///
+    /// [`Node`]: struct.Node.html
+    pub fn min_height(mut self, min_height: u32) -> Self {
+        self.0.min_size.height = style::Dimension::Points(min_height as f32);
         self
     }
 
+    /// Defines the maximum height of a [`Node`] in pixels.
+    ///
+    /// [`Node`]: struct.Node.html
+    pub fn max_height(mut self, max_height: u32) -> Self {
+        self.0.max_size.height = style::Dimension::Points(max_height as f32);
+        self.fill_height()
+    }
+
+    /// Makes a [`Node`] fill all the horizontal available space.
+    ///
+    /// [`Node`]: struct.Node.html
     pub fn fill_width(mut self) -> Self {
         self.0.size.width = stretch::style::Dimension::Percent(1.0);
         self
     }
 
-    pub fn grow(mut self) -> Self {
-        self.0.flex_grow = 1.0;
+    /// Makes a [`Node`] fill all the vertical available space.
+    ///
+    /// [`Node`]: struct.Node.html
+    pub fn fill_height(mut self) -> Self {
+        self.0.size.height = stretch::style::Dimension::Percent(1.0);
         self
     }
 
-    pub fn shrink(mut self) -> Self {
-        self.0.align_self = style::AlignSelf::Auto;
-        self
-    }
-
-    pub fn align_items(mut self, align: Align) -> Self {
+    pub(crate) fn align_items(mut self, align: Align) -> Self {
         self.0.align_items = align.into();
         self
     }
 
-    pub fn justify_content(mut self, justify: Justify) -> Self {
+    pub(crate) fn justify_content(mut self, justify: Justify) -> Self {
         self.0.justify_content = justify.into();
         self
     }
 
+    /// Sets the alignment of a [`Node`].
+    ///
+    /// If the [`Node`] is inside a...
+    ///
+    ///   * [`Column`], this setting will affect its __horizontal__ alignment.
+    ///   * [`Row`], this setting will affect its __vertical__ alignment.
+    ///
+    /// [`Node`]: struct.Node.html
+    /// [`Column`]: widget/struct.Column.html
+    /// [`Row`]: widget/struct.Row.html
     pub fn align_self(mut self, align: Align) -> Self {
         self.0.align_self = align.into();
         self
     }
 
+    /// Sets the padding of a [`Node`] in pixels.
+    ///
+    /// [`Node`]: struct.Node.html
     pub fn padding(mut self, px: u32) -> Self {
         self.0.padding = stretch::geometry::Rect {
             start: style::Dimension::Points(px as f32),
@@ -70,17 +110,12 @@ impl Style {
 
         self
     }
-
-    pub fn padding_top(mut self, px: u32) -> Self {
-        self.0.padding.top = style::Dimension::Points(px as f32);
-        self
-    }
 }
 
 impl Default for Style {
     fn default() -> Style {
         Style(style::Style {
-            align_items: style::AlignItems::Stretch,
+            align_items: style::AlignItems::FlexStart,
             justify_content: style::JustifyContent::FlexStart,
             ..style::Style::default()
         })

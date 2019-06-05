@@ -1,6 +1,8 @@
 use super::Renderer;
 
-use crate::graphics::{self, Color, Point, Rectangle};
+use crate::graphics::{
+    self, Color, HorizontalAlignment, Point, Rectangle, VerticalAlignment,
+};
 use crate::ui::core::{widget::text, Node, Number, Size, Style};
 
 use std::cell::RefCell;
@@ -68,6 +70,8 @@ impl text::Renderer for Renderer {
         content: &str,
         size: f32,
         color: Color,
+        horizontal_alignment: HorizontalAlignment,
+        vertical_alignment: VerticalAlignment,
         bounds: Rectangle<f32>,
     ) {
         self.font.borrow_mut().add(graphics::Text {
@@ -76,7 +80,8 @@ impl text::Renderer for Renderer {
             bounds: (bounds.width, bounds.height),
             color,
             size,
-            ..graphics::Text::default()
+            horizontal_alignment,
+            vertical_alignment,
         });
     }
 }

@@ -15,34 +15,29 @@ pub struct Row<'a, M, R> {
 impl<'a, M, R> Row<'a, M, R> {
     pub fn new() -> Self {
         Row {
-            style: Style::default(),
+            style: Style::default().fill_width(),
             spacing: 0,
             children: Vec::new(),
         }
     }
 
-    pub fn width(mut self, width: f32) -> Self {
+    pub fn width(mut self, width: u32) -> Self {
         self.style = self.style.width(width);
         self
     }
 
-    pub fn height(mut self, height: f32) -> Self {
+    pub fn height(mut self, height: u32) -> Self {
         self.style = self.style.height(height);
         self
     }
 
-    pub fn max_width(mut self, max_width: f32) -> Self {
+    pub fn max_width(mut self, max_width: u32) -> Self {
         self.style = self.style.max_width(max_width);
         self
     }
 
-    pub fn max_height(mut self, max_height: f32) -> Self {
+    pub fn max_height(mut self, max_height: u32) -> Self {
         self.style = self.style.max_height(max_height);
-        self
-    }
-
-    pub fn fill_width(mut self) -> Self {
-        self.style = self.style.fill_width();
         self
     }
 

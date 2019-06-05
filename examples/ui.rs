@@ -1,4 +1,6 @@
-use coffee::graphics::{Color, Frame, Window, WindowSettings};
+use coffee::graphics::{
+    Color, Frame, HorizontalAlignment, Window, WindowSettings,
+};
 use coffee::input::KeyboardAndMouse;
 use coffee::load::{loading_screen::ProgressBar, Task};
 use coffee::ui::{
@@ -84,17 +86,17 @@ impl UserInterface for Tour {
         }
 
         let content = Column::new()
-            .max_width(500.0)
+            .max_width(500)
             .spacing(20)
             .push(steps.layout().map(Message::StepMessage))
             .push(controls);
 
         Column::new()
-            .width(window.width())
-            .height(window.height())
+            .width(window.width() as u32)
+            .height(window.height() as u32)
+            .padding(20)
             .align_items(Align::Center)
             .justify_content(Justify::Center)
-            .padding(20)
             .push(content)
             .into()
     }
@@ -314,7 +316,10 @@ impl<'a> Step {
     }
 
     fn container(title: &str) -> Column<'a, StepMessage> {
-        Column::new().spacing(20).push(Text::new(title).size(50))
+        Column::new()
+            .spacing(20)
+            .align_items(Align::Stretch)
+            .push(Text::new(title).size(50))
     }
 
     fn welcome() -> Column<'a, StepMessage> {
@@ -415,7 +420,10 @@ impl<'a> Step {
                 value as f32,
                 StepMessage::SliderChanged,
             ))
-            .push(Text::new(&value.to_string()).align_self(Align::Center))
+            .push(
+                Text::new(&value.to_string())
+                    .horizontal_alignment(HorizontalAlignment::Center),
+            )
     }
 
     fn text(
@@ -508,7 +516,8 @@ impl<'a> Step {
                 StepMessage::SpacingChanged,
             ))
             .push(
-                Text::new(&format!("{} px", spacing)).align_self(Align::Center),
+                Text::new(&format!("{} px", spacing))
+                    .horizontal_alignment(HorizontalAlignment::Center),
             );
 
         Self::container("Rows and columns")

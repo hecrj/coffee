@@ -31,13 +31,13 @@ impl<'a, M, R> Slider<'a, M, R> {
             value: value.max(range.start).min(range.end),
             range,
             on_change: Box::new(on_change),
-            style: Style::default().min_width(100.0),
+            style: Style::default().min_width(100).fill_width(),
             renderer: std::marker::PhantomData,
         }
     }
 
     pub fn width(mut self, width: u32) -> Self {
-        self.style = self.style.width(width as f32);
+        self.style = self.style.width(width);
         self
     }
 }
@@ -51,7 +51,7 @@ where
     type Renderer = R;
 
     fn node(&self, _renderer: &R) -> Node {
-        Node::new(self.style.height(25.0).grow(), Vec::new())
+        Node::new(self.style.height(25), Vec::new())
     }
 
     fn on_event(

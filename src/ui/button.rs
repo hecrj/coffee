@@ -93,10 +93,7 @@ impl button::Renderer for Renderer {
 
         self.font.borrow_mut().add(Text {
             content: label,
-            position: Point::new(
-                bounds.x + bounds.width / 2.0,
-                bounds.y + bounds.height / 2.0 - 4.0,
-            ),
+            position: Point::new(bounds.x, bounds.y - 4.0),
             bounds: (bounds.width, bounds.height),
             color: if mouse_over {
                 Color::WHITE

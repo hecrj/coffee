@@ -185,8 +185,8 @@ impl UserInterface for Particles {
         Column::new()
             .padding(20)
             .spacing(20)
-            .width(window.width())
-            .height(window.height())
+            .width(window.width() as u32)
+            .height(window.height() as u32)
             .justify_content(Justify::End)
             .push(Checkbox::new(
                 self.interpolate,
