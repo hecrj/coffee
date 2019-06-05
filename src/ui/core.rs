@@ -11,8 +11,8 @@ mod style;
 
 pub mod widget;
 
-pub use stretch::geometry::Size;
-pub use stretch::number::Number;
+#[doc(no_inline)]
+pub use stretch::{geometry::Size, number::Number};
 
 pub use element::Element;
 pub use event::Event;

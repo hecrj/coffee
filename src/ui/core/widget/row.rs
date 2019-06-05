@@ -102,7 +102,7 @@ impl<'a, M, R> Widget for Row<'a, M, R> {
             node.0.set_style(style);
         }
 
-        Node::new(self.style, children)
+        Node::with_children(self.style, children)
     }
 
     fn on_event(

@@ -16,11 +16,19 @@ use crate::ui::core::{Number, Size, Style};
 pub struct Node(pub(super) node::Node);
 
 impl Node {
+    /// Creates a new [`Node`] with the given [`Style`].
+    ///
+    /// [`Node`]: struct.Node.html
+    /// [`Style`]: struct.Style.html
+    pub fn new(style: Style) -> Node {
+        Self::with_children(style, Vec::new())
+    }
+
     /// Creates a new [`Node`] with the given [`Style`] and children.
     ///
     /// [`Node`]: struct.Node.html
     /// [`Style`]: struct.Style.html
-    pub fn new(style: Style, children: Vec<Node>) -> Node {
+    pub(crate) fn with_children(style: Style, children: Vec<Node>) -> Node {
         Node(node::Node::new(
             style.0,
             children.iter().map(|c| &c.0).collect(),
@@ -29,12 +37,13 @@ impl Node {
 
     /// Creates a new [`Node`] with the given [`Style`] and a measure function.
     ///
+    /// This type of node cannot have any children.
+    ///
     /// You should use this when your [`Widget`] can adapt its contents to the
     /// size of its container. The measure function will receive the container
-    /// [`Size`] as a parameter and must compute the size of the [`Node`] inside
-    /// the given bounds.
-    ///
-    /// This type of node cannot have any children.
+    /// size as a parameter and must compute the size of the [`Node`] inside
+    /// the given bounds (if the `Number` for a dimension is `Undefined` it
+    /// means that it has no boundary).
     ///
     /// [`Node`]: struct.Node.html
     /// [`Style`]: struct.Style.html

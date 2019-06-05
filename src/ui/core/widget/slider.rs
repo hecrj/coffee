@@ -51,7 +51,7 @@ where
     type Renderer = R;
 
     fn node(&self, _renderer: &R) -> Node {
-        Node::new(self.style.height(25), Vec::new())
+        Node::new(self.style.height(25))
     }
 
     fn on_event(

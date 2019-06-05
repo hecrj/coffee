@@ -37,7 +37,7 @@ where
     type Renderer = R;
 
     fn node(&self, renderer: &R) -> Node {
-        Node::new(self.style, vec![self.content.node(renderer)])
+        Node::with_children(self.style, vec![self.content.node(renderer)])
     }
 
     fn on_event(
