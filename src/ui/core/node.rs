@@ -12,7 +12,7 @@ impl Node {
         ))
     }
 
-    pub fn new_leaf<F>(style: Style, measure: F) -> Node
+    pub fn with_measure<F>(style: Style, measure: F) -> Node
     where
         F: Fn(Size<Number>) -> Size<f32> + 'static,
     {

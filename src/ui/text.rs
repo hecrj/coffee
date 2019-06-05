@@ -14,7 +14,7 @@ impl text::Renderer for Renderer {
         let content = String::from(content);
         let measure = RefCell::new(None);
 
-        Node::new_leaf(style, move |bounds| {
+        Node::with_measure(style, move |bounds| {
             // TODO: Investigate why stretch tries to measure this MANY times
             // with every ancestor's bounds.
             // Bug? Using the library wrong? I should probably open an issue on
