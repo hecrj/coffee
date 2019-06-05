@@ -104,6 +104,7 @@ pub mod button;
 pub mod core;
 pub mod slider;
 
+#[doc(no_inline)]
 pub use self::core::{Align, Justify};
 pub use button::Button;
 pub use checkbox::Checkbox;

@@ -171,10 +171,25 @@ fn hash_dimension<H: Hasher>(dimension: style::Dimension, state: &mut H) {
     }
 }
 
+/// Alignment on the cross axis of a container.
+///
+///   * On a [`Column`], it describes __horizontal__ alignment.
+///   * On a [`Row`], it describes __vertical__ alignment.
+///
+/// [`Column`]: widget/struct.Column.html
+/// [`Row`]: widget/struct.Row.html
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Align {
+    /// Align at the start of the cross axis.
     Start,
+
+    /// Align at the center of the cross axis.
     Center,
+
+    /// Align at the end of the cross axis.
     End,
+
+    /// Stretch over the cross axis.
     Stretch,
 }
 
@@ -202,12 +217,31 @@ impl From<Align> for style::AlignSelf {
     }
 }
 
+/// Distribution of the contents of a container on the main axis.
+///
+///   * On a [`Column`], it describes __vertical__ distribution.
+///   * On a [`Row`], it describes __horizontal__ distribution.
+///
+/// [`Column`]: widget/struct.Column.html
+/// [`Row`]: widget/struct.Row.html
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Justify {
+    /// Place items at the start of the main axis.
     Start,
+
+    /// Place items at the center of the main axis.
     Center,
+
+    /// Place items at the end of the main axis.
     End,
+
+    /// Place items with space between.
     SpaceBetween,
+
+    /// Place items with space around.
     SpaceAround,
+
+    /// Place items with evenly distributed space.
     SpaceEvenly,
 }
 

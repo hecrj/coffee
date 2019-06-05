@@ -12,6 +12,7 @@ use crate::ui::core::{Number, Size, Style};
 /// [`Node`]: struct.Node.html
 /// [`Widget::node`]: widget/trait.Widget.html#tymethod.node
 /// [`Layout`]: struct.Layout.html
+#[derive(Debug)]
 pub struct Node(pub(super) node::Node);
 
 impl Node {
