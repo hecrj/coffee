@@ -1,4 +1,4 @@
-use crate::graphics::{Batch, Font, Image, Point, Window};
+use crate::graphics::{Batch, Font, Frame, Image, Point};
 use crate::load::{Join, Task};
 use crate::ui::core;
 
@@ -22,8 +22,7 @@ impl core::Renderer for Renderer {
             })
     }
 
-    fn flush(&mut self, window: &mut Window) {
-        let mut frame = window.frame();
+    fn flush(&mut self, frame: &mut Frame) {
         let target = &mut frame.as_target();
 
         self.sprites.draw(Point::new(0.0, 0.0), target);

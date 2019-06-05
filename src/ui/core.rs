@@ -1,3 +1,4 @@
+//! Customize your user interface with your own widgets and renderers.
 mod element;
 mod event;
 mod hasher;

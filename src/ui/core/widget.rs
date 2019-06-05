@@ -1,3 +1,4 @@
+//! Use the built-in widgets or build your own.
 mod column;
 mod row;
 

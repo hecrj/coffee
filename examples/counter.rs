@@ -1,4 +1,7 @@
-use coffee::graphics::{Color, Frame, Window, WindowSettings};
+use coffee::graphics::{
+    Color, Frame, HorizontalAlignment, VerticalAlignment, Window,
+    WindowSettings,
+};
 use coffee::input::KeyboardAndMouse;
 use coffee::load::{loading_screen::ProgressBar, Task};
 use coffee::ui::{
@@ -76,7 +79,13 @@ impl UserInterface for Counter {
                 Button::new(&mut self.increment_button, "+")
                     .on_click(Message::IncrementPressed),
             )
-            .push(Text::new(&self.value.to_string()).size(50))
+            .push(
+                Text::new(&self.value.to_string())
+                    .size(50)
+                    .height(60)
+                    .horizontal_alignment(HorizontalAlignment::Center)
+                    .vertical_alignment(VerticalAlignment::Center),
+            )
             .push(
                 Button::new(&mut self.decrement_button, "-")
                     .on_click(Message::DecrementPressed),

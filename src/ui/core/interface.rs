@@ -1,7 +1,7 @@
 use std::hash::Hasher;
 use stretch::result;
 
-use crate::graphics::{Point, Window};
+use crate::graphics::{Frame, Point};
 use crate::ui::core::{Element, Event, Layout, MouseCursor, Renderer};
 
 pub struct Interface<'a, M, R> {
@@ -67,7 +67,7 @@ impl<'a, M, R: Renderer> Interface<'a, M, R> {
     pub fn draw(
         &self,
         renderer: &mut R,
-        window: &mut Window,
+        frame: &mut Frame,
         cursor_position: Point,
     ) -> MouseCursor {
         let Interface { root, layout, .. } = self;
@@ -76,7 +76,7 @@ impl<'a, M, R: Renderer> Interface<'a, M, R> {
             root.widget
                 .draw(renderer, Self::layout(layout), cursor_position);
 
-        renderer.flush(window);
+        renderer.flush(frame);
 
         cursor
     }

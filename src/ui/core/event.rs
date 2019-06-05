@@ -5,6 +5,11 @@ pub use winit::ElementState as ButtonState;
 pub use winit::MouseButton;
 pub use winit::VirtualKeyCode as KeyCode;
 
+/// A user interface event.
+///
+/// This is a subset of [`input::Event`].
+///
+/// [`input::Event`]: ../../input/enum.Event.html
 #[derive(PartialEq, Clone, Copy, Debug)]
 pub enum Event {
     /// A keyboard key was pressed or released.

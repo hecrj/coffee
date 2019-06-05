@@ -47,6 +47,11 @@ impl<M, R> Text<M, R> {
         self
     }
 
+    pub fn height(mut self, height: u32) -> Self {
+        self.style = self.style.height(height);
+        self
+    }
+
     pub fn horizontal_alignment(
         mut self,
         alignment: HorizontalAlignment,

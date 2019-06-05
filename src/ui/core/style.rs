@@ -217,7 +217,7 @@ impl From<Align> for style::AlignSelf {
     }
 }
 
-/// Distribution of the contents of a container on the main axis.
+/// Distribution on the main axis of a container.
 ///
 ///   * On a [`Column`], it describes __vertical__ distribution.
 ///   * On a [`Row`], it describes __horizontal__ distribution.

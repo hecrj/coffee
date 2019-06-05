@@ -302,8 +302,11 @@ pub trait UserInterface: Game {
                     )
                 });
 
-            let new_cursor =
-                interface.draw(renderer, window, input.cursor_position());
+            let new_cursor = interface.draw(
+                renderer,
+                &mut window.frame(),
+                input.cursor_position(),
+            );
 
             ui_cache = interface.cache();
 
