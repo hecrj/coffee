@@ -6,6 +6,7 @@ use crate::ui::core::{
     Widget,
 };
 
+/// A container that places its contents __horizontally__.
 pub struct Row<'a, M, R> {
     style: Style,
     spacing: u16,
@@ -13,6 +14,9 @@ pub struct Row<'a, M, R> {
 }
 
 impl<'a, M, R> Row<'a, M, R> {
+    /// Creates an empty [`Row`].
+    ///
+    /// [`Row`]: struct.Row.html
     pub fn new() -> Self {
         Row {
             style: Style::default().fill_width(),
@@ -21,51 +25,88 @@ impl<'a, M, R> Row<'a, M, R> {
         }
     }
 
-    pub fn width(mut self, width: u32) -> Self {
-        self.style = self.style.width(width);
-        self
-    }
-
-    pub fn height(mut self, height: u32) -> Self {
-        self.style = self.style.height(height);
-        self
-    }
-
-    pub fn max_width(mut self, max_width: u32) -> Self {
-        self.style = self.style.max_width(max_width);
-        self
-    }
-
-    pub fn max_height(mut self, max_height: u32) -> Self {
-        self.style = self.style.max_height(max_height);
-        self
-    }
-
-    pub fn align_self(mut self, align: Align) -> Self {
-        self.style = self.style.align_self(align);
-        self
-    }
-
-    pub fn align_items(mut self, align: Align) -> Self {
-        self.style = self.style.align_items(align);
-        self
-    }
-
-    pub fn justify_content(mut self, justify: Justify) -> Self {
-        self.style = self.style.justify_content(justify);
-        self
-    }
-
+    /// Sets the horizontal spacing _between_ elements in pixels.
+    ///
+    /// Custom margins per element do not exist in Coffee. You should use this
+    /// method instead! While less flexible, it helps you keep spacing between
+    /// elements consistent.
     pub fn spacing(mut self, px: u16) -> Self {
         self.spacing = px;
         self
     }
 
+    /// Sets the padding of the [`Row`] in pixels.
+    ///
+    /// [`Row`]: struct.Row.html
     pub fn padding(mut self, px: u32) -> Self {
         self.style = self.style.padding(px);
         self
     }
 
+    /// Sets the width of the [`Row`] in pixels.
+    ///
+    /// [`Row`]: struct.Row.html
+    pub fn width(mut self, width: u32) -> Self {
+        self.style = self.style.width(width);
+        self
+    }
+
+    /// Sets the height of the [`Row`] in pixels.
+    ///
+    /// [`Row`]: struct.Row.html
+    pub fn height(mut self, height: u32) -> Self {
+        self.style = self.style.height(height);
+        self
+    }
+
+    /// Sets the maximum width of the [`Row`] in pixels.
+    ///
+    /// [`Row`]: struct.Row.html
+    pub fn max_width(mut self, max_width: u32) -> Self {
+        self.style = self.style.max_width(max_width);
+        self
+    }
+
+    /// Sets the maximum height of the [`Row`] in pixels.
+    ///
+    /// [`Row`]: struct.Row.html
+    pub fn max_height(mut self, max_height: u32) -> Self {
+        self.style = self.style.max_height(max_height);
+        self
+    }
+
+    /// Sets the alignment of the [`Row`] itself.
+    ///
+    /// This is useful if you want to override the default alignment given by
+    /// the parent container.
+    ///
+    /// [`Row`]: struct.Row.html
+    pub fn align_self(mut self, align: Align) -> Self {
+        self.style = self.style.align_self(align);
+        self
+    }
+
+    /// Sets the vertical alignment of the contents of the [`Row`] .
+    ///
+    /// [`Row`]: struct.Row.html
+    pub fn align_items(mut self, align: Align) -> Self {
+        self.style = self.style.align_items(align);
+        self
+    }
+
+    /// Sets the horizontal distribution strategy for the contents of the
+    /// [`Row`] .
+    ///
+    /// [`Row`]: struct.Row.html
+    pub fn justify_content(mut self, justify: Justify) -> Self {
+        self.style = self.style.justify_content(justify);
+        self
+    }
+
+    /// Adds an [`Element`] to the [`Row`].
+    ///
+    /// [`Element`]: ../struct.Element.html
+    /// [`Row`]: struct.Row.html
     pub fn push<E>(mut self, child: E) -> Row<'a, M, R>
     where
         E: Into<Element<'a, M, R>>,

@@ -6,6 +6,7 @@ use crate::ui::core::{
     Widget,
 };
 
+/// A container that places its contents __vertically__.
 pub struct Column<'a, M, R> {
     style: Style,
     spacing: u16,
@@ -13,6 +14,9 @@ pub struct Column<'a, M, R> {
 }
 
 impl<'a, M, R> Column<'a, M, R> {
+    /// Creates an empty [`Column`].
+    ///
+    /// [`Column`]: struct.Column.html
     pub fn new() -> Self {
         let mut style = Style::default().fill_width();
         style.0.flex_direction = stretch::style::FlexDirection::Column;
@@ -24,51 +28,88 @@ impl<'a, M, R> Column<'a, M, R> {
         }
     }
 
-    pub fn width(mut self, width: u32) -> Self {
-        self.style = self.style.width(width);
-        self
-    }
-
-    pub fn height(mut self, height: u32) -> Self {
-        self.style = self.style.height(height);
-        self
-    }
-
-    pub fn max_width(mut self, max_width: u32) -> Self {
-        self.style = self.style.max_width(max_width);
-        self
-    }
-
-    pub fn fill_width(mut self) -> Self {
-        self.style = self.style.fill_width();
-        self
-    }
-
+    /// Sets the vertical spacing _between_ elements in pixels.
+    ///
+    /// Custom margins per element do not exist in Coffee. You should use this
+    /// method instead! While less flexible, it helps you keep spacing between
+    /// elements consistent.
     pub fn spacing(mut self, px: u16) -> Self {
         self.spacing = px;
         self
     }
 
+    /// Sets the padding of the [`Column`] in pixels.
+    ///
+    /// [`Column`]: struct.Column.html
     pub fn padding(mut self, px: u32) -> Self {
         self.style = self.style.padding(px);
         self
     }
 
+    /// Sets the width of the [`Column`] in pixels.
+    ///
+    /// [`Column`]: struct.Column.html
+    pub fn width(mut self, width: u32) -> Self {
+        self.style = self.style.width(width);
+        self
+    }
+
+    /// Sets the height of the [`Column`] in pixels.
+    ///
+    /// [`Column`]: struct.Column.html
+    pub fn height(mut self, height: u32) -> Self {
+        self.style = self.style.height(height);
+        self
+    }
+
+    /// Sets the maximum width of the [`Column`] in pixels.
+    ///
+    /// [`Column`]: struct.Column.html
+    pub fn max_width(mut self, max_width: u32) -> Self {
+        self.style = self.style.max_width(max_width);
+        self
+    }
+
+    /// Sets the maximum height of the [`Column`] in pixels.
+    ///
+    /// [`Column`]: struct.Column.html
+    pub fn max_height(mut self, max_height: u32) -> Self {
+        self.style = self.style.max_height(max_height);
+        self
+    }
+
+    /// Sets the alignment of the [`Column`] itself.
+    ///
+    /// This is useful if you want to override the default alignment given by
+    /// the parent container.
+    ///
+    /// [`Column`]: struct.Column.html
     pub fn align_self(mut self, align: Align) -> Self {
         self.style = self.style.align_self(align);
         self
     }
 
+    /// Sets the horizontal alignment of the contents of the [`Column`] .
+    ///
+    /// [`Column`]: struct.Column.html
     pub fn align_items(mut self, align: Align) -> Self {
         self.style = self.style.align_items(align);
         self
     }
 
+    /// Sets the vertical distribution strategy for the contents of the
+    /// [`Column`] .
+    ///
+    /// [`Column`]: struct.Column.html
     pub fn justify_content(mut self, justify: Justify) -> Self {
         self.style = self.style.justify_content(justify);
         self
     }
 
+    /// Adds an [`Element`] to the [`Column`].
+    ///
+    /// [`Element`]: ../struct.Element.html
+    /// [`Column`]: struct.Column.html
     pub fn push<E>(mut self, child: E) -> Column<'a, M, R>
     where
         E: Into<Element<'a, M, R>>,

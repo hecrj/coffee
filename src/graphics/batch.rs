@@ -57,6 +57,7 @@ impl Batch {
     ///
     /// This is useful to avoid creating a new batch every frame and
     /// reallocating the same memory.
+    ///
     /// [`Batch`]: struct.Batch.html
     pub fn clear(&mut self) {
         self.instances.clear();

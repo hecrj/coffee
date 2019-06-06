@@ -77,7 +77,7 @@ impl UserInterface for Tour {
             );
         }
 
-        controls = controls.push(Column::new().fill_width());
+        controls = controls.push(Column::new());
 
         if steps.can_continue() {
             controls = controls.push(

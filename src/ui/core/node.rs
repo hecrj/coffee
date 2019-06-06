@@ -48,7 +48,6 @@ impl Node {
     /// [`Node`]: struct.Node.html
     /// [`Style`]: struct.Style.html
     /// [`Widget`]: widget/trait.Widget.html
-    /// [`Size`]: struct.Size.html
     pub fn with_measure<F>(style: Style, measure: F) -> Node
     where
         F: 'static + Fn(Size<Number>) -> Size<f32>,
