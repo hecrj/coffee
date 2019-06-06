@@ -2,6 +2,11 @@ use crate::graphics::Frame;
 use crate::load::Task;
 
 /// The renderer of a user interface.
+///
+/// The implementor of this trait will also need to implement the `Renderer`
+/// trait of the [widgets] you want to use.
+///
+/// [widgets]: widget/index.html
 pub trait Renderer {
     /// The configuration of the renderer.
     ///

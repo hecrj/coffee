@@ -73,7 +73,7 @@ impl UserInterface for Tour {
             controls = controls.push(
                 Button::new(back_button, "Back")
                     .on_click(Message::BackPressed)
-                    .r#type(button::Type::Secondary),
+                    .class(button::Class::Secondary),
             );
         }
 
@@ -348,11 +348,11 @@ impl<'a> Step {
             .push(Button::new(primary, "Primary"))
             .push(
                 Button::new(secondary, "Secondary")
-                    .r#type(button::Type::Secondary),
+                    .class(button::Class::Secondary),
             )
             .push(
                 Button::new(positive, "Positive")
-                    .r#type(button::Type::Positive),
+                    .class(button::Class::Positive),
             )
             .push(Text::new(
                 "Additional types will be added in the near future! Choose \

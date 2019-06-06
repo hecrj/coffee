@@ -6,8 +6,8 @@ use crate::graphics::{
 use crate::ui::core::{widget::button, MouseCursor};
 
 pub type Button<'a, M> = button::Button<'a, M, Renderer>;
+pub use button::Class;
 pub use button::State;
-pub use button::Type;
 
 const LEFT: Rectangle<u16> = Rectangle {
     x: 0,
@@ -33,11 +33,11 @@ const RIGHT: Rectangle<u16> = Rectangle {
 impl button::Renderer for Renderer {
     fn draw(
         &mut self,
-        state: &button::State,
-        label: &str,
-        type_: button::Type,
-        mut bounds: Rectangle<f32>,
         cursor_position: Point,
+        mut bounds: Rectangle<f32>,
+        state: &State,
+        label: &str,
+        class: Class,
     ) -> MouseCursor {
         let mouse_over = bounds.contains(cursor_position);
 
@@ -52,16 +52,16 @@ impl button::Renderer for Renderer {
             }
         }
 
-        let type_index = match type_ {
-            button::Type::Primary => 0,
-            button::Type::Secondary => 1,
-            button::Type::Positive => 2,
+        let class_index = match class {
+            button::Class::Primary => 0,
+            button::Class::Secondary => 1,
+            button::Class::Positive => 2,
         };
 
         self.sprites.add(Sprite {
             source: Rectangle {
                 x: LEFT.x + state_offset,
-                y: LEFT.y + type_index * LEFT.height,
+                y: LEFT.y + class_index * LEFT.height,
                 ..LEFT
             },
             position: Point::new(bounds.x, bounds.y),
@@ -71,7 +71,7 @@ impl button::Renderer for Renderer {
         self.sprites.add(Sprite {
             source: Rectangle {
                 x: BACKGROUND.x + state_offset,
-                y: BACKGROUND.y + type_index * BACKGROUND.height,
+                y: BACKGROUND.y + class_index * BACKGROUND.height,
                 ..BACKGROUND
             },
             position: Point::new(bounds.x + LEFT.width as f32, bounds.y),
@@ -81,7 +81,7 @@ impl button::Renderer for Renderer {
         self.sprites.add(Sprite {
             source: Rectangle {
                 x: RIGHT.x + state_offset,
-                y: RIGHT.y + type_index * RIGHT.height,
+                y: RIGHT.y + class_index * RIGHT.height,
                 ..RIGHT
             },
             position: Point::new(

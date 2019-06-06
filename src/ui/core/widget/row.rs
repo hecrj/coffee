@@ -7,6 +7,10 @@ use crate::ui::core::{
 };
 
 /// A container that places its contents __horizontally__.
+///
+/// A [`Row`] will try to fill the horizontal space of its container.
+///
+/// [`Row`]: struct.Row.html
 pub struct Row<'a, M, R> {
     style: Style,
     spacing: u16,
