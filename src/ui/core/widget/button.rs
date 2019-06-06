@@ -16,12 +16,29 @@ use std::hash::Hash;
 
 /// A generic widget that produces a message when clicked.
 ///
-/// It implements [`Widget`] when the associated [`Widget::Renderer`] implements
+/// It implements [`Widget`] when the associated [`core::Renderer`] implements
 /// the [`button::Renderer`] trait.
 ///
 /// [`Widget`]: ../trait.Widget.html
-/// [`Widget::Renderer`]: ../trait.Widget.html#associatedtype.Renderer
+/// [`core::Renderer`]: ../../trait.Renderer.html
 /// [`button::Renderer`]: trait.Renderer.html
+///
+/// # Example
+///
+/// ```
+/// use coffee::ui::{button, Button};
+///
+/// pub enum Message {
+///     ButtonClicked,
+/// }
+///
+/// let button_state = &mut button::State::new();
+///
+/// Button::new(button_state, "Click me!")
+///     .on_click(Message::ButtonClicked);
+/// ```
+///
+/// ![Button drawn by the built-in renderer](https://i.imgur.com/783e6Sh.png)
 pub struct Button<'a, Message> {
     state: &'a mut State,
     label: String,
@@ -188,10 +205,12 @@ impl State {
 
 /// The type of a [`Button`].
 ///
+/// ![Buttons drawn with a different class by the built-in renderer](https://i.imgur.com/BRuOtjw.png)
+///
 /// [`Button`]: struct.Button.html
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Class {
-    /// The [`Button`] performs an important action.
+    /// The [`Button`] performs the main action.
     ///
     /// [`Button`]: struct.Button.html
     Primary,
@@ -217,8 +236,12 @@ pub enum Class {
 pub trait Renderer {
     /// Draws a [`Button`].
     ///
-    /// It receives the current cursor position and the bounds,
-    /// [`State`], label, and [`Class`] of the [`Button`].
+    /// It receives:
+    ///   * the current cursor position
+    ///   * the bounds of the [`Button`]
+    ///   * the current state of the [`Button`]
+    ///   * the label of the [`Button`]
+    ///   * the [`Class`] of the [`Button`]
     ///
     /// [`Button`]: struct.Button.html
     /// [`State`]: struct.State.html

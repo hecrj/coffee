@@ -43,12 +43,13 @@ impl Game for Tour {
         frame: &mut Frame,
         _timer: &Timer,
     ) {
-        frame.clear(Color {
-            r: 0.3,
-            g: 0.3,
-            b: 0.6,
-            a: 1.0,
-        });
+        //frame.clear(Color {
+        //    r: 0.3,
+        //    g: 0.3,
+        //    b: 0.6,
+        //    a: 1.0,
+        //});
+        frame.clear(Color::WHITE);
     }
 }
 
@@ -365,11 +366,14 @@ impl<'a> Step {
             .push(Text::new(
                 "A box that can be checked. Useful to build toggle controls.",
             ))
-            .push(Checkbox::new(
-                is_checked,
-                "Show \"Next\" button",
-                StepMessage::CheckboxToggled,
-            ))
+            .push(
+                Checkbox::new(
+                    is_checked,
+                    "Show \"Next\" button",
+                    StepMessage::CheckboxToggled,
+                )
+                .label_color(Color::BLACK),
+            )
             .push(Text::new(
                 "A checkbox always has a label, and both the checkbox and its \
                  label can be clicked to toggle it.",

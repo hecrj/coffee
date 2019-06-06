@@ -12,10 +12,10 @@ const SPRITE: Rectangle<u16> = Rectangle {
 impl checkbox::Renderer for Renderer {
     fn draw(
         &mut self,
-        is_checked: bool,
+        cursor_position: Point,
         bounds: Rectangle<f32>,
         text_bounds: Rectangle<f32>,
-        cursor_position: Point,
+        is_checked: bool,
     ) -> MouseCursor {
         let mouse_over = bounds.contains(cursor_position)
             || text_bounds.contains(cursor_position);
