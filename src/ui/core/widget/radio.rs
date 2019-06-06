@@ -1,5 +1,4 @@
-use std::hash::Hash;
-
+//! Create choices using radio buttons.
 use crate::graphics::{
     Color, HorizontalAlignment, Point, Rectangle, VerticalAlignment,
 };
@@ -9,13 +8,66 @@ use crate::ui::core::{
     Align, Element, Event, Hasher, Layout, MouseCursor, Node, Widget,
 };
 
+use std::hash::Hash;
+
+/// A circular button representing a choice.
+///
+/// It implements [`Widget`] when the [`core::Renderer`] implements the
+/// [`radio::Renderer`] trait.
+///
+/// [`Widget`]: ../trait.Widget.html
+/// [`core::Renderer`]: ../../trait.Renderer.html
+/// [`radio::Renderer`]: trait.Renderer.html
+///
+/// # Example
+/// ```
+/// use coffee::graphics::Color;
+/// use coffee::ui::{Column, Radio};
+///
+/// #[derive(Clone, Copy, PartialEq, Eq)]
+/// pub enum Choice {
+///     A,
+///     B,
+/// }
+///
+/// #[derive(Clone, Copy)]
+/// pub enum Message {
+///     RadioSelected(Choice),
+/// }
+///
+/// let selected_choice = Some(Choice::A);
+///
+/// Column::new()
+///     .spacing(20)
+///     .push(
+///         Radio::new(Choice::A, "This is A", selected_choice, Message::RadioSelected)
+///             .label_color(Color::BLACK),
+///     )
+///     .push(
+///         Radio::new(Choice::B, "This is B", selected_choice, Message::RadioSelected)
+///             .label_color(Color::BLACK),
+///     );
+/// ```
+///
+/// ![Checkbox drawn by the built-in renderer](https://i.imgur.com/8kka6cz.png)
 pub struct Radio<Message> {
     is_selected: bool,
     on_click: Message,
     label: String,
+    label_color: Color,
 }
 
 impl<Message> Radio<Message> {
+    /// Creates a new [`Radio`] button.
+    ///
+    /// It expects:
+    ///   * the value related to the [`Radio`] button
+    ///   * the label of the [`Radio`] button
+    ///   * the current selected value
+    ///   * a function that will be called when the [`Radio`] is selected. It
+    ///   receives the value of the radio and must produce a `Message`.
+    ///
+    /// [`Radio`]: struct.Radio.html
     pub fn new<F, V>(value: V, label: &str, selected: Option<V>, f: F) -> Self
     where
         V: Eq + Copy,
@@ -25,7 +77,17 @@ impl<Message> Radio<Message> {
             is_selected: Some(value) == selected,
             on_click: f(value),
             label: String::from(label),
+            label_color: Color::WHITE,
         }
+    }
+
+    /// Sets the [`Color`] of the label of the [`Radio`].
+    ///
+    /// [`Color`]: ../../../../graphics/struct.Color.html
+    /// [`Radio`]: struct.Radio.html
+    pub fn label_color(mut self, color: Color) -> Self {
+        self.label_color = color;
+        self
     }
 }
 
@@ -77,17 +139,17 @@ where
         (renderer as &mut text::Renderer).draw(
             &self.label,
             20.0,
-            Color::WHITE,
+            self.label_color,
             HorizontalAlignment::Left,
             VerticalAlignment::Top,
             text_bounds,
         );
 
         (renderer as &mut self::Renderer).draw(
-            self.is_selected,
+            cursor_position,
             children[0].bounds(),
             layout.bounds(),
-            cursor_position,
+            self.is_selected,
         )
     }
 
@@ -96,13 +158,29 @@ where
     }
 }
 
+/// The renderer of a [`Radio`] button.
+///
+/// Your [`core::Renderer`] will need to implement this trait before being
+/// able to use a [`Radio`] button in your user interface.
+///
+/// [`Radio`]: struct.Radio.html
+/// [`core::Renderer`]: ../../trait.Renderer.html
 pub trait Renderer {
+    /// Draws a [`Radio`] button.
+    ///
+    /// It receives:
+    ///   * the current cursor position
+    ///   * the bounds of the [`Radio`]
+    ///   * the bounds of the label of the [`Radio`]
+    ///   * whether the [`Radio`] is selected or not
+    ///
+    /// [`Radio`]: struct.Radio.html
     fn draw(
         &mut self,
-        is_selected: bool,
+        cursor_position: Point,
         bounds: Rectangle<f32>,
         label_bounds: Rectangle<f32>,
-        cursor_position: Point,
+        is_selected: bool,
     ) -> MouseCursor;
 }
 

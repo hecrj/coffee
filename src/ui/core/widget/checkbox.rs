@@ -46,8 +46,12 @@ pub struct Checkbox<Message> {
 impl<Message> Checkbox<Message> {
     /// Creates a new [`Checkbox`] with the given state and label.
     ///
-    /// The provided function is triggered when the [`Checkbox`] is toggled and
-    /// must produce a `Message`.
+    /// It expects:
+    ///   * a boolean describing whether the [`Checkbox`] is checked or not
+    ///   * the label of the [`Checkbox`]
+    ///   * a function that will be called when the [`Checkbox`] is toggled.
+    ///   It receives the new state of the [`Checkbox`] and must produce a
+    ///   `Message`.
     ///
     /// [`Checkbox`]: struct.Checkbox.html
     pub fn new<F>(is_checked: bool, label: &str, f: F) -> Self

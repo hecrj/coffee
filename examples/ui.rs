@@ -388,12 +388,15 @@ impl<'a> Step {
             .push(Language::all().iter().cloned().fold(
                 Column::new().padding(10).spacing(20),
                 |choices, language| {
-                    choices.push(Radio::new(
-                        language,
-                        language.into(),
-                        selection,
-                        StepMessage::LanguageSelected,
-                    ))
+                    choices.push(
+                        Radio::new(
+                            language,
+                            language.into(),
+                            selection,
+                            StepMessage::LanguageSelected,
+                        )
+                        .label_color(Color::BLACK),
+                    )
                 },
             ));
 
@@ -577,10 +580,10 @@ impl From<Language> for &str {
     fn from(language: Language) -> &'static str {
         match language {
             Language::Rust => "Rust",
-            Language::Elm => "Elm",
+            Language::Elm => "This is B",
             Language::Ruby => "Ruby",
             Language::Haskell => "Haskell",
-            Language::C => "C",
+            Language::C => "This is A",
             Language::Other => "Other",
         }
     }

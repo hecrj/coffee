@@ -12,10 +12,10 @@ const SPRITE: Rectangle<u16> = Rectangle {
 impl radio::Renderer for Renderer {
     fn draw(
         &mut self,
-        is_selected: bool,
+        cursor_position: Point,
         bounds: Rectangle<f32>,
         bounds_with_label: Rectangle<f32>,
-        cursor_position: Point,
+        is_selected: bool,
     ) -> MouseCursor {
         let mouse_over = bounds_with_label.contains(cursor_position);
 
