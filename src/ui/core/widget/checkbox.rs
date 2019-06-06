@@ -9,37 +9,31 @@ use crate::ui::core::{
     Align, Element, Event, Hasher, Layout, MouseCursor, Node, Widget,
 };
 
-pub struct Checkbox<M, R> {
+pub struct Checkbox<Message> {
     is_checked: bool,
-    on_toggle: Box<Fn(bool) -> M>,
+    on_toggle: Box<Fn(bool) -> Message>,
     label: String,
-    renderer: std::marker::PhantomData<R>,
 }
 
-impl<M, R> Checkbox<M, R> {
+impl<Message> Checkbox<Message> {
     pub fn new<F>(is_checked: bool, label: &str, f: F) -> Self
     where
-        F: Fn(bool) -> M + 'static,
+        F: 'static + Fn(bool) -> Message,
     {
         Checkbox {
             is_checked,
             on_toggle: Box::new(f),
             label: String::from(label),
-            renderer: std::marker::PhantomData,
         }
     }
 }
 
-impl<M, R> Widget for Checkbox<M, R>
+impl<Message, Renderer> Widget<Message, Renderer> for Checkbox<Message>
 where
-    R: Renderer + text::Renderer + 'static,
-    M: Copy,
+    Renderer: self::Renderer + text::Renderer,
 {
-    type Message = M;
-    type Renderer = R;
-
-    fn node(&self, renderer: &R) -> Node {
-        Row::<(), R>::new()
+    fn node(&self, renderer: &Renderer) -> Node {
+        Row::<(), Renderer>::new()
             .spacing(15)
             .align_items(Align::Center)
             .push(Column::new().width(28).height(28))
@@ -52,7 +46,7 @@ where
         event: Event,
         layout: Layout,
         cursor_position: Point,
-        messages: &mut Vec<M>,
+        messages: &mut Vec<Message>,
     ) {
         match event {
             Event::MouseInput {
@@ -73,7 +67,7 @@ where
 
     fn draw(
         &self,
-        renderer: &mut R,
+        renderer: &mut Renderer,
         layout: Layout,
         cursor_position: Point,
     ) -> MouseCursor {
@@ -91,7 +85,7 @@ where
             text_bounds,
         );
 
-        (renderer as &mut Renderer).draw(
+        (renderer as &mut self::Renderer).draw(
             self.is_checked,
             children[0].bounds(),
             text_bounds,
@@ -114,12 +108,13 @@ pub trait Renderer {
     ) -> MouseCursor;
 }
 
-impl<'a, M, R> From<Checkbox<M, R>> for Element<'a, M, R>
+impl<'a, Message, Renderer> From<Checkbox<Message>>
+    for Element<'a, Message, Renderer>
 where
-    R: Renderer + text::Renderer + 'static,
-    M: Copy + 'static,
+    Renderer: self::Renderer + text::Renderer,
+    Message: 'static,
 {
-    fn from(checkbox: Checkbox<M, R>) -> Element<'a, M, R> {
+    fn from(checkbox: Checkbox<Message>) -> Element<'a, Message, Renderer> {
         Element::new(checkbox)
     }
 }

@@ -11,13 +11,13 @@ use crate::ui::core::{
 /// A [`Row`] will try to fill the horizontal space of its container.
 ///
 /// [`Row`]: struct.Row.html
-pub struct Row<'a, M, R> {
+pub struct Row<'a, Message, Renderer> {
     style: Style,
     spacing: u16,
-    children: Vec<Element<'a, M, R>>,
+    children: Vec<Element<'a, Message, Renderer>>,
 }
 
-impl<'a, M, R> Row<'a, M, R> {
+impl<'a, Message, Renderer> Row<'a, Message, Renderer> {
     /// Creates an empty [`Row`].
     ///
     /// [`Row`]: struct.Row.html
@@ -111,20 +111,19 @@ impl<'a, M, R> Row<'a, M, R> {
     ///
     /// [`Element`]: ../struct.Element.html
     /// [`Row`]: struct.Row.html
-    pub fn push<E>(mut self, child: E) -> Row<'a, M, R>
+    pub fn push<E>(mut self, child: E) -> Row<'a, Message, Renderer>
     where
-        E: Into<Element<'a, M, R>>,
+        E: Into<Element<'a, Message, Renderer>>,
     {
         self.children.push(child.into());
         self
     }
 }
 
-impl<'a, M, R> Widget for Row<'a, M, R> {
-    type Message = M;
-    type Renderer = R;
-
-    fn node(&self, renderer: &R) -> Node {
+impl<'a, Message, Renderer> Widget<Message, Renderer>
+    for Row<'a, Message, Renderer>
+{
+    fn node(&self, renderer: &Renderer) -> Node {
         let mut children: Vec<Node> = self
             .children
             .iter()
@@ -155,7 +154,7 @@ impl<'a, M, R> Widget for Row<'a, M, R> {
         event: Event,
         layout: Layout,
         cursor_position: Point,
-        messages: &mut Vec<Self::Message>,
+        messages: &mut Vec<Message>,
     ) {
         self.children.iter_mut().zip(layout.children()).for_each(
             |(child, layout)| {
@@ -168,7 +167,7 @@ impl<'a, M, R> Widget for Row<'a, M, R> {
 
     fn draw(
         &self,
-        renderer: &mut Self::Renderer,
+        renderer: &mut Renderer,
         layout: Layout,
         cursor_position: Point,
     ) -> MouseCursor {
@@ -198,12 +197,13 @@ impl<'a, M, R> Widget for Row<'a, M, R> {
     }
 }
 
-impl<'a, M, R> From<Row<'a, M, R>> for Element<'a, M, R>
+impl<'a, Message, Renderer> From<Row<'a, Message, Renderer>>
+    for Element<'a, Message, Renderer>
 where
-    R: 'static,
-    M: 'static,
+    Renderer: 'a,
+    Message: 'static,
 {
-    fn from(row: Row<'a, M, R>) -> Element<'a, M, R> {
+    fn from(row: Row<'a, Message, Renderer>) -> Element<'a, Message, Renderer> {
         Element::new(row)
     }
 }

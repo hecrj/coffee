@@ -1,9 +1,6 @@
-use super::Renderer;
-
 use crate::graphics::{Point, Rectangle, Sprite};
 use crate::ui::core::{widget::checkbox, MouseCursor};
-
-pub type Checkbox<M> = checkbox::Checkbox<M, Renderer>;
+use crate::ui::Renderer;
 
 const SPRITE: Rectangle<u16> = Rectangle {
     x: 98,

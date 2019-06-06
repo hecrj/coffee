@@ -1,9 +1,6 @@
-use super::Renderer;
-
 use crate::graphics::{Point, Rectangle, Sprite};
 use crate::ui::core::{widget::radio, MouseCursor};
-
-pub type Radio<M> = radio::Radio<M, Renderer>;
+use crate::ui::Renderer;
 
 const SPRITE: Rectangle<u16> = Rectangle {
     x: 98,

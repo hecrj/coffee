@@ -22,16 +22,15 @@ use std::hash::Hash;
 /// [`Widget`]: ../trait.Widget.html
 /// [`Widget::Renderer`]: ../trait.Widget.html#associatedtype.Renderer
 /// [`button::Renderer`]: trait.Renderer.html
-pub struct Button<'a, M, R> {
+pub struct Button<'a, Message> {
     state: &'a mut State,
     label: String,
     class: Class,
-    on_click: Option<M>,
+    on_click: Option<Message>,
     style: Style,
-    renderer: std::marker::PhantomData<R>,
 }
 
-impl<'a, M, R> Button<'a, M, R> {
+impl<'a, Message> Button<'a, Message> {
     /// Creates a new [`Button`] with some local [`State`] and the given label.
     ///
     /// The default [`Class`] of a new [`Button`] is [`Class::Primary`].
@@ -47,7 +46,6 @@ impl<'a, M, R> Button<'a, M, R> {
             class: Class::Primary,
             on_click: None,
             style: Style::default().min_width(100),
-            renderer: std::marker::PhantomData,
         }
     }
 
@@ -91,21 +89,18 @@ impl<'a, M, R> Button<'a, M, R> {
     /// Sets the message that will be produced when the [`Button`] is clicked.
     ///
     /// [`Button`]: struct.Button.html
-    pub fn on_click(mut self, msg: M) -> Self {
+    pub fn on_click(mut self, msg: Message) -> Self {
         self.on_click = Some(msg);
         self
     }
 }
 
-impl<'a, M, R> Widget for Button<'a, M, R>
+impl<'a, Message, Renderer> Widget<Message, Renderer> for Button<'a, Message>
 where
-    R: Renderer,
-    M: Copy,
+    Renderer: self::Renderer,
+    Message: Copy,
 {
-    type Message = M;
-    type Renderer = R;
-
-    fn node(&self, _renderer: &R) -> Node {
+    fn node(&self, _renderer: &Renderer) -> Node {
         Node::new(self.style.height(50))
     }
 
@@ -114,7 +109,7 @@ where
         event: Event,
         layout: Layout,
         cursor_position: Point,
-        messages: &mut Vec<M>,
+        messages: &mut Vec<Message>,
     ) {
         match event {
             Event::MouseInput {
@@ -148,7 +143,7 @@ where
 
     fn draw(
         &self,
-        renderer: &mut R,
+        renderer: &mut Renderer,
         layout: Layout,
         cursor_position: Point,
     ) -> MouseCursor {
@@ -238,12 +233,13 @@ pub trait Renderer {
     ) -> MouseCursor;
 }
 
-impl<'a, M, R> From<Button<'a, M, R>> for Element<'a, M, R>
+impl<'a, Message, Renderer> From<Button<'a, Message>>
+    for Element<'a, Message, Renderer>
 where
-    R: 'static + Renderer,
-    M: 'static + Copy,
+    Renderer: self::Renderer,
+    Message: 'static + Copy,
 {
-    fn from(button: Button<'a, M, R>) -> Element<'a, M, R> {
+    fn from(button: Button<'a, Message>) -> Element<'a, Message, Renderer> {
         Element::new(button)
     }
 }

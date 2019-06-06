@@ -1,14 +1,11 @@
-use super::Renderer;
-
 use crate::graphics::{
     self, Color, HorizontalAlignment, Point, Rectangle, VerticalAlignment,
 };
 use crate::ui::core::{widget::text, Node, Number, Size, Style};
+use crate::ui::Renderer;
 
 use std::cell::RefCell;
 use std::f32;
-
-pub type Text<M> = text::Text<M, Renderer>;
 
 impl text::Renderer for Renderer {
     fn node(&self, style: Style, content: &str, size: f32) -> Node {

@@ -7,18 +7,16 @@ use crate::ui::core::{
     Element, Hasher, Layout, MouseCursor, Node, Style, Widget,
 };
 
-pub struct Text<M, R> {
+pub struct Text {
     content: String,
     size: u16,
     color: Color,
     style: Style,
     horizontal_alignment: HorizontalAlignment,
     vertical_alignment: VerticalAlignment,
-    message: std::marker::PhantomData<M>,
-    renderer: std::marker::PhantomData<R>,
 }
 
-impl<M, R> Text<M, R> {
+impl Text {
     pub fn new(label: &str) -> Self {
         Text {
             content: String::from(label),
@@ -27,8 +25,6 @@ impl<M, R> Text<M, R> {
             style: Style::default().fill_width(),
             horizontal_alignment: HorizontalAlignment::Left,
             vertical_alignment: VerticalAlignment::Top,
-            message: std::marker::PhantomData,
-            renderer: std::marker::PhantomData,
         }
     }
 
@@ -66,20 +62,17 @@ impl<M, R> Text<M, R> {
     }
 }
 
-impl<M, R> Widget for Text<M, R>
+impl<Message, Renderer> Widget<Message, Renderer> for Text
 where
-    R: Renderer,
+    Renderer: self::Renderer,
 {
-    type Message = M;
-    type Renderer = R;
-
-    fn node(&self, renderer: &R) -> Node {
+    fn node(&self, renderer: &Renderer) -> Node {
         renderer.node(self.style, &self.content, self.size as f32)
     }
 
     fn draw(
         &self,
-        renderer: &mut R,
+        renderer: &mut Renderer,
         layout: Layout,
         _cursor_position: Point,
     ) -> MouseCursor {
@@ -117,12 +110,11 @@ pub trait Renderer {
     );
 }
 
-impl<'a, M, R> From<Text<M, R>> for Element<'a, M, R>
+impl<'a, Message, Renderer> From<Text> for Element<'a, Message, Renderer>
 where
-    R: Renderer + 'static,
-    M: 'static,
+    Renderer: self::Renderer,
 {
-    fn from(text: Text<M, R>) -> Element<'a, M, R> {
+    fn from(text: Text) -> Element<'a, Message, Renderer> {
         Element::new(text)
     }
 }

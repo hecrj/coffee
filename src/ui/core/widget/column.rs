@@ -11,13 +11,13 @@ use crate::ui::core::{
 /// A [`Column`] will try to fill the horizontal space of its container.
 ///
 /// [`Column`]: struct.Column.html
-pub struct Column<'a, M, R> {
+pub struct Column<'a, Message, Renderer> {
     style: Style,
     spacing: u16,
-    children: Vec<Element<'a, M, R>>,
+    children: Vec<Element<'a, Message, Renderer>>,
 }
 
-impl<'a, M, R> Column<'a, M, R> {
+impl<'a, Message, Renderer> Column<'a, Message, Renderer> {
     /// Creates an empty [`Column`].
     ///
     /// [`Column`]: struct.Column.html
@@ -114,20 +114,19 @@ impl<'a, M, R> Column<'a, M, R> {
     ///
     /// [`Element`]: ../struct.Element.html
     /// [`Column`]: struct.Column.html
-    pub fn push<E>(mut self, child: E) -> Column<'a, M, R>
+    pub fn push<E>(mut self, child: E) -> Column<'a, Message, Renderer>
     where
-        E: Into<Element<'a, M, R>>,
+        E: Into<Element<'a, Message, Renderer>>,
     {
         self.children.push(child.into());
         self
     }
 }
 
-impl<'a, M, R> Widget for Column<'a, M, R> {
-    type Message = M;
-    type Renderer = R;
-
-    fn node(&self, renderer: &R) -> Node {
+impl<'a, Message, Renderer> Widget<Message, Renderer>
+    for Column<'a, Message, Renderer>
+{
+    fn node(&self, renderer: &Renderer) -> Node {
         let mut children: Vec<Node> = self
             .children
             .iter()
@@ -158,7 +157,7 @@ impl<'a, M, R> Widget for Column<'a, M, R> {
         event: Event,
         layout: Layout,
         cursor_position: Point,
-        messages: &mut Vec<Self::Message>,
+        messages: &mut Vec<Message>,
     ) {
         self.children.iter_mut().zip(layout.children()).for_each(
             |(child, layout)| {
@@ -171,7 +170,7 @@ impl<'a, M, R> Widget for Column<'a, M, R> {
 
     fn draw(
         &self,
-        renderer: &mut Self::Renderer,
+        renderer: &mut Renderer,
         layout: Layout,
         cursor_position: Point,
     ) -> MouseCursor {
@@ -201,12 +200,15 @@ impl<'a, M, R> Widget for Column<'a, M, R> {
     }
 }
 
-impl<'a, M, R> From<Column<'a, M, R>> for Element<'a, M, R>
+impl<'a, Message, Renderer> From<Column<'a, Message, Renderer>>
+    for Element<'a, Message, Renderer>
 where
-    R: 'static,
-    M: 'static,
+    Renderer: 'a,
+    Message: 'static,
 {
-    fn from(column: Column<'a, M, R>) -> Element<'a, M, R> {
+    fn from(
+        column: Column<'a, Message, Renderer>,
+    ) -> Element<'a, Message, Renderer> {
         Element::new(column)
     }
 }

@@ -94,38 +94,41 @@
 //! [`Game`]: ../trait.Game.html
 //! [`UserInterface`]: trait.UserInterface.html
 //! [`examples` directory on GitHub]: https://github.com/hecrj/coffee/tree/0.3.0/examples
-mod checkbox;
-mod panel;
-mod radio;
-mod renderer;
-mod text;
-
-pub mod button;
 pub mod core;
-pub mod slider;
+mod renderer;
 
+pub use self::core::widget::{
+    button, slider, Button, Checkbox, Radio, Slider, Text,
+};
 #[doc(no_inline)]
 pub use self::core::{Align, Justify};
-pub use button::Button;
-pub use checkbox::Checkbox;
-pub use panel::Panel;
-pub use radio::Radio;
 pub use renderer::{Configuration, Renderer};
-pub use slider::Slider;
-pub use text::Text;
 
-pub type Column<'a, M> = self::core::widget::Column<'a, M, Renderer>;
-pub type Row<'a, M> = self::core::widget::Row<'a, M, Renderer>;
-pub type Element<'a, M> = self::core::Element<'a, M, Renderer>;
+/// A [`Column`] using the built-in [`Renderer`].
+///
+/// [`Column`]: core/widget/struct.Column.html
+/// [`Renderer`]: struct.Renderer.html
+pub type Column<'a, Message> =
+    self::core::widget::Column<'a, Message, Renderer>;
 
-use self::core::{Event, Interface, MouseCursor, Renderer as _};
+/// A [`Row`] using the built-in [`Renderer`].
+///
+/// [`Row`]: core/widget/struct.Row.html
+/// [`Renderer`]: struct.Renderer.html
+pub type Row<'a, Message> = self::core::widget::Row<'a, Message, Renderer>;
+
+/// An [`Element`] using the built-in [`Renderer`].
+///
+/// [`Element`]: core/widget/struct.Element.html
+/// [`Renderer`]: struct.Renderer.html
+pub type Element<'a, Message> = self::core::Element<'a, Message, Renderer>;
 
 use crate::game;
 use crate::graphics::{window, Window, WindowSettings};
 use crate::input::{self, HasCursorPosition, Input};
 use crate::load::{Join, LoadingScreen};
-use crate::Debug;
-use crate::{Game, Result, State, Timer};
+use crate::ui::core::{Event, Interface, MouseCursor, Renderer as _};
+use crate::{Debug, Game, Result, State, Timer};
 
 /// The user interface of your game.
 ///

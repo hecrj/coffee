@@ -7,16 +7,15 @@ use crate::ui::core::{
     Element, Event, Hasher, Layout, MouseCursor, Node, Style, Widget,
 };
 
-pub struct Slider<'a, M, R> {
+pub struct Slider<'a, Message> {
     state: &'a mut State,
     range: Range<f32>,
     value: f32,
-    on_change: Box<dyn Fn(f32) -> M>,
+    on_change: Box<dyn Fn(f32) -> Message>,
     style: Style,
-    renderer: std::marker::PhantomData<R>,
 }
 
-impl<'a, M, R> Slider<'a, M, R> {
+impl<'a, Message> Slider<'a, Message> {
     pub fn new<F>(
         state: &'a mut State,
         range: Range<f32>,
@@ -24,7 +23,7 @@ impl<'a, M, R> Slider<'a, M, R> {
         on_change: F,
     ) -> Self
     where
-        F: Fn(f32) -> M + 'static,
+        F: Fn(f32) -> Message + 'static,
     {
         Slider {
             state,
@@ -32,7 +31,6 @@ impl<'a, M, R> Slider<'a, M, R> {
             range,
             on_change: Box::new(on_change),
             style: Style::default().min_width(100).fill_width(),
-            renderer: std::marker::PhantomData,
         }
     }
 
@@ -42,15 +40,11 @@ impl<'a, M, R> Slider<'a, M, R> {
     }
 }
 
-impl<'a, M, R> Widget for Slider<'a, M, R>
+impl<'a, Message, Renderer> Widget<Message, Renderer> for Slider<'a, Message>
 where
-    R: Renderer,
-    M: Copy,
+    Renderer: self::Renderer,
 {
-    type Message = M;
-    type Renderer = R;
-
-    fn node(&self, _renderer: &R) -> Node {
+    fn node(&self, _renderer: &Renderer) -> Node {
         Node::new(self.style.height(25))
     }
 
@@ -59,7 +53,7 @@ where
         event: Event,
         layout: Layout,
         cursor_position: Point,
-        messages: &mut Vec<M>,
+        messages: &mut Vec<Message>,
     ) {
         let mut change = || {
             let bounds = layout.bounds();
@@ -103,7 +97,7 @@ where
 
     fn draw(
         &self,
-        renderer: &mut R,
+        renderer: &mut Renderer,
         layout: Layout,
         cursor_position: Point,
     ) -> MouseCursor {
@@ -147,12 +141,13 @@ impl State {
     }
 }
 
-impl<'a, M, R> From<Slider<'a, M, R>> for Element<'a, M, R>
+impl<'a, Message, Renderer> From<Slider<'a, Message>>
+    for Element<'a, Message, Renderer>
 where
-    R: Renderer + 'static,
-    M: Copy + 'static,
+    Renderer: self::Renderer,
+    Message: 'static,
 {
-    fn from(slider: Slider<'a, M, R>) -> Element<'a, M, R> {
+    fn from(slider: Slider<'a, Message>) -> Element<'a, Message, Renderer> {
         Element::new(slider)
     }
 }

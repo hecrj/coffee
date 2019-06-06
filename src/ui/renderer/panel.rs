@@ -1,9 +1,6 @@
-use super::Renderer;
-
 use crate::graphics::{Point, Rectangle, Sprite};
 use crate::ui::core::widget::panel;
-
-pub type Panel<'a, M> = panel::Panel<'a, M, Renderer>;
+use crate::ui::Renderer;
 
 const PANEL_WIDTH: u16 = 28;
 const PANEL_HEIGHT: u16 = 34;

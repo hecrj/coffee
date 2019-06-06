@@ -21,24 +21,21 @@ pub use text::Text;
 use crate::graphics::Point;
 use crate::ui::core::{Event, Hasher, Layout, MouseCursor, Node};
 
-pub trait Widget {
-    type Message;
-    type Renderer;
-
-    fn node(&self, renderer: &Self::Renderer) -> Node;
+pub trait Widget<Message, Renderer> {
+    fn node(&self, renderer: &Renderer) -> Node;
 
     fn on_event(
         &mut self,
         _event: Event,
         _layout: Layout,
         _cursor_position: Point,
-        _messages: &mut Vec<Self::Message>,
+        _messages: &mut Vec<Message>,
     ) {
     }
 
     fn draw(
         &self,
-        renderer: &mut Self::Renderer,
+        renderer: &mut Renderer,
         layout: Layout,
         cursor_position: Point,
     ) -> MouseCursor;

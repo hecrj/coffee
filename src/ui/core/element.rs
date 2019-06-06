@@ -10,18 +10,18 @@ use crate::ui::core::{Event, Hasher, Layout, MouseCursor, Node, Widget};
 ///
 /// [`Widget`]: widget/trait.Widget.html
 /// [`Element`]: struct.Element.html
-pub struct Element<'a, M, R> {
-    pub(crate) widget: Box<Widget<Message = M, Renderer = R> + 'a>,
+pub struct Element<'a, Message, Renderer> {
+    pub(crate) widget: Box<Widget<Message, Renderer> + 'a>,
 }
 
-impl<'a, M, R> Element<'a, M, R> {
+impl<'a, Message, Renderer> Element<'a, Message, Renderer> {
     /// Create a new [`Element`] containing the given [`Widget`].
     ///
     /// [`Element`]: struct.Element.html
     /// [`Widget`]: widget/trait.Widget.html
     pub fn new(
-        widget: impl Widget<Message = M, Renderer = R> + 'a,
-    ) -> Element<'a, M, R> {
+        widget: impl Widget<Message, Renderer> + 'a,
+    ) -> Element<'a, Message, Renderer> {
         Element {
             widget: Box::new(widget),
         }
@@ -124,19 +124,19 @@ impl<'a, M, R> Element<'a, M, R> {
     /// This way, neither `main_menu` nor `gameplay_overlay` know anything about
     /// the global `Message` type and it allows the user of these modules to
     /// wire them up in any way they want.
-    pub fn map<F, B>(self, f: F) -> Element<'a, B, R>
+    pub fn map<F, B>(self, f: F) -> Element<'a, B, Renderer>
     where
-        M: 'static + Copy,
+        Message: 'static + Copy,
+        Renderer: 'a,
         B: 'static,
-        R: 'static,
-        F: 'static + Fn(M) -> B,
+        F: 'static + Fn(Message) -> B,
     {
         Element {
             widget: Box::new(Map::new(self.widget, f)),
         }
     }
 
-    pub(crate) fn compute_layout(&self, renderer: &R) -> result::Layout {
+    pub(crate) fn compute_layout(&self, renderer: &Renderer) -> result::Layout {
         let node = self.widget.node(renderer);
 
         node.0.compute_layout(geometry::Size::undefined()).unwrap()
@@ -147,18 +147,18 @@ impl<'a, M, R> Element<'a, M, R> {
     }
 }
 
-pub struct Map<'a, A, B, R> {
-    widget: Box<Widget<Message = A, Renderer = R> + 'a>,
+pub struct Map<'a, A, B, Renderer> {
+    widget: Box<Widget<A, Renderer> + 'a>,
     mapper: Box<Fn(A) -> B>,
 }
 
-impl<'a, A, B, R> Map<'a, A, B, R> {
+impl<'a, A, B, Renderer> Map<'a, A, B, Renderer> {
     pub fn new<F>(
-        widget: Box<Widget<Message = A, Renderer = R> + 'a>,
+        widget: Box<Widget<A, Renderer> + 'a>,
         mapper: F,
-    ) -> Map<'a, A, B, R>
+    ) -> Map<'a, A, B, Renderer>
     where
-        F: Fn(A) -> B + 'static,
+        F: 'static + Fn(A) -> B,
     {
         Map {
             widget,
@@ -167,14 +167,11 @@ impl<'a, A, B, R> Map<'a, A, B, R> {
     }
 }
 
-impl<'a, A, B, R> Widget for Map<'a, A, B, R>
+impl<'a, A, B, Renderer> Widget<B, Renderer> for Map<'a, A, B, Renderer>
 where
     A: Copy,
 {
-    type Message = B;
-    type Renderer = R;
-
-    fn node(&self, renderer: &R) -> Node {
+    fn node(&self, renderer: &Renderer) -> Node {
         self.widget.node(renderer)
     }
 
@@ -183,7 +180,7 @@ where
         event: Event,
         layout: Layout,
         cursor_position: Point,
-        messages: &mut Vec<Self::Message>,
+        messages: &mut Vec<B>,
     ) {
         let mut original_messages = Vec::new();
 
@@ -202,7 +199,7 @@ where
 
     fn draw(
         &self,
-        renderer: &mut R,
+        renderer: &mut Renderer,
         layout: Layout,
         cursor_position: Point,
     ) -> MouseCursor {

@@ -9,38 +9,33 @@ use crate::ui::core::{
     Align, Element, Event, Hasher, Layout, MouseCursor, Node, Widget,
 };
 
-pub struct Radio<M, R> {
+pub struct Radio<Message> {
     is_selected: bool,
-    on_click: M,
+    on_click: Message,
     label: String,
-    renderer: std::marker::PhantomData<R>,
 }
 
-impl<M, R> Radio<M, R> {
+impl<Message> Radio<Message> {
     pub fn new<F, V>(value: V, label: &str, selected: Option<V>, f: F) -> Self
     where
         V: Eq + Copy,
-        F: Fn(V) -> M + 'static,
+        F: 'static + Fn(V) -> Message,
     {
         Radio {
             is_selected: Some(value) == selected,
             on_click: f(value),
             label: String::from(label),
-            renderer: std::marker::PhantomData,
         }
     }
 }
 
-impl<M, R> Widget for Radio<M, R>
+impl<Message, Renderer> Widget<Message, Renderer> for Radio<Message>
 where
-    R: Renderer + text::Renderer + 'static,
-    M: Copy,
+    Renderer: self::Renderer + text::Renderer,
+    Message: Copy,
 {
-    type Message = M;
-    type Renderer = R;
-
-    fn node(&self, renderer: &R) -> Node {
-        Row::<(), R>::new()
+    fn node(&self, renderer: &Renderer) -> Node {
+        Row::<(), Renderer>::new()
             .spacing(15)
             .align_items(Align::Center)
             .push(Column::new().width(28).height(28))
@@ -53,7 +48,7 @@ where
         event: Event,
         layout: Layout,
         cursor_position: Point,
-        messages: &mut Vec<M>,
+        messages: &mut Vec<Message>,
     ) {
         match event {
             Event::MouseInput {
@@ -70,7 +65,7 @@ where
 
     fn draw(
         &self,
-        renderer: &mut R,
+        renderer: &mut Renderer,
         layout: Layout,
         cursor_position: Point,
     ) -> MouseCursor {
@@ -88,7 +83,7 @@ where
             text_bounds,
         );
 
-        (renderer as &mut Renderer).draw(
+        (renderer as &mut self::Renderer).draw(
             self.is_selected,
             children[0].bounds(),
             layout.bounds(),
@@ -111,12 +106,13 @@ pub trait Renderer {
     ) -> MouseCursor;
 }
 
-impl<'a, M, R> From<Radio<M, R>> for Element<'a, M, R>
+impl<'a, Message, Renderer> From<Radio<Message>>
+    for Element<'a, Message, Renderer>
 where
-    R: Renderer + text::Renderer + 'static,
-    M: Copy + 'static,
+    Renderer: self::Renderer + text::Renderer,
+    Message: 'static + Copy,
 {
-    fn from(checkbox: Radio<M, R>) -> Element<'a, M, R> {
+    fn from(checkbox: Radio<Message>) -> Element<'a, Message, Renderer> {
         Element::new(checkbox)
     }
 }

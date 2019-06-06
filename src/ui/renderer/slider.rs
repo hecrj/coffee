@@ -1,11 +1,8 @@
-use std::ops::Range;
-
-use super::Renderer;
 use crate::graphics::{Point, Rectangle, Sprite};
 use crate::ui::core::{widget::slider, MouseCursor};
+use crate::ui::Renderer;
 
-pub type Slider<'a, M> = slider::Slider<'a, M, Renderer>;
-pub use slider::State;
+use std::ops::Range;
 
 const RAIL: Rectangle<u16> = Rectangle {
     x: 98,

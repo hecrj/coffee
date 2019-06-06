@@ -1,13 +1,9 @@
-use super::Renderer;
 use crate::graphics::{
     Color, HorizontalAlignment, Point, Rectangle, Sprite, Text,
     VerticalAlignment,
 };
 use crate::ui::core::{widget::button, MouseCursor};
-
-pub type Button<'a, M> = button::Button<'a, M, Renderer>;
-pub use button::Class;
-pub use button::State;
+use crate::ui::Renderer;
 
 const LEFT: Rectangle<u16> = Rectangle {
     x: 0,
@@ -35,9 +31,9 @@ impl button::Renderer for Renderer {
         &mut self,
         cursor_position: Point,
         mut bounds: Rectangle<f32>,
-        state: &State,
+        state: &button::State,
         label: &str,
-        class: Class,
+        class: button::Class,
     ) -> MouseCursor {
         let mouse_over = bounds.contains(cursor_position);
 

@@ -1,3 +1,10 @@
+mod button;
+mod checkbox;
+mod panel;
+mod radio;
+mod slider;
+mod text;
+
 use crate::graphics::{Batch, Font, Frame, Image, Point};
 use crate::load::{Join, Task};
 use crate::ui::core;

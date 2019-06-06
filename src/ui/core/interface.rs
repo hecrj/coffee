@@ -2,11 +2,11 @@ use std::hash::Hasher;
 use stretch::result;
 
 use crate::graphics::{Frame, Point};
-use crate::ui::core::{Element, Event, Layout, MouseCursor, Renderer};
+use crate::ui::core::{self, Element, Event, Layout, MouseCursor};
 
-pub struct Interface<'a, M, R> {
+pub struct Interface<'a, Message, Renderer> {
     hash: u64,
-    root: Element<'a, M, R>,
+    root: Element<'a, Message, Renderer>,
     layout: result::Layout,
 }
 
@@ -15,11 +15,14 @@ pub struct Cache {
     layout: result::Layout,
 }
 
-impl<'a, M, R: Renderer> Interface<'a, M, R> {
+impl<'a, Message, Renderer> Interface<'a, Message, Renderer>
+where
+    Renderer: core::Renderer,
+{
     pub fn compute(
-        root: Element<'a, M, R>,
-        renderer: &R,
-    ) -> Interface<'a, M, R> {
+        root: Element<'a, Message, Renderer>,
+        renderer: &Renderer,
+    ) -> Interface<'a, Message, Renderer> {
         let hasher = &mut twox_hash::XxHash::default();
         root.hash(hasher);
 
@@ -30,10 +33,10 @@ impl<'a, M, R: Renderer> Interface<'a, M, R> {
     }
 
     pub fn compute_with_cache(
-        root: Element<'a, M, R>,
-        renderer: &R,
+        root: Element<'a, Message, Renderer>,
+        renderer: &Renderer,
         cache: Cache,
-    ) -> Interface<'a, M, R> {
+    ) -> Interface<'a, Message, Renderer> {
         let hasher = &mut twox_hash::XxHash::default();
         root.hash(hasher);
 
@@ -52,7 +55,7 @@ impl<'a, M, R: Renderer> Interface<'a, M, R> {
         &mut self,
         event: Event,
         cursor_position: Point,
-        messages: &mut Vec<M>,
+        messages: &mut Vec<Message>,
     ) {
         let Interface { root, layout, .. } = self;
 
@@ -66,7 +69,7 @@ impl<'a, M, R: Renderer> Interface<'a, M, R> {
 
     pub fn draw(
         &self,
-        renderer: &mut R,
+        renderer: &mut Renderer,
         frame: &mut Frame,
         cursor_position: Point,
     ) -> MouseCursor {

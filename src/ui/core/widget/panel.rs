@@ -5,13 +5,13 @@ use crate::ui::core::{
     Event, Hasher, Layout, MouseCursor, Node, Style, Widget,
 };
 
-pub struct Panel<'a, M, R> {
+pub struct Panel<'a, Message, Renderer> {
     style: Style,
-    content: Box<Widget<Message = M, Renderer = R> + 'a>,
+    content: Box<Widget<Message, Renderer> + 'a>,
 }
 
-impl<'a, M, R> Panel<'a, M, R> {
-    pub fn new(content: impl Widget<Message = M, Renderer = R> + 'a) -> Self {
+impl<'a, Message, Renderer> Panel<'a, Message, Renderer> {
+    pub fn new(content: impl Widget<Message, Renderer> + 'a) -> Self {
         Panel {
             style: Style::default().padding(20),
             content: Box::new(content),
@@ -29,14 +29,12 @@ impl<'a, M, R> Panel<'a, M, R> {
     }
 }
 
-impl<'a, M, R> Widget for Panel<'a, M, R>
+impl<'a, Message, Renderer> Widget<Message, Renderer>
+    for Panel<'a, Message, Renderer>
 where
-    R: Renderer,
+    Renderer: self::Renderer,
 {
-    type Message = M;
-    type Renderer = R;
-
-    fn node(&self, renderer: &R) -> Node {
+    fn node(&self, renderer: &Renderer) -> Node {
         Node::with_children(self.style, vec![self.content.node(renderer)])
     }
 
@@ -45,7 +43,7 @@ where
         event: Event,
         layout: Layout,
         cursor_position: Point,
-        messages: &mut Vec<Self::Message>,
+        messages: &mut Vec<Message>,
     ) {
         [&mut self.content]
             .iter_mut()
@@ -57,7 +55,7 @@ where
 
     fn draw(
         &self,
-        renderer: &mut Self::Renderer,
+        renderer: &mut Renderer,
         layout: Layout,
         cursor_position: Point,
     ) -> MouseCursor {
