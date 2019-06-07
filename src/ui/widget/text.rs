@@ -170,8 +170,8 @@ pub trait Renderer {
     ///   * the contents of the [`Text`]
     ///   * the size of the [`Text`]
     ///   * the color of the [`Text`]
-    ///   * the [`HorizontalAlignment`] of the [`Text`].
-    ///   * the [`VerticalAlignment`] of the [`Text`].
+    ///   * the [`HorizontalAlignment`] of the [`Text`]
+    ///   * the [`VerticalAlignment`] of the [`Text`]
     ///
     /// [`Text`]: struct.Text.html
     /// [`HorizontalAlignment`]: ../../../graphics/enum.HorizontalAlignment.html
