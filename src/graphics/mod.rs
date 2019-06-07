@@ -72,7 +72,7 @@
 //! }
 //! ```
 //!
-//! You can load your resources during [`Game::new`]. Check out the different
+//! You can load your resources during [`Game::load`]. Check out the different
 //! types in this module to get a basic understanding of which kind of resources
 //! are supported.
 //!
@@ -89,7 +89,7 @@
 //! [`TextureArray`]: texture_array/struct.TextureArray.html
 //! [`Font`]: struct.Font.html
 //! [`Game::draw`]: ../trait.Game.html#tymethod.draw
-//! [`Game::new`]: ../trait.Game.html#tymethod.new
+//! [`Game::load`]: ../trait.Game.html#tymethod.load
 
 #[cfg(feature = "opengl")]
 mod backend_gfx;

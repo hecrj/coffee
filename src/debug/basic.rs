@@ -147,7 +147,6 @@ impl Debug {
         self.draw_durations.average()
     }
 
-    /// Get the average time spent rendering the UI.
     pub(crate) fn ui_started(&mut self) {
         self.ui_start = time::Instant::now();
     }
@@ -156,8 +155,9 @@ impl Debug {
         self.ui_durations.push(time::Instant::now() - self.ui_start);
     }
 
-    /// Get the average time spent render the UI.
+    /// Get the average time spent rendering the [`UserInterface`].
     ///
+    /// [`UserInterface`]: ui/trait.UserInterface.html
     pub fn ui_duration(&self) -> time::Duration {
         self.ui_durations.average()
     }
@@ -187,7 +187,7 @@ impl Debug {
         self.enabled
     }
 
-    /// Draw the debug information.
+    /// Draws the debug information.
     pub fn draw(&mut self, frame: &mut graphics::Frame) {
         if self.frames_until_refresh <= 0 {
             self.text.clear();

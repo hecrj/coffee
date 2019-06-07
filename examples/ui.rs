@@ -43,13 +43,12 @@ impl Game for Tour {
         frame: &mut Frame,
         _timer: &Timer,
     ) {
-        //frame.clear(Color {
-        //    r: 0.3,
-        //    g: 0.3,
-        //    b: 0.6,
-        //    a: 1.0,
-        //});
-        frame.clear(Color::WHITE);
+        frame.clear(Color {
+            r: 0.3,
+            g: 0.3,
+            b: 0.6,
+            a: 1.0,
+        });
     }
 }
 

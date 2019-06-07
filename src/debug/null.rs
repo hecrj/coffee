@@ -22,6 +22,8 @@ impl Debug {
     pub(crate) fn update_finished(&mut self) {}
     pub(crate) fn draw_started(&mut self) {}
     pub(crate) fn draw_finished(&mut self) {}
+    pub(crate) fn ui_started(&mut self) {}
+    pub(crate) fn ui_finished(&mut self) {}
     pub(crate) fn debug_started(&mut self) {}
     pub(crate) fn debug_finished(&mut self) {}
 
