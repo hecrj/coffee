@@ -133,7 +133,7 @@ use crate::{Debug, Game, Result, State, Timer};
 /// Implementors of this trait must also implement [`Game`] and should hold all
 /// the state of the user interface.
 ///
-/// Be sure to read the introduction to the [`ui` module] first! It will help
+/// Be sure to read the introduction of the [`ui` module] first! It will help
 /// you understand the purpose of this trait.
 ///
 /// [`Game`]: ../trait.Game.html

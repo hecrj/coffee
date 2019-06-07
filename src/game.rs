@@ -4,28 +4,57 @@ use crate::input;
 use crate::load::{Join, LoadingScreen, Task};
 use crate::{Debug, Input, Result, State, Timer};
 
-/// The entrypoint of the engine. It describes your game logic.
+/// The entrypoint of the engine. It attaches user interaction and graphics
+/// to your game [`State`].
 ///
-/// TODO: Update
-/// Implementors of this trait should hold the game state.
+/// Implementors of this trait should hold the game assets and view data
+/// necessary for drawing.
 ///
 /// Coffee forces you to decouple your game state from your view and input
 /// state. While this might seem limiting at first, it helps you to keep
 /// mutability at bay and forces you to think about the architecture of your
 /// game.
 ///
-/// Ideally, your game state should be an opaque type with a meaningful API with
-/// clear boundaries. External code (like draw code or input code) should rely
-/// on this API to do its job.
+/// [`State`]: trait.State.html
 pub trait Game {
+    /// The state of your game, holding all the game data.
+    ///
+    /// It needs to implement the [`State`] trait.
+    ///
+    /// Ideally, your game state should be an opaque type with a meaningful API
+    /// with clear boundaries. External code (like draw code or input code) should
+    /// rely on this API to do its job.
+    ///
+    /// If your game has no state, use `()`.
+    ///
+    /// [`State`]: trait.State.html
     type State: State;
 
     /// The input data of your game.
     ///
-    /// For instance, you could start by simply using a `HashSet` here to track
-    /// which keys are pressed at any given time.
+    /// The built-in [`KeyboardAndMouse`] type can be a good starting point. It
+    /// allows you to query the state of the keyboard and the mouse.
+    ///
+    /// You can also build your custom input type using the [`Input`] trait.
+    ///
+    /// If your game does not deal with user input, use `()`.
+    ///
+    /// [`KeyboardAndMouse`]: input/struct.KeyboardAndMouse.html
+    /// [`Input`]: input/trait.Input.html
     type Input: Input;
 
+    /// The loading screen that will be used when your game starts.
+    ///
+    /// The built-in [`ProgressBar`] loading screen is a good choice to get
+    /// started. It shows a simple progress bar.
+    ///
+    /// You can also build your own loading screen type using the
+    /// [`LoadingScreen`] trait.
+    ///
+    /// If you do not want your game to have a loading screen, use `()`.
+    ///
+    /// [`ProgressBar`]: load/loading_screen/struct.ProgressBar.html
+    /// [`LoadingScreen`]: load/loading_screen/trait.LoadingScreen.html
     type LoadingScreen: LoadingScreen;
 
     /// Defines the key that will be used to toggle the [`debug`] view. Set it to
@@ -36,31 +65,29 @@ pub trait Game {
     /// [`debug`]: #method.debug
     const DEBUG_KEY: Option<input::KeyCode> = Some(input::KeyCode::F12);
 
-    /// Create your game here.
+    /// Loads the [`Game`].
     ///
-    /// You need to return your initial game state, view state, and input state.
+    /// Use the [`load`] module to load your assets here.
     ///
-    /// It is recommended to load your game assets right here. You can use
-    /// the [`load`] module to declaratively describe how to load your
-    /// assets and get a _consistent_ loading screen for free!
-    ///
+    /// [`Game`]: trait.Game.html
     /// [`load`]: load/index.html
     fn load(window: &Window) -> Task<Self>
     where
         Self: Sized;
 
-    /// Draw your game here.
+    /// Draws the [`Game`].
     ///
     /// Check out the [`graphics`] module to learn more about rendering in
     /// Coffee.
     ///
     /// This function will be called once per frame.
     ///
+    /// [`Game`]: trait.Game.html
     /// [`graphics`]: graphics/index.html
     /// [`update`]: #tymethod.update
     fn draw(&mut self, state: &Self::State, frame: &mut Frame, timer: &Timer);
 
-    /// Handle a close request from the operating system to the game window.
+    /// Handles a close request from the operating system to the game window.
     ///
     /// This function should return true to allow the game loop to end,
     /// otherwise false.
@@ -70,16 +97,16 @@ pub trait Game {
         true
     }
 
-    /// Consume your [`Input`] to let users interact with your game.
+    /// Consumes [`Input`] to let users interact with the [`Game`].
     ///
-    /// Right before an [`update`], input events will be processed and this
+    /// Right before a [`State::update`], input events will be processed and this
     /// function will be called. This reduces latency when multiple updates need
     /// to happen during a single frame.
     ///
-    /// If no [`update`] is needed during a frame, it will still be called once,
+    /// If no [`State::update`] is needed during a frame, it will still be called once,
     /// right after processing input events and before drawing. This allows you
     /// to keep your view updated every frame in order to offer a smooth user
-    /// experience independently of the [`TICKS_PER_SECOND`] setting.
+    /// experience independently of the [`State::TICKS_PER_SECOND`] setting.
     ///
     /// You can access the [`Window`]. For instance, you may want to toggle
     /// fullscreen mode based on some input, or maybe access the [`Gpu`]
@@ -88,8 +115,8 @@ pub trait Game {
     /// By default, it does nothing.
     ///
     /// [`Input`]: #associatedtype.Input
-    /// [`update`]: #tymethod.update
-    /// [`TICKS_PER_SECOND`]: #associatedconstant.TICKS_PER_SECOND
+    /// [`State::update`]: trait.State.html#tymethod.update
+    /// [`State::TICKS_PER_SECOND`]: trait.State.html#associatedconstant.TICKS_PER_SECOND
     /// [`Window`]: graphics/struct.Window.html
     /// [`Gpu`]: graphics/struct.Gpu.html
     fn interact(
@@ -100,12 +127,13 @@ pub trait Game {
     ) {
     }
 
-    /// Implement this function to display debug information.
+    /// Displays debug information.
     ///
-    /// It is called after `draw` once per frame when debug has been toggled
-    /// using the [`DEBUG_KEY`]. Anything you draw here will be on top. Debug
-    /// code is only called when compiling with `debug_assertions` _or_ the
-    /// `debug` feature enabled.
+    /// This method is called after `draw` once per frame when debug has been
+    /// toggled using the [`DEBUG_KEY`]. Anything you draw here will be on top.
+    ///
+    /// Debug code is only called when compiling with `debug_assertions` _or_
+    /// the `debug` feature enabled.
     ///
     /// By default, it shows [`Debug`], which displays a brief summary about
     /// game performance in the top left corner.

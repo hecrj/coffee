@@ -22,8 +22,9 @@
 //! Here is a minimal example that will open a window:
 //!
 //! ```no_run
-//! use coffee::{Game, Result, Timer};
 //! use coffee::graphics::{Color, Frame, Window, WindowSettings};
+//! use coffee::load::Task;
+//! use coffee::{Game, Result, Timer};
 //!
 //! fn main() -> Result<()> {
 //!     MyGame::run(WindowSettings {
@@ -35,25 +36,20 @@
 //! }
 //!
 //! struct MyGame {
-//!     // Your game state goes here...
+//!     // Your game assets go here...
 //! }
 //!
 //! impl Game for MyGame {
-//!     type View = (); // No view data.
-//!     type Input = (); // No input data.
+//!     type State = (); // No game state
+//!     type Input = (); // No input data
+//!     type LoadingScreen = (); // No loading screen
 //!
-//!     const TICKS_PER_SECOND: u16 = 60; // Update rate
-//!
-//!     fn new(_window: &mut Window) -> Result<(MyGame, Self::View, Self::Input)> {
+//!     fn load(_window: &Window) -> Task<MyGame> {
 //!         // Load your game assets here. Check out the `load` module!
-//!         Ok((MyGame { /* ... */ }, (), ()))
+//!         Task::new(|| MyGame { /* ... */ })
 //!     }
 //!
-//!     fn update(&mut self, _view: &Self::View, _window: &Window) {
-//!         // Update your game here
-//!     }
-//!
-//!     fn draw(&self, _view: &mut Self::View, frame: &mut Frame, _timer: &Timer) {
+//!     fn draw(&mut self, _state: &Self::State, frame: &mut Frame, _timer: &Timer) {
 //!         // Clear the current frame
 //!         frame.clear(Color::BLACK);
 //!

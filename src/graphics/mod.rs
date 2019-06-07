@@ -39,33 +39,28 @@
 //! the provided [`Frame`]:
 //!
 //! ```
-//! use coffee::{Game, Timer};
 //! use coffee::graphics::{Color, Frame, Window};
+//! use coffee::{Game, Timer};
 //! # use coffee::Result;
 //! # use coffee::graphics::Gpu;
+//! # use coffee::load::Task;
 //! #
 //! # struct MyGame;
 //!
 //! impl Game for MyGame {
-//! #   type View = ();
+//! #   type State = ();
 //! #   type Input = ();
+//! #   type LoadingScreen = ();
 //! #
-//! #   const TICKS_PER_SECOND: u16 = 60;
-//! #
-//! #   fn new(window: &mut Window) -> Result<(MyGame, Self::View, Self::Input)> {
-//! #       Ok((MyGame, (), ()))
+//! #   fn load(window: &Window) -> Task<MyGame> {
+//! #       Task::new(|| MyGame)
 //! #   }
 //! #
 //!     // ...
 //!
-//! #   fn interact(&mut self, _input: &mut Self::Input,
-//! #              _view: &mut Self::View, _window: &mut Window) {}
-//! #
-//! #   fn update(&mut self, _view: &Self::View, window: &Window) {}
-//! #
 //!     fn draw(
-//!         &self,
-//!         _view: &mut Self::View,
+//!         &mut self,
+//!         _state: &Self::State,
 //!         frame: &mut Frame,
 //!         _timer: &Timer,
 //!     ) {
