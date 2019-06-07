@@ -6,7 +6,7 @@ use crate::load::Task;
 /// The implementor of this trait will also need to implement the `Renderer`
 /// trait of the [widgets] you want to use.
 ///
-/// [widgets]: widget/index.html
+/// [widgets]: ../widget/index.html
 pub trait Renderer {
     /// The configuration of the renderer.
     ///
@@ -31,7 +31,7 @@ pub trait Renderer {
     /// and call [`Batch::draw`] here.
     ///
     /// [`Frame`]: ../../graphics/struct.Frame.html
-    /// [`Widget::draw`]: widget/trait.Widget.html#tymethod.draw
+    /// [`Widget::draw`]: trait.Widget.html#tymethod.draw
     /// [`Renderer`]: trait.Renderer.html
     /// [`Batch`]: ../../graphics/struct.Batch.html
     /// [`Batch::draw`]: ../../graphics/struct.Batch.html#method.draw

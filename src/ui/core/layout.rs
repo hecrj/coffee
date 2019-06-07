@@ -9,9 +9,9 @@ use crate::graphics::{Point, Rectangle, Vector};
 /// [`Widget::node`].
 ///
 /// [`Node`]: struct.Node.html
-/// [`Widget::on_event`]: widget/trait.Widget.html#method.on_event
-/// [`Widget::draw`]: widget/trait.Widget.html#tymethod.draw
-/// [`Widget::node`]: widget/trait.Widget.html#tymethod.node
+/// [`Widget::on_event`]: trait.Widget.html#method.on_event
+/// [`Widget::draw`]: trait.Widget.html#tymethod.draw
+/// [`Widget::node`]: trait.Widget.html#tymethod.node
 #[derive(Debug)]
 pub struct Layout<'a> {
     layout: &'a result::Layout,

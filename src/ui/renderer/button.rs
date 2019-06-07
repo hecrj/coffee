@@ -2,8 +2,8 @@ use crate::graphics::{
     Color, HorizontalAlignment, Point, Rectangle, Sprite, Text,
     VerticalAlignment,
 };
-use crate::ui::core::{widget::button, MouseCursor};
-use crate::ui::Renderer;
+use crate::ui::core::MouseCursor;
+use crate::ui::{button, Renderer};
 
 const LEFT: Rectangle<u16> = Rectangle {
     x: 0,

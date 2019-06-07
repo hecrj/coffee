@@ -19,8 +19,8 @@ use std::hash::Hash;
 /// It implements [`Widget`] when the associated [`core::Renderer`] implements
 /// the [`button::Renderer`] trait.
 ///
-/// [`Widget`]: ../trait.Widget.html
-/// [`core::Renderer`]: ../../trait.Renderer.html
+/// [`Widget`]: ../../core/trait.Widget.html
+/// [`core::Renderer`]: ../../core/trait.Renderer.html
 /// [`button::Renderer`]: trait.Renderer.html
 ///
 /// # Example
@@ -32,9 +32,9 @@ use std::hash::Hash;
 ///     ButtonClicked,
 /// }
 ///
-/// let button_state = &mut button::State::new();
+/// let state = &mut button::State::new();
 ///
-/// Button::new(button_state, "Click me!")
+/// Button::new(state, "Click me!")
 ///     .on_click(Message::ButtonClicked);
 /// ```
 ///
@@ -232,14 +232,14 @@ pub enum Class {
 /// able to use a [`Button`] in your user interface.
 ///
 /// [`Button`]: struct.Button.html
-/// [`core::Renderer`]: ../../trait.Renderer.html
+/// [`core::Renderer`]: ../../core/trait.Renderer.html
 pub trait Renderer {
     /// Draws a [`Button`].
     ///
     /// It receives:
     ///   * the current cursor position
     ///   * the bounds of the [`Button`]
-    ///   * the current state of the [`Button`]
+    ///   * the local state of the [`Button`]
     ///   * the label of the [`Button`]
     ///   * the [`Class`] of the [`Button`]
     ///

@@ -6,7 +6,7 @@ use crate::ui::core::{
     Widget,
 };
 
-/// A container that places its contents __vertically__.
+/// A container that places its contents vertically.
 ///
 /// A [`Column`] will try to fill the horizontal space of its container.
 ///
@@ -112,7 +112,7 @@ impl<'a, Message, Renderer> Column<'a, Message, Renderer> {
 
     /// Adds an [`Element`] to the [`Column`].
     ///
-    /// [`Element`]: ../struct.Element.html
+    /// [`Element`]: ../core/struct.Element.html
     /// [`Column`]: struct.Column.html
     pub fn push<E>(mut self, child: E) -> Column<'a, Message, Renderer>
     where

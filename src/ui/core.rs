@@ -8,8 +8,7 @@ mod mouse_cursor;
 mod node;
 mod renderer;
 mod style;
-
-pub mod widget;
+mod widget;
 
 #[doc(no_inline)]
 pub use stretch::{geometry::Size, number::Number};

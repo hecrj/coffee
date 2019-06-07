@@ -3,10 +3,10 @@ use crate::graphics::{
     Color, HorizontalAlignment, Point, Rectangle, VerticalAlignment,
 };
 use crate::input::{ButtonState, MouseButton};
-use crate::ui::core::widget::{text, Column, Row, Text};
 use crate::ui::core::{
     Align, Element, Event, Hasher, Layout, MouseCursor, Node, Widget,
 };
+use crate::ui::widget::{text, Column, Row, Text};
 
 use std::hash::Hash;
 
@@ -15,8 +15,8 @@ use std::hash::Hash;
 /// It implements [`Widget`] when the [`core::Renderer`] implements the
 /// [`radio::Renderer`] trait.
 ///
-/// [`Widget`]: ../trait.Widget.html
-/// [`core::Renderer`]: ../../trait.Renderer.html
+/// [`Widget`]: ../../core/trait.Widget.html
+/// [`core::Renderer`]: ../../core/trait.Renderer.html
 /// [`radio::Renderer`]: trait.Renderer.html
 ///
 /// # Example
@@ -164,7 +164,7 @@ where
 /// able to use a [`Radio`] button in your user interface.
 ///
 /// [`Radio`]: struct.Radio.html
-/// [`core::Renderer`]: ../../trait.Renderer.html
+/// [`core::Renderer`]: ../../core/trait.Renderer.html
 pub trait Renderer {
     /// Draws a [`Radio`] button.
     ///

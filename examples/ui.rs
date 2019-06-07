@@ -366,14 +366,11 @@ impl<'a> Step {
             .push(Text::new(
                 "A box that can be checked. Useful to build toggle controls.",
             ))
-            .push(
-                Checkbox::new(
-                    is_checked,
-                    "Show \"Next\" button",
-                    StepMessage::CheckboxToggled,
-                )
-                .label_color(Color::BLACK),
-            )
+            .push(Checkbox::new(
+                is_checked,
+                "Show \"Next\" button",
+                StepMessage::CheckboxToggled,
+            ))
             .push(Text::new(
                 "A checkbox always has a label, and both the checkbox and its \
                  label can be clicked to toggle it.",
@@ -388,15 +385,12 @@ impl<'a> Step {
             .push(Language::all().iter().cloned().fold(
                 Column::new().padding(10).spacing(20),
                 |choices, language| {
-                    choices.push(
-                        Radio::new(
-                            language,
-                            language.into(),
-                            selection,
-                            StepMessage::LanguageSelected,
-                        )
-                        .label_color(Color::BLACK),
-                    )
+                    choices.push(Radio::new(
+                        language,
+                        language.into(),
+                        selection,
+                        StepMessage::LanguageSelected,
+                    ))
                 },
             ));
 
@@ -423,7 +417,7 @@ impl<'a> Step {
             ))
             .push(Slider::new(
                 state,
-                0.0..100.0,
+                0.0..=100.0,
                 value as f32,
                 StepMessage::SliderChanged,
             ))
@@ -448,7 +442,7 @@ impl<'a> Step {
             )
             .push(Slider::new(
                 size_slider,
-                10.0..50.0,
+                10.0..=50.0,
                 size as f32,
                 StepMessage::TextSizeChanged,
             ));
@@ -462,13 +456,13 @@ impl<'a> Step {
             .push(
                 Row::new()
                     .spacing(10)
-                    .push(Slider::new(red, 0.0..1.0, color.r, move |r| {
+                    .push(Slider::new(red, 0.0..=1.0, color.r, move |r| {
                         StepMessage::TextColorChanged(Color { r, ..color })
                     }))
-                    .push(Slider::new(green, 0.0..1.0, color.g, move |g| {
+                    .push(Slider::new(green, 0.0..=1.0, color.g, move |g| {
                         StepMessage::TextColorChanged(Color { g, ..color })
                     }))
-                    .push(Slider::new(blue, 0.0..1.0, color.b, move |b| {
+                    .push(Slider::new(blue, 0.0..=1.0, color.b, move |b| {
                         StepMessage::TextColorChanged(Color { b, ..color })
                     })),
             );
@@ -518,7 +512,7 @@ impl<'a> Step {
             .spacing(10)
             .push(Slider::new(
                 spacing_slider,
-                0.0..100.0,
+                0.0..=100.0,
                 spacing as f32,
                 StepMessage::SpacingChanged,
             ))
@@ -580,10 +574,10 @@ impl From<Language> for &str {
     fn from(language: Language) -> &'static str {
         match language {
             Language::Rust => "Rust",
-            Language::Elm => "This is B",
+            Language::Elm => "Elm",
             Language::Ruby => "Ruby",
             Language::Haskell => "Haskell",
-            Language::C => "This is A",
+            Language::C => "C",
             Language::Other => "Other",
         }
     }

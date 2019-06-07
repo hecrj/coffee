@@ -1,7 +1,8 @@
 use crate::graphics::{
     self, Color, HorizontalAlignment, Point, Rectangle, VerticalAlignment,
 };
-use crate::ui::core::{widget::text, Node, Number, Size, Style};
+use crate::ui::core::{Node, Number, Size, Style};
+use crate::ui::widget::text;
 use crate::ui::Renderer;
 
 use std::cell::RefCell;

@@ -8,7 +8,7 @@ use crate::ui::core::{Event, Hasher, Layout, MouseCursor, Node, Widget};
 /// If you have a widget, you should be able to use `widget.into()` to turn it
 /// into an [`Element`].
 ///
-/// [`Widget`]: widget/trait.Widget.html
+/// [`Widget`]: trait.Widget.html
 /// [`Element`]: struct.Element.html
 pub struct Element<'a, Message, Renderer> {
     pub(crate) widget: Box<Widget<Message, Renderer> + 'a>,
@@ -18,7 +18,7 @@ impl<'a, Message, Renderer> Element<'a, Message, Renderer> {
     /// Create a new [`Element`] containing the given [`Widget`].
     ///
     /// [`Element`]: struct.Element.html
-    /// [`Widget`]: widget/trait.Widget.html
+    /// [`Widget`]: trait.Widget.html
     pub fn new(
         widget: impl Widget<Message, Renderer> + 'a,
     ) -> Element<'a, Message, Renderer> {
@@ -42,7 +42,7 @@ impl<'a, Message, Renderer> Element<'a, Message, Renderer> {
     /// ```
     /// mod main_menu {
     ///     use coffee::ui::core::Element;
-    ///     # use coffee::ui::core::widget::Column;
+    ///     # use coffee::ui::Column;
     ///     use coffee::ui::Renderer;
     ///
     ///     pub struct MainMenu {
@@ -69,7 +69,7 @@ impl<'a, Message, Renderer> Element<'a, Message, Renderer> {
     /// mod gameplay_overlay {
     ///     // Analogous to the `main_menu` module
     /// #    use coffee::ui::core::Element;
-    /// #    use coffee::ui::core::widget::Column;
+    /// #    use coffee::ui::Column;
     /// #    use coffee::ui::Renderer;
     /// #
     /// #    pub struct GameplayOverlay { /* ... */ }

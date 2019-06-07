@@ -6,7 +6,7 @@ use crate::ui::core::{
     Widget,
 };
 
-/// A container that places its contents __horizontally__.
+/// A container that places its contents horizontally.
 ///
 /// A [`Row`] will try to fill the horizontal space of its container.
 ///
@@ -109,7 +109,7 @@ impl<'a, Message, Renderer> Row<'a, Message, Renderer> {
 
     /// Adds an [`Element`] to the [`Row`].
     ///
-    /// [`Element`]: ../struct.Element.html
+    /// [`Element`]: ../core/struct.Element.html
     /// [`Row`]: struct.Row.html
     pub fn push<E>(mut self, child: E) -> Row<'a, Message, Renderer>
     where

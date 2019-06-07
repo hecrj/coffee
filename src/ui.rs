@@ -96,30 +96,28 @@
 //! [`examples` directory on GitHub]: https://github.com/hecrj/coffee/tree/0.3.0/examples
 pub mod core;
 mod renderer;
+pub mod widget;
 
-pub use self::core::widget::{
-    button, slider, Button, Checkbox, Radio, Slider, Text,
-};
 #[doc(no_inline)]
 pub use self::core::{Align, Justify};
 pub use renderer::{Configuration, Renderer};
+pub use widget::{button, slider, Button, Checkbox, Radio, Slider, Text};
 
 /// A [`Column`] using the built-in [`Renderer`].
 ///
-/// [`Column`]: core/widget/struct.Column.html
+/// [`Column`]: widget/struct.Column.html
 /// [`Renderer`]: struct.Renderer.html
-pub type Column<'a, Message> =
-    self::core::widget::Column<'a, Message, Renderer>;
+pub type Column<'a, Message> = widget::Column<'a, Message, Renderer>;
 
 /// A [`Row`] using the built-in [`Renderer`].
 ///
-/// [`Row`]: core/widget/struct.Row.html
+/// [`Row`]: widget/struct.Row.html
 /// [`Renderer`]: struct.Renderer.html
-pub type Row<'a, Message> = self::core::widget::Row<'a, Message, Renderer>;
+pub type Row<'a, Message> = widget::Row<'a, Message, Renderer>;
 
 /// An [`Element`] using the built-in [`Renderer`].
 ///
-/// [`Element`]: core/widget/struct.Element.html
+/// [`Element`]: core/struct.Element.html
 /// [`Renderer`]: struct.Renderer.html
 pub type Element<'a, Message> = self::core::Element<'a, Message, Renderer>;
 

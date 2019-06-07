@@ -1,5 +1,6 @@
 use crate::graphics::{Point, Rectangle, Sprite};
-use crate::ui::core::{widget::radio, MouseCursor};
+use crate::ui::core::MouseCursor;
+use crate::ui::widget::radio;
 use crate::ui::Renderer;
 
 const SPRITE: Rectangle<u16> = Rectangle {

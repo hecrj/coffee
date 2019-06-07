@@ -5,18 +5,18 @@ use crate::graphics::{
     Color, HorizontalAlignment, Point, Rectangle, VerticalAlignment,
 };
 use crate::input::{ButtonState, MouseButton};
-use crate::ui::core::widget::{text, Column, Row, Text};
 use crate::ui::core::{
     Align, Element, Event, Hasher, Layout, MouseCursor, Node, Widget,
 };
+use crate::ui::widget::{text, Column, Row, Text};
 
 /// A box that can be checked.
 ///
 /// It implements [`Widget`] when the [`core::Renderer`] implements the
 /// [`checkbox::Renderer`] trait.
 ///
-/// [`Widget`]: ../trait.Widget.html
-/// [`core::Renderer`]: ../../trait.Renderer.html
+/// [`Widget`]: ../../core/trait.Widget.html
+/// [`core::Renderer`]: ../../core/trait.Renderer.html
 /// [`checkbox::Renderer`]: trait.Renderer.html
 ///
 /// # Example
@@ -44,7 +44,7 @@ pub struct Checkbox<Message> {
 }
 
 impl<Message> Checkbox<Message> {
-    /// Creates a new [`Checkbox`] with the given state and label.
+    /// Creates a new [`Checkbox`].
     ///
     /// It expects:
     ///   * a boolean describing whether the [`Checkbox`] is checked or not
@@ -151,7 +151,7 @@ where
 /// able to use a [`Checkbox`] in your user interface.
 ///
 /// [`Checkbox`]: struct.Checkbox.html
-/// [`core::Renderer`]: ../../trait.Renderer.html
+/// [`core::Renderer`]: ../../core/trait.Renderer.html
 pub trait Renderer {
     /// Draws a [`Checkbox`].
     ///

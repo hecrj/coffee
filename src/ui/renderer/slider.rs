@@ -1,8 +1,8 @@
 use crate::graphics::{Point, Rectangle, Sprite};
-use crate::ui::core::{widget::slider, MouseCursor};
-use crate::ui::Renderer;
+use crate::ui::core::MouseCursor;
+use crate::ui::{slider, Renderer};
 
-use std::ops::Range;
+use std::ops::RangeInclusive;
 
 const RAIL: Rectangle<u16> = Rectangle {
     x: 98,
@@ -21,11 +21,11 @@ const MARKER: Rectangle<u16> = Rectangle {
 impl slider::Renderer for Renderer {
     fn draw(
         &mut self,
-        state: &slider::State,
-        range: &Range<f32>,
-        value: f32,
-        bounds: Rectangle<f32>,
         cursor_position: Point,
+        bounds: Rectangle<f32>,
+        state: &slider::State,
+        range: RangeInclusive<f32>,
+        value: f32,
     ) -> MouseCursor {
         self.sprites.add(Sprite {
             source: RAIL,
@@ -36,8 +36,10 @@ impl slider::Renderer for Renderer {
             scale: (bounds.width - MARKER.width as f32, 1.0),
         });
 
+        let (range_start, range_end) = range.into_inner();
+
         let marker_offset = (bounds.width - MARKER.width as f32)
-            * ((value - range.start) / (range.end - range.start).max(1.0));
+            * ((value - range_start) / (range_end - range_start).max(1.0));
 
         let mouse_over = bounds.contains(cursor_position);
         let is_active = state.is_dragging() || mouse_over;
