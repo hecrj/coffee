@@ -18,6 +18,7 @@ bugs. [Feel free to contribute!]
 [Feel free to contribute!]: #contributing--feedback
 
 ## Features
+  * Responsive GUI support with built-in widgets
   * Declarative, type-safe asset loading
   * Loading screens with progress tracking
   * Built-in [debug view with performance metrics]
@@ -53,39 +54,35 @@ opt-level = 2
 Here is a minimal example that will open a window:
 
 ```rust
+use coffee::graphics::{Color, Frame, Window, WindowSettings};
+use coffee::load::Task;
 use coffee::{Game, Result, Timer};
-use coffee::graphics::{Color, Window, WindowSettings};
 
 fn main() -> Result<()> {
     MyGame::run(WindowSettings {
         title: String::from("A caffeinated game"),
         size: (1280, 1024),
         resizable: true,
+        fullscreen: false,
     })
 }
 
 struct MyGame {
-    // Your game state goes here...
+    // Your game assets go here...
 }
 
 impl Game for MyGame {
-    type View = (); // No view data.
-    type Input = (); // No input data.
+    type State = (); // No game state
+    type Input = (); // No input data
+    type LoadingScreen = (); // No loading screen
 
-    const TICKS_PER_SECOND: u16 = 60; // Update rate
-
-    fn new(_window: &mut Window) -> Result<(MyGame, Self::View, Self::Input)> {
+    fn load(_window: &Window) -> Task<MyGame> {
         // Load your game assets here. Check out the `load` module!
-        Ok((MyGame { /* ... */ }, (), ()))
+        Task::new(|| MyGame { /* ... */ })
     }
 
-    fn update(&mut self, _view: &Self::View, _window: &Window) {
-        // Update your game here
-    }
-
-    fn draw(&self, _view: &mut Self::View, window: &mut Window, _timer: &Timer) {
+    fn draw(&mut self, _state: &Self::State, frame: &mut Frame, _timer: &Timer) {
         // Clear the current frame
-        let mut frame = window.frame();
         frame.clear(Color::BLACK);
 
         // Draw your game here. Check out the `graphics` module!
@@ -104,6 +101,7 @@ Coffee builds upon
   * [`winit`] for windowing and mouse/keyboard events.
   * [`gfx` pre-ll] for OpenGL support, based heavily on the [`ggez`] codebase.
   * [`wgpu`] for _experimental_ Vulkan, Metal, D3D11 and D3D12 support.
+  * [`stretch`] for responsive GUI layouting based on Flexbox.
   * [`glyph_brush`] for TrueType font rendering.
   * [`nalgebra`] for the `Point`, `Vector`, and `Transformation` types.
   * [`image`] for image loading and texture array building.
@@ -111,6 +109,7 @@ Coffee builds upon
 [`winit`]: https://github.com/rust-windowing/winit
 [`gfx` pre-ll]: https://github.com/gfx-rs/gfx/tree/pre-ll
 [`wgpu`]: https://github.com/gfx-rs/wgpu
+[`stretch`]: https://github.com/vislyhq/stretch
 [`glyph_brush`]: https://github.com/alexheretic/glyph-brush/tree/master/glyph-brush
 [`nalgebra`]: https://github.com/rustsim/nalgebra
 [`image`]: https://github.com/image-rs/image
@@ -134,7 +133,10 @@ the [Rust Community Discord]. I go by `@lone_scientist` there.
 
 ## Credits / Thank you
   * [`ggez`], an awesome, easy-to-use, good game engine that introduced me to
-    Rust a month ago. Its graphics implementation served me as a guide to
-    implement OpenGL support for Coffee.
+    Rust. Its graphics implementation served me as a guide to implement OpenGL
+    support for Coffee.
+  * [Kenney], creators of amazing free game assets with no strings attached. The
+    built-in GUI renderer in Coffee uses a modified version of their UI sprites.
 
 [`ggez`]: https://github.com/ggez/ggez
+[Kenney]: https://kenney.nl
