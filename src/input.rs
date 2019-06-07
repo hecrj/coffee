@@ -54,7 +54,7 @@ impl KeyboardAndMouse {
         self.is_cursor_taken
     }
 
-    pub fn clicks(&self) -> &Vec<Point> {
+    pub fn clicks(&self) -> &[Point] {
         &self.points_clicked
     }
 
