@@ -8,6 +8,11 @@ OpenGL, we run:
 cargo run --example <example> --features opengl
 ```
 
+Coffee moves fast and the `master` branch can contain breaking changes! Be sure
+to browse the [latest tag] if you intend to use the latest release.
+
+[latest tag]: https://github.com/hecrj/coffee/tree/0.2.0
+
 ## Particles
 
 A particle gravity simulator that showcases a loading screen, input handling,
