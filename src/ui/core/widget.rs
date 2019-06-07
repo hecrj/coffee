@@ -29,10 +29,10 @@ pub trait Widget<Message, Renderer> {
 
     /// Computes the _layout_ hash of the [`Widget`].
     ///
-    /// The produced hash is used to decide if the [`Layout`] needs to be
-    /// recomputed between frames. Therefore, to ensure maximum efficiency, the
-    /// hash should only be affected by the properties of the [`Widget`] that
-    /// may affect layouting.
+    /// The produced hash is used by the runtime to decide if the [`Layout`]
+    /// needs to be recomputed between frames. Therefore, to ensure maximum
+    /// efficiency, the hash should only be affected by the properties of the
+    /// [`Widget`] that can affect layouting.
     ///
     /// For example, the [`Text`] widget does not hash its color property, as
     /// its value cannot affect the overall [`Layout`] of the user interface.
@@ -45,7 +45,7 @@ pub trait Widget<Message, Renderer> {
     /// Processes a runtime [`Event`].
     ///
     /// It receives:
-    ///   * an [`Event`] describing user interaction.
+    ///   * an [`Event`] describing user interaction
     ///   * the computed [`Layout`] of the [`Widget`]
     ///   * the current cursor position
     ///   * a mutable `Message` vector, allowing the [`Widget`] to produce

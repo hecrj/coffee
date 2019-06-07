@@ -137,12 +137,12 @@ where
         text_bounds.y -= 2.0;
 
         (renderer as &mut text::Renderer).draw(
+            text_bounds,
             &self.label,
             20.0,
             self.label_color,
             HorizontalAlignment::Left,
             VerticalAlignment::Top,
-            text_bounds,
         );
 
         (renderer as &mut self::Renderer).draw(

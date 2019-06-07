@@ -124,12 +124,12 @@ where
         let text_bounds = children[1].bounds();
 
         (renderer as &mut text::Renderer).draw(
+            text_bounds,
             &self.label,
             20.0,
             self.label_color,
             HorizontalAlignment::Left,
             VerticalAlignment::Top,
-            text_bounds,
         );
 
         (renderer as &mut self::Renderer).draw(
