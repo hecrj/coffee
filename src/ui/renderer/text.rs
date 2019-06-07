@@ -65,12 +65,12 @@ impl text::Renderer for Renderer {
 
     fn draw(
         &mut self,
+        bounds: Rectangle<f32>,
         content: &str,
         size: f32,
         color: Color,
         horizontal_alignment: HorizontalAlignment,
         vertical_alignment: VerticalAlignment,
-        bounds: Rectangle<f32>,
     ) {
         self.font.borrow_mut().add(graphics::Text {
             content,
