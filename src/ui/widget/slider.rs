@@ -40,7 +40,7 @@ use crate::ui::core::{
 /// Slider::new(state, 0.0..=100.0, value, Message::SliderChanged);
 /// ```
 ///
-/// ![Slider drawn by the built-in renderer](https://i.imgur.com/TQIXB6B.png)
+/// ![Slider drawn by the built-in renderer](https://github.com/hecrj/coffee/blob/bda9818f823dfcb8a7ad0ff4940b4d4b387b5208/images/ui/slider.png?raw=true)
 pub struct Slider<'a, Message> {
     state: &'a mut State,
     range: RangeInclusive<f32>,

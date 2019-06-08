@@ -28,7 +28,7 @@ use std::hash::Hash;
 ///     .color(Color { r: 0.0, g: 0.0, b: 1.0, a: 1.0 });
 /// ```
 ///
-/// ![Text drawn by the built-in renderer](https://i.imgur.com/KcXqzde.png)
+/// ![Text drawn by the built-in renderer](https://github.com/hecrj/coffee/blob/bda9818f823dfcb8a7ad0ff4940b4d4b387b5208/images/ui/text.png?raw=true)
 #[derive(Debug, Clone)]
 pub struct Text {
     content: String,

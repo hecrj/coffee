@@ -38,7 +38,7 @@ use std::hash::Hash;
 ///     .on_press(Message::ButtonClicked);
 /// ```
 ///
-/// ![Button drawn by the built-in renderer](https://i.imgur.com/783e6Sh.png)
+/// ![Button drawn by the built-in renderer](https://github.com/hecrj/coffee/blob/bda9818f823dfcb8a7ad0ff4940b4d4b387b5208/images/ui/button.png?raw=true)
 pub struct Button<'a, Message> {
     state: &'a mut State,
     label: String,
@@ -220,7 +220,7 @@ impl State {
 
 /// The type of a [`Button`].
 ///
-/// ![Buttons drawn with a different class by the built-in renderer](https://i.imgur.com/BRuOtjw.png)
+/// ![Different buttons drawn by the built-in renderer](https://github.com/hecrj/coffee/blob/bda9818f823dfcb8a7ad0ff4940b4d4b387b5208/images/ui/button_classes.png?raw=true)
 ///
 /// [`Button`]: struct.Button.html
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
