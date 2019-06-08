@@ -1,10 +1,27 @@
 //! Build a responsive graphical user interface for your game.
 //!
+//! # Basic concepts
+//! The user interface runtime in Coffee is heavily inspired by [Elm] and
+//! [The Elm Architecture].
+//!
+//! Basically, user interfaces in Coffee are split into four different concepts:
+//!
+//!   * __state__ — data owned by the implementor of [`UserInterface`] and
+//!   [`Game::State`]
+//!   * __messages__ — user interactions or meaningful events that you care
+//!   about
+//!   * __update logic__ — a way to react to __messages__ and update your
+//!   __state__
+//!   * __layout logic__ — a way to transform your state into [widgets] that
+//!   may produce __messages__ on user interaction
+//!
 //! # Getting started
 //! Once you have implemented the [`Game`] trait, you can easily add a user
-//! interface to your game by also implementing the [`UserInterface`] trait.
+//! interface to your game by implementing the [`UserInterface`] trait.
 //!
-//! Here is an example that will produce an interactive counter:
+//! Let's take a look at a simple example with basic user interaction: an
+//! interactive counter that can be incremented and decremented using two
+//! different buttons.
 //!
 //! ```
 //! use coffee::graphics::{Color, Window};
@@ -15,15 +32,18 @@
 //! # use coffee::load::{loading_screen::ProgressBar, Task};
 //! # use coffee::{Game, Result, Timer};
 //!
+//! // The state of our user interface
 //! struct Counter {
 //!     // The counter value
 //!     value: i32,
 //!
 //!     // Local state of the two counter buttons
+//!     // This is internal widget state that may change outside our update
+//!     // logic.
 //!     increment_button: button::State,
 //!     decrement_button: button::State,
 //! }
-//! #
+//!
 //! # impl Game for Counter {
 //! #     type State = ();
 //! #     type Input = KeyboardAndMouse;
@@ -41,8 +61,8 @@
 //! #         frame.clear(Color::BLACK);
 //! #     }
 //! # }
-//!
-//! // The user interactions that we are interested on.
+//! #
+//! // The messages, user interactions that we are interested on.
 //! #[derive(Debug, Clone, Copy)]
 //! pub enum Message {
 //!     IncrementPressed,
@@ -50,14 +70,15 @@
 //! }
 //!
 //! impl UserInterface for Counter {
-//!     // The messages that will be triggered by the counter.
+//!     // We use the message enum we just defined
 //!     type Message = Message;
 //!
 //!     // We can simply use the the built-in `Renderer`.
 //!     type Renderer = Renderer;
 //!
+//!     // The update logic, called when a message is produced
 //!     fn update(&mut self, _state: &mut Self::State, message: Message) {
-//!         // We update the user interface after an interaction here.
+//!         // We simply update the counter value after an interaction here.
 //!         match message {
 //!             Message::IncrementPressed => {
 //!                 self.value += 1;
@@ -68,32 +89,58 @@
 //!         }
 //!     }
 //!
+//!     // The layout logic, describing the different components of the user interface.
 //!     fn layout(&mut self, _state: &Self::State, window: &Window) -> Element<Message> {
-//!         // We create the different widgets of our user interface here.
 //!         // We use a column so the elements inside are laid out vertically.
 //!         Column::new()
-//!             .spacing(20) // We set a spacing between elements of 20 pixels
 //!             .push(
+//!                 // The increment button. We tell it to produce an
+//!                 // `IncrementPressed` message when pressed
 //!                 Button::new(&mut self.increment_button, "+")
-//!                     .on_click(Message::IncrementPressed),
+//!                     .on_press(Message::IncrementPressed),
 //!             )
-//!             .push(Text::new(&self.value.to_string()).size(50))
 //!             .push(
-//!                 Button::new(&mut self.decrement_button, "-")
-//!                     .on_click(Message::DecrementPressed),
+//!                 // We show the value of the counter here
+//!                 Text::new(&self.value.to_string()).size(50),
 //!             )
-//!             .into() // We convert the column into a generic `Element`
+//!             .push(
+//!                 // The decrement button. We tell it to produce a
+//!                 // `DecrementPressed` message when pressed
+//!                 Button::new(&mut self.decrement_button, "-")
+//!                     .on_press(Message::DecrementPressed),
+//!             )
+//!             .into() // We need to return a generic `Element`
 //!     }
 //! }
 //! ```
 //!
-//! The [`Game`] implementation is mostly irrelevant and was omitted in order to
+//! _The [`Game`] implementation is mostly irrelevant and was omitted in order to
 //! keep the example short. You can find the full source code of this example
-//! (and other examples too!) in the [`examples` directory on GitHub].
+//! (and other examples too!) in the [`examples` directory on GitHub]._
 //!
-//! [`Game`]: ../trait.Game.html
+//! Notice how [`UserInterface::update`] focuses on processing messages and
+//! updating state. On the other hand, [`UserInterface::layout`] only focuses on
+//! building the user interface from the current state. This separation of
+//! concerns will help you build composable user interfaces that are easy to
+//! debug and test!
+//!
+//! # Customization
+//! Coffee provides some [widgets] and a [`Renderer`] out-of-the-box. However,
+//! you can build your own! Check out the [`core`] module to learn more!
+//!
+//! [Elm]: https://elm-lang.org
+//! [The Elm Architecture]: https://guide.elm-lang.org/architecture/
 //! [`UserInterface`]: trait.UserInterface.html
-//! [`examples` directory on GitHub]: https://github.com/hecrj/coffee/tree/0.3.0/examples
+//! [`Game::State`]: ../trait.Game.html#associatedtype.State
+//! [`UserInterface::update`]: trait.UserInterface.html#tymethod.update
+//! [`UserInterface::layout`]: trait.UserInterface.html#tymethod.layout
+//! [`UserInterface::Message`]: trait.UserInterface.html#associatedtype.Message
+//! [widgets]: widget/index.html
+//! [`Button`]: widget/button/struct.Button.html
+//! [`Game`]: ../trait.Game.html
+//! [`examples` directory on GitHub]: https://github.com/hecrj/coffee/tree/master/examples
+//! [`Renderer`]: struct.Renderer.html
+//! [`core`]: core/index.html
 pub mod core;
 mod renderer;
 pub mod widget;

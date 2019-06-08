@@ -35,7 +35,7 @@ use std::hash::Hash;
 /// let state = &mut button::State::new();
 ///
 /// Button::new(state, "Click me!")
-///     .on_click(Message::ButtonClicked);
+///     .on_press(Message::ButtonClicked);
 /// ```
 ///
 /// ![Button drawn by the built-in renderer](https://i.imgur.com/783e6Sh.png)
@@ -43,7 +43,7 @@ pub struct Button<'a, Message> {
     state: &'a mut State,
     label: String,
     class: Class,
-    on_click: Option<Message>,
+    on_press: Option<Message>,
     style: Style,
 }
 
@@ -56,7 +56,7 @@ where
             .field("state", &self.state)
             .field("label", &self.label)
             .field("class", &self.class)
-            .field("on_click", &self.on_click)
+            .field("on_press", &self.on_press)
             .field("style", &self.style)
             .finish()
     }
@@ -76,7 +76,7 @@ impl<'a, Message> Button<'a, Message> {
             state,
             label: String::from(label),
             class: Class::Primary,
-            on_click: None,
+            on_press: None,
             style: Style::default().min_width(100),
         }
     }
@@ -118,11 +118,11 @@ impl<'a, Message> Button<'a, Message> {
         self
     }
 
-    /// Sets the message that will be produced when the [`Button`] is clicked.
+    /// Sets the message that will be produced when the [`Button`] is pressed.
     ///
     /// [`Button`]: struct.Button.html
-    pub fn on_click(mut self, msg: Message) -> Self {
-        self.on_click = Some(msg);
+    pub fn on_press(mut self, msg: Message) -> Self {
+        self.on_press = Some(msg);
         self
     }
 }
@@ -148,7 +148,7 @@ where
                 button: MouseButton::Left,
                 state,
             } => {
-                if let Some(on_click) = self.on_click {
+                if let Some(on_press) = self.on_press {
                     let bounds = layout.bounds();
 
                     match state {
@@ -163,7 +163,7 @@ where
                             self.state.is_pressed = false;
 
                             if is_clicked {
-                                messages.push(on_click);
+                                messages.push(on_press);
                             }
                         }
                     }

@@ -76,7 +76,7 @@ impl UserInterface for Counter {
             .spacing(20)
             .push(
                 Button::new(&mut self.increment_button, "+")
-                    .on_click(Message::IncrementPressed),
+                    .on_press(Message::IncrementPressed),
             )
             .push(
                 Text::new(&self.value.to_string())
@@ -87,7 +87,7 @@ impl UserInterface for Counter {
             )
             .push(
                 Button::new(&mut self.decrement_button, "-")
-                    .on_click(Message::DecrementPressed),
+                    .on_press(Message::DecrementPressed),
             )
             .into()
     }

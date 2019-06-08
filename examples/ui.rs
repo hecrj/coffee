@@ -71,7 +71,7 @@ impl UserInterface for Tour {
         if steps.has_previous() {
             controls = controls.push(
                 Button::new(back_button, "Back")
-                    .on_click(Message::BackPressed)
+                    .on_press(Message::BackPressed)
                     .class(button::Class::Secondary),
             );
         }
@@ -80,7 +80,7 @@ impl UserInterface for Tour {
 
         if steps.can_continue() {
             controls = controls.push(
-                Button::new(next_button, "Next").on_click(Message::NextPressed),
+                Button::new(next_button, "Next").on_press(Message::NextPressed),
             );
         }
 
