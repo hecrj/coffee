@@ -1,6 +1,4 @@
-use super::{
-    ButtonState, Event, HasCursorPosition, Input, KeyCode, MouseButton,
-};
+use super::{ButtonState, Event, Input, KeyCode, MouseButton};
 use crate::graphics::Point;
 
 use std::collections::HashSet;
@@ -91,11 +89,5 @@ impl Input for KeyboardAndMouse {
     fn clear(&mut self) {
         self.points_clicked.clear();
         self.released_keys.clear();
-    }
-}
-
-impl HasCursorPosition for KeyboardAndMouse {
-    fn cursor_position(&self) -> Point {
-        self.cursor_position
     }
 }

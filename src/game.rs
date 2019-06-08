@@ -180,7 +180,7 @@ pub trait Game {
             timer.update();
 
             while timer.tick() {
-                process_events(
+                interact(
                     game,
                     input,
                     state,
@@ -188,7 +188,6 @@ pub trait Game {
                     window,
                     &mut event_loop,
                     &mut alive,
-                    None,
                 );
 
                 debug.update_started();
@@ -197,7 +196,7 @@ pub trait Game {
             }
 
             if !timer.has_ticked() {
-                process_events(
+                interact(
                     game,
                     input,
                     state,
@@ -205,7 +204,6 @@ pub trait Game {
                     window,
                     &mut event_loop,
                     &mut alive,
-                    None,
                 );
             }
 
@@ -227,7 +225,7 @@ pub trait Game {
     }
 }
 
-pub(crate) fn process_events<G: Game>(
+fn interact<G: Game>(
     game: &mut G,
     input: &mut G::Input,
     state: &mut G::State,
@@ -235,61 +233,65 @@ pub(crate) fn process_events<G: Game>(
     window: &mut Window,
     event_loop: &mut window::EventLoop,
     alive: &mut bool,
-    mut events: Option<&mut Vec<input::Event>>,
 ) {
     debug.interact_started();
-    event_loop.poll(|event| {
-        match event {
-            window::Event::Input(input_event) => {
-                input.update(input_event);
 
-                #[cfg(any(debug_assertions, feature = "debug"))]
-                match input_event {
-                    input::Event::KeyboardInput {
-                        state: input::ButtonState::Released,
-                        key_code,
-                    } if Some(key_code) == G::DEBUG_KEY => {
-                        debug.toggle();
-                    }
-                    _ => {}
-                }
+    event_loop
+        .poll(|event| process_event(game, input, debug, window, alive, event));
 
-                if let Some(ref mut events) = events {
-                    events.push(input_event);
-                }
-            }
-            window::Event::CursorMoved(logical_position) => {
-                let position = logical_position.to_physical(window.dpi());
-                let event = input::Event::CursorMoved {
-                    x: position.x as f32,
-                    y: position.y as f32,
-                };
-
-                input.update(event);
-
-                if let Some(ref mut events) = events {
-                    events.push(event);
-                }
-            }
-            window::Event::Moved(logical_position) => {
-                let position = logical_position.to_physical(window.dpi());
-
-                input.update(input::Event::WindowMoved {
-                    x: position.x as f32,
-                    y: position.y as f32,
-                })
-            }
-            window::Event::CloseRequested => {
-                if game.on_close_request() {
-                    *alive = false;
-                }
-            }
-            window::Event::Resized(new_size) => {
-                window.resize(new_size);
-            }
-        };
-    });
     game.interact(input, state, window);
     input.clear();
+
     debug.interact_finished();
+}
+
+pub(crate) fn process_event<G: Game, I: Input>(
+    game: &mut G,
+    input: &mut I,
+    debug: &mut Debug,
+    window: &mut Window,
+    alive: &mut bool,
+    event: window::Event,
+) {
+    match event {
+        window::Event::Input(input_event) => {
+            input.update(input_event);
+
+            #[cfg(any(debug_assertions, feature = "debug"))]
+            match input_event {
+                input::Event::KeyboardInput {
+                    state: input::ButtonState::Released,
+                    key_code,
+                } if Some(key_code) == G::DEBUG_KEY => {
+                    debug.toggle();
+                }
+                _ => {}
+            }
+        }
+        window::Event::CursorMoved(logical_position) => {
+            let position = logical_position.to_physical(window.dpi());
+            let event = input::Event::CursorMoved {
+                x: position.x as f32,
+                y: position.y as f32,
+            };
+
+            input.update(event);
+        }
+        window::Event::Moved(logical_position) => {
+            let position = logical_position.to_physical(window.dpi());
+
+            input.update(input::Event::WindowMoved {
+                x: position.x as f32,
+                y: position.y as f32,
+            })
+        }
+        window::Event::CloseRequested => {
+            if game.on_close_request() {
+                *alive = false;
+            }
+        }
+        window::Event::Resized(new_size) => {
+            window.resize(new_size);
+        }
+    };
 }

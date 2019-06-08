@@ -1,8 +1,7 @@
 use coffee::graphics::{
     Color, Frame, HorizontalAlignment, Window, WindowSettings,
 };
-use coffee::input::KeyboardAndMouse;
-use coffee::load::{loading_screen::ProgressBar, Task};
+use coffee::load::Task;
 use coffee::ui::{
     button, slider, Align, Button, Checkbox, Column, Element, Justify, Radio,
     Renderer, Row, Slider, Text,
@@ -25,9 +24,9 @@ struct Tour {
 }
 
 impl Game for Tour {
-    type Input = KeyboardAndMouse;
+    type Input = ();
     type State = ();
-    type LoadingScreen = ProgressBar;
+    type LoadingScreen = ();
 
     fn load(_window: &Window) -> Task<Tour> {
         Task::new(|| Tour {

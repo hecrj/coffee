@@ -6,8 +6,6 @@ mod keyboard_and_mouse;
 pub use event::{ButtonState, Event, KeyCode, MouseButton};
 pub use keyboard_and_mouse::KeyboardAndMouse;
 
-use crate::graphics::Point;
-
 /// An input tracker.
 pub trait Input {
     /// Creates a new [`Input`].
@@ -40,10 +38,4 @@ impl Input for () {
     fn update(&mut self, _event: Event) {}
 
     fn clear(&mut self) {}
-}
-
-/// A cursor position tracker.
-pub trait HasCursorPosition {
-    /// Returns the current cursor position.
-    fn cursor_position(&self) -> Point;
 }

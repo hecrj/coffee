@@ -122,8 +122,8 @@ pub type Row<'a, Message> = widget::Row<'a, Message, Renderer>;
 pub type Element<'a, Message> = self::core::Element<'a, Message, Renderer>;
 
 use crate::game;
-use crate::graphics::{window, Window, WindowSettings};
-use crate::input::{self, HasCursorPosition, Input};
+use crate::graphics::{window, Point, Window, WindowSettings};
+use crate::input::{self, Input as _};
 use crate::load::{Join, LoadingScreen};
 use crate::ui::core::{Event, Interface, MouseCursor, Renderer as _};
 use crate::{Debug, Game, Result, State, Timer};
@@ -218,7 +218,6 @@ pub trait UserInterface: Game {
     fn run(window_settings: WindowSettings) -> Result<()>
     where
         Self: 'static + Sized,
-        Self::Input: HasCursorPosition,
     {
         // Set up window
         let mut event_loop = window::EventLoop::new();
@@ -235,14 +234,13 @@ pub trait UserInterface: Game {
         )
             .join();
         let (game, state, renderer) = &mut loading_screen.run(load, window)?;
-        let input = &mut Self::Input::new();
+        let input = &mut Input::new();
         debug.loading_finished();
 
         // Game loop
         let mut timer = Timer::new(Self::State::TICKS_PER_SECOND);
         let mut alive = true;
-        let events = &mut Vec::new();
-        let triggered_events = &mut Vec::new();
+        let messages = &mut Vec::new();
         let mut mouse_cursor = MouseCursor::OutOfBounds;
         let mut ui_cache =
             Interface::compute(game.layout(state, window), &renderer).cache();
@@ -252,7 +250,7 @@ pub trait UserInterface: Game {
             timer.update();
 
             while timer.tick() {
-                game::process_events(
+                interact(
                     game,
                     input,
                     state,
@@ -260,7 +258,6 @@ pub trait UserInterface: Game {
                     window,
                     &mut event_loop,
                     &mut alive,
-                    Some(events),
                 );
 
                 debug.update_started();
@@ -269,7 +266,7 @@ pub trait UserInterface: Game {
             }
 
             if !timer.has_ticked() {
-                game::process_events(
+                interact(
                     game,
                     input,
                     state,
@@ -277,7 +274,6 @@ pub trait UserInterface: Game {
                     window,
                     &mut event_loop,
                     &mut alive,
-                    Some(events),
                 );
             }
 
@@ -292,21 +288,15 @@ pub trait UserInterface: Game {
                 ui_cache,
             );
 
-            events
-                .drain(..)
-                .filter_map(Event::from_input)
-                .for_each(|event| {
-                    interface.on_event(
-                        event,
-                        input.cursor_position(),
-                        triggered_events,
-                    )
-                });
+            let cursor_position = input.cursor_position;
+            input.ui_events.drain(..).for_each(|event| {
+                interface.on_event(event, cursor_position, messages)
+            });
 
             let new_cursor = interface.draw(
                 renderer,
                 &mut window.frame(),
-                input.cursor_position(),
+                input.cursor_position,
             );
 
             ui_cache = interface.cache();
@@ -322,14 +312,14 @@ pub trait UserInterface: Game {
                 mouse_cursor = new_cursor;
             }
 
-            for event in triggered_events.drain(..) {
+            for event in messages.drain(..) {
                 game.update(state, event);
             }
             debug.ui_finished();
 
             if debug.is_enabled() {
                 debug.debug_started();
-                game.debug(input, state, window, &mut debug);
+                game.debug(&mut input.game_input, state, window, &mut debug);
                 debug.debug_finished();
             }
 
@@ -339,4 +329,60 @@ pub trait UserInterface: Game {
 
         Ok(())
     }
+}
+
+struct Input<I: input::Input> {
+    game_input: I,
+    cursor_position: Point,
+    ui_events: Vec<Event>,
+}
+
+impl<I: input::Input> input::Input for Input<I> {
+    fn new() -> Input<I> {
+        Input {
+            game_input: I::new(),
+            cursor_position: Point::new(0.0, 0.0),
+            ui_events: Vec::new(),
+        }
+    }
+
+    fn update(&mut self, event: input::Event) {
+        self.game_input.update(event);
+
+        match event {
+            input::Event::CursorMoved { x, y } => {
+                self.cursor_position = Point::new(x, y);
+            }
+            _ => {}
+        };
+
+        if let Some(ui_event) = Event::from_input(event) {
+            self.ui_events.push(ui_event);
+        }
+    }
+
+    fn clear(&mut self) {
+        self.game_input.clear();
+    }
+}
+
+fn interact<G: Game>(
+    game: &mut G,
+    input: &mut Input<G::Input>,
+    state: &mut G::State,
+    debug: &mut Debug,
+    window: &mut Window,
+    event_loop: &mut window::EventLoop,
+    alive: &mut bool,
+) {
+    debug.interact_started();
+
+    event_loop.poll(|event| {
+        game::process_event(game, input, debug, window, alive, event)
+    });
+
+    game.interact(&mut input.game_input, state, window);
+    input.clear();
+
+    debug.interact_finished();
 }

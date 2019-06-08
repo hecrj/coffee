@@ -2,8 +2,7 @@ use coffee::graphics::{
     Color, Frame, HorizontalAlignment, VerticalAlignment, Window,
     WindowSettings,
 };
-use coffee::input::KeyboardAndMouse;
-use coffee::load::{loading_screen::ProgressBar, Task};
+use coffee::load::Task;
 use coffee::ui::{
     button, Align, Button, Column, Element, Justify, Renderer, Text,
 };
@@ -26,8 +25,8 @@ struct Counter {
 
 impl Game for Counter {
     type State = ();
-    type Input = KeyboardAndMouse;
-    type LoadingScreen = ProgressBar;
+    type Input = ();
+    type LoadingScreen = ();
 
     fn load(_window: &Window) -> Task<Counter> {
         Task::new(|| Counter {
