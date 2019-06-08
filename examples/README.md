@@ -8,10 +8,10 @@ OpenGL, we run:
 cargo run --example <example> --features opengl
 ```
 
-Coffee moves fast and the `master` branch can contain breaking changes! Be sure
-to browse the [latest tag] if you want to learn about the latest release.
+Coffee moves fast and the `master` branch can contain breaking changes! If you
+want to learn about a specific release, check out [the release list].
 
-[latest tag]: https://github.com/hecrj/coffee/tree/0.2.0/examples
+[the release list]: https://github.com/hecrj/coffee/releases
 
 ## Particles
 
