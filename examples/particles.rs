@@ -125,7 +125,7 @@ impl Game for Particles {
             state.gravity_centers.push(*point);
         }
 
-        if input.was_key_released(&KeyCode::F) {
+        if input.was_key_released(KeyCode::F) {
             window.toggle_fullscreen();
         }
     }
