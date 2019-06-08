@@ -6,7 +6,7 @@ use crate::ui::core::{Event, Hasher, Layout, MouseCursor, Node};
 /// Implementors of this trait should also implement `From` for [`Element`].
 ///
 /// [`Element`]: struct.Element.html
-pub trait Widget<Message, Renderer> {
+pub trait Widget<Message, Renderer>: std::fmt::Debug {
     /// Returns the [`Node`] of the [`Widget`].
     ///
     /// This [`Node`] is used by the runtime to compute the [`Layout`] of the

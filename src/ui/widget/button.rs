@@ -47,6 +47,21 @@ pub struct Button<'a, Message> {
     style: Style,
 }
 
+impl<'a, Message> std::fmt::Debug for Button<'a, Message>
+where
+    Message: std::fmt::Debug,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        f.debug_struct("Button")
+            .field("state", &self.state)
+            .field("label", &self.label)
+            .field("class", &self.class)
+            .field("on_click", &self.on_click)
+            .field("style", &self.style)
+            .finish()
+    }
+}
+
 impl<'a, Message> Button<'a, Message> {
     /// Creates a new [`Button`] with some local [`State`] and the given label.
     ///
@@ -115,7 +130,7 @@ impl<'a, Message> Button<'a, Message> {
 impl<'a, Message, Renderer> Widget<Message, Renderer> for Button<'a, Message>
 where
     Renderer: self::Renderer,
-    Message: Copy,
+    Message: Copy + std::fmt::Debug,
 {
     fn node(&self, _renderer: &Renderer) -> Node {
         Node::new(self.style.height(50))
@@ -260,7 +275,7 @@ impl<'a, Message, Renderer> From<Button<'a, Message>>
     for Element<'a, Message, Renderer>
 where
     Renderer: self::Renderer,
-    Message: 'static + Copy,
+    Message: 'static + Copy + std::fmt::Debug,
 {
     fn from(button: Button<'a, Message>) -> Element<'a, Message, Renderer> {
         Element::new(button)

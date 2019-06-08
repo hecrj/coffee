@@ -24,13 +24,13 @@ use std::hash::Hash;
 /// use coffee::graphics::Color;
 /// use coffee::ui::{Column, Radio};
 ///
-/// #[derive(Clone, Copy, PartialEq, Eq)]
+/// #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 /// pub enum Choice {
 ///     A,
 ///     B,
 /// }
 ///
-/// #[derive(Clone, Copy)]
+/// #[derive(Debug, Clone, Copy)]
 /// pub enum Message {
 ///     RadioSelected(Choice),
 /// }
@@ -55,6 +55,20 @@ pub struct Radio<Message> {
     on_click: Message,
     label: String,
     label_color: Color,
+}
+
+impl<Message> std::fmt::Debug for Radio<Message>
+where
+    Message: std::fmt::Debug,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        f.debug_struct("Radio")
+            .field("is_selected", &self.is_selected)
+            .field("on_click", &self.on_click)
+            .field("label", &self.label)
+            .field("label_color", &self.label_color)
+            .finish()
+    }
 }
 
 impl<Message> Radio<Message> {
@@ -94,7 +108,7 @@ impl<Message> Radio<Message> {
 impl<Message, Renderer> Widget<Message, Renderer> for Radio<Message>
 where
     Renderer: self::Renderer + text::Renderer,
-    Message: Copy,
+    Message: Copy + std::fmt::Debug,
 {
     fn node(&self, renderer: &Renderer) -> Node {
         Row::<(), Renderer>::new()
@@ -188,7 +202,7 @@ impl<'a, Message, Renderer> From<Radio<Message>>
     for Element<'a, Message, Renderer>
 where
     Renderer: self::Renderer + text::Renderer,
-    Message: 'static + Copy,
+    Message: 'static + Copy + std::fmt::Debug,
 {
     fn from(checkbox: Radio<Message>) -> Element<'a, Message, Renderer> {
         Element::new(checkbox)

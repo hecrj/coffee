@@ -42,30 +42,40 @@ use crate::Result;
 /// [create an issue]: https://github.com/hecrj/coffee/issues
 /// [open a pull request]: https://github.com/hecrj/coffee/pulls
 pub trait LoadingScreen {
+    /// Creates the [`LoadingScreen`].
+    ///
+    /// You can use the provided [`Gpu`] to load the assets necessary to show
+    /// the loading screen.
+    ///
+    /// [`LoadingScreen`]: trait.LoadingScreen.html
     fn new(gpu: &mut graphics::Gpu) -> Result<Self>
     where
         Self: Sized;
 
-    /// React to task progress.
+    /// Draws the [`LoadingScreen`] with the given [`Progress`].
     ///
     /// You should provide feedback to the user here. You can draw on the given
     /// [`Frame`], like in [`Game::draw`].
     ///
+    /// [`LoadingScreen`]: trait.LoadingScreen.html
+    /// [`Progress`]: ../struct.Progress.html
     /// [`Frame`]: ../../graphics/struct.Frame.html
     /// [`Game::draw`]: ../../trait.Game.html#tymethod.draw
-    fn on_progress(&mut self, progress: &Progress, frame: &mut graphics::Frame);
+    fn draw(&mut self, progress: &Progress, frame: &mut graphics::Frame);
 
-    /// Run the loading screen with a task and obtain its result.
+    /// Runs the [`LoadingScreen`] with a task and obtain its result.
     ///
     /// By default, it runs the task and refreshes the window when there is
     /// progress.
+    ///
+    /// [`LoadingScreen`]: trait.LoadingScreen.html
     fn run<T>(
         &mut self,
         task: Task<T>,
         window: &mut graphics::Window,
     ) -> Result<T> {
         task.run(window, |progress, window| {
-            self.on_progress(progress, &mut window.frame());
+            self.draw(progress, &mut window.frame());
             window.swap_buffers();
         })
     }
@@ -76,10 +86,5 @@ impl LoadingScreen for () {
         Ok(())
     }
 
-    fn on_progress(
-        &mut self,
-        _progress: &Progress,
-        _frame: &mut graphics::Frame,
-    ) {
-    }
+    fn draw(&mut self, _progress: &Progress, _frame: &mut graphics::Frame) {}
 }

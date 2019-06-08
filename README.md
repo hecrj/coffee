@@ -51,7 +51,7 @@ opt-level = 2
 ```
 
 Coffee moves fast and the `master` branch can contain breaking changes! Be sure
-to browse the [latest tag] if you intend to use the latest release.
+to browse the [latest tag] if you want to learn about the latest release.
 
 [latest tag]: https://github.com/hecrj/coffee/tree/0.2.0
 

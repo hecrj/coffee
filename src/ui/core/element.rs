@@ -14,6 +14,14 @@ pub struct Element<'a, Message, Renderer> {
     pub(crate) widget: Box<Widget<Message, Renderer> + 'a>,
 }
 
+impl<'a, Message, Renderer> std::fmt::Debug for Element<'a, Message, Renderer> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        f.debug_struct("Element")
+            .field("widget", &self.widget)
+            .finish()
+    }
+}
+
 impl<'a, Message, Renderer> Element<'a, Message, Renderer> {
     /// Create a new [`Element`] containing the given [`Widget`].
     ///
@@ -150,6 +158,12 @@ impl<'a, Message, Renderer> Element<'a, Message, Renderer> {
 pub struct Map<'a, A, B, Renderer> {
     widget: Box<Widget<A, Renderer> + 'a>,
     mapper: Box<Fn(A) -> B>,
+}
+
+impl<'a, A, B, Renderer> std::fmt::Debug for Map<'a, A, B, Renderer> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        f.debug_struct("Map").field("widget", &self.widget).finish()
+    }
 }
 
 impl<'a, A, B, Renderer> Map<'a, A, B, Renderer> {

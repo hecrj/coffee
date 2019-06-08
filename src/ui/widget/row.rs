@@ -17,6 +17,16 @@ pub struct Row<'a, Message, Renderer> {
     children: Vec<Element<'a, Message, Renderer>>,
 }
 
+impl<'a, Message, Renderer> std::fmt::Debug for Row<'a, Message, Renderer> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        f.debug_struct("Row")
+            .field("style", &self.style)
+            .field("spacing", &self.spacing)
+            .field("children", &self.children)
+            .finish()
+    }
+}
+
 impl<'a, Message, Renderer> Row<'a, Message, Renderer> {
     /// Creates an empty [`Row`].
     ///

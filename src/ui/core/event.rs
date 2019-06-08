@@ -50,7 +50,7 @@ pub enum Event {
 }
 
 impl Event {
-    pub fn from_input(event: input::Event) -> Option<Event> {
+    pub(crate) fn from_input(event: input::Event) -> Option<Event> {
         match event {
             input::Event::KeyboardInput { state, key_code } => {
                 Some(Event::KeyboardInput { state, key_code })

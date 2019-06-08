@@ -16,6 +16,7 @@ pub struct Sprite {
     /// The position where the sprite should be drawn.
     pub position: Point,
 
+    /// The scale to apply to the sprite.
     pub scale: (f32, f32),
 }
 

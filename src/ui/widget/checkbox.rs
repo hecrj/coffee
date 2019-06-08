@@ -43,6 +43,16 @@ pub struct Checkbox<Message> {
     label_color: Color,
 }
 
+impl<Message> std::fmt::Debug for Checkbox<Message> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        f.debug_struct("Checkbox")
+            .field("is_checked", &self.is_checked)
+            .field("label", &self.label)
+            .field("label_color", &self.label_color)
+            .finish()
+    }
+}
+
 impl<Message> Checkbox<Message> {
     /// Creates a new [`Checkbox`].
     ///

@@ -24,6 +24,14 @@ pub struct Renderer {
     pub(crate) font: Rc<RefCell<Font>>,
 }
 
+impl std::fmt::Debug for Renderer {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        f.debug_struct("Renderer")
+            .field("sprites", &self.sprites)
+            .finish()
+    }
+}
+
 impl core::Renderer for Renderer {
     type Configuration = Configuration;
 
@@ -65,6 +73,7 @@ impl core::Renderer for Renderer {
 ///     ..Configuration::default()
 /// };
 /// ```
+#[derive(Debug)]
 pub struct Configuration {
     /// The spritesheet used to render the [different widgets] of the user interface.
     ///

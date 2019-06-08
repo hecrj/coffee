@@ -49,6 +49,17 @@ pub struct Slider<'a, Message> {
     style: Style,
 }
 
+impl<'a, Message> std::fmt::Debug for Slider<'a, Message> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        f.debug_struct("Slider")
+            .field("state", &self.state)
+            .field("range", &self.range)
+            .field("value", &self.value)
+            .field("style", &self.style)
+            .finish()
+    }
+}
+
 impl<'a, Message> Slider<'a, Message> {
     /// Creates a new [`Slider`].
     ///

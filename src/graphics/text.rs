@@ -5,23 +5,25 @@ use crate::graphics::{Color, Point};
 /// A section of text.
 #[derive(Clone, PartialEq, Debug)]
 pub struct Text<'a> {
-    /// Text content.
+    /// Text content
     pub content: &'a str,
 
-    /// Text position.
+    /// Text position
     pub position: Point,
 
-    /// Text bounds, in screen coordinates.
+    /// Text bounds, in screen coordinates
     pub bounds: (f32, f32),
 
-    /// Text size.
+    /// Text size
     pub size: f32,
 
-    /// Text color.
+    /// Text color
     pub color: Color,
 
+    /// Text horizontal alignment
     pub horizontal_alignment: HorizontalAlignment,
 
+    /// Text vertical alignment
     pub vertical_alignment: VerticalAlignment,
 }
 
@@ -40,16 +42,28 @@ impl Default for Text<'static> {
     }
 }
 
+/// The horizontal alignment of some resource.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum HorizontalAlignment {
+    /// Align left
     Left,
+
+    /// Horizontally centered
     Center,
+
+    /// Align right
     Right,
 }
 
+/// The vertical alignment of some resource.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VerticalAlignment {
+    /// Align top
     Top,
+
+    /// Vertically centered
     Center,
+
+    /// Align bottom
     Bottom,
 }

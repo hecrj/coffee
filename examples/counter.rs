@@ -47,7 +47,7 @@ impl Game for Counter {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub enum Message {
     IncrementPressed,
     DecrementPressed,

@@ -17,6 +17,16 @@ pub struct Column<'a, Message, Renderer> {
     children: Vec<Element<'a, Message, Renderer>>,
 }
 
+impl<'a, Message, Renderer> std::fmt::Debug for Column<'a, Message, Renderer> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        f.debug_struct("Column")
+            .field("style", &self.style)
+            .field("spacing", &self.spacing)
+            .field("children", &self.children)
+            .finish()
+    }
+}
+
 impl<'a, Message, Renderer> Column<'a, Message, Renderer> {
     /// Creates an empty [`Column`].
     ///

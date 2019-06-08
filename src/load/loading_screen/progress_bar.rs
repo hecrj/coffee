@@ -31,11 +31,7 @@ impl LoadingScreen for ProgressBar {
         })
     }
 
-    fn on_progress(
-        &mut self,
-        progress: &Progress,
-        frame: &mut graphics::Frame,
-    ) {
+    fn draw(&mut self, progress: &Progress, frame: &mut graphics::Frame) {
         frame.clear(graphics::Color::BLACK);
 
         self.pencil.draw(

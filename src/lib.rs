@@ -63,8 +63,8 @@
 //! [`Game`]: trait.Game.html
 //! [`Game::run`]: trait.Game.html#method.run
 //! [`WindowSettings`]: graphics/struct.WindowSettings.html
-//#![deny(missing_docs)]
-//#![deny(missing_debug_implementations)]
+#![deny(missing_docs)]
+#![deny(missing_debug_implementations)]
 #![deny(unused_results)]
 #![deny(unsafe_code)]
 
