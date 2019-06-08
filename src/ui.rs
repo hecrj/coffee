@@ -39,7 +39,7 @@
 //!
 //!     // Local state of the two counter buttons
 //!     // This is internal widget state that may change outside our update
-//!     // logic.
+//!     // logic
 //!     increment_button: button::State,
 //!     decrement_button: button::State,
 //! }
@@ -62,7 +62,7 @@
 //! #     }
 //! # }
 //! #
-//! // The messages, user interactions that we are interested on.
+//! // The messages, user interactions that we are interested on
 //! #[derive(Debug, Clone, Copy)]
 //! pub enum Message {
 //!     IncrementPressed,
@@ -73,12 +73,12 @@
 //!     // We use the message enum we just defined
 //!     type Message = Message;
 //!
-//!     // We can use the the built-in `Renderer`.
+//!     // We can use the the built-in `Renderer`
 //!     type Renderer = Renderer;
 //!
 //!     // The update logic, called when a message is produced
 //!     fn update(&mut self, _state: &mut Self::State, message: Message) {
-//!         // We update the counter value after an interaction here.
+//!         // We update the counter value after an interaction here
 //!         match message {
 //!             Message::IncrementPressed => {
 //!                 self.value += 1;
@@ -89,9 +89,9 @@
 //!         }
 //!     }
 //!
-//!     // The layout logic, describing the different components of the user interface.
+//!     // The layout logic, describing the different components of the user interface
 //!     fn layout(&mut self, _state: &Self::State, window: &Window) -> Element<Message> {
-//!         // We use a column so the elements inside are laid out vertically.
+//!         // We use a column so the elements inside are laid out vertically
 //!         Column::new()
 //!             .push(
 //!                 // The increment button. We tell it to produce an
