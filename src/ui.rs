@@ -12,7 +12,7 @@
 //!   about
 //!   * __update logic__ — a way to react to __messages__ and update your
 //!   __state__
-//!   * __layout logic__ — a way to transform your state into [widgets] that
+//!   * __layout logic__ — a way to transform your __state__ into [widgets] that
 //!   may produce __messages__ on user interaction
 //!
 //! # Getting started

@@ -7,7 +7,7 @@
 //! If you want to implement your own loading screen, check out the
 //! [`LoadingScreen`] trait.
 //!
-//! If you just want a simple placeholder, you can try out the built-in
+//! If you want a simple placeholder, you can try out the built-in
 //! [`ProgressBar`] loading screen.
 //!
 //! [`Task`]: ../struct.Task.html

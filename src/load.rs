@@ -28,7 +28,7 @@ use crate::Result;
 /// A `Task<T>` represents an operation that produces a value of type `T`.
 ///
 /// # Laziness
-/// A [`Task`] is just a recipe that describes how to produce a specific output,
+/// A [`Task`] is a recipe that describes how to produce a specific output,
 /// like a function. They can be combined or transformed in certain ways and
 /// run whenever needed.
 ///
