@@ -20,7 +20,7 @@ impl text::Renderer for Renderer {
             // Bug? Using the library wrong? I should probably open an issue on
             // the stretch repository.
             // I noticed that the first measure is the one that matters in
-            // practice. Here, we simply use a RefCell to store the cached
+            // practice. Here, we use a RefCell to store the cached
             // measurement.
             let mut measure = measure.borrow_mut();
 

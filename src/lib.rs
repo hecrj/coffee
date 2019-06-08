@@ -17,8 +17,8 @@
 //! Check out the [repository] for more details!
 //!
 //! # Usage
-//! To get started, simply implement the [`Game`] trait. Then, call
-//! [`Game::run`] with some [`WindowSettings`] to run your game.
+//! To get started, implement the [`Game`] trait. Then, call [`Game::run`] with
+//! some [`WindowSettings`] to run your game.
 //!
 //! Here is a minimal example that will open a window:
 //!

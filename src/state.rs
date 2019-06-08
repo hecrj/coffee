@@ -18,7 +18,7 @@ pub trait State {
 
     /// Loads the [`State`].
     ///
-    /// Most of the time, you should simply use [`Task::new`] here.
+    /// Most of the time, you should use [`Task::new`] here.
     ///
     /// [`State`]: trait.State.html
     /// [`Task::new`]: load/struct.Task.html#method.new

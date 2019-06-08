@@ -73,12 +73,12 @@
 //!     // We use the message enum we just defined
 //!     type Message = Message;
 //!
-//!     // We can simply use the the built-in `Renderer`.
+//!     // We can use the the built-in `Renderer`.
 //!     type Renderer = Renderer;
 //!
 //!     // The update logic, called when a message is produced
 //!     fn update(&mut self, _state: &mut Self::State, message: Message) {
-//!         // We simply update the counter value after an interaction here.
+//!         // We update the counter value after an interaction here.
 //!         match message {
 //!             Message::IncrementPressed => {
 //!                 self.value += 1;
@@ -211,7 +211,7 @@ pub trait UserInterface: Game {
     /// The renderer used to draw the user interface.
     ///
     /// If you just want to use the built-in widgets in Coffee, you should
-    /// simply use the [`Renderer`] type here.
+    /// use the built-in [`Renderer`] type here.
     ///
     /// If you want to write your own renderer, you will need to implement the
     /// [`core::Renderer`] trait.

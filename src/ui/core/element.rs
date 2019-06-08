@@ -106,7 +106,7 @@ impl<'a, Message, Renderer> Element<'a, Message, Renderer> {
     /// }
     ///
     /// // The messages of our UI
-    /// // We simply nest the messages here
+    /// // We nest the messages here
     /// #[derive(Debug, Clone, Copy)]
     /// enum Message {
     ///     MainMenu(main_menu::Message),

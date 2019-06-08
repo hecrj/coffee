@@ -25,7 +25,7 @@ use crate::Result;
 /// to the user.
 ///
 /// # Usage
-/// If you have a [`LoadingScreen`], simply set it as your [`Game::LoadingScreen`]
+/// If you have a [`LoadingScreen`], set it as your [`Game::LoadingScreen`]
 /// associated type. Coffee will automatically use it when your game starts!
 ///
 /// # Future plans
