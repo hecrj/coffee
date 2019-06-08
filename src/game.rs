@@ -129,7 +129,7 @@ pub trait Game {
 
     /// Displays debug information.
     ///
-    /// This method is called after `draw` once per frame when debug has been
+    /// This method is called after [`draw`] once per frame when debug has been
     /// toggled using the [`DEBUG_KEY`]. Anything you draw here will be on top.
     ///
     /// Debug code is only called when compiling with `debug_assertions` _or_
@@ -138,16 +138,17 @@ pub trait Game {
     /// By default, it shows [`Debug`], which displays a brief summary about
     /// game performance in the top left corner.
     ///
+    /// [`draw`]: #tymethod.draw
     /// [`DEBUG_KEY`]: #associatedconstant.DEBUG_KEY
     /// [`Debug`]: struct.Debug.html
     fn debug(
         &self,
         _input: &Self::Input,
         _state: &Self::State,
-        window: &mut Window,
+        frame: &mut Frame,
         debug: &mut Debug,
     ) {
-        debug.draw(&mut window.frame())
+        debug.draw(frame);
     }
 
     /// Runs the [`Game`] with the given [`WindowSettings`].
@@ -213,7 +214,7 @@ pub trait Game {
 
             if debug.is_enabled() {
                 debug.debug_started();
-                game.debug(input, state, window, &mut debug);
+                game.debug(input, state, &mut window.frame(), &mut debug);
                 debug.debug_finished();
             }
 

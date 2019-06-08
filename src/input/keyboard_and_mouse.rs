@@ -25,11 +25,19 @@ impl KeyboardAndMouse {
     }
 
     /// Returns true if the cursor is currently not available.
+    ///
+    /// This mostly happens when the cursor is currently over a
+    /// [`UserInterface`].
+    ///
+    /// [`UserInterface`]: ../ui/trait.UserInterface.html
     pub fn is_cursor_taken(&self) -> bool {
         self.is_cursor_taken
     }
 
     /// Returns the positions of the mouse clicks during the last interaction.
+    ///
+    /// Clicks performed while the mouse cursor is not available are
+    /// automatically ignored.
     pub fn clicks(&self) -> &[Point] {
         &self.points_clicked
     }

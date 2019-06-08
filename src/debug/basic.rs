@@ -74,9 +74,9 @@ impl Debug {
         self.load_duration = time::Instant::now() - self.load_start;
     }
 
-    /// Get the time spent running [`Game::new`].
+    /// Get the time spent loading your [`Game`].
     ///
-    /// [`Game::new`]: trait.Game.html#tymethod.new
+    /// [`Game`]: trait.Game.html
     pub fn load_duration(&self) -> time::Duration {
         self.load_duration
     }
@@ -121,9 +121,9 @@ impl Debug {
             .push(time::Instant::now() - self.update_start);
     }
 
-    /// Get the average time spent running [`Game::update`].
+    /// Get the average time spent running [`State::update`].
     ///
-    /// [`Game::update`]: trait.Game.html#tymethod.update
+    /// [`State::update`]: trait.State.html#tymethod.update
     pub fn update_duration(&self) -> time::Duration {
         self.update_durations.average()
     }

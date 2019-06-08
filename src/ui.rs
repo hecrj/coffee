@@ -312,14 +312,19 @@ pub trait UserInterface: Game {
                 mouse_cursor = new_cursor;
             }
 
-            for event in messages.drain(..) {
-                game.update(state, event);
+            for message in messages.drain(..) {
+                game.update(state, message);
             }
             debug.ui_finished();
 
             if debug.is_enabled() {
                 debug.debug_started();
-                game.debug(&mut input.game_input, state, window, &mut debug);
+                game.debug(
+                    &mut input.game_input,
+                    state,
+                    &mut window.frame(),
+                    &mut debug,
+                );
                 debug.debug_finished();
             }
 

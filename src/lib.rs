@@ -2,6 +2,7 @@
 //! and type-safety.
 //!
 //! # Features
+//!   * Responsive, customizable GUI with built-in widgets
 //!   * Declarative, type-safe asset loading
 //!   * Loading screens with progress tracking
 //!   * Built-in [debug view with performance metrics]

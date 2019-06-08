@@ -18,7 +18,7 @@ bugs. [Feel free to contribute!]
 [Feel free to contribute!]: #contributing--feedback
 
 ## Features
-  * Responsive GUI support with built-in widgets
+  * Responsive, customizable GUI with built-in widgets
   * Declarative, type-safe asset loading
   * Loading screens with progress tracking
   * Built-in [debug view with performance metrics]
