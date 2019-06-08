@@ -130,8 +130,8 @@ impl<'a, Message, Renderer> Element<'a, Message, Renderer> {
     /// ```
     ///
     /// This way, neither `main_menu` nor `gameplay_overlay` know anything about
-    /// the global `Message` type and it allows the user of these modules to
-    /// wire them up in any way they want.
+    /// the global `Message` type. They become reusable, allowing the user of
+    /// these modules to compose them together freely.
     pub fn map<F, B>(self, f: F) -> Element<'a, B, Renderer>
     where
         Message: 'static + Copy,

@@ -3,8 +3,12 @@ use crate::ui::core::{Event, Hasher, Layout, MouseCursor, Node};
 
 /// A component that displays information or allows interaction.
 ///
-/// Implementors of this trait should also implement `From` for [`Element`].
+/// If you want to build a custom widget, you will need to implement this trait.
+/// Additionally, remember to also provide [`Into<Element>`] so your users can
+/// easily turn your [`Widget`] into a generic [`Element`]
 ///
+/// [`Into<Element>`]: struct.Element.html
+/// [`Widget`]: trait.Widget.html
 /// [`Element`]: struct.Element.html
 pub trait Widget<Message, Renderer>: std::fmt::Debug {
     /// Returns the [`Node`] of the [`Widget`].
@@ -19,7 +23,10 @@ pub trait Widget<Message, Renderer>: std::fmt::Debug {
 
     /// Draws the [`Widget`] using the associated `Renderer`.
     ///
+    /// It must return the [`MouseCursor`] state for the [`Widget`].
+    ///
     /// [`Widget`]: trait.Widget.html
+    /// [`MouseCursor`]: enum.MouseCursor.html
     fn draw(
         &self,
         renderer: &mut Renderer,
