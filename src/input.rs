@@ -1,85 +1,47 @@
 //! Allow players to interact with your game.
-use crate::graphics::window::winit;
 
-pub use winit::ElementState as ButtonState;
-pub use winit::MouseButton;
-pub use winit::VirtualKeyCode as KeyCode;
+mod event;
+mod keyboard_and_mouse;
 
-/// An input event.
+pub use event::{ButtonState, Event, KeyCode, MouseButton};
+pub use keyboard_and_mouse::KeyboardAndMouse;
+
+/// The input of your [`Game`].
 ///
-/// You can listen to this type of events by implementing [`Game::on_input`].
+/// If you just want simple access to the keyboard and mouse, check out the
+/// built-in [`KeyboardAndMouse`] type.
 ///
-/// There are many events still missing here! Controllers are also not supported
-/// _yet_!
-///
-/// Feel free to [open an issue] if you need a particular event.
-/// [PRs are also appreciated!]
-///
-/// [`Game::on_input`]: ../trait.Game.html#method.on_input
-/// [open an issue]: https://github.com/hecrj/coffee/issues
-/// [PRS are also appreciated!]: https://github.com/hecrj/coffee/pulls
-#[derive(PartialEq, Clone, Copy, Debug)]
-pub enum Event {
-    /// A keyboard key was pressed or released.
-    KeyboardInput {
-        /// The state of the key
-        state: ButtonState,
+/// [`Game`]: ../trait.Game.html
+/// [`KeyboardAndMouse`]: struct.KeyboardAndMouse.html
+pub trait Input {
+    /// Creates a new [`Input`].
+    ///
+    /// [`Input`]: trait.Input.html
+    fn new() -> Self;
 
-        /// The key identifier
-        key_code: KeyCode,
-    },
+    /// Processes an input event.
+    ///
+    /// This function may be called multiple times during event processing,
+    /// before [`Game::interact`].
+    ///
+    /// [`Game::interact`]: ../trait.Game.html#method.interact
+    fn update(&mut self, event: Event);
 
-    /// Text was entered.
-    TextInput {
-        /// The character entered
-        character: char,
-    },
+    /// Clears any temporary state that should be consumed by [`Game::interact`]
+    /// and could accumulate otherwise.
+    ///
+    /// This method will be called after each [`Game::interact`].
+    ///
+    /// [`Game::interact`]: ../trait.Game.html#method.interact
+    fn clear(&mut self);
+}
 
-    /// The mouse cursor was moved
-    CursorMoved {
-        /// The X coordinate of the mouse position
-        x: f32,
+impl Input for () {
+    fn new() -> () {
+        ()
+    }
 
-        /// The Y coordinate of the mouse position
-        y: f32,
-    },
+    fn update(&mut self, _event: Event) {}
 
-    /// The mouse cursor entered the game window.
-    CursorEntered,
-
-    /// The mouse cursor left the game window.
-    CursorLeft,
-
-    /// A mouse button was pressed or released.
-    MouseInput {
-        /// The state of the button
-        state: ButtonState,
-
-        /// The button identifier
-        button: MouseButton,
-    },
-
-    /// The mouse wheel was scrolled.
-    MouseWheel {
-        /// The number of horizontal lines scrolled
-        delta_x: f32,
-
-        /// The number of vertical lines scrolled
-        delta_y: f32,
-    },
-
-    /// The game window gained focus.
-    WindowFocused,
-
-    /// The game window lost focus.
-    WindowUnfocused,
-
-    /// The game window was moved.
-    WindowMoved {
-        /// The new X coordinate of the window
-        x: f32,
-
-        /// The new Y coordinate of the window
-        y: f32,
-    },
+    fn clear(&mut self) {}
 }

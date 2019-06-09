@@ -132,6 +132,10 @@ impl Window {
         self.width = physical_size.width as f32;
         self.height = physical_size.height as f32;
     }
+
+    pub(crate) fn update_cursor(&mut self, new_cursor: winit::MouseCursor) {
+        self.surface.window().set_cursor(new_cursor);
+    }
 }
 
 impl std::fmt::Debug for Window {

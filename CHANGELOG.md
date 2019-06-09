@@ -6,6 +6,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- __Responsive GUI support!__ The new `ui` module can be used to extend a `Game`
+  and build a user interface. [#35]
+  - GUI runtime based on [Elm] and [The Elm Architecture].
+  - Layouting based on Flexbox and powered by [`stretch`].
+  - Built-in GUI widgets. Specifically: buttons, sliders, checkboxes, radio
+    buttons, rows, and columns.
+  - Built-in GUI renderer. It is capable of rendering all the built-in GUI
+    widgets.
+  - Customization. The `ui::core` module can be used to implement custom widgets
+    and renderers.
+- `Input` trait. It allows to implement reusable input handlers. [#35]
+- `KeyboardAndMouse` input handler. Useful to quickstart development and have
+  easy access to the keyboard and the mouse from the get-go. [#35]
+- `CursorTaken` and `CursorReturned` input events. They are fired when the cursor
+  is used/freed by the user interface.
 - Off-screen text rendering support. `Font::draw` now supports any `Target`
   instead of a window `Frame`. [#25]
 - `Game::debug` performance tracking. Time spent on this method is now shown in
@@ -18,17 +33,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Implementation of `ParallelExtend` for `Batch`. A `Batch` can now be populated
   using multiple threads, useful to improve performance when dealing with many
   thousands of quads. [#37]
+- `Text` alignment. It can be defined using the new `HorizontalAlignment` and
+- `VerticalAlignment` types in the `graphics` module. [#35]
+- `Font::measure`. It allows to measure the dimensions of any `Text`. [#35]
+- `Rectangle::contains`. It returns whether or not a `Rectangle` contains a
+  given `Point`. [#35]
+- `Sprite::scale`. It can be used to change the `Sprite` size when drawed.
+- `Default` implementation for `Sprite`. [#35]
+- `Debug::ui_duration`. It returns the average time spent running the UI runtime.
 - Multiple gravity centers based on mouse clicks in the particles example. [#30]
 
 ### Changed
+- The `View` associated type has been removed. Thus, implementors of the `Game`
+  trait are also meant to hold the game assets. This simplifies the API
+  considerably, and it helps model your game state-view relationship with
+  precision, avoiding inconsistencies. [#35]
+- The `Game::Input` associated type now has to implement the new `Input` trait.
+  This splits code quite nicely, as the `on_input` method moves away from `Game`.
+  It also makes `Input` implementors reusable. For instance, a `KeyboardAndMouse`
+  type has been implemented that can be used out of the box! [#35]
+- The `Game::LoadingScreen` associated type has been introduced. Given that all
+  the `Game` associated types implement a trait with a `load` method, wiring a
+  loading screen now is as simple as writing its name. Because of this, the
+  `Game::new` method is no longer necessary and it is dropped. [#35]
+- `Game::draw` now takes a `Frame` directly instead of a `Window`. [#35]
+- `LoadingScreen::on_progress` has been renamed to `LoadingScreen::draw` and it
+  now receives a `Frame` instead of a `Window`. [#35]
 - The performance of the particles example has been improved considerably on all
   platforms. [#37]
+
+### Removed
+- `Game::new`. `Game::load` should be used instead. [#35]
+- `Game::on_input`. Input handlers now must be implemented using the new `Input`
+  trait. [#35]
 
 [#25]: https://github.com/hecrj/coffee/pull/25
 [#26]: https://github.com/hecrj/coffee/pull/26
 [#28]: https://github.com/hecrj/coffee/pull/28
 [#30]: https://github.com/hecrj/coffee/pull/30
+[#35]: https://github.com/hecrj/coffee/pull/35
 [#37]: https://github.com/hecrj/coffee/pull/37
+[Elm]: https://elm-lang.org
+[The Elm Architecture]: https://guide.elm-lang.org/architecture/
+[`stretch`]: https://github.com/vislyhq/stretch
 
 
 ## [0.2.0] - 2019-04-28

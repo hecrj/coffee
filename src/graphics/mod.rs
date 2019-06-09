@@ -39,36 +39,25 @@
 //! the provided [`Frame`]:
 //!
 //! ```
-//! use coffee::{Game, Timer};
 //! use coffee::graphics::{Color, Frame, Window};
+//! use coffee::{Game, Timer};
 //! # use coffee::Result;
 //! # use coffee::graphics::Gpu;
+//! # use coffee::load::Task;
 //! #
 //! # struct MyGame;
 //!
 //! impl Game for MyGame {
-//! #   type View = ();
 //! #   type Input = ();
+//! #   type LoadingScreen = ();
 //! #
-//! #   const TICKS_PER_SECOND: u16 = 60;
-//! #
-//! #   fn new(window: &mut Window) -> Result<(MyGame, Self::View, Self::Input)> {
-//! #       Ok((MyGame, (), ()))
+//! #   fn load(window: &Window) -> Task<MyGame> {
+//! #       Task::new(|| MyGame)
 //! #   }
 //! #
 //!     // ...
 //!
-//! #   fn interact(&mut self, _input: &mut Self::Input,
-//! #              _view: &mut Self::View, _window: &mut Window) {}
-//! #
-//! #   fn update(&mut self, _view: &Self::View, window: &Window) {}
-//! #
-//!     fn draw(
-//!         &self,
-//!         _view: &mut Self::View,
-//!         frame: &mut Frame,
-//!         _timer: &Timer,
-//!     ) {
+//!     fn draw(&mut self, frame: &mut Frame, _timer: &Timer) {
 //!         frame.clear(Color::BLACK);
 //!
 //!         // Use your resources here...
@@ -77,7 +66,7 @@
 //! }
 //! ```
 //!
-//! You can load your resources during [`Game::new`]. Check out the different
+//! You can load your resources during [`Game::load`]. Check out the different
 //! types in this module to get a basic understanding of which kind of resources
 //! are supported.
 //!
@@ -94,7 +83,7 @@
 //! [`TextureArray`]: texture_array/struct.TextureArray.html
 //! [`Font`]: struct.Font.html
 //! [`Game::draw`]: ../trait.Game.html#tymethod.draw
-//! [`Game::new`]: ../trait.Game.html#tymethod.new
+//! [`Game::load`]: ../trait.Game.html#tymethod.load
 
 #[cfg(feature = "opengl")]
 mod backend_gfx;
@@ -144,7 +133,7 @@ pub use quad::{IntoQuad, Quad};
 pub use rectangle::Rectangle;
 pub use sprite::Sprite;
 pub use target::Target;
-pub use text::Text;
+pub use text::{HorizontalAlignment, Text, VerticalAlignment};
 pub use texture_array::TextureArray;
 pub use transformation::Transformation;
 pub use vector::Vector;
