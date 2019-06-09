@@ -88,25 +88,6 @@ impl Game for Particles {
             })
     }
 
-    fn update(&mut self, _window: &Window) {
-        let gravity_centers = self.gravity_centers.clone();
-
-        // Update particles in parallel! <3 rayon
-        self.particles.par_iter_mut().for_each(move |particle| {
-            particle.acceleration = gravity_centers
-                .iter()
-                .map(|gravity_center| {
-                    let distance = particle.position - gravity_center;
-                    -((Self::G * Self::CENTER_MASS) * distance.normalize())
-                        / distance.norm_squared().max(1000.0)
-                })
-                .sum();
-
-            particle.velocity += particle.acceleration;
-            particle.position += particle.velocity;
-        });
-    }
-
     fn interact(&mut self, input: &mut KeyboardAndMouse, window: &mut Window) {
         self.gravity_centers[0] = input.cursor_position();
 
@@ -121,6 +102,26 @@ impl Game for Particles {
         if input.was_key_released(KeyCode::F) {
             window.toggle_fullscreen();
         }
+    }
+
+    fn update(&mut self, _window: &Window) {
+        let gravity_centers = self.gravity_centers.clone();
+
+        // Update particles in parallel! <3 rayon
+        self.particles.par_iter_mut().for_each(move |particle| {
+            particle.acceleration = gravity_centers
+                .iter()
+                .map(|gravity_center| {
+                    let distance = particle.position - gravity_center;
+
+                    -((Self::G * Self::CENTER_MASS) * distance.normalize())
+                        / distance.norm_squared().max(1000.0)
+                })
+                .sum();
+
+            particle.velocity += particle.acceleration;
+            particle.position += particle.velocity;
+        });
     }
 
     fn draw(&mut self, frame: &mut Frame, timer: &Timer) {

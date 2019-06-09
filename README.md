@@ -73,11 +73,10 @@ fn main() -> Result<()> {
 }
 
 struct MyGame {
-    // Your game assets go here...
+    // Your game state and assets go here...
 }
 
 impl Game for MyGame {
-    type State = (); // No game state
     type Input = (); // No input data
     type LoadingScreen = (); // No loading screen
 
@@ -86,7 +85,7 @@ impl Game for MyGame {
         Task::new(|| MyGame { /* ... */ })
     }
 
-    fn draw(&mut self, _state: &Self::State, frame: &mut Frame, _timer: &Timer) {
+    fn draw(&mut self, frame: &mut Frame, _timer: &Timer) {
         // Clear the current frame
         frame.clear(Color::BLACK);
 

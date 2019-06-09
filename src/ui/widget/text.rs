@@ -47,7 +47,7 @@ impl Text {
         Text {
             content: String::from(label),
             size: 20,
-            color: Color::default(),
+            color: Color::WHITE,
             style: Style::default().fill_width(),
             horizontal_alignment: HorizontalAlignment::Left,
             vertical_alignment: VerticalAlignment::Top,

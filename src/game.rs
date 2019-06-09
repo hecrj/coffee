@@ -45,7 +45,7 @@ pub trait Game {
     ///
     /// By default, it is set to `60`.
     ///
-    /// [`update`]: #tymethod.update
+    /// [`update`]: #method.update
     const TICKS_PER_SECOND: u16 = 60;
 
     /// Defines the key that will be used to toggle the [`debug`] view. Set it to
@@ -75,7 +75,7 @@ pub trait Game {
     ///
     /// [`Game`]: trait.Game.html
     /// [`graphics`]: graphics/index.html
-    /// [`update`]: #tymethod.update
+    /// [`update`]: #method.update
     fn draw(&mut self, frame: &mut Frame, timer: &Timer);
 
     /// Consumes [`Input`] to let users interact with the [`Game`].
@@ -97,8 +97,8 @@ pub trait Game {
     ///
     /// [`Input`]: #associatedtype.Input
     /// [`Game`]: trait.Game.html
-    /// [`update`]: method.update
-    /// [`TICKS_PER_SECOND`]: associatedconstant.TICKS_PER_SECOND
+    /// [`update`]: #method.update
+    /// [`TICKS_PER_SECOND`]: #associatedconstant.TICKS_PER_SECOND
     /// [`Window`]: graphics/struct.Window.html
     /// [`Gpu`]: graphics/struct.Gpu.html
     fn interact(&mut self, _input: &mut Self::Input, _window: &mut Window) {}
