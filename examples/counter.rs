@@ -24,7 +24,6 @@ struct Counter {
 }
 
 impl Game for Counter {
-    type State = ();
     type Input = ();
     type LoadingScreen = ();
 
@@ -36,7 +35,7 @@ impl Game for Counter {
         })
     }
 
-    fn draw(&mut self, _state: &(), frame: &mut Frame, _timer: &Timer) {
+    fn draw(&mut self, frame: &mut Frame, _timer: &Timer) {
         frame.clear(Color {
             r: 0.3,
             g: 0.3,
@@ -56,7 +55,7 @@ impl UserInterface for Counter {
     type Message = Message;
     type Renderer = Renderer;
 
-    fn update(&mut self, _state: &mut (), message: Message) {
+    fn react(&mut self, message: Message) {
         match message {
             Message::IncrementPressed => {
                 self.value += 1;
@@ -67,7 +66,7 @@ impl UserInterface for Counter {
         }
     }
 
-    fn layout(&mut self, _state: &(), window: &Window) -> Element<Message> {
+    fn layout(&mut self, window: &Window) -> Element<Message> {
         Column::new()
             .width(window.width() as u32)
             .height(window.height() as u32)

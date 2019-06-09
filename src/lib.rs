@@ -37,11 +37,10 @@
 //! }
 //!
 //! struct MyGame {
-//!     // Your game assets go here...
+//!     // Your game state and assets go here...
 //! }
 //!
 //! impl Game for MyGame {
-//!     type State = (); // No game state
 //!     type Input = (); // No input data
 //!     type LoadingScreen = (); // No loading screen
 //!
@@ -50,7 +49,7 @@
 //!         Task::new(|| MyGame { /* ... */ })
 //!     }
 //!
-//!     fn draw(&mut self, _state: &Self::State, frame: &mut Frame, _timer: &Timer) {
+//!     fn draw(&mut self, frame: &mut Frame, _timer: &Timer) {
 //!         // Clear the current frame
 //!         frame.clear(Color::BLACK);
 //!
@@ -72,7 +71,6 @@
 mod debug;
 mod game;
 mod result;
-mod state;
 mod timer;
 
 pub mod graphics;
@@ -84,6 +82,5 @@ pub use debug::Debug;
 pub use game::Game;
 pub use input::Input;
 pub use result::{Error, Result};
-pub use state::State;
 pub use timer::Timer;
 pub use ui::UserInterface;

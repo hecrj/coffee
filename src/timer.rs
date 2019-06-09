@@ -2,11 +2,11 @@ use std::time;
 
 /// The timer of your game state.
 ///
-/// A [`Timer`] is updated once per frame, and it ticks [`State::TICKS_PER_SECOND`]
+/// A [`Timer`] is updated once per frame, and it ticks [`Game::TICKS_PER_SECOND`]
 /// times every second. When the timer ticks, your game is updated.
 ///
 /// [`Timer`]: struct.Timer.html
-/// [`State::TICKS_PER_SECOND`]: trait.State.html#associatedconstant.TICKS_PER_SECOND
+/// [`Game::TICKS_PER_SECOND`]: trait.Game.html#associatedconstant.TICKS_PER_SECOND
 #[derive(Debug)]
 pub struct Timer {
     target_ticks: u16,

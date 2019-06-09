@@ -39,7 +39,7 @@ pub struct Debug {
 }
 
 impl Debug {
-    pub(crate) fn new(gpu: &mut graphics::Gpu, draw_rate: u16) -> Self {
+    pub(crate) fn new(gpu: &mut graphics::Gpu) -> Self {
         let now = time::Instant::now();
 
         Self {
@@ -61,7 +61,7 @@ impl Debug {
             debug_start: now,
             debug_durations: TimeBuffer::new(200),
             text: Vec::new(),
-            draw_rate,
+            draw_rate: 10,
             frames_until_refresh: 0,
         }
     }
@@ -121,9 +121,9 @@ impl Debug {
             .push(time::Instant::now() - self.update_start);
     }
 
-    /// Get the average time spent running [`State::update`].
+    /// Get the average time spent running [`Game::update`].
     ///
-    /// [`State::update`]: trait.State.html#tymethod.update
+    /// [`Game::update`]: trait.Game.html#tymethod.update
     pub fn update_duration(&self) -> time::Duration {
         self.update_durations.average()
     }

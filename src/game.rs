@@ -1,35 +1,18 @@
 use crate::graphics::window;
 use crate::graphics::{Frame, Window, WindowSettings};
 use crate::input;
-use crate::load::{Join, LoadingScreen, Task};
-use crate::{Debug, Input, Result, State, Timer};
+use crate::load::{LoadingScreen, Task};
+use crate::{Debug, Input, Result, Timer};
 
-/// The entrypoint of the engine. It attaches user interaction and graphics
-/// to your game [`State`].
+/// The entrypoint of the engine. It describes your game logic.
 ///
-/// Implementors of this trait should hold the game assets and view data
+/// Implementors of this trait should hold the game state and any assets
 /// necessary for drawing.
 ///
-/// Coffee forces you to decouple your game state from your view and input
-/// state. While this might seem limiting at first, it helps you to keep
-/// mutability at bay and forces you to think about the architecture of your
-/// game.
-///
-/// [`State`]: trait.State.html
+/// Coffee forces you to decouple your game state from your input state. While
+/// this might seem limiting at first, it helps you to keep mutability at bay
+/// and forces you to think about the architecture of your game.
 pub trait Game {
-    /// The state of your game, holding all the game data.
-    ///
-    /// It needs to implement the [`State`] trait.
-    ///
-    /// Ideally, your game state should be an opaque type with a meaningful API
-    /// with clear boundaries. External code (like draw code or input code) should
-    /// rely on this API to do its job.
-    ///
-    /// If your game has no state, use `()`.
-    ///
-    /// [`State`]: trait.State.html
-    type State: State;
-
     /// The input data of your game.
     ///
     /// The built-in [`KeyboardAndMouse`] type can be a good starting point. It
@@ -56,6 +39,14 @@ pub trait Game {
     /// [`ProgressBar`]: load/loading_screen/struct.ProgressBar.html
     /// [`LoadingScreen`]: load/loading_screen/trait.LoadingScreen.html
     type LoadingScreen: LoadingScreen;
+
+    /// Defines how many times the [`update`] function should be called per
+    /// second.
+    ///
+    /// By default, it is set to `60`.
+    ///
+    /// [`update`]: #tymethod.update
+    const TICKS_PER_SECOND: u16 = 60;
 
     /// Defines the key that will be used to toggle the [`debug`] view. Set it to
     /// `None` if you want to disable it.
@@ -85,28 +76,18 @@ pub trait Game {
     /// [`Game`]: trait.Game.html
     /// [`graphics`]: graphics/index.html
     /// [`update`]: #tymethod.update
-    fn draw(&mut self, state: &Self::State, frame: &mut Frame, timer: &Timer);
-
-    /// Handles a close request from the operating system to the game window.
-    ///
-    /// This function should return true to allow the game loop to end,
-    /// otherwise false.
-    ///
-    /// By default, it does nothing and returns true.
-    fn on_close_request(&mut self) -> bool {
-        true
-    }
+    fn draw(&mut self, frame: &mut Frame, timer: &Timer);
 
     /// Consumes [`Input`] to let users interact with the [`Game`].
     ///
-    /// Right before a [`State::update`], input events will be processed and this
+    /// Right before an [`update`], input events will be processed and this
     /// function will be called. This reduces latency when multiple updates need
     /// to happen during a single frame.
     ///
-    /// If no [`State::update`] is needed during a frame, it will still be called once,
+    /// If no [`update`] is needed during a frame, it will still be called once,
     /// right after processing input events and before drawing. This allows you
     /// to keep your view updated every frame in order to offer a smooth user
-    /// experience independently of the [`State::TICKS_PER_SECOND`] setting.
+    /// experience independently of the [`TICKS_PER_SECOND`] setting.
     ///
     /// You can access the [`Window`]. For instance, you may want to toggle
     /// fullscreen mode based on some input, or maybe access the [`Gpu`]
@@ -115,17 +96,30 @@ pub trait Game {
     /// By default, it does nothing.
     ///
     /// [`Input`]: #associatedtype.Input
-    /// [`State::update`]: trait.State.html#tymethod.update
-    /// [`State::TICKS_PER_SECOND`]: trait.State.html#associatedconstant.TICKS_PER_SECOND
+    /// [`Game`]: trait.Game.html
+    /// [`update`]: method.update
+    /// [`TICKS_PER_SECOND`]: associatedconstant.TICKS_PER_SECOND
     /// [`Window`]: graphics/struct.Window.html
     /// [`Gpu`]: graphics/struct.Gpu.html
-    fn interact(
-        &mut self,
-        _input: &mut Self::Input,
-        _state: &mut Self::State,
-        _window: &mut Window,
-    ) {
-    }
+    fn interact(&mut self, _input: &mut Self::Input, _window: &mut Window) {}
+
+    /// Updates the [`Game`].
+    ///
+    /// All your game logic should live here.
+    ///
+    /// The [`TICKS_PER_SECOND`] constant defines how many times this function
+    /// will be called per second. This function may be called multiple times
+    /// per frame if it is necessary.
+    ///
+    /// Notice that you are also allowed to access [`Window`] data. This can be
+    /// useful if your [`Game`] needs to know how much of the world is visible.
+    ///
+    /// By default, it does nothing.
+    ///
+    /// [`Game`]: trait.Game.html
+    /// [`TICKS_PER_SECOND`]: #associatedconstant.TICKS_PER_SECOND
+    /// [`Window`]: graphics/struct.Window.html
+    fn update(&mut self, _window: &Window) {}
 
     /// Displays debug information.
     ///
@@ -144,11 +138,20 @@ pub trait Game {
     fn debug(
         &self,
         _input: &Self::Input,
-        _state: &Self::State,
         frame: &mut Frame,
         debug: &mut Debug,
     ) {
         debug.draw(frame);
+    }
+
+    /// Handles a close request from the operating system to the game window.
+    ///
+    /// This function should return true to allow the game loop to end,
+    /// otherwise false.
+    ///
+    /// By default, it does nothing and returns true.
+    fn on_close_request(&mut self) -> bool {
+        true
     }
 
     /// Runs the [`Game`] with the given [`WindowSettings`].
@@ -162,18 +165,17 @@ pub trait Game {
         // Set up window
         let mut event_loop = window::EventLoop::new();
         let window = &mut Window::new(window_settings, &event_loop)?;
-        let mut debug = Debug::new(window.gpu(), Self::State::TICKS_PER_SECOND);
+        let mut debug = Debug::new(window.gpu());
 
         // Load game
         debug.loading_started();
         let mut loading_screen = Self::LoadingScreen::new(window.gpu())?;
-        let load = (Self::load(window), Self::State::load(window)).join();
-        let (game, state) = &mut loading_screen.run(load, window)?;
+        let game = &mut loading_screen.run(Self::load(window), window)?;
         let input = &mut Self::Input::new();
         debug.loading_finished();
 
         // Game loop
-        let mut timer = Timer::new(Self::State::TICKS_PER_SECOND);
+        let mut timer = Timer::new(Self::TICKS_PER_SECOND);
         let mut alive = true;
 
         while alive {
@@ -184,7 +186,6 @@ pub trait Game {
                 interact(
                     game,
                     input,
-                    state,
                     &mut debug,
                     window,
                     &mut event_loop,
@@ -192,7 +193,7 @@ pub trait Game {
                 );
 
                 debug.update_started();
-                state.update();
+                game.update(window);
                 debug.update_finished();
             }
 
@@ -200,7 +201,6 @@ pub trait Game {
                 interact(
                     game,
                     input,
-                    state,
                     &mut debug,
                     window,
                     &mut event_loop,
@@ -209,12 +209,12 @@ pub trait Game {
             }
 
             debug.draw_started();
-            game.draw(state, &mut window.frame(), &timer);
+            game.draw(&mut window.frame(), &timer);
             debug.draw_finished();
 
             if debug.is_enabled() {
                 debug.debug_started();
-                game.debug(input, state, &mut window.frame(), &mut debug);
+                game.debug(input, &mut window.frame(), &mut debug);
                 debug.debug_finished();
             }
 
@@ -229,7 +229,6 @@ pub trait Game {
 fn interact<G: Game>(
     game: &mut G,
     input: &mut G::Input,
-    state: &mut G::State,
     debug: &mut Debug,
     window: &mut Window,
     event_loop: &mut window::EventLoop,
@@ -240,7 +239,7 @@ fn interact<G: Game>(
     event_loop
         .poll(|event| process_event(game, input, debug, window, alive, event));
 
-    game.interact(input, state, window);
+    game.interact(input, window);
     input.clear();
 
     debug.interact_finished();

@@ -48,7 +48,6 @@
 //! # struct MyGame;
 //!
 //! impl Game for MyGame {
-//! #   type State = ();
 //! #   type Input = ();
 //! #   type LoadingScreen = ();
 //! #
@@ -58,12 +57,7 @@
 //! #
 //!     // ...
 //!
-//!     fn draw(
-//!         &mut self,
-//!         _state: &Self::State,
-//!         frame: &mut Frame,
-//!         _timer: &Timer,
-//!     ) {
+//!     fn draw(&mut self, frame: &mut Frame, _timer: &Timer) {
 //!         frame.clear(Color::BLACK);
 //!
 //!         // Use your resources here...

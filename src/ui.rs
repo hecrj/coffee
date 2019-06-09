@@ -45,7 +45,6 @@
 //! }
 //!
 //! # impl Game for Counter {
-//! #     type State = ();
 //! #     type Input = KeyboardAndMouse;
 //! #     type LoadingScreen = ProgressBar;
 //! #
@@ -57,7 +56,7 @@
 //! #         })
 //! #     }
 //! #
-//! #     fn draw(&mut self, _state: &(), frame: &mut Frame, _timer: &Timer) {
+//! #     fn draw(&mut self, frame: &mut Frame, _timer: &Timer) {
 //! #         frame.clear(Color::BLACK);
 //! #     }
 //! # }
@@ -77,7 +76,7 @@
 //!     type Renderer = Renderer;
 //!
 //!     // The update logic, called when a message is produced
-//!     fn update(&mut self, _state: &mut Self::State, message: Message) {
+//!     fn react(&mut self, message: Message) {
 //!         // We update the counter value after an interaction here
 //!         match message {
 //!             Message::IncrementPressed => {
@@ -90,7 +89,7 @@
 //!     }
 //!
 //!     // The layout logic, describing the different components of the user interface
-//!     fn layout(&mut self, _state: &Self::State, window: &Window) -> Element<Message> {
+//!     fn layout(&mut self, window: &Window) -> Element<Message> {
 //!         // We use a column so the elements inside are laid out vertically
 //!         Column::new()
 //!             .push(
@@ -118,7 +117,7 @@
 //! keep the example short. You can find the full source code of this example
 //! (and other examples too!) in the [`examples` directory on GitHub]._
 //!
-//! Notice how [`UserInterface::update`] focuses on processing messages and
+//! Notice how [`UserInterface::react`] focuses on processing messages and
 //! updating state. On the other hand, [`UserInterface::layout`] only focuses on
 //! building the user interface from the current state. This separation of
 //! concerns will help you build composable user interfaces that are easy to
@@ -132,7 +131,7 @@
 //! [The Elm Architecture]: https://guide.elm-lang.org/architecture/
 //! [`UserInterface`]: trait.UserInterface.html
 //! [`Game::State`]: ../trait.Game.html#associatedtype.State
-//! [`UserInterface::update`]: trait.UserInterface.html#tymethod.update
+//! [`UserInterface::react`]: trait.UserInterface.html#tymethod.react
 //! [`UserInterface::layout`]: trait.UserInterface.html#tymethod.layout
 //! [`UserInterface::Message`]: trait.UserInterface.html#associatedtype.Message
 //! [widgets]: widget/index.html
@@ -173,7 +172,7 @@ use crate::graphics::{window, Point, Window, WindowSettings};
 use crate::input::{self, Input as _};
 use crate::load::{Join, LoadingScreen};
 use crate::ui::core::{Event, Interface, MouseCursor, Renderer as _};
-use crate::{Debug, Game, Result, State, Timer};
+use crate::{Debug, Game, Result, Timer};
 
 /// The user interface of your game.
 ///
@@ -189,7 +188,7 @@ pub trait UserInterface: Game {
     /// The type of messages handled by the user interface.
     ///
     /// Messages are produced by user interactions. The runtime feeds these
-    /// messages to the [`update`] method, which updates the state of the game
+    /// messages to the [`react`] method, which updates the state of the game
     /// depending on the user interaction.
     ///
     /// The [`Message`] type should normally be an enumeration of different
@@ -204,7 +203,7 @@ pub trait UserInterface: Game {
     /// }
     /// ```
     ///
-    /// [`update`]: #tymethod.update
+    /// [`react`]: #tymethod.react
     /// [`Message`]: #associatedtype.Message
     type Message;
 
@@ -220,7 +219,7 @@ pub trait UserInterface: Game {
     /// [`core::Renderer`]: core/trait.Renderer.html
     type Renderer: self::core::Renderer;
 
-    /// Processes a [`Message`], updating game state as needed.
+    /// Reacts to a [`Message`], updating game state as needed.
     ///
     /// This method is analogous to [`Game::interact`], but it processes a
     /// [`Message`] instead of [`Game::Input`].
@@ -230,7 +229,7 @@ pub trait UserInterface: Game {
     /// [`Game::interact`]: ../trait.Game.html#method.interact
     /// [`Game::Input`]: ../trait.Game.html#associatedtype.Input
     /// [`Message`]: #associatedtype.Message
-    fn update(&mut self, state: &mut Self::State, message: Self::Message);
+    fn react(&mut self, message: Self::Message);
 
     /// Produces the layout of the user interface.
     ///
@@ -243,7 +242,6 @@ pub trait UserInterface: Game {
     /// [`Element`]: core/struct.Element.html
     fn layout(
         &mut self,
-        state: &Self::State,
         window: &Window,
     ) -> self::core::Element<Self::Message, Self::Renderer>;
 
@@ -257,7 +255,7 @@ pub trait UserInterface: Game {
     /// Runs the [`Game`] with a user interface.
     ///
     /// Call this method instead of [`Game::run`] once you have implemented the
-    /// [`UserInterface`] in order to enable it.
+    /// [`UserInterface`].
     ///
     /// [`Game`]: ../trait.Game.html
     /// [`UserInterface`]: trait.UserInterface.html
@@ -269,28 +267,27 @@ pub trait UserInterface: Game {
         // Set up window
         let mut event_loop = window::EventLoop::new();
         let window = &mut Window::new(window_settings, &event_loop)?;
-        let mut debug = Debug::new(window.gpu(), Self::State::TICKS_PER_SECOND);
+        let mut debug = Debug::new(window.gpu());
 
         // Load game
         debug.loading_started();
         let mut loading_screen = Self::LoadingScreen::new(window.gpu())?;
         let load = (
             Self::load(window),
-            Self::State::load(window),
             Self::Renderer::load(Self::configuration()),
         )
             .join();
-        let (game, state, renderer) = &mut loading_screen.run(load, window)?;
+        let (game, renderer) = &mut loading_screen.run(load, window)?;
         let input = &mut Input::new();
         debug.loading_finished();
 
         // Game loop
-        let mut timer = Timer::new(Self::State::TICKS_PER_SECOND);
+        let mut timer = Timer::new(Self::TICKS_PER_SECOND);
         let mut alive = true;
         let messages = &mut Vec::new();
         let mut mouse_cursor = MouseCursor::OutOfBounds;
         let mut ui_cache =
-            Interface::compute(game.layout(state, window), &renderer).cache();
+            Interface::compute(game.layout(window), &renderer).cache();
 
         while alive {
             debug.frame_started();
@@ -300,7 +297,6 @@ pub trait UserInterface: Game {
                 interact(
                     game,
                     input,
-                    state,
                     &mut debug,
                     window,
                     &mut event_loop,
@@ -308,7 +304,7 @@ pub trait UserInterface: Game {
                 );
 
                 debug.update_started();
-                state.update();
+                game.update(window);
                 debug.update_finished();
             }
 
@@ -316,7 +312,6 @@ pub trait UserInterface: Game {
                 interact(
                     game,
                     input,
-                    state,
                     &mut debug,
                     window,
                     &mut event_loop,
@@ -325,12 +320,12 @@ pub trait UserInterface: Game {
             }
 
             debug.draw_started();
-            game.draw(state, &mut window.frame(), &timer);
+            game.draw(&mut window.frame(), &timer);
             debug.draw_finished();
 
             debug.ui_started();
             let mut interface = Interface::compute_with_cache(
-                game.layout(state, window),
+                game.layout(window),
                 &renderer,
                 ui_cache,
             );
@@ -360,7 +355,7 @@ pub trait UserInterface: Game {
             }
 
             for message in messages.drain(..) {
-                game.update(state, message);
+                game.react(message);
             }
             debug.ui_finished();
 
@@ -368,7 +363,6 @@ pub trait UserInterface: Game {
                 debug.debug_started();
                 game.debug(
                     &mut input.game_input,
-                    state,
                     &mut window.frame(),
                     &mut debug,
                 );
@@ -421,7 +415,6 @@ impl<I: input::Input> input::Input for Input<I> {
 fn interact<G: Game>(
     game: &mut G,
     input: &mut Input<G::Input>,
-    state: &mut G::State,
     debug: &mut Debug,
     window: &mut Window,
     event_loop: &mut window::EventLoop,
@@ -433,7 +426,7 @@ fn interact<G: Game>(
         game::process_event(game, input, debug, window, alive, event)
     });
 
-    game.interact(&mut input.game_input, state, window);
+    game.interact(&mut input.game_input, window);
     input.clear();
 
     debug.interact_finished();

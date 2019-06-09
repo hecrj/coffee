@@ -3,23 +3,16 @@
 //! rendering. Move the mouse around to attract the particles.
 use rand::Rng;
 use rayon::prelude::*;
+use std::{thread, time};
 
 use coffee::graphics::{
     Batch, Color, Frame, Image, Point, Rectangle, Sprite, Vector, Window,
     WindowSettings,
 };
 use coffee::input::{KeyCode, KeyboardAndMouse};
-use coffee::load::{loading_screen::ProgressBar, Task};
+use coffee::load::{loading_screen::ProgressBar, Join, Task};
 use coffee::ui::{Checkbox, Column, Element, Justify, Renderer};
 use coffee::{Game, Result, Timer, UserInterface};
-
-// Try increasing this value! I (@hecrj) can render 1 MILLION particles at
-// 90 fps on my system (4790k, GTX 980, Windows 7) using Vulkan.
-const AMOUNT: u32 = 50_000;
-
-// Play with these values to alter the way gravity works.
-const G: f32 = 6.674;
-const CENTER_MASS: f32 = 200.0;
 
 fn main() -> Result<()> {
     <Particles as UserInterface>::run(WindowSettings {
@@ -30,73 +23,35 @@ fn main() -> Result<()> {
     })
 }
 
-struct State {
+struct Particles {
     particles: Vec<Particle>,
     gravity_centers: Vec<Point>,
-}
 
-impl State {
-    fn generate(max_x: f32, max_y: f32) -> Task<State> {
-        Task::new(move || {
-            let rng = &mut rand::thread_rng();
-
-            let particles = (0..AMOUNT)
-                .map(|_| Particle::random(max_x, max_y, rng))
-                .collect();
-
-            State {
-                particles,
-                gravity_centers: vec![Point::new(0.0, 0.0)],
-            }
-        })
-    }
-}
-
-impl coffee::State for State {
-    // Low update rate.
-    // This makes graphics interpolation really noticeable when toggled.
-    const TICKS_PER_SECOND: u16 = 20;
-
-    fn load(window: &Window) -> Task<State> {
-        Task::stage(
-            "Generating particles...",
-            State::generate(window.width(), window.height()),
-        )
-    }
-
-    fn update(&mut self) {
-        let gravity_centers = self.gravity_centers.clone();
-
-        // Update particles in parallel! <3 rayon
-        self.particles.par_iter_mut().for_each(move |particle| {
-            particle.acceleration = gravity_centers
-                .iter()
-                .map(|gravity_center| {
-                    let distance = particle.position - gravity_center;
-                    -((G * CENTER_MASS) * distance.normalize())
-                        / distance.norm_squared().max(1000.0)
-                })
-                .sum();
-
-            particle.velocity += particle.acceleration;
-            particle.position += particle.velocity;
-        });
-    }
-}
-
-struct Particles {
     batch: Batch,
     interpolate: bool,
 }
 
 impl Particles {
-    fn load() -> Task<Particles> {
-        Task::using_gpu(|gpu| Image::from_colors(gpu, &COLORS)).map(|palette| {
-            Particles {
-                batch: Batch::new(palette),
-                interpolate: true,
-            }
+    // Try increasing this value! I (@hecrj) can render 1 MILLION particles at
+    // 90 fps on my system (4790k, GTX 980, Windows 7) using Vulkan.
+    const AMOUNT: usize = 50_000;
+
+    // Play with these values to alter the way gravity works.
+    const G: f32 = 6.674;
+    const CENTER_MASS: f32 = 200.0;
+
+    fn generate(max_x: f32, max_y: f32) -> Task<Vec<Particle>> {
+        Task::new(move || {
+            let rng = &mut rand::thread_rng();
+
+            (0..Self::AMOUNT)
+                .map(|_| Particle::random(max_x, max_y, rng))
+                .collect()
         })
+    }
+
+    fn load_palette() -> Task<Image> {
+        Task::using_gpu(|gpu| Image::from_colors(gpu, &COLORS))
     }
 
     fn particle_color(velocity: Vector) -> u16 {
@@ -105,24 +60,62 @@ impl Particles {
 }
 
 impl Game for Particles {
-    type State = State;
     type Input = KeyboardAndMouse;
     type LoadingScreen = ProgressBar;
 
-    fn load(_window: &Window) -> Task<Particles> {
-        Task::stage("Loading assets...", Particles::load())
+    // Low update rate.
+    // This makes graphics interpolation really noticeable when toggled.
+    const TICKS_PER_SECOND: u16 = 20;
+
+    fn load(window: &Window) -> Task<Particles> {
+        (
+            Task::stage(
+                "Generating particles...",
+                Self::generate(window.width(), window.height()),
+            ),
+            Task::stage("Loading assets...", Self::load_palette()),
+            Task::stage(
+                "Showing off the loading screen for a bit...",
+                Task::new(|| thread::sleep(time::Duration::from_secs(2))),
+            ),
+        )
+            .join()
+            .map(|(particles, palette, _)| Particles {
+                particles,
+                gravity_centers: vec![Point::new(0.0, 0.0)],
+                batch: Batch::new(palette),
+                interpolate: true,
+            })
     }
 
-    fn interact(
-        &mut self,
-        input: &mut KeyboardAndMouse,
-        state: &mut State,
-        window: &mut Window,
-    ) {
-        state.gravity_centers[0] = input.cursor_position();
+    fn update(&mut self, _window: &Window) {
+        let gravity_centers = self.gravity_centers.clone();
 
-        for point in input.clicks() {
-            state.gravity_centers.push(*point);
+        // Update particles in parallel! <3 rayon
+        self.particles.par_iter_mut().for_each(move |particle| {
+            particle.acceleration = gravity_centers
+                .iter()
+                .map(|gravity_center| {
+                    let distance = particle.position - gravity_center;
+                    -((Self::G * Self::CENTER_MASS) * distance.normalize())
+                        / distance.norm_squared().max(1000.0)
+                })
+                .sum();
+
+            particle.velocity += particle.acceleration;
+            particle.position += particle.velocity;
+        });
+    }
+
+    fn interact(&mut self, input: &mut KeyboardAndMouse, window: &mut Window) {
+        self.gravity_centers[0] = input.cursor_position();
+
+        for position in input.clicks() {
+            self.gravity_centers.push(*position);
+        }
+
+        if input.was_key_released(KeyCode::I) {
+            self.interpolate = !self.interpolate;
         }
 
         if input.was_key_released(KeyCode::F) {
@@ -130,7 +123,7 @@ impl Game for Particles {
         }
     }
 
-    fn draw(&mut self, state: &State, frame: &mut Frame, timer: &Timer) {
+    fn draw(&mut self, frame: &mut Frame, timer: &Timer) {
         frame.clear(Color::BLACK);
 
         // When interpolating, we need to know how close the next tick is
@@ -141,7 +134,7 @@ impl Game for Particles {
         };
 
         // Generate sprites in parallel! <3 rayon
-        let sprites = state.particles.par_iter().map(|particle| {
+        let sprites = self.particles.par_iter().map(|particle| {
             let velocity =
                 particle.velocity + particle.acceleration * delta_factor;
 
@@ -173,7 +166,7 @@ impl UserInterface for Particles {
     type Message = Message;
     type Renderer = Renderer;
 
-    fn update(&mut self, _state: &mut State, msg: Message) {
+    fn react(&mut self, msg: Message) {
         match msg {
             Message::ToggleInterpolation(interpolate) => {
                 self.interpolate = interpolate;
@@ -181,7 +174,7 @@ impl UserInterface for Particles {
         }
     }
 
-    fn layout(&mut self, _state: &State, window: &Window) -> Element<Message> {
+    fn layout(&mut self, window: &Window) -> Element<Message> {
         Column::new()
             .padding(20)
             .spacing(20)

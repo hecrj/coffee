@@ -8,7 +8,7 @@ pub struct Debug {}
 
 #[cfg(not(debug_assertions))]
 impl Debug {
-    pub(crate) fn new(_gpu: &mut graphics::Gpu, _draw_rate: u16) -> Self {
+    pub(crate) fn new(_gpu: &mut graphics::Gpu) -> Self {
         Self {}
     }
 

@@ -114,7 +114,6 @@ impl InputExample {
 }
 
 impl Game for InputExample {
-    type State = ();
     type Input = CustomInput;
     type LoadingScreen = ProgressBar;
 
@@ -122,12 +121,7 @@ impl Game for InputExample {
         Task::stage("Loading...", InputExample::load())
     }
 
-    fn interact(
-        &mut self,
-        input: &mut CustomInput,
-        _state: &mut (),
-        _window: &mut Window,
-    ) {
+    fn interact(&mut self, input: &mut CustomInput, _window: &mut Window) {
         self.cursor_position = input.cursor_position;
         self.mouse_wheel = input.mouse_wheel;
         self.keys_pressed = input.keys_pressed.clone();
@@ -151,7 +145,7 @@ impl Game for InputExample {
         }
     }
 
-    fn draw(&mut self, _state: &(), frame: &mut Frame, _timer: &Timer) {
+    fn draw(&mut self, frame: &mut Frame, _timer: &Timer) {
         frame.clear(Color::BLACK);
 
         // This closure simplifies some of the boilerplate.

@@ -42,7 +42,6 @@ impl Colors {
 }
 
 impl Game for Colors {
-    type State = ();
     type Input = ();
     type LoadingScreen = ProgressBar;
 
@@ -50,7 +49,7 @@ impl Game for Colors {
         Task::stage("Loading view...", Colors::load())
     }
 
-    fn draw(&mut self, _state: &(), frame: &mut Frame, _timer: &Timer) {
+    fn draw(&mut self, frame: &mut Frame, _timer: &Timer) {
         frame.clear(Color::new(0.5, 0.5, 0.5, 1.0));
 
         let target = &mut frame.as_target();

@@ -25,7 +25,6 @@ struct Tour {
 
 impl Game for Tour {
     type Input = ();
-    type State = ();
     type LoadingScreen = ();
 
     fn load(_window: &Window) -> Task<Tour> {
@@ -36,12 +35,7 @@ impl Game for Tour {
         })
     }
 
-    fn draw(
-        &mut self,
-        _state: &Self::State,
-        frame: &mut Frame,
-        _timer: &Timer,
-    ) {
+    fn draw(&mut self, frame: &mut Frame, _timer: &Timer) {
         frame.clear(Color {
             r: 0.3,
             g: 0.3,
@@ -55,11 +49,21 @@ impl UserInterface for Tour {
     type Message = Message;
     type Renderer = Renderer;
 
-    fn layout(
-        &mut self,
-        _state: &Self::State,
-        window: &Window,
-    ) -> Element<Message> {
+    fn react(&mut self, event: Message) {
+        match event {
+            Message::BackPressed => {
+                self.steps.go_back();
+            }
+            Message::NextPressed => {
+                self.steps.advance();
+            }
+            Message::StepMessage(step_msg) => {
+                self.steps.update(step_msg);
+            }
+        }
+    }
+
+    fn layout(&mut self, window: &Window) -> Element<Message> {
         let Tour {
             steps,
             back_button,
@@ -98,20 +102,6 @@ impl UserInterface for Tour {
             .justify_content(Justify::Center)
             .push(content)
             .into()
-    }
-
-    fn update(&mut self, _state: &mut Self::State, event: Message) {
-        match event {
-            Message::BackPressed => {
-                self.steps.go_back();
-            }
-            Message::NextPressed => {
-                self.steps.advance();
-            }
-            Message::StepMessage(step_msg) => {
-                self.steps.update(step_msg);
-            }
-        }
     }
 }
 
