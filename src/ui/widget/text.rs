@@ -120,7 +120,7 @@ where
     fn draw(
         &self,
         renderer: &mut Renderer,
-        layout: Layout,
+        layout: Layout<'_>,
         _cursor_position: Point,
     ) -> MouseCursor {
         renderer.draw(

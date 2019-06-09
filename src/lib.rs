@@ -67,6 +67,7 @@
 #![deny(missing_debug_implementations)]
 #![deny(unused_results)]
 #![deny(unsafe_code)]
+#![deny(rust_2018_idioms)]
 
 mod debug;
 mod game;

@@ -35,5 +35,5 @@ pub trait Renderer {
     /// [`Renderer`]: trait.Renderer.html
     /// [`Batch`]: ../../graphics/struct.Batch.html
     /// [`Batch::draw`]: ../../graphics/struct.Batch.html#method.draw
-    fn flush(&mut self, frame: &mut Frame);
+    fn flush(&mut self, frame: &mut Frame<'_>);
 }

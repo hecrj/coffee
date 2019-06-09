@@ -94,7 +94,7 @@ use crate::Result;
 /// [`map`]: #method.map
 pub struct Task<T> {
     total_work: u32,
-    function: Box<Fn(&mut Worker) -> Result<T>>,
+    function: Box<dyn Fn(&mut Worker<'_>) -> Result<T>>,
 }
 
 impl<T> Task<T> {
@@ -162,7 +162,7 @@ impl<T> Task<T> {
 
     pub(crate) fn sequence<F>(total_work: u32, f: F) -> Task<T>
     where
-        F: 'static + Fn(&mut Worker) -> Result<T>,
+        F: 'static + Fn(&mut Worker<'_>) -> Result<T>,
     {
         Task {
             total_work,
@@ -280,14 +280,14 @@ impl<T> Task<T> {
 }
 
 impl<T> std::fmt::Debug for Task<T> {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "Task {{ total_work: {} }}", self.total_work)
     }
 }
 
 pub(crate) struct Worker<'a> {
     window: &'a mut graphics::Window,
-    listener: &'a mut FnMut(&Progress, &mut graphics::Window) -> (),
+    listener: &'a mut dyn FnMut(&Progress, &mut graphics::Window) -> (),
     progress: Progress,
 }
 
@@ -305,7 +305,7 @@ impl<'a> Worker<'a> {
     pub fn with_stage<T>(
         &mut self,
         title: String,
-        f: &Box<Fn(&mut Worker) -> T>,
+        f: &Box<dyn Fn(&mut Worker<'_>) -> T>,
     ) -> T {
         self.progress.stages.push(title);
         self.notify_progress(0);

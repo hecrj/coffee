@@ -50,7 +50,7 @@ pub struct Slider<'a, Message> {
 }
 
 impl<'a, Message> std::fmt::Debug for Slider<'a, Message> {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Slider")
             .field("state", &self.state)
             .field("range", &self.range)
@@ -111,7 +111,7 @@ where
     fn on_event(
         &mut self,
         event: Event,
-        layout: Layout,
+        layout: Layout<'_>,
         cursor_position: Point,
         messages: &mut Vec<Message>,
     ) {
@@ -158,7 +158,7 @@ where
     fn draw(
         &self,
         renderer: &mut Renderer,
-        layout: Layout,
+        layout: Layout<'_>,
         cursor_position: Point,
     ) -> MouseCursor {
         renderer.draw(

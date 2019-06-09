@@ -18,7 +18,7 @@ pub struct Column<'a, Message, Renderer> {
 }
 
 impl<'a, Message, Renderer> std::fmt::Debug for Column<'a, Message, Renderer> {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Column")
             .field("style", &self.style)
             .field("spacing", &self.spacing)
@@ -165,7 +165,7 @@ impl<'a, Message, Renderer> Widget<Message, Renderer>
     fn on_event(
         &mut self,
         event: Event,
-        layout: Layout,
+        layout: Layout<'_>,
         cursor_position: Point,
         messages: &mut Vec<Message>,
     ) {
@@ -181,7 +181,7 @@ impl<'a, Message, Renderer> Widget<Message, Renderer>
     fn draw(
         &self,
         renderer: &mut Renderer,
-        layout: Layout,
+        layout: Layout<'_>,
         cursor_position: Point,
     ) -> MouseCursor {
         let mut cursor = MouseCursor::OutOfBounds;

@@ -18,13 +18,13 @@ impl Font {
         }
     }
 
-    pub fn add(&mut self, text: Text) {
-        let section: wgpu_glyph::Section = text.into();
+    pub fn add(&mut self, text: Text<'_>) {
+        let section: wgpu_glyph::Section<'_> = text.into();
         self.glyphs.queue(section);
     }
 
-    pub fn measure(&mut self, text: Text) -> (f32, f32) {
-        let section: wgpu_glyph::Section = text.into();
+    pub fn measure(&mut self, text: Text<'_>) -> (f32, f32) {
+        let section: wgpu_glyph::Section<'_> = text.into();
         let bounds = self.glyphs.pixel_bounds(section);
 
         match bounds {

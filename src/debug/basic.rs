@@ -188,7 +188,7 @@ impl Debug {
     }
 
     /// Draws the debug information.
-    pub fn draw(&mut self, frame: &mut graphics::Frame) {
+    pub fn draw(&mut self, frame: &mut graphics::Frame<'_>) {
         if self.frames_until_refresh <= 0 {
             self.text.clear();
             self.refresh_text();
@@ -231,7 +231,7 @@ impl Debug {
         }
     }
 
-    fn draw_text(&mut self, frame: &mut graphics::Frame) {
+    fn draw_text(&mut self, frame: &mut graphics::Frame<'_>) {
         for (row, (key, value)) in self.text.iter().enumerate() {
             let y = row as f32 * Self::ROW_HEIGHT;
 
@@ -304,7 +304,7 @@ fn format_duration(duration: &time::Duration) -> String {
 }
 
 impl std::fmt::Debug for Debug {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
             "Debug {{ load: {:?}, interact: {:?}, update: {:?}, draw: {:?}, frame: {:?} }}",

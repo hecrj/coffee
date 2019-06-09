@@ -243,7 +243,7 @@ pub trait UserInterface: Game {
     fn layout(
         &mut self,
         window: &Window,
-    ) -> self::core::Element<Self::Message, Self::Renderer>;
+    ) -> self::core::Element<'_, Self::Message, Self::Renderer>;
 
     /// Builds the renderer configuration for the user interface.
     ///

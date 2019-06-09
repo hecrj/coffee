@@ -61,7 +61,7 @@ pub trait LoadingScreen {
     /// [`Progress`]: ../struct.Progress.html
     /// [`Frame`]: ../../graphics/struct.Frame.html
     /// [`Game::draw`]: ../../trait.Game.html#tymethod.draw
-    fn draw(&mut self, progress: &Progress, frame: &mut graphics::Frame);
+    fn draw(&mut self, progress: &Progress, frame: &mut graphics::Frame<'_>);
 
     /// Runs the [`LoadingScreen`] with a task and obtain its result.
     ///
@@ -86,5 +86,6 @@ impl LoadingScreen for () {
         Ok(())
     }
 
-    fn draw(&mut self, _progress: &Progress, _frame: &mut graphics::Frame) {}
+    fn draw(&mut self, _progress: &Progress, _frame: &mut graphics::Frame<'_>) {
+    }
 }

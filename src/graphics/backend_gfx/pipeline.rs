@@ -179,7 +179,7 @@ pub struct Shader {
 }
 
 impl Shader {
-    pub fn new(factory: &mut gl::Factory, init: pipe::Init) -> Shader {
+    pub fn new(factory: &mut gl::Factory, init: pipe::Init<'_>) -> Shader {
         let set = factory
             .create_shader_set(
                 include_bytes!("shader/basic.vert"),
