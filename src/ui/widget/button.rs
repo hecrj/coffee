@@ -51,7 +51,7 @@ impl<'a, Message> std::fmt::Debug for Button<'a, Message>
 where
     Message: std::fmt::Debug,
 {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Button")
             .field("state", &self.state)
             .field("label", &self.label)
@@ -139,7 +139,7 @@ where
     fn on_event(
         &mut self,
         event: Event,
-        layout: Layout,
+        layout: Layout<'_>,
         cursor_position: Point,
         messages: &mut Vec<Message>,
     ) {
@@ -176,7 +176,7 @@ where
     fn draw(
         &self,
         renderer: &mut Renderer,
-        layout: Layout,
+        layout: Layout<'_>,
         cursor_position: Point,
     ) -> MouseCursor {
         renderer.draw(

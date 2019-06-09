@@ -30,7 +30,7 @@ pub trait Widget<Message, Renderer>: std::fmt::Debug {
     fn draw(
         &self,
         renderer: &mut Renderer,
-        layout: Layout,
+        layout: Layout<'_>,
         cursor_position: Point,
     ) -> MouseCursor;
 
@@ -66,7 +66,7 @@ pub trait Widget<Message, Renderer>: std::fmt::Debug {
     fn on_event(
         &mut self,
         _event: Event,
-        _layout: Layout,
+        _layout: Layout<'_>,
         _cursor_position: Point,
         _messages: &mut Vec<Message>,
     ) {

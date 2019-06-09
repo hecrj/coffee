@@ -76,7 +76,7 @@ pub trait Game {
     /// [`Game`]: trait.Game.html
     /// [`graphics`]: graphics/index.html
     /// [`update`]: #method.update
-    fn draw(&mut self, frame: &mut Frame, timer: &Timer);
+    fn draw(&mut self, frame: &mut Frame<'_>, timer: &Timer);
 
     /// Consumes [`Input`] to let users interact with the [`Game`].
     ///
@@ -138,7 +138,7 @@ pub trait Game {
     fn debug(
         &self,
         _input: &Self::Input,
-        frame: &mut Frame,
+        frame: &mut Frame<'_>,
         debug: &mut Debug,
     ) {
         debug.draw(frame);

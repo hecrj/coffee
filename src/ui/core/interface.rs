@@ -70,7 +70,7 @@ where
     pub fn draw(
         &self,
         renderer: &mut Renderer,
-        frame: &mut Frame,
+        frame: &mut Frame<'_>,
         cursor_position: Point,
     ) -> MouseCursor {
         let Interface { root, layout, .. } = self;
@@ -91,7 +91,7 @@ where
         }
     }
 
-    fn layout(layout: &result::Layout) -> Layout {
+    fn layout(layout: &result::Layout) -> Layout<'_> {
         Layout::new(layout, Point::new(0.0, 0.0))
     }
 }

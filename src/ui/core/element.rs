@@ -11,11 +11,11 @@ use crate::ui::core::{Event, Hasher, Layout, MouseCursor, Node, Widget};
 /// [`Widget`]: trait.Widget.html
 /// [`Element`]: struct.Element.html
 pub struct Element<'a, Message, Renderer> {
-    pub(crate) widget: Box<Widget<Message, Renderer> + 'a>,
+    pub(crate) widget: Box<dyn Widget<Message, Renderer> + 'a>,
 }
 
 impl<'a, Message, Renderer> std::fmt::Debug for Element<'a, Message, Renderer> {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Element")
             .field("widget", &self.widget)
             .finish()
@@ -156,19 +156,19 @@ impl<'a, Message, Renderer> Element<'a, Message, Renderer> {
 }
 
 pub struct Map<'a, A, B, Renderer> {
-    widget: Box<Widget<A, Renderer> + 'a>,
-    mapper: Box<Fn(A) -> B>,
+    widget: Box<dyn Widget<A, Renderer> + 'a>,
+    mapper: Box<dyn Fn(A) -> B>,
 }
 
 impl<'a, A, B, Renderer> std::fmt::Debug for Map<'a, A, B, Renderer> {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Map").field("widget", &self.widget).finish()
     }
 }
 
 impl<'a, A, B, Renderer> Map<'a, A, B, Renderer> {
     pub fn new<F>(
-        widget: Box<Widget<A, Renderer> + 'a>,
+        widget: Box<dyn Widget<A, Renderer> + 'a>,
         mapper: F,
     ) -> Map<'a, A, B, Renderer>
     where
@@ -192,7 +192,7 @@ where
     fn on_event(
         &mut self,
         event: Event,
-        layout: Layout,
+        layout: Layout<'_>,
         cursor_position: Point,
         messages: &mut Vec<B>,
     ) {
@@ -214,7 +214,7 @@ where
     fn draw(
         &self,
         renderer: &mut Renderer,
-        layout: Layout,
+        layout: Layout<'_>,
         cursor_position: Point,
     ) -> MouseCursor {
         self.widget.draw(renderer, layout, cursor_position)

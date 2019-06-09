@@ -46,7 +46,7 @@ impl Batch {
     /// Draw the [`Batch`] at the given position.
     ///
     /// [`Batch`]: struct.Batch.html
-    pub fn draw(&self, position: Point, target: &mut Target) {
+    pub fn draw(&self, position: Point, target: &mut Target<'_>) {
         let mut translated = target.transform(Transformation::translate(
             Vector::new(position.x, position.y),
         ));

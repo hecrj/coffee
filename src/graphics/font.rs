@@ -22,14 +22,14 @@ impl Font {
     }
 
     /// Adds text to this font.
-    pub fn add(&mut self, text: Text) {
+    pub fn add(&mut self, text: Text<'_>) {
         self.0.add(text)
     }
 
     /// Computes the pixel bounds of the given [`Text`].
     ///
     /// [`Text`]: struct.Text.html
-    pub fn measure(&mut self, text: Text) -> (f32, f32) {
+    pub fn measure(&mut self, text: Text<'_>) -> (f32, f32) {
         self.0.measure(text)
     }
 
@@ -37,7 +37,7 @@ impl Font {
     ///
     /// [`Font`]: struct.Font.html
     #[inline]
-    pub fn draw(&mut self, target: &mut Target) {
+    pub fn draw(&mut self, target: &mut Target<'_>) {
         target.draw_font(&mut self.0)
     }
 }

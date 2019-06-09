@@ -25,7 +25,7 @@ pub struct Renderer {
 }
 
 impl std::fmt::Debug for Renderer {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Renderer")
             .field("sprites", &self.sprites)
             .finish()
@@ -44,7 +44,7 @@ impl core::Renderer for Renderer {
             })
     }
 
-    fn flush(&mut self, frame: &mut Frame) {
+    fn flush(&mut self, frame: &mut Frame<'_>) {
         let target = &mut frame.as_target();
 
         self.sprites.draw(Point::new(0.0, 0.0), target);

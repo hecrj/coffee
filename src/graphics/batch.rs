@@ -45,7 +45,7 @@ impl Batch {
     /// Draw the [`Batch`] at the given position.
     ///
     /// [`Batch`]: struct.Batch.html
-    pub fn draw(&self, position: Point, target: &mut Target) {
+    pub fn draw(&self, position: Point, target: &mut Target<'_>) {
         let mut translated = target.transform(Transformation::translate(
             Vector::new(position.x, position.y),
         ));
@@ -65,7 +65,7 @@ impl Batch {
 }
 
 impl std::fmt::Debug for Batch {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "Batch {{ image: {:?} }}", self.image,)
     }
 }

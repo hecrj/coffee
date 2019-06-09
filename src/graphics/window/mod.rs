@@ -80,7 +80,7 @@ impl Window {
     ///
     /// [`Frame`]: struct.Frame.html
     /// [`Window`]: struct.Window.html
-    pub(crate) fn frame(&mut self) -> Frame {
+    pub(crate) fn frame(&mut self) -> Frame<'_> {
         Frame::new(self)
     }
 
@@ -139,7 +139,7 @@ impl Window {
 }
 
 impl std::fmt::Debug for Window {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
             "Window {{ width: {}, height: {} }}",

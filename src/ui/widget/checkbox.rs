@@ -38,13 +38,13 @@ use crate::ui::widget::{text, Column, Row, Text};
 /// ![Checkbox drawn by the built-in renderer](https://github.com/hecrj/coffee/blob/bda9818f823dfcb8a7ad0ff4940b4d4b387b5208/images/ui/checkbox.png?raw=true)
 pub struct Checkbox<Message> {
     is_checked: bool,
-    on_toggle: Box<Fn(bool) -> Message>,
+    on_toggle: Box<dyn Fn(bool) -> Message>,
     label: String,
     label_color: Color,
 }
 
 impl<Message> std::fmt::Debug for Checkbox<Message> {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Checkbox")
             .field("is_checked", &self.is_checked)
             .field("label", &self.label)
@@ -102,7 +102,7 @@ where
     fn on_event(
         &mut self,
         event: Event,
-        layout: Layout,
+        layout: Layout<'_>,
         cursor_position: Point,
         messages: &mut Vec<Message>,
     ) {
@@ -126,14 +126,15 @@ where
     fn draw(
         &self,
         renderer: &mut Renderer,
-        layout: Layout,
+        layout: Layout<'_>,
         cursor_position: Point,
     ) -> MouseCursor {
         let children: Vec<_> = layout.children().collect();
 
         let text_bounds = children[1].bounds();
 
-        (renderer as &mut text::Renderer).draw(
+        text::Renderer::draw(
+            renderer,
             text_bounds,
             &self.label,
             20.0,
@@ -142,7 +143,8 @@ where
             VerticalAlignment::Top,
         );
 
-        (renderer as &mut self::Renderer).draw(
+        self::Renderer::draw(
+            renderer,
             cursor_position,
             children[0].bounds(),
             text_bounds,

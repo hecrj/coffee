@@ -61,7 +61,7 @@ impl<Message> std::fmt::Debug for Radio<Message>
 where
     Message: std::fmt::Debug,
 {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Radio")
             .field("is_selected", &self.is_selected)
             .field("on_click", &self.on_click)
@@ -122,7 +122,7 @@ where
     fn on_event(
         &mut self,
         event: Event,
-        layout: Layout,
+        layout: Layout<'_>,
         cursor_position: Point,
         messages: &mut Vec<Message>,
     ) {
@@ -142,7 +142,7 @@ where
     fn draw(
         &self,
         renderer: &mut Renderer,
-        layout: Layout,
+        layout: Layout<'_>,
         cursor_position: Point,
     ) -> MouseCursor {
         let children: Vec<_> = layout.children().collect();
@@ -150,7 +150,8 @@ where
         let mut text_bounds = children[1].bounds();
         text_bounds.y -= 2.0;
 
-        (renderer as &mut text::Renderer).draw(
+        text::Renderer::draw(
+            renderer,
             text_bounds,
             &self.label,
             20.0,
@@ -159,7 +160,8 @@ where
             VerticalAlignment::Top,
         );
 
-        (renderer as &mut self::Renderer).draw(
+        self::Renderer::draw(
+            renderer,
             cursor_position,
             children[0].bounds(),
             layout.bounds(),

@@ -22,7 +22,7 @@ impl<'a> Target<'a> {
         view: TargetView,
         width: f32,
         height: f32,
-    ) -> Target {
+    ) -> Target<'_> {
         Target {
             gpu,
             view,
@@ -36,7 +36,7 @@ impl<'a> Target<'a> {
         width: f32,
         height: f32,
         transformation: Transformation,
-    ) -> Target {
+    ) -> Target<'_> {
         let mut target = Self::new(gpu, view, width, height);
         target.transformation = transformation * target.transformation;
         target
@@ -76,7 +76,7 @@ impl<'a> Target<'a> {
     /// ```
     ///
     /// [`Target`]: struct.Target.html
-    pub fn transform(&mut self, transformation: Transformation) -> Target {
+    pub fn transform(&mut self, transformation: Transformation) -> Target<'_> {
         Target {
             gpu: self.gpu,
             view: self.view.clone(),
@@ -111,7 +111,7 @@ impl<'a> Target<'a> {
 }
 
 impl<'a> std::fmt::Debug for Target<'a> {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "Target {{ transformation: {:?} }}", self.transformation)
     }
 }
