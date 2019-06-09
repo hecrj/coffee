@@ -16,7 +16,7 @@ pub struct Texture {
 }
 
 impl fmt::Debug for Texture {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
             "Texture {{ width: {}, height: {}, layers: {} }}",
