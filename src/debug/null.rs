@@ -35,5 +35,5 @@ impl Debug {
     }
 
     #[allow(missing_docs)]
-    pub fn draw(&mut self, _frame: &mut graphics::Frame) {}
+    pub fn draw(&mut self, _frame: &mut graphics::Frame<'_>) {}
 }
