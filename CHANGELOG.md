@@ -36,7 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Text` alignment. It can be defined using the new `HorizontalAlignment` and
 - `VerticalAlignment` types in the `graphics` module. [#35]
 - `Font::measure`. It allows to measure the dimensions of any `Text`. [#35]
-- `Rectangle::contains`. It returns whether or not a `Rectangle`] contains a
+- `Rectangle::contains`. It returns whether or not a `Rectangle` contains a
   given `Point`. [#35]
 - `Sprite::scale`. It can be used to change the `Sprite` size when drawed.
 - `Default` implementation for `Sprite`. [#35]
@@ -63,6 +63,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   platforms. [#37]
 
 ### Removed
+- `Game::new`. `Game::load` should be used instead. [#35]
 - `Game::on_input`. Input handlers now must be implemented using the new `Input`
   trait. [#35]
 
