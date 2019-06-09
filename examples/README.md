@@ -31,3 +31,14 @@ cargo run --example particles --features opengl,debug --release
 ![Particles example][particles]
 
 [particles]: https://github.com/hecrj/coffee/blob/master/images/examples/particles.png?raw=true
+
+## User Interface
+
+A tour showcasing the different built-in widgets available for building
+responsive user interfaces in Coffee.
+
+```
+cargo run --example ui --features opengl,debug --release
+```
+
+[![GUI](https://thumbs.gfycat.com/LivelyOnlyHypacrosaurus-size_restricted.gif)](https://gfycat.com/livelyonlyhypacrosaurus)
