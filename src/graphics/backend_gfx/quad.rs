@@ -4,7 +4,7 @@ use gfx_device_gl as gl;
 
 use super::format;
 use super::texture::Texture;
-use crate::graphics::{Quad, Transformation};
+use crate::graphics::{self, Transformation};
 
 const MAX_INSTANCES: u32 = 100_000;
 const QUAD_INDICES: [u16; 6] = [0, 1, 2, 0, 2, 3];
@@ -29,7 +29,7 @@ gfx_defines! {
         position: [f32; 2] = "a_Pos",
     }
 
-    vertex Instance {
+    vertex Quad {
         src: [f32; 4] = "a_Src",
         translation: [f32; 2] = "a_Translation",
         scale: [f32; 2] = "a_Scale",
@@ -44,7 +44,7 @@ gfx_defines! {
         vertices: gfx::VertexBuffer<Vertex> = (),
         texture: gfx::TextureSampler<[f32; 4]> = "t_Texture",
         globals: gfx::ConstantBuffer<Globals> = "Globals",
-        instances: gfx::InstanceBuffer<Instance> = (),
+        instances: gfx::InstanceBuffer<Quad> = (),
         out: gfx::RawRenderTarget =
           (
               "Target0",
@@ -135,10 +135,10 @@ impl Pipeline {
         self.data.texture.0 = texture.view().clone();
     }
 
-    pub fn draw_quads(
+    pub fn draw_textured(
         &mut self,
         encoder: &mut gfx::Encoder<gl::Resources, gl::CommandBuffer>,
-        instances: &[Instance],
+        instances: &[Quad],
         transformation: &Transformation,
         view: &gfx::handle::RawRenderTargetView<gl::Resources>,
     ) {
@@ -182,8 +182,8 @@ impl Shader {
     pub fn new(factory: &mut gl::Factory, init: pipe::Init<'_>) -> Shader {
         let set = factory
             .create_shader_set(
-                include_bytes!("shader/basic.vert"),
-                include_bytes!("shader/basic.frag"),
+                include_bytes!("shader/quad.vert"),
+                include_bytes!("shader/quad.frag"),
             )
             .expect("Shader set creation");
 
@@ -208,13 +208,13 @@ impl Shader {
     }
 }
 
-impl From<Quad> for Instance {
-    fn from(quad: Quad) -> Instance {
+impl From<graphics::Quad> for Quad {
+    fn from(quad: graphics::Quad) -> Quad {
         let source = quad.source;
         let position = quad.position;
         let (width, height) = quad.size;
 
-        Instance {
+        Quad {
             src: [source.x, source.y, source.width, source.height],
             translation: [position.x, position.y],
             scale: [width, height],

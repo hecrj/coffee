@@ -91,17 +91,17 @@ impl Game for Example {
 
         let shape = match self.shape {
             ShapeOption::Rectangle => Shape::Rectangle(Rectangle {
-                x: frame.width() / 2.0 - 100.0,
+                x: frame.width() / 4.0 - 100.0,
                 y: frame.height() / 2.0 - 50.0,
                 width: 200.0,
                 height: 100.0,
             }),
             ShapeOption::Circle => Shape::Circle {
-                center: Point::new(frame.width() / 2.0, frame.height() / 2.0),
+                center: Point::new(frame.width() / 4.0, frame.height() / 2.0),
                 radius: self.radius,
             },
             ShapeOption::Ellipse => Shape::Ellipse {
-                center: Point::new(frame.width() / 2.0, frame.height() / 2.0),
+                center: Point::new(frame.width() / 4.0, frame.height() / 2.0),
                 horizontal_radius: self.radius,
                 vertical_radius: self.vertical_radius,
                 rotation: 0.0,
