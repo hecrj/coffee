@@ -1,3 +1,5 @@
+pub mod triangle;
+
 use std::mem;
 
 use crate::graphics::{Quad, Transformation};
@@ -321,9 +323,9 @@ const QUAD_VERTS: [Vertex; 4] = [
 
 #[derive(Debug, Clone, Copy)]
 pub struct Instance {
-    pub source: [f32; 4],
-    pub scale: [f32; 2],
-    pub translation: [f32; 2],
+    source: [f32; 4],
+    scale: [f32; 2],
+    translation: [f32; 2],
     pub layer: u32,
 }
 

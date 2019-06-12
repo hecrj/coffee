@@ -5,6 +5,7 @@ pub mod texture;
 mod types;
 
 pub use font::Font;
+pub use pipeline::triangle::Vertex;
 pub use pipeline::Instance;
 pub use surface::{winit, Surface};
 pub use texture::Texture;
@@ -19,6 +20,7 @@ use pipeline::Pipeline;
 pub struct Gpu {
     device: wgpu::Device,
     pipeline: Pipeline,
+    triangle_pipeline: pipeline::triangle::Pipeline,
     encoder: wgpu::CommandEncoder,
 }
 
@@ -40,6 +42,7 @@ impl Gpu {
         });
 
         let pipeline = Pipeline::new(&mut device);
+        let triangle_pipeline = pipeline::triangle::Pipeline::new(&mut device);
 
         let window = builder
             .build(events_loop)
@@ -55,6 +58,7 @@ impl Gpu {
             Gpu {
                 device,
                 pipeline,
+                triangle_pipeline,
                 encoder,
             },
             surface,
@@ -101,6 +105,23 @@ impl Gpu {
         Font::from_bytes(&mut self.device, bytes)
     }
 
+    pub(super) fn draw_triangles(
+        &mut self,
+        vertices: &[Vertex],
+        indices: &[u16],
+        view: &TargetView,
+        transformation: &Transformation,
+    ) {
+        self.triangle_pipeline.draw(
+            &mut self.device,
+            &mut self.encoder,
+            vertices,
+            indices,
+            transformation,
+            view,
+        );
+    }
+
     pub(super) fn draw_texture_quads(
         &mut self,
         texture: &Texture,
@@ -113,8 +134,8 @@ impl Gpu {
             &mut self.encoder,
             texture.binding(),
             instances,
-            &transformation,
-            &view,
+            transformation,
+            view,
         );
     }
 
