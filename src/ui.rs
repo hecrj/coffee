@@ -6,8 +6,7 @@
 //!
 //! Basically, user interfaces in Coffee are split into four different concepts:
 //!
-//!   * __state__ — data owned by the implementor of [`UserInterface`] and
-//!   [`Game::State`]
+//!   * __state__ — data owned by the implementor of [`UserInterface`]
 //!   * __messages__ — user interactions or meaningful events that you care
 //!   about
 //!   * __update logic__ — a way to react to __messages__ and update your
@@ -130,7 +129,6 @@
 //! [Elm]: https://elm-lang.org
 //! [The Elm Architecture]: https://guide.elm-lang.org/architecture/
 //! [`UserInterface`]: trait.UserInterface.html
-//! [`Game::State`]: ../trait.Game.html#associatedtype.State
 //! [`UserInterface::react`]: trait.UserInterface.html#tymethod.react
 //! [`UserInterface::layout`]: trait.UserInterface.html#tymethod.layout
 //! [`UserInterface::Message`]: trait.UserInterface.html#associatedtype.Message
