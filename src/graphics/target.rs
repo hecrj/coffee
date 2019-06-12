@@ -1,4 +1,4 @@
-use crate::graphics::gpu::{Font, Gpu, Instance, TargetView, Texture, Vertex};
+use crate::graphics::gpu::{self, Font, Gpu, TargetView, Texture, Vertex};
 use crate::graphics::{Color, Transformation};
 
 /// A rendering target.
@@ -108,7 +108,7 @@ impl<'a> Target<'a> {
     pub(super) fn draw_texture_quads(
         &mut self,
         texture: &Texture,
-        instances: &[Instance],
+        instances: &[gpu::Quad],
     ) {
         self.gpu.draw_texture_quads(
             texture,

@@ -51,12 +51,10 @@ impl Pipeline {
                 bind_group_layouts: &[&transform_layout],
             });
 
-        let vs_module = device.create_shader_module(include_bytes!(
-            "../shader/triangle.vert.spv"
-        ));
-        let fs_module = device.create_shader_module(include_bytes!(
-            "../shader/triangle.frag.spv"
-        ));
+        let vs_module = device
+            .create_shader_module(include_bytes!("shader/triangle.vert.spv"));
+        let fs_module = device
+            .create_shader_module(include_bytes!("shader/triangle.frag.spv"));
 
         let pipeline =
             device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
@@ -141,6 +139,10 @@ impl Pipeline {
         transformation: &Transformation,
         target: &wgpu::TextureView,
     ) {
+        if vertices.is_empty() || indices.is_empty() {
+            return;
+        }
+
         let matrix: [f32; 16] = transformation.clone().into();
 
         let transform_buffer = device

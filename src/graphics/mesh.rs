@@ -1,4 +1,4 @@
-use crate::graphics::{gpu, Color, Shape, Target};
+use crate::graphics::{gpu, Color, Rectangle, Shape, Target};
 
 use lyon_tessellation as lyon;
 
@@ -22,6 +22,19 @@ impl Mesh {
         );
 
         match shape {
+            Shape::Rectangle(Rectangle {
+                x,
+                y,
+                width,
+                height,
+            }) => {
+                let _ = lyon::basic_shapes::fill_rectangle(
+                    &lyon::math::rect(x, y, width, height),
+                    &Self::fill_options(),
+                    &mut builder,
+                )
+                .expect("Fill rectangle");
+            }
             Shape::Circle { center, radius } => {
                 let _ = lyon::basic_shapes::fill_circle(
                     lyon::math::point(center.x, center.y),
@@ -29,13 +42,95 @@ impl Mesh {
                     &Self::fill_options(),
                     &mut builder,
                 )
-                .expect("Circle mesh");
+                .expect("Fill circle");
+            }
+            Shape::Ellipse {
+                center,
+                horizontal_radius,
+                vertical_radius,
+                rotation,
+            } => {
+                let _ = lyon::basic_shapes::fill_ellipse(
+                    lyon::math::point(center.x, center.y),
+                    lyon::math::vector(horizontal_radius, vertical_radius),
+                    lyon::math::Angle::radians(rotation),
+                    &Self::fill_options(),
+                    &mut builder,
+                )
+                .expect("Fill ellipse");
+            }
+            Shape::Polyline { points } => {
+                let _ = lyon::basic_shapes::fill_polyline(
+                    points
+                        .iter()
+                        .map(|point| lyon::math::point(point.x, point.y)),
+                    &mut lyon::FillTessellator::new(),
+                    &Self::fill_options(),
+                    &mut builder,
+                )
+                .expect("Fill polyline");
             }
         }
     }
 
     #[inline]
-    pub fn stroke(&mut self, shape: Shape, color: Color, width: u16) {}
+    pub fn stroke(&mut self, shape: Shape, color: Color, width: u16) {
+        let mut builder = lyon::BuffersBuilder::new(
+            &mut self.buffers,
+            WithColor(color.into_linear()),
+        );
+
+        match shape {
+            Shape::Rectangle(Rectangle {
+                x,
+                y,
+                width: rect_width,
+                height,
+            }) => {
+                let _ = lyon::basic_shapes::stroke_rectangle(
+                    &lyon::math::rect(x, y, rect_width, height),
+                    &Self::stroke_options(width),
+                    &mut builder,
+                )
+                .expect("Stroke rectangle");
+            }
+            Shape::Circle { center, radius } => {
+                let _ = lyon::basic_shapes::stroke_circle(
+                    lyon::math::point(center.x, center.y),
+                    radius,
+                    &Self::stroke_options(width),
+                    &mut builder,
+                )
+                .expect("Stroke circle");
+            }
+            Shape::Ellipse {
+                center,
+                horizontal_radius,
+                vertical_radius,
+                rotation,
+            } => {
+                let _ = lyon::basic_shapes::stroke_ellipse(
+                    lyon::math::point(center.x, center.y),
+                    lyon::math::vector(horizontal_radius, vertical_radius),
+                    lyon::math::Angle::radians(rotation),
+                    &Self::stroke_options(width),
+                    &mut builder,
+                )
+                .expect("Stroke ellipse");
+            }
+            Shape::Polyline { points } => {
+                let _ = lyon::basic_shapes::stroke_polyline(
+                    points
+                        .iter()
+                        .map(|point| lyon::math::point(point.x, point.y)),
+                    false,
+                    &Self::stroke_options(width),
+                    &mut builder,
+                )
+                .expect("Fill polyline");
+            }
+        }
+    }
 
     pub fn draw(&self, target: &mut Target<'_>) {
         target.draw_triangles(&self.buffers.vertices, &self.buffers.indices);
@@ -44,12 +139,22 @@ impl Mesh {
     fn fill_options() -> lyon::FillOptions {
         lyon::FillOptions::DEFAULT.with_normals(false)
     }
+
+    fn stroke_options(width: u16) -> lyon::StrokeOptions {
+        lyon::StrokeOptions::DEFAULT.with_line_width(width as f32)
+    }
 }
 
 struct WithColor([f32; 4]);
 
 impl lyon::VertexConstructor<lyon::FillVertex, gpu::Vertex> for WithColor {
     fn new_vertex(&mut self, vertex: lyon::FillVertex) -> gpu::Vertex {
+        gpu::Vertex::new([vertex.position.x, vertex.position.y], self.0)
+    }
+}
+
+impl lyon::VertexConstructor<lyon::StrokeVertex, gpu::Vertex> for WithColor {
+    fn new_vertex(&mut self, vertex: lyon::StrokeVertex) -> gpu::Vertex {
         gpu::Vertex::new([vertex.position.x, vertex.position.y], self.0)
     }
 }
