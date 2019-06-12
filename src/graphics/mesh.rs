@@ -2,18 +2,26 @@ use crate::graphics::{gpu, Color, Rectangle, Shape, Target};
 
 use lyon_tessellation as lyon;
 
-#[derive(Debug)]
+/// A set of shapes that can be drawn.
+#[derive(Debug, Clone)]
 pub struct Mesh {
     buffers: lyon::VertexBuffers<gpu::Vertex, u16>,
 }
 
 impl Mesh {
+    /// Creates a new empty [`Mesh`].
+    ///
+    /// [`Mesh`]: struct.Mesh.html
     pub fn new() -> Mesh {
         Mesh {
             buffers: lyon::VertexBuffers::new(),
         }
     }
 
+    /// Adds a filled [`Shape`] to the [`Mesh`].
+    ///
+    /// [`Shape`]: enum.Shape.html
+    /// [`Mesh`]: struct.Mesh.html
     #[inline]
     pub fn fill(&mut self, shape: Shape, color: Color) {
         let mut builder = lyon::BuffersBuilder::new(
@@ -73,6 +81,10 @@ impl Mesh {
         }
     }
 
+    /// Adds the stroke of a [`Shape`] to the [`Mesh`].
+    ///
+    /// [`Shape`]: enum.Shape.html
+    /// [`Mesh`]: struct.Mesh.html
     #[inline]
     pub fn stroke(&mut self, shape: Shape, color: Color, width: u16) {
         let mut builder = lyon::BuffersBuilder::new(
@@ -132,6 +144,9 @@ impl Mesh {
         }
     }
 
+    /// Draws the [`Mesh`] .
+    ///
+    /// [`Mesh`]: struct.Mesh.html
     pub fn draw(&self, target: &mut Target<'_>) {
         target.draw_triangles(&self.buffers.vertices, &self.buffers.indices);
     }
