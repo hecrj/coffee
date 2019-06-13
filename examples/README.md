@@ -25,7 +25,7 @@ compile it with the `debug` feature if you want to enable the built-in debug
 view:
 
 ```
-cargo run --example particles --features opengl,debug --release
+cargo run --example particles --features vulkan,debug --release
 ```
 
 ![Particles example][particles]
