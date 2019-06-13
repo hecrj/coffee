@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     and renderers.
 - __Mesh support__. The types `Shape` and `Mesh` have been introduced.
   Rectangles, circles, ellipses, and polylines can now be drawn with ease using
-  fill or stroke modes.
+  fill or stroke modes. [#50]
 - `Input` trait. It allows to implement reusable input handlers. [#35]
 - `KeyboardAndMouse` input handler. Useful to quickstart development and have
   easy access to the keyboard and the mouse from the get-go. [#35]
@@ -76,6 +76,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#30]: https://github.com/hecrj/coffee/pull/30
 [#35]: https://github.com/hecrj/coffee/pull/35
 [#37]: https://github.com/hecrj/coffee/pull/37
+[#50]: https://github.com/hecrj/coffee/pull/50
 [Elm]: https://elm-lang.org
 [The Elm Architecture]: https://guide.elm-lang.org/architecture/
 [`stretch`]: https://github.com/vislyhq/stretch
