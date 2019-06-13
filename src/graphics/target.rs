@@ -1,4 +1,4 @@
-use crate::graphics::gpu::{Font, Gpu, Instance, TargetView, Texture};
+use crate::graphics::gpu::{self, Font, Gpu, TargetView, Texture, Vertex};
 use crate::graphics::{Color, Transformation};
 
 /// A rendering target.
@@ -92,10 +92,23 @@ impl<'a> Target<'a> {
         self.gpu.clear(&self.view, color);
     }
 
+    pub(super) fn draw_triangles(
+        &mut self,
+        vertices: &[Vertex],
+        indices: &[u16],
+    ) {
+        self.gpu.draw_triangles(
+            vertices,
+            indices,
+            &self.view,
+            &self.transformation,
+        );
+    }
+
     pub(super) fn draw_texture_quads(
         &mut self,
         texture: &Texture,
-        instances: &[Instance],
+        instances: &[gpu::Quad],
     ) {
         self.gpu.draw_texture_quads(
             texture,

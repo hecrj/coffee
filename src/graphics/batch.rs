@@ -9,7 +9,7 @@ use crate::graphics::{Image, IntoQuad, Point, Target, Transformation, Vector};
 /// [`Image`]: struct.Image.html
 pub struct Batch {
     image: Image,
-    instances: Vec<gpu::Instance>,
+    instances: Vec<gpu::Quad>,
     x_unit: f32,
     y_unit: f32,
 }
@@ -37,7 +37,7 @@ impl Batch {
     #[inline]
     pub fn add<Q: IntoQuad>(&mut self, quad: Q) {
         let instance =
-            gpu::Instance::from(quad.into_quad(self.x_unit, self.y_unit));
+            gpu::Quad::from(quad.into_quad(self.x_unit, self.y_unit));
 
         self.instances.push(instance);
     }
@@ -80,9 +80,7 @@ impl<Q: IntoQuad> Extend<Q> for Batch {
         let y_unit = self.y_unit;
 
         self.instances.extend(
-            iter.map(|quad| {
-                gpu::Instance::from(quad.into_quad(x_unit, y_unit))
-            }),
+            iter.map(|quad| gpu::Quad::from(quad.into_quad(x_unit, y_unit))),
         );
     }
 }
@@ -104,9 +102,8 @@ impl<Q: IntoQuad + Send> ParallelExtend<Q> for Batch {
         let y_unit = self.y_unit;
 
         self.instances.par_extend(
-            par_iter.map(|quad| {
-                gpu::Instance::from(quad.into_quad(x_unit, y_unit))
-            }),
+            par_iter
+                .map(|quad| gpu::Quad::from(quad.into_quad(x_unit, y_unit))),
         );
     }
 }

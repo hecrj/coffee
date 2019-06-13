@@ -68,7 +68,7 @@ impl Canvas {
     pub fn draw<Q: IntoQuad>(&self, quad: Q, target: &mut Target<'_>) {
         target.draw_texture_quads(
             &self.drawable.texture(),
-            &[gpu::Instance::from(quad.into_quad(
+            &[gpu::Quad::from(quad.into_quad(
                 1.0 / self.width() as f32,
                 1.0 / self.height() as f32,
             ))],

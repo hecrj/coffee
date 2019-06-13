@@ -1,6 +1,6 @@
 use std::mem;
 
-use crate::graphics::{Quad, Transformation};
+use crate::graphics::{self, Transformation};
 
 pub struct Pipeline {
     pipeline: wgpu::RenderPipeline,
@@ -86,10 +86,10 @@ impl Pipeline {
                 bind_group_layouts: &[&constant_layout, &texture_layout],
             });
 
-        let vs_module = device
-            .create_shader_module(include_bytes!("shader/basic.vert.spv"));
-        let fs_module = device
-            .create_shader_module(include_bytes!("shader/basic.frag.spv"));
+        let vs_module =
+            device.create_shader_module(include_bytes!("shader/quad.vert.spv"));
+        let fs_module =
+            device.create_shader_module(include_bytes!("shader/quad.frag.spv"));
 
         let pipeline =
             device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
@@ -137,7 +137,7 @@ impl Pipeline {
                         }],
                     },
                     wgpu::VertexBufferDescriptor {
-                        stride: mem::size_of::<Instance>() as u32,
+                        stride: mem::size_of::<Quad>() as u32,
                         step_mode: wgpu::InputStepMode::Instance,
                         attributes: &[
                             wgpu::VertexAttributeDescriptor {
@@ -181,7 +181,7 @@ impl Pipeline {
             .fill_from_slice(&QUAD_INDICES);
 
         let instances = device.create_buffer(&wgpu::BufferDescriptor {
-            size: mem::size_of::<Instance>() as u32 * Instance::MAX as u32,
+            size: mem::size_of::<Quad>() as u32 * Quad::MAX as u32,
             usage: wgpu::BufferUsageFlags::VERTEX
                 | wgpu::BufferUsageFlags::TRANSFER_DST,
         });
@@ -213,12 +213,12 @@ impl Pipeline {
         TextureBinding(binding)
     }
 
-    pub fn draw_texture_quads(
+    pub fn draw_textured(
         &mut self,
         device: &mut wgpu::Device,
         encoder: &mut wgpu::CommandEncoder,
         texture: &TextureBinding,
-        instances: &[Instance],
+        instances: &[Quad],
         transformation: &Transformation,
         target: &wgpu::TextureView,
     ) {
@@ -240,7 +240,7 @@ impl Pipeline {
         let total = instances.len();
 
         while i < total {
-            let end = (i + Instance::MAX).min(total);
+            let end = (i + Quad::MAX).min(total);
             let amount = end - i;
 
             let instance_buffer = device
@@ -255,7 +255,7 @@ impl Pipeline {
                 0,
                 &self.instances,
                 0,
-                (mem::size_of::<Instance>() * amount) as u32,
+                (mem::size_of::<Quad>() * amount) as u32,
             );
             {
                 let mut render_pass =
@@ -292,7 +292,7 @@ impl Pipeline {
                 );
             }
 
-            i += Instance::MAX;
+            i += Quad::MAX;
         }
     }
 }
@@ -320,24 +320,24 @@ const QUAD_VERTS: [Vertex; 4] = [
 ];
 
 #[derive(Debug, Clone, Copy)]
-pub struct Instance {
-    pub source: [f32; 4],
-    pub scale: [f32; 2],
-    pub translation: [f32; 2],
+pub struct Quad {
+    source: [f32; 4],
+    scale: [f32; 2],
+    translation: [f32; 2],
     pub layer: u32,
 }
 
-impl Instance {
+impl Quad {
     const MAX: usize = 100_000;
 }
 
-impl From<Quad> for Instance {
-    fn from(quad: Quad) -> Instance {
+impl From<graphics::Quad> for Quad {
+    fn from(quad: graphics::Quad) -> Quad {
         let source = quad.source;
         let position = quad.position;
         let (width, height) = quad.size;
 
-        Instance {
+        Quad {
             source: [source.x, source.y, source.width, source.height],
             translation: [position.x, position.y],
             scale: [width, height],
