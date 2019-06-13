@@ -16,11 +16,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     widgets.
   - Customization. The `ui::core` module can be used to implement custom widgets
     and renderers.
+- __Mesh support__. The types `Shape` and `Mesh` have been introduced.
+  Rectangles, circles, ellipses, and polylines can now be drawn with ease using
+  fill or stroke modes.
 - `Input` trait. It allows to implement reusable input handlers. [#35]
 - `KeyboardAndMouse` input handler. Useful to quickstart development and have
   easy access to the keyboard and the mouse from the get-go. [#35]
 - `CursorTaken` and `CursorReturned` input events. They are fired when the cursor
-  is used/freed by the user interface.
+  is used/freed by the user interface. [#35]
 - Off-screen text rendering support. `Font::draw` now supports any `Target`
   instead of a window `Frame`. [#25]
 - `Game::debug` performance tracking. Time spent on this method is now shown in
