@@ -167,7 +167,7 @@ pub type Element<'a, Message> = self::core::Element<'a, Message, Renderer>;
 
 use crate::game;
 use crate::graphics::{window, Point, Window, WindowSettings};
-use crate::input::{self, Input as _};
+use crate::input::{self, gamepad, Input as _};
 use crate::load::{Join, LoadingScreen};
 use crate::ui::core::{Event, Interface, MouseCursor, Renderer as _};
 use crate::{Debug, Game, Result, Timer};
@@ -263,7 +263,7 @@ pub trait UserInterface: Game {
         Self: 'static + Sized,
     {
         // Set up window
-        let mut event_loop = window::EventLoop::new();
+        let event_loop = &mut window::EventLoop::new();
         let window = &mut Window::new(window_settings, &event_loop)?;
         let mut debug = Debug::new(window.gpu());
 
@@ -277,6 +277,7 @@ pub trait UserInterface: Game {
             .join();
         let (game, renderer) = &mut loading_screen.run(load, window)?;
         let input = &mut Input::new();
+        let mut gamepads = gamepad::Tracker::new();
         debug.loading_finished();
 
         // Game loop
@@ -297,7 +298,8 @@ pub trait UserInterface: Game {
                     input,
                     &mut debug,
                     window,
-                    &mut event_loop,
+                    event_loop,
+                    gamepads.as_mut(),
                     &mut alive,
                 );
 
@@ -312,7 +314,8 @@ pub trait UserInterface: Game {
                     input,
                     &mut debug,
                     window,
-                    &mut event_loop,
+                    event_loop,
+                    gamepads.as_mut(),
                     &mut alive,
                 );
             }
@@ -416,13 +419,16 @@ fn interact<G: Game>(
     debug: &mut Debug,
     window: &mut Window,
     event_loop: &mut window::EventLoop,
+    gamepads: Option<&mut gamepad::Tracker>,
     alive: &mut bool,
 ) {
     debug.interact_started();
 
     event_loop.poll(|event| {
-        game::process_event(game, input, debug, window, alive, event)
+        game::process_window_event(game, input, debug, window, alive, event)
     });
+
+    game::process_gamepad_events(gamepads, input);
 
     game.interact(&mut input.game_input, window);
     input.clear();

@@ -1,11 +1,18 @@
 //! Allow players to interact with your game.
 
+pub mod gamepad;
+
 mod event;
 mod keyboard_and_mouse;
 
-pub use event::{ButtonState, Event, GamepadEvent, KeyCode, MouseButton};
+pub use event::{ButtonState, Event, KeyCode, MouseButton};
 pub use keyboard_and_mouse::KeyboardAndMouse;
 
+/// The input of your [`Game`].
+///
+/// If you just want simple access to the keyboard and mouse, check out the
+/// built-in [`KeyboardAndMouse`] type.
+///
 /// [`Game`]: ../trait.Game.html
 /// [`KeyboardAndMouse`]: struct.KeyboardAndMouse.html
 pub trait Input {

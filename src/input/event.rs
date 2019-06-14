@@ -1,8 +1,6 @@
 use crate::graphics::window::winit;
+use crate::input::gamepad;
 
-pub use gilrs::ev::state::GamepadState;
-pub use gilrs::ev::EventType as GamepadEvent;
-pub use gilrs::GamepadId;
 pub use winit::ElementState as ButtonState;
 pub use winit::MouseButton;
 pub use winit::VirtualKeyCode as KeyCode;
@@ -80,11 +78,11 @@ pub enum Event {
 
     /// An event from a gamepad was emitted.
     Gamepad {
-        /// Thw id of the gamepad that emitted the event.
-        id: GamepadId,
+        /// The gamepad identifier
+        id: gamepad::Id,
 
-        /// The gamepad event.
-        event: GamepadEvent,
+        /// The gamepad event
+        event: gamepad::Event,
     },
 
     /// The game window gained focus.

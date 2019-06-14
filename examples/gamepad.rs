@@ -2,6 +2,7 @@
 use coffee::graphics::{
     Color, Font, Frame, Point, Text, Window, WindowSettings,
 };
+use coffee::input::{self, gamepad, Input};
 use coffee::load::Task;
 use coffee::{Game, Result, Timer};
 
@@ -20,7 +21,7 @@ struct GamepadExample {
 }
 
 impl Game for GamepadExample {
-    type Input = ();
+    type Input = Gamepad;
     type LoadingScreen = ();
 
     fn load(_window: &Window) -> Task<GamepadExample> {
@@ -31,10 +32,10 @@ impl Game for GamepadExample {
             })
     }
 
-    fn interact(&mut self, _input: &mut (), _window: &mut Window) {
-        //if let Some(Event::GamepadEvent { event, .. }) = input.last_event {
-        //    self.last_event = format!("{:#?}", event);
-        //}
+    fn interact(&mut self, gamepad: &mut Gamepad, _window: &mut Window) {
+        if let Some(event) = gamepad.last_event {
+            self.last_event = format!("{:#?}", event);
+        }
     }
 
     fn draw(&mut self, frame: &mut Frame, _timer: &Timer) {
@@ -59,4 +60,25 @@ impl Game for GamepadExample {
 
         self.font.draw(&mut frame.as_target());
     }
+}
+
+struct Gamepad {
+    last_event: Option<gamepad::Event>,
+}
+
+impl Input for Gamepad {
+    fn new() -> Gamepad {
+        Gamepad { last_event: None }
+    }
+
+    fn update(&mut self, event: input::Event) {
+        match event {
+            input::Event::Gamepad { event, .. } => {
+                self.last_event = Some(event);
+            }
+            _ => {}
+        }
+    }
+
+    fn clear(&mut self) {}
 }
