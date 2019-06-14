@@ -4,7 +4,7 @@ mod radio;
 mod slider;
 mod text;
 
-use crate::graphics::{Batch, Font, Frame, Image, Point};
+use crate::graphics::{Batch, Color, Font, Frame, Image, Mesh, Point, Shape};
 use crate::load::{Join, Task};
 use crate::ui::core;
 
@@ -22,6 +22,7 @@ use std::rc::Rc;
 pub struct Renderer {
     pub(crate) sprites: Batch,
     pub(crate) font: Rc<RefCell<Font>>,
+    explain_mesh: Mesh,
 }
 
 impl std::fmt::Debug for Renderer {
@@ -41,7 +42,17 @@ impl core::Renderer for Renderer {
             .map(|(sprites, font)| Renderer {
                 sprites: Batch::new(sprites),
                 font: Rc::new(RefCell::new(font)),
+                explain_mesh: Mesh::new(),
             })
+    }
+
+    fn explain(&mut self, layout: &core::Layout<'_>, color: Color) {
+        self.explain_mesh
+            .stroke(Shape::Rectangle(layout.bounds()), color, 1);
+
+        layout
+            .children()
+            .for_each(|layout| self.explain(&layout, color));
     }
 
     fn flush(&mut self, frame: &mut Frame<'_>) {
@@ -51,6 +62,11 @@ impl core::Renderer for Renderer {
         self.sprites.clear();
 
         self.font.borrow_mut().draw(target);
+
+        if !self.explain_mesh.is_empty() {
+            self.explain_mesh.draw(target);
+            self.explain_mesh = Mesh::new();
+        }
     }
 }
 
