@@ -18,6 +18,13 @@ impl Mesh {
         }
     }
 
+    /// Returns true if the [`Mesh`] is empty.
+    ///
+    /// [`Mesh`]: struct.Mesh.html
+    pub fn is_empty(&self) -> bool {
+        self.buffers.vertices.is_empty()
+    }
+
     /// Adds a filled [`Shape`] to the [`Mesh`].
     ///
     /// [`Shape`]: enum.Shape.html

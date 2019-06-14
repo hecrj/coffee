@@ -1,7 +1,7 @@
 use stretch::{geometry, result};
 
-use crate::graphics::Point;
-use crate::ui::core::{Event, Hasher, Layout, MouseCursor, Node, Widget};
+use crate::graphics::{Color, Point};
+use crate::ui::core::{self, Event, Hasher, Layout, MouseCursor, Node, Widget};
 
 /// A generic [`Widget`].
 ///
@@ -144,6 +144,23 @@ impl<'a, Message, Renderer> Element<'a, Message, Renderer> {
         }
     }
 
+    /// Marks the [`Element`] as _to-be-explained_.
+    ///
+    /// The [`Renderer`] will explain the layout of the [`Element`] graphically.
+    /// This can be very useful for debugging your layout!
+    ///
+    /// [`Element`]: struct.Element.html
+    /// [`Renderer`]: trait.Renderer.html
+    pub fn explain(self, color: Color) -> Element<'a, Message, Renderer>
+    where
+        Message: 'static,
+        Renderer: 'a + core::Renderer,
+    {
+        Element {
+            widget: Box::new(Explain::new(self, color)),
+        }
+    }
+
     pub(crate) fn compute_layout(&self, renderer: &Renderer) -> result::Layout {
         let node = self.widget.node(renderer);
 
@@ -155,7 +172,7 @@ impl<'a, Message, Renderer> Element<'a, Message, Renderer> {
     }
 }
 
-pub struct Map<'a, A, B, Renderer> {
+struct Map<'a, A, B, Renderer> {
     widget: Box<dyn Widget<A, Renderer> + 'a>,
     mapper: Box<dyn Fn(A) -> B>,
 }
@@ -222,5 +239,61 @@ where
 
     fn hash(&self, state: &mut Hasher) {
         self.widget.hash(state);
+    }
+}
+
+struct Explain<'a, Message, Renderer> {
+    element: Element<'a, Message, Renderer>,
+    color: Color,
+}
+
+impl<'a, Message, Renderer> std::fmt::Debug for Explain<'a, Message, Renderer> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Explain")
+            .field("element", &self.element)
+            .finish()
+    }
+}
+
+impl<'a, Message, Renderer> Explain<'a, Message, Renderer> {
+    fn new(element: Element<'a, Message, Renderer>, color: Color) -> Self {
+        Explain { element, color }
+    }
+}
+
+impl<'a, Message, Renderer> Widget<Message, Renderer>
+    for Explain<'a, Message, Renderer>
+where
+    Renderer: core::Renderer,
+{
+    fn node(&self, renderer: &Renderer) -> Node {
+        self.element.widget.node(renderer)
+    }
+
+    fn on_event(
+        &mut self,
+        event: Event,
+        layout: Layout<'_>,
+        cursor_position: Point,
+        messages: &mut Vec<Message>,
+    ) {
+        self.element
+            .widget
+            .on_event(event, layout, cursor_position, messages)
+    }
+
+    fn draw(
+        &self,
+        renderer: &mut Renderer,
+        layout: Layout<'_>,
+        cursor_position: Point,
+    ) -> MouseCursor {
+        renderer.explain(&layout, self.color);
+
+        self.element.widget.draw(renderer, layout, cursor_position)
+    }
+
+    fn hash(&self, state: &mut Hasher) {
+        self.element.widget.hash(state);
     }
 }
