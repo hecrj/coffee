@@ -1,11 +1,15 @@
 //! Allow players to interact with your game.
 
 pub mod gamepad;
+pub mod keyboard;
+pub mod mouse;
+pub mod window;
 
 mod event;
 mod keyboard_and_mouse;
 
-pub use event::{ButtonState, Event, KeyCode, MouseButton};
+pub use crate::graphics::window::winit::ElementState as ButtonState;
+pub use event::Event;
 pub use keyboard_and_mouse::KeyboardAndMouse;
 
 /// The input of your [`Game`].

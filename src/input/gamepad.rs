@@ -1,3 +1,5 @@
+//! Listen to gamepad events.
+
 mod event;
 
 pub use event::Event;

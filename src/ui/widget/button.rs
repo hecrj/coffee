@@ -7,7 +7,7 @@
 //! [`Class`]: enum.Class.html
 
 use crate::graphics::{Point, Rectangle};
-use crate::input::{ButtonState, MouseButton};
+use crate::input::{mouse, ButtonState};
 use crate::ui::core::{
     Align, Element, Event, Hasher, Layout, MouseCursor, Node, Style, Widget,
 };
@@ -144,10 +144,10 @@ where
         messages: &mut Vec<Message>,
     ) {
         match event {
-            Event::MouseInput {
-                button: MouseButton::Left,
+            Event::Mouse(mouse::Event::Input {
+                button: mouse::Button::Left,
                 state,
-            } => {
+            }) => {
                 if let Some(on_press) = self.on_press {
                     let bounds = layout.bounds();
 

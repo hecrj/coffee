@@ -5,7 +5,7 @@ use coffee::graphics::{
     Color, Font, Frame, Image, Point, Quad, Rectangle, Text, Vector, Window,
     WindowSettings,
 };
-use coffee::input::{self, Input};
+use coffee::input::{self, keyboard, mouse, Input};
 use coffee::load::{loading_screen::ProgressBar, Join, Task};
 use coffee::{Game, Result, Timer};
 
@@ -21,8 +21,8 @@ fn main() -> Result<()> {
 struct CustomInput {
     cursor_position: Point,
     mouse_wheel: Point,
-    keys_pressed: HashSet<input::KeyCode>,
-    mouse_buttons_pressed: HashSet<input::MouseButton>,
+    keys_pressed: HashSet<keyboard::KeyCode>,
+    mouse_buttons_pressed: HashSet<mouse::Button>,
     text_buffer: String,
 }
 
@@ -39,30 +39,35 @@ impl Input for CustomInput {
 
     fn update(&mut self, event: input::Event) {
         match event {
-            input::Event::CursorMoved { x, y } => {
-                self.cursor_position = Point::new(x, y);
-            }
-            input::Event::TextInput { character } => {
-                self.text_buffer.push(character);
-            }
-            input::Event::MouseWheel { delta_x, delta_y } => {
-                self.mouse_wheel = Point::new(delta_x, delta_y);
-            }
-            input::Event::KeyboardInput { key_code, state } => match state {
-                input::ButtonState::Pressed => {
-                    self.keys_pressed.insert(key_code);
+            input::Event::Mouse(mouse_event) => match mouse_event {
+                mouse::Event::CursorMoved { x, y } => {
+                    self.cursor_position = Point::new(x, y);
                 }
-                input::ButtonState::Released => {
-                    self.keys_pressed.remove(&key_code);
+                mouse::Event::Input { state, button } => match state {
+                    input::ButtonState::Pressed => {
+                        self.mouse_buttons_pressed.insert(button);
+                    }
+                    input::ButtonState::Released => {
+                        self.mouse_buttons_pressed.remove(&button);
+                    }
+                },
+                mouse::Event::WheelScrolled { delta_x, delta_y } => {
+                    self.mouse_wheel = Point::new(delta_x, delta_y);
                 }
+                _ => {}
             },
-            input::Event::MouseInput { state, button } => match state {
-                input::ButtonState::Pressed => {
-                    self.mouse_buttons_pressed.insert(button);
+            input::Event::Keyboard(keyboard_event) => match keyboard_event {
+                keyboard::Event::TextEntered { character } => {
+                    self.text_buffer.push(character);
                 }
-                input::ButtonState::Released => {
-                    self.mouse_buttons_pressed.remove(&button);
-                }
+                keyboard::Event::Input { key_code, state } => match state {
+                    input::ButtonState::Pressed => {
+                        self.keys_pressed.insert(key_code);
+                    }
+                    input::ButtonState::Released => {
+                        self.keys_pressed.remove(&key_code);
+                    }
+                },
             },
             _ => {}
         }
@@ -78,8 +83,8 @@ struct InputExample {
     font: Font,
     cursor_position: Point,
     mouse_wheel: Point,
-    keys_pressed: HashSet<input::KeyCode>,
-    mouse_buttons_pressed: HashSet<input::MouseButton>,
+    keys_pressed: HashSet<keyboard::KeyCode>,
+    mouse_buttons_pressed: HashSet<mouse::Button>,
     text_buffer: String,
 }
 

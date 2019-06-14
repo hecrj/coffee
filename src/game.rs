@@ -1,7 +1,6 @@
 use crate::graphics::window;
 use crate::graphics::{Frame, Window, WindowSettings};
-use crate::input;
-use crate::input::gamepad;
+use crate::input::{self, gamepad, keyboard, mouse};
 use crate::load::{LoadingScreen, Task};
 use crate::{Debug, Input, Result, Timer};
 
@@ -55,7 +54,7 @@ pub trait Game {
     /// By default, it is set to `F12`.
     ///
     /// [`debug`]: #method.debug
-    const DEBUG_KEY: Option<input::KeyCode> = Some(input::KeyCode::F12);
+    const DEBUG_KEY: Option<keyboard::KeyCode> = Some(keyboard::KeyCode::F12);
 
     /// Loads the [`Game`].
     ///
@@ -267,10 +266,10 @@ pub(crate) fn process_window_event<G: Game, I: Input>(
 
             #[cfg(any(debug_assertions, feature = "debug"))]
             match input_event {
-                input::Event::KeyboardInput {
+                input::Event::Keyboard(keyboard::Event::Input {
                     state: input::ButtonState::Released,
                     key_code,
-                } if Some(key_code) == G::DEBUG_KEY => {
+                }) if Some(key_code) == G::DEBUG_KEY => {
                     debug.toggle();
                 }
                 _ => {}
@@ -278,20 +277,19 @@ pub(crate) fn process_window_event<G: Game, I: Input>(
         }
         window::Event::CursorMoved(logical_position) => {
             let position = logical_position.to_physical(window.dpi());
-            let event = input::Event::CursorMoved {
+
+            input.update(input::Event::Mouse(mouse::Event::CursorMoved {
                 x: position.x as f32,
                 y: position.y as f32,
-            };
-
-            input.update(event);
+            }));
         }
         window::Event::Moved(logical_position) => {
             let position = logical_position.to_physical(window.dpi());
 
-            input.update(input::Event::WindowMoved {
+            input.update(input::Event::Window(input::window::Event::Moved {
                 x: position.x as f32,
                 y: position.y as f32,
-            })
+            }))
         }
         window::Event::CloseRequested => {
             if game.on_close_request() {

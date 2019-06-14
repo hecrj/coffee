@@ -2,7 +2,7 @@
 use crate::graphics::{
     Color, HorizontalAlignment, Point, Rectangle, VerticalAlignment,
 };
-use crate::input::{ButtonState, MouseButton};
+use crate::input::{mouse, ButtonState};
 use crate::ui::core::{
     Align, Element, Event, Hasher, Layout, MouseCursor, Node, Widget,
 };
@@ -127,10 +127,10 @@ where
         messages: &mut Vec<Message>,
     ) {
         match event {
-            Event::MouseInput {
-                button: MouseButton::Left,
+            Event::Mouse(mouse::Event::Input {
+                button: mouse::Button::Left,
                 state: ButtonState::Pressed,
-            } => {
+            }) => {
                 if layout.bounds().contains(cursor_position) {
                     messages.push(self.on_click);
                 }

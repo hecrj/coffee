@@ -167,7 +167,7 @@ pub type Element<'a, Message> = self::core::Element<'a, Message, Renderer>;
 
 use crate::game;
 use crate::graphics::{window, Point, Window, WindowSettings};
-use crate::input::{self, gamepad, Input as _};
+use crate::input::{self, gamepad, mouse, Input as _};
 use crate::load::{Join, LoadingScreen};
 use crate::ui::core::{Event, Interface, MouseCursor, Renderer as _};
 use crate::{Debug, Game, Result, Timer};
@@ -346,9 +346,12 @@ pub trait UserInterface: Game {
 
             if new_cursor != mouse_cursor {
                 if new_cursor == MouseCursor::OutOfBounds {
-                    input.update(input::Event::CursorReturned);
+                    input.update(input::Event::Mouse(
+                        mouse::Event::CursorReturned,
+                    ));
                 } else if mouse_cursor == MouseCursor::OutOfBounds {
-                    input.update(input::Event::CursorTaken);
+                    input
+                        .update(input::Event::Mouse(mouse::Event::CursorTaken));
                 }
 
                 window.update_cursor(new_cursor.into());
@@ -397,7 +400,7 @@ impl<I: input::Input> input::Input for Input<I> {
         self.game_input.update(event);
 
         match event {
-            input::Event::CursorMoved { x, y } => {
+            input::Event::Mouse(mouse::Event::CursorMoved { x, y }) => {
                 self.cursor_position = Point::new(x, y);
             }
             _ => {}

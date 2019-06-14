@@ -8,7 +8,7 @@ use std::hash::Hash;
 use std::ops::RangeInclusive;
 
 use crate::graphics::{Point, Rectangle};
-use crate::input::{ButtonState, MouseButton};
+use crate::input::{mouse, ButtonState};
 use crate::ui::core::{
     Element, Event, Hasher, Layout, MouseCursor, Node, Style, Widget,
 };
@@ -132,10 +132,10 @@ where
         };
 
         match event {
-            Event::MouseInput {
-                button: MouseButton::Left,
+            Event::Mouse(mouse::Event::Input {
+                button: mouse::Button::Left,
                 state,
-            } => match state {
+            }) => match state {
                 ButtonState::Pressed => {
                     if layout.bounds().contains(cursor_position) {
                         change();
@@ -146,7 +146,7 @@ where
                     self.state.is_dragging = false;
                 }
             },
-            Event::CursorMoved => {
+            Event::Mouse(mouse::Event::CursorMoved { .. }) => {
                 if self.state.is_dragging {
                     change();
                 }

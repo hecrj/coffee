@@ -2,18 +2,25 @@ use super::{Axis, Button};
 
 use std::convert::TryFrom;
 
+/// A gamepad event.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Event {
+    /// A gamepad was connected.
     Connected,
 
+    /// A gamepad was disconnected.
     Disconnected,
 
+    /// A button was pressed.
     ButtonPressed(Button),
 
+    /// A button was released.
     ButtonReleased(Button),
 
+    /// The value of a button was changed.
     ButtonChanged(Button, f32),
 
+    /// The value of an axis was changed.
     AxisChanged(Axis, f32),
 }
 
