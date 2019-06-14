@@ -29,6 +29,7 @@ bugs. [Feel free to contribute!]
   * Explicit and efficient batched draws
   * Off-screen rendering
   * TrueType font rendering
+  * Gamepad support
 
 [debug view with performance metrics]: https://github.com/hecrj/coffee/blob/master/images/debug.png
 
