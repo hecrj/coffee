@@ -68,6 +68,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   sources: `Keyboard`, `Mouse`, `Gamepad`, and `Window`. Each one of these
   sources has its own module inside `input` with an `Event` type where the old
   variants can be found. [#29]
+- `input::KeyCode` has been moved to `input::keyboard::KeyCode`. [#29]
+- `input::MouseButton` has been moved to `input::mouse::Button`. [#29]
 - The performance of the particles example has been improved considerably on all
   platforms. [#37]
 
