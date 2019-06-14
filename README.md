@@ -107,6 +107,7 @@ Coffee builds upon
   * [`wgpu`] for _experimental_ Vulkan, Metal, D3D11 and D3D12 support.
   * [`stretch`] for responsive GUI layouting based on Flexbox.
   * [`glyph_brush`] for TrueType font rendering.
+  * [`gilrs`] for gamepad support.
   * [`nalgebra`] for the `Point`, `Vector`, and `Transformation` types.
   * [`image`] for image loading and texture array building.
 
@@ -115,6 +116,7 @@ Coffee builds upon
 [`wgpu`]: https://github.com/gfx-rs/wgpu
 [`stretch`]: https://github.com/vislyhq/stretch
 [`glyph_brush`]: https://github.com/alexheretic/glyph-brush/tree/master/glyph-brush
+[`gilrs`]: https://gitlab.com/gilrs-project/gilrs
 [`nalgebra`]: https://github.com/rustsim/nalgebra
 [`image`]: https://github.com/image-rs/image
 
