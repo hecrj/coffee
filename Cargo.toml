@@ -48,6 +48,9 @@ gfx_winit = { package = "winit", version = "0.19", optional = true }
 wgpu = { version = "0.2", optional = true }
 wgpu_glyph = { version = "0.3", optional = true }
 
+# controller support
+gilrs = "0.7.1"
+
 [dev-dependencies]
 # Example dependencies
 rand = "0.6"

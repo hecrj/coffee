@@ -1,5 +1,5 @@
 use super::winit;
-use crate::input;
+use crate::input::{self, keyboard, mouse, window};
 
 pub(crate) enum Event {
     CloseRequested,
@@ -36,42 +36,45 @@ impl EventLoop {
                             },
                         ..
                     } => {
-                        f(Event::Input(input::Event::KeyboardInput {
-                            state,
-                            key_code,
-                        }));
+                        f(Event::Input(input::Event::Keyboard(
+                            keyboard::Event::Input { state, key_code },
+                        )));
+                    }
+                    winit::WindowEvent::ReceivedCharacter(codepoint) => {
+                        f(Event::Input(input::Event::Keyboard(
+                            keyboard::Event::TextEntered {
+                                character: codepoint,
+                            },
+                        )))
                     }
                     winit::WindowEvent::MouseInput {
                         state, button, ..
-                    } => f(Event::Input(input::Event::MouseInput {
-                        state,
-                        button,
-                    })),
+                    } => f(Event::Input(input::Event::Mouse(
+                        mouse::Event::Input { state, button },
+                    ))),
                     winit::WindowEvent::MouseWheel { delta, .. } => match delta
                     {
                         winit::MouseScrollDelta::LineDelta(x, y) => {
-                            f(Event::Input(input::Event::MouseWheel {
-                                delta_x: x,
-                                delta_y: y,
-                            }))
+                            f(Event::Input(input::Event::Mouse(
+                                mouse::Event::WheelScrolled {
+                                    delta_x: x,
+                                    delta_y: y,
+                                },
+                            )))
                         }
                         _ => {}
                     },
-
-                    winit::WindowEvent::ReceivedCharacter(codepoint) => {
-                        f(Event::Input(input::Event::TextInput {
-                            character: codepoint,
-                        }))
-                    }
                     winit::WindowEvent::CursorMoved { position, .. } => {
                         f(Event::CursorMoved(position))
                     }
                     winit::WindowEvent::CursorEntered { .. } => {
-                        f(Event::Input(input::Event::CursorEntered))
+                        f(Event::Input(input::Event::Mouse(
+                            mouse::Event::CursorEntered,
+                        )))
                     }
-                    winit::WindowEvent::CursorLeft { .. } => {
-                        f(Event::Input(input::Event::CursorLeft))
-                    }
+                    winit::WindowEvent::CursorLeft { .. } => f(Event::Input(
+                        input::Event::Mouse(mouse::Event::CursorLeft),
+                    )),
                     winit::WindowEvent::CloseRequested { .. } => {
                         f(Event::CloseRequested)
                     }
@@ -80,9 +83,9 @@ impl EventLoop {
                     }
                     winit::WindowEvent::Focused(focus) => {
                         f(Event::Input(if focus == true {
-                            input::Event::WindowFocused
+                            input::Event::Window(window::Event::Focused)
                         } else {
-                            input::Event::WindowUnfocused
+                            input::Event::Window(window::Event::Unfocused)
                         }))
                     }
                     winit::WindowEvent::Moved(position) => {

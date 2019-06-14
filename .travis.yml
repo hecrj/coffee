@@ -10,6 +10,11 @@ os:
 before_install:
   - |
     if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+      sudo apt-get -qq update
+      sudo apt-get install -y libudev-dev
+    fi
+  - |
+    if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
       mkdir glslang
       cd glslang
       wget https://github.com/KhronosGroup/glslang/releases/download/7.11.3214/glslang-master-linux-Release.zip

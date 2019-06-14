@@ -1,8 +1,6 @@
-use crate::graphics::window::winit;
+use crate::input::{gamepad, keyboard, mouse, window};
 
-pub use winit::ElementState as ButtonState;
-pub use winit::MouseButton;
-pub use winit::VirtualKeyCode as KeyCode;
+use std::time::SystemTime;
 
 /// An input event.
 ///
@@ -11,84 +9,29 @@ pub use winit::VirtualKeyCode as KeyCode;
 ///
 /// You can use your own input handler by implementing the [`Input`] trait.
 ///
-/// Controllers will be supported _soon_!
-///
 /// [`Game`]: ../trait.Game.html
 /// [`Game::Input`]: ../trait.Game.html#associatedtype.Input
 /// [`Input`]: trait.Input.html
 #[derive(PartialEq, Clone, Copy, Debug)]
 pub enum Event {
-    /// A keyboard key was pressed or released.
-    KeyboardInput {
-        /// The state of the key
-        state: ButtonState,
+    /// A keyboard event
+    Keyboard(keyboard::Event),
 
-        /// The key identifier
-        key_code: KeyCode,
+    /// A mouse event
+    Mouse(mouse::Event),
+
+    /// A gamepad event
+    Gamepad {
+        /// The gamepad identifier
+        id: gamepad::Id,
+
+        /// The gamepad event
+        event: gamepad::Event,
+
+        /// The time of the event
+        time: SystemTime,
     },
 
-    /// Text was entered.
-    TextInput {
-        /// The character entered
-        character: char,
-    },
-
-    /// The mouse cursor was moved
-    CursorMoved {
-        /// The X coordinate of the mouse position
-        x: f32,
-
-        /// The Y coordinate of the mouse position
-        y: f32,
-    },
-
-    /// The mouse cursor entered the game window.
-    CursorEntered,
-
-    /// The mouse cursor left the game window.
-    CursorLeft,
-
-    /// The mouse cursor has been taken and is in use.
-    ///
-    /// This event is fired when the cursor is hovering or interacting with a
-    /// [`UserInterface`].
-    ///
-    /// [`UserInterface`]: ../ui/trait.UserInterface.html
-    CursorTaken,
-
-    /// The mouse cursor has been returned and is no longer in use.
-    CursorReturned,
-
-    /// A mouse button was pressed or released.
-    MouseInput {
-        /// The state of the button
-        state: ButtonState,
-
-        /// The button identifier
-        button: MouseButton,
-    },
-
-    /// The mouse wheel was scrolled.
-    MouseWheel {
-        /// The number of horizontal lines scrolled
-        delta_x: f32,
-
-        /// The number of vertical lines scrolled
-        delta_y: f32,
-    },
-
-    /// The game window gained focus.
-    WindowFocused,
-
-    /// The game window lost focus.
-    WindowUnfocused,
-
-    /// The game window was moved.
-    WindowMoved {
-        /// The new X coordinate of the window
-        x: f32,
-
-        /// The new Y coordinate of the window
-        y: f32,
-    },
+    /// A window event
+    Window(window::Event),
 }

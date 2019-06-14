@@ -167,7 +167,7 @@ pub type Element<'a, Message> = self::core::Element<'a, Message, Renderer>;
 
 use crate::game;
 use crate::graphics::{window, Point, Window, WindowSettings};
-use crate::input::{self, Input as _};
+use crate::input::{self, gamepad, mouse, Input as _};
 use crate::load::{Join, LoadingScreen};
 use crate::ui::core::{Event, Interface, MouseCursor, Renderer as _};
 use crate::{Debug, Game, Result, Timer};
@@ -263,7 +263,7 @@ pub trait UserInterface: Game {
         Self: 'static + Sized,
     {
         // Set up window
-        let mut event_loop = window::EventLoop::new();
+        let event_loop = &mut window::EventLoop::new();
         let window = &mut Window::new(window_settings, &event_loop)?;
         let mut debug = Debug::new(window.gpu());
 
@@ -277,6 +277,7 @@ pub trait UserInterface: Game {
             .join();
         let (game, renderer) = &mut loading_screen.run(load, window)?;
         let input = &mut Input::new();
+        let mut gamepads = gamepad::Tracker::new();
         debug.loading_finished();
 
         // Game loop
@@ -297,7 +298,8 @@ pub trait UserInterface: Game {
                     input,
                     &mut debug,
                     window,
-                    &mut event_loop,
+                    event_loop,
+                    gamepads.as_mut(),
                     &mut alive,
                 );
 
@@ -312,7 +314,8 @@ pub trait UserInterface: Game {
                     input,
                     &mut debug,
                     window,
-                    &mut event_loop,
+                    event_loop,
+                    gamepads.as_mut(),
                     &mut alive,
                 );
             }
@@ -343,9 +346,12 @@ pub trait UserInterface: Game {
 
             if new_cursor != mouse_cursor {
                 if new_cursor == MouseCursor::OutOfBounds {
-                    input.update(input::Event::CursorReturned);
+                    input.update(input::Event::Mouse(
+                        mouse::Event::CursorReturned,
+                    ));
                 } else if mouse_cursor == MouseCursor::OutOfBounds {
-                    input.update(input::Event::CursorTaken);
+                    input
+                        .update(input::Event::Mouse(mouse::Event::CursorTaken));
                 }
 
                 window.update_cursor(new_cursor.into());
@@ -394,7 +400,7 @@ impl<I: input::Input> input::Input for Input<I> {
         self.game_input.update(event);
 
         match event {
-            input::Event::CursorMoved { x, y } => {
+            input::Event::Mouse(mouse::Event::CursorMoved { x, y }) => {
                 self.cursor_position = Point::new(x, y);
             }
             _ => {}
@@ -416,13 +422,16 @@ fn interact<G: Game>(
     debug: &mut Debug,
     window: &mut Window,
     event_loop: &mut window::EventLoop,
+    gamepads: Option<&mut gamepad::Tracker>,
     alive: &mut bool,
 ) {
     debug.interact_started();
 
     event_loop.poll(|event| {
-        game::process_event(game, input, debug, window, alive, event)
+        game::process_window_event(game, input, debug, window, alive, event)
     });
+
+    game::process_gamepad_events(gamepads, input);
 
     game.interact(&mut input.game_input, window);
     input.clear();

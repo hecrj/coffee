@@ -1,6 +1,6 @@
 use crate::graphics::window;
 use crate::graphics::{Frame, Window, WindowSettings};
-use crate::input;
+use crate::input::{self, gamepad, keyboard, mouse};
 use crate::load::{LoadingScreen, Task};
 use crate::{Debug, Input, Result, Timer};
 
@@ -54,7 +54,7 @@ pub trait Game {
     /// By default, it is set to `F12`.
     ///
     /// [`debug`]: #method.debug
-    const DEBUG_KEY: Option<input::KeyCode> = Some(input::KeyCode::F12);
+    const DEBUG_KEY: Option<keyboard::KeyCode> = Some(keyboard::KeyCode::F12);
 
     /// Loads the [`Game`].
     ///
@@ -163,7 +163,7 @@ pub trait Game {
         Self: Sized + 'static,
     {
         // Set up window
-        let mut event_loop = window::EventLoop::new();
+        let event_loop = &mut window::EventLoop::new();
         let window = &mut Window::new(window_settings, &event_loop)?;
         let mut debug = Debug::new(window.gpu());
 
@@ -172,6 +172,7 @@ pub trait Game {
         let mut loading_screen = Self::LoadingScreen::new(window.gpu())?;
         let game = &mut loading_screen.run(Self::load(window), window)?;
         let input = &mut Self::Input::new();
+        let mut gamepads = gamepad::Tracker::new();
         debug.loading_finished();
 
         // Game loop
@@ -188,7 +189,8 @@ pub trait Game {
                     input,
                     &mut debug,
                     window,
-                    &mut event_loop,
+                    event_loop,
+                    gamepads.as_mut(),
                     &mut alive,
                 );
 
@@ -203,7 +205,8 @@ pub trait Game {
                     input,
                     &mut debug,
                     window,
-                    &mut event_loop,
+                    event_loop,
+                    gamepads.as_mut(),
                     &mut alive,
                 );
             }
@@ -232,12 +235,16 @@ fn interact<G: Game>(
     debug: &mut Debug,
     window: &mut Window,
     event_loop: &mut window::EventLoop,
+    gamepads: Option<&mut gamepad::Tracker>,
     alive: &mut bool,
 ) {
     debug.interact_started();
 
-    event_loop
-        .poll(|event| process_event(game, input, debug, window, alive, event));
+    event_loop.poll(|event| {
+        process_window_event(game, input, debug, window, alive, event)
+    });
+
+    process_gamepad_events(gamepads, input);
 
     game.interact(input, window);
     input.clear();
@@ -245,7 +252,7 @@ fn interact<G: Game>(
     debug.interact_finished();
 }
 
-pub(crate) fn process_event<G: Game, I: Input>(
+pub(crate) fn process_window_event<G: Game, I: Input>(
     game: &mut G,
     input: &mut I,
     debug: &mut Debug,
@@ -259,10 +266,10 @@ pub(crate) fn process_event<G: Game, I: Input>(
 
             #[cfg(any(debug_assertions, feature = "debug"))]
             match input_event {
-                input::Event::KeyboardInput {
+                input::Event::Keyboard(keyboard::Event::Input {
                     state: input::ButtonState::Released,
                     key_code,
-                } if Some(key_code) == G::DEBUG_KEY => {
+                }) if Some(key_code) == G::DEBUG_KEY => {
                     debug.toggle();
                 }
                 _ => {}
@@ -270,20 +277,19 @@ pub(crate) fn process_event<G: Game, I: Input>(
         }
         window::Event::CursorMoved(logical_position) => {
             let position = logical_position.to_physical(window.dpi());
-            let event = input::Event::CursorMoved {
+
+            input.update(input::Event::Mouse(mouse::Event::CursorMoved {
                 x: position.x as f32,
                 y: position.y as f32,
-            };
-
-            input.update(event);
+            }));
         }
         window::Event::Moved(logical_position) => {
             let position = logical_position.to_physical(window.dpi());
 
-            input.update(input::Event::WindowMoved {
+            input.update(input::Event::Window(input::window::Event::Moved {
                 x: position.x as f32,
                 y: position.y as f32,
-            })
+            }))
         }
         window::Event::CloseRequested => {
             if game.on_close_request() {
@@ -294,4 +300,15 @@ pub(crate) fn process_event<G: Game, I: Input>(
             window.resize(new_size);
         }
     };
+}
+
+pub(crate) fn process_gamepad_events<I: Input>(
+    gamepads: Option<&mut gamepad::Tracker>,
+    input: &mut I,
+) {
+    if let Some(tracker) = gamepads {
+        while let Some((id, event, time)) = tracker.next_event() {
+            input.update(input::Event::Gamepad { id, event, time });
+        }
+    }
 }

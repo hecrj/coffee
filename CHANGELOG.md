@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     widgets.
   - Customization. The `ui::core` module can be used to implement custom widgets
     and renderers.
+- __Gamepad support__. The `input::Event` enum now has a `Gamepad` variant. [#29]
 - __Mesh support__. The types `Shape` and `Mesh` have been introduced.
   Rectangles, circles, ellipses, and polylines can now be drawn with ease using
   fill or stroke modes. [#50]
@@ -45,6 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Default` implementation for `Sprite`. [#35]
 - `Debug::ui_duration`. It returns the average time spent running the UI runtime.
 - Multiple gravity centers based on mouse clicks in the particles example. [#30]
+- A gamepad example that displays the last gamepad event. [#29]
 
 ### Changed
 - The `View` associated type has been removed. Thus, implementors of the `Game`
@@ -62,6 +64,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Game::draw` now takes a `Frame` directly instead of a `Window`. [#35]
 - `LoadingScreen::on_progress` has been renamed to `LoadingScreen::draw` and it
   now receives a `Frame` instead of a `Window`. [#35]
+- `input::Event` is now split into four different variants representing input
+  sources: `Keyboard`, `Mouse`, `Gamepad`, and `Window`. Each one of these
+  sources has its own module inside `input` with an `Event` type where the old
+  variants can be found. [#29]
+- `input::KeyCode` has been moved to `input::keyboard::KeyCode`. [#29]
+- `input::MouseButton` has been moved to `input::mouse::Button`. [#29]
 - The performance of the particles example has been improved considerably on all
   platforms. [#37]
 
@@ -73,6 +81,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#25]: https://github.com/hecrj/coffee/pull/25
 [#26]: https://github.com/hecrj/coffee/pull/26
 [#28]: https://github.com/hecrj/coffee/pull/28
+[#29]: https://github.com/hecrj/coffee/pull/29
 [#30]: https://github.com/hecrj/coffee/pull/30
 [#35]: https://github.com/hecrj/coffee/pull/35
 [#37]: https://github.com/hecrj/coffee/pull/37

@@ -1,9 +1,4 @@
-use crate::graphics::window::winit;
-use crate::input;
-
-pub use winit::ElementState as ButtonState;
-pub use winit::MouseButton;
-pub use winit::VirtualKeyCode as KeyCode;
+use crate::input::{self, gamepad, keyboard, mouse};
 
 /// A user interface event.
 ///
@@ -12,58 +7,31 @@ pub use winit::VirtualKeyCode as KeyCode;
 /// [`input::Event`]: ../../input/enum.Event.html
 #[derive(PartialEq, Clone, Copy, Debug)]
 pub enum Event {
-    /// A keyboard key was pressed or released.
-    KeyboardInput {
-        /// The state of the key
-        state: ButtonState,
+    /// A keyboard event
+    Keyboard(keyboard::Event),
 
-        /// The key identifier
-        key_code: KeyCode,
-    },
+    /// A mouse event
+    Mouse(mouse::Event),
 
-    /// Text was entered.
-    TextInput {
-        /// The character entered
-        character: char,
-    },
+    /// A gamepad event
+    Gamepad {
+        /// The gamepad identifier
+        id: gamepad::Id,
 
-    /// The mouse cursor was moved.
-    CursorMoved,
-
-    /// A mouse button was pressed or released.
-    MouseInput {
-        /// The state of the button
-        state: ButtonState,
-
-        /// The button identifier
-        button: MouseButton,
-    },
-
-    /// The mouse wheel was scrolled.
-    MouseWheel {
-        /// The number of horizontal lines scrolled
-        delta_x: f32,
-
-        /// The number of vertical lines scrolled
-        delta_y: f32,
+        /// The gamepad event
+        event: gamepad::Event,
     },
 }
 
 impl Event {
     pub(crate) fn from_input(event: input::Event) -> Option<Event> {
         match event {
-            input::Event::KeyboardInput { state, key_code } => {
-                Some(Event::KeyboardInput { state, key_code })
+            input::Event::Keyboard(keyboard_event) => {
+                Some(Event::Keyboard(keyboard_event))
             }
-            input::Event::TextInput { character } => {
-                Some(Event::TextInput { character })
-            }
-            input::Event::CursorMoved { .. } => Some(Event::CursorMoved),
-            input::Event::MouseInput { state, button } => {
-                Some(Event::MouseInput { state, button })
-            }
-            input::Event::MouseWheel { delta_x, delta_y } => {
-                Some(Event::MouseWheel { delta_x, delta_y })
+            input::Event::Mouse(mouse_event) => Some(Event::Mouse(mouse_event)),
+            input::Event::Gamepad { id, event, .. } => {
+                Some(Event::Gamepad { id, event })
             }
             _ => None,
         }
