@@ -45,10 +45,7 @@ impl text::Renderer for Renderer {
 
                 let (width, height) = font.borrow_mut().measure(text);
 
-                let size = Size {
-                    width: width + (size / 10.0).round(),
-                    height: height + (size / 3.0).round(),
-                };
+                let size = Size { width, height };
 
                 // If the text has no width boundary we avoid caching as the
                 // layout engine may just be measuring text in a row.

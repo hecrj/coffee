@@ -26,7 +26,7 @@ impl Font {
         self.0.add(text)
     }
 
-    /// Computes the pixel bounds of the given [`Text`].
+    /// Computes the layout bounds of the given [`Text`].
     ///
     /// [`Text`]: struct.Text.html
     pub fn measure(&mut self, text: Text<'_>) -> (f32, f32) {

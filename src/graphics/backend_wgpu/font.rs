@@ -25,10 +25,10 @@ impl Font {
 
     pub fn measure(&mut self, text: Text<'_>) -> (f32, f32) {
         let section: wgpu_glyph::Section<'_> = text.into();
-        let bounds = self.glyphs.pixel_bounds(section);
+        let bounds = self.glyphs.glyph_bounds(section);
 
         match bounds {
-            Some(bounds) => (bounds.width() as f32, bounds.height() as f32),
+            Some(bounds) => (bounds.width(), bounds.height()),
             None => (0.0, 0.0),
         }
     }
