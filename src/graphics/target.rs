@@ -1,4 +1,4 @@
-use crate::graphics::gpu::{Font, Gpu, Instance, TargetView, Texture};
+use crate::graphics::gpu::{self, Font, Gpu, TargetView, Texture, Vertex};
 use crate::graphics::{Color, Transformation};
 
 /// A rendering target.
@@ -22,7 +22,7 @@ impl<'a> Target<'a> {
         view: TargetView,
         width: f32,
         height: f32,
-    ) -> Target {
+    ) -> Target<'_> {
         Target {
             gpu,
             view,
@@ -36,7 +36,7 @@ impl<'a> Target<'a> {
         width: f32,
         height: f32,
         transformation: Transformation,
-    ) -> Target {
+    ) -> Target<'_> {
         let mut target = Self::new(gpu, view, width, height);
         target.transformation = transformation * target.transformation;
         target
@@ -76,7 +76,7 @@ impl<'a> Target<'a> {
     /// ```
     ///
     /// [`Target`]: struct.Target.html
-    pub fn transform(&mut self, transformation: Transformation) -> Target {
+    pub fn transform(&mut self, transformation: Transformation) -> Target<'_> {
         Target {
             gpu: self.gpu,
             view: self.view.clone(),
@@ -92,10 +92,23 @@ impl<'a> Target<'a> {
         self.gpu.clear(&self.view, color);
     }
 
+    pub(super) fn draw_triangles(
+        &mut self,
+        vertices: &[Vertex],
+        indices: &[u16],
+    ) {
+        self.gpu.draw_triangles(
+            vertices,
+            indices,
+            &self.view,
+            &self.transformation,
+        );
+    }
+
     pub(super) fn draw_texture_quads(
         &mut self,
         texture: &Texture,
-        instances: &[Instance],
+        instances: &[gpu::Quad],
     ) {
         self.gpu.draw_texture_quads(
             texture,
@@ -111,7 +124,7 @@ impl<'a> Target<'a> {
 }
 
 impl<'a> std::fmt::Debug for Target<'a> {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "Target {{ transformation: {:?} }}", self.transformation)
     }
 }

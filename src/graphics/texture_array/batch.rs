@@ -1,6 +1,5 @@
 use super::{Index, TextureArray};
-use crate::graphics::gpu::Instance;
-use crate::graphics::{IntoQuad, Point, Target, Transformation, Vector};
+use crate::graphics::{gpu, IntoQuad, Point, Target, Transformation, Vector};
 
 /// A collection of quads that can be drawn with a [`TextureArray`] all at once.
 ///
@@ -8,7 +7,7 @@ use crate::graphics::{IntoQuad, Point, Target, Transformation, Vector};
 #[derive(Debug)]
 pub struct Batch {
     texture_array: TextureArray,
-    instances: Vec<Instance>,
+    instances: Vec<gpu::Quad>,
 }
 
 impl Batch {
@@ -36,7 +35,7 @@ impl Batch {
         quad.source.x += index.offset.x;
         quad.source.y += index.offset.y;
 
-        let mut instance = Instance::from(quad);
+        let mut instance = gpu::Quad::from(quad);
 
         instance.layer = index.layer.into();
 
@@ -46,7 +45,7 @@ impl Batch {
     /// Draw the [`Batch`] at the given position.
     ///
     /// [`Batch`]: struct.Batch.html
-    pub fn draw(&self, position: Point, target: &mut Target) {
+    pub fn draw(&self, position: Point, target: &mut Target<'_>) {
         let mut translated = target.transform(Transformation::translate(
             Vector::new(position.x, position.y),
         ));

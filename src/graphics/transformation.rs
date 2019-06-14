@@ -60,9 +60,9 @@ impl Transformation {
     /// You can use this to rotate your camera, for example.
     /// Note: Rotation is in radians.
     pub fn rotate(rotation: f32) -> Transformation {
-        Transformation(nalgebra::Matrix4::new_rotation(
-            nalgebra::Vector3::new(0.0, 0.0, rotation)
-        ))
+        Transformation(nalgebra::Matrix4::new_rotation(nalgebra::Vector3::new(
+            0.0, 0.0, rotation,
+        )))
     }
 }
 

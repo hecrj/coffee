@@ -1,6 +1,6 @@
 use super::Window;
 
-use crate::graphics::{Color, Target};
+use crate::graphics::{Color, Gpu, Target};
 
 /// The next frame of your game.
 ///
@@ -19,8 +19,17 @@ pub struct Frame<'a> {
 }
 
 impl<'a> Frame<'a> {
-    pub(crate) fn new(window: &mut Window) -> Frame {
+    pub(crate) fn new(window: &mut Window) -> Frame<'_> {
         Frame { window }
+    }
+
+    /// Get the [`Gpu`] linked to the [`Window`] of this [`Frame`].
+    ///
+    /// [`Gpu`]: struct.Gpu.html
+    /// [`Window`]: struct.Window.html
+    /// [`Frame`]: struct.Frame.html
+    pub fn gpu(&mut self) -> &mut Gpu {
+        self.window.gpu()
     }
 
     /// Get the width of the frame.
@@ -38,7 +47,7 @@ impl<'a> Frame<'a> {
     /// You will need to use this in order to render some resources to it.
     ///
     /// [`Target`]: struct.Target.html
-    pub fn as_target(&mut self) -> Target {
+    pub fn as_target(&mut self) -> Target<'_> {
         let view = self.window.surface.target().clone();
         let width = self.window.width;
         let height = self.window.height;

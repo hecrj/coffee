@@ -1,5 +1,5 @@
 use crate::graphics::gpu::{self, texture, Gpu};
-use crate::graphics::{Quad, Target};
+use crate::graphics::{IntoQuad, Target};
 use crate::load::Task;
 use crate::Result;
 
@@ -65,16 +65,19 @@ impl Canvas {
     ///
     /// [`Canvas`]: struct.Canvas.html
     /// [`Target`]: struct.Target.html
-    pub fn draw(&self, quad: Quad, target: &mut Target) {
+    pub fn draw<Q: IntoQuad>(&self, quad: Q, target: &mut Target<'_>) {
         target.draw_texture_quads(
             &self.drawable.texture(),
-            &[gpu::Instance::from(quad)],
+            &[gpu::Quad::from(quad.into_quad(
+                1.0 / self.width() as f32,
+                1.0 / self.height() as f32,
+            ))],
         );
     }
 }
 
 impl std::fmt::Debug for Canvas {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
             "Canvas {{ width: {}, height: {} }}",

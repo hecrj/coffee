@@ -100,10 +100,10 @@ impl Image {
     ///
     /// [`Image`]: struct.Image.html
     #[inline]
-    pub fn draw<Q: IntoQuad>(&self, quad: Q, target: &mut Target) {
+    pub fn draw<Q: IntoQuad>(&self, quad: Q, target: &mut Target<'_>) {
         target.draw_texture_quads(
             &self.texture,
-            &[gpu::Instance::from(quad.into_quad(
+            &[gpu::Quad::from(quad.into_quad(
                 1.0 / self.width() as f32,
                 1.0 / self.height() as f32,
             ))],
@@ -112,7 +112,7 @@ impl Image {
 }
 
 impl std::fmt::Debug for Image {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
             "Image {{ width: {}, height: {} }}",

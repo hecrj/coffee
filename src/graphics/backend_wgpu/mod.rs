@@ -1,24 +1,26 @@
 mod font;
-mod pipeline;
+mod quad;
 mod surface;
 pub mod texture;
+mod triangle;
 mod types;
 
 pub use font::Font;
-pub use pipeline::Instance;
+pub use quad::Quad;
 pub use surface::{winit, Surface};
 pub use texture::Texture;
+pub use triangle::Vertex;
 pub use types::TargetView;
 
 use crate::graphics::{Color, Transformation};
 use crate::{Error, Result};
-use pipeline::Pipeline;
 
 #[allow(missing_debug_implementations)]
 #[allow(missing_docs)]
 pub struct Gpu {
     device: wgpu::Device,
-    pipeline: Pipeline,
+    quad_pipeline: quad::Pipeline,
+    triangle_pipeline: triangle::Pipeline,
     encoder: wgpu::CommandEncoder,
 }
 
@@ -39,7 +41,8 @@ impl Gpu {
             },
         });
 
-        let pipeline = Pipeline::new(&mut device);
+        let quad_pipeline = quad::Pipeline::new(&mut device);
+        let triangle_pipeline = triangle::Pipeline::new(&mut device);
 
         let window = builder
             .build(events_loop)
@@ -54,7 +57,8 @@ impl Gpu {
         Ok((
             Gpu {
                 device,
-                pipeline,
+                quad_pipeline,
+                triangle_pipeline,
                 encoder,
             },
             surface,
@@ -79,14 +83,14 @@ impl Gpu {
         &mut self,
         image: &image::DynamicImage,
     ) -> Texture {
-        Texture::new(&mut self.device, &self.pipeline, image)
+        Texture::new(&mut self.device, &self.quad_pipeline, image)
     }
 
     pub(super) fn upload_texture_array(
         &mut self,
         layers: &[image::DynamicImage],
     ) -> Texture {
-        Texture::new_array(&mut self.device, &self.pipeline, layers)
+        Texture::new_array(&mut self.device, &self.quad_pipeline, layers)
     }
 
     pub(super) fn create_drawable_texture(
@@ -94,27 +98,49 @@ impl Gpu {
         width: u16,
         height: u16,
     ) -> texture::Drawable {
-        texture::Drawable::new(&mut self.device, &self.pipeline, width, height)
+        texture::Drawable::new(
+            &mut self.device,
+            &self.quad_pipeline,
+            width,
+            height,
+        )
     }
 
     pub(super) fn upload_font(&mut self, bytes: &'static [u8]) -> Font {
         Font::from_bytes(&mut self.device, bytes)
     }
 
-    pub(super) fn draw_texture_quads(
+    pub(super) fn draw_triangles(
         &mut self,
-        texture: &Texture,
-        instances: &[Instance],
+        vertices: &[Vertex],
+        indices: &[u16],
         view: &TargetView,
         transformation: &Transformation,
     ) {
-        self.pipeline.draw_texture_quads(
+        self.triangle_pipeline.draw(
+            &mut self.device,
+            &mut self.encoder,
+            vertices,
+            indices,
+            transformation,
+            view,
+        );
+    }
+
+    pub(super) fn draw_texture_quads(
+        &mut self,
+        texture: &Texture,
+        instances: &[Quad],
+        view: &TargetView,
+        transformation: &Transformation,
+    ) {
+        self.quad_pipeline.draw_textured(
             &mut self.device,
             &mut self.encoder,
             texture.binding(),
             instances,
-            &transformation,
-            &view,
+            transformation,
+            view,
         );
     }
 

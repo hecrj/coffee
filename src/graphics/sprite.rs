@@ -15,6 +15,25 @@ pub struct Sprite {
 
     /// The position where the sprite should be drawn.
     pub position: Point,
+
+    /// The scale to apply to the sprite.
+    pub scale: (f32, f32),
+}
+
+impl Default for Sprite {
+    #[inline]
+    fn default() -> Sprite {
+        Sprite {
+            source: Rectangle {
+                x: 0,
+                y: 0,
+                width: 1,
+                height: 1,
+            },
+            position: Point::new(0.0, 0.0),
+            scale: (1.0, 1.0),
+        }
+    }
 }
 
 impl IntoQuad for Sprite {
@@ -27,7 +46,10 @@ impl IntoQuad for Sprite {
                 height: self.source.height as f32 * y_unit,
             },
             position: self.position,
-            size: (self.source.width as f32, self.source.height as f32),
+            size: (
+                self.source.width as f32 * self.scale.0,
+                self.source.height as f32 * self.scale.1,
+            ),
         }
     }
 }

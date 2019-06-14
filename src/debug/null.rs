@@ -8,7 +8,7 @@ pub struct Debug {}
 
 #[cfg(not(debug_assertions))]
 impl Debug {
-    pub(crate) fn new(_gpu: &mut graphics::Gpu, _draw_rate: u16) -> Self {
+    pub(crate) fn new(_gpu: &mut graphics::Gpu) -> Self {
         Self {}
     }
 
@@ -22,6 +22,8 @@ impl Debug {
     pub(crate) fn update_finished(&mut self) {}
     pub(crate) fn draw_started(&mut self) {}
     pub(crate) fn draw_finished(&mut self) {}
+    pub(crate) fn ui_started(&mut self) {}
+    pub(crate) fn ui_finished(&mut self) {}
     pub(crate) fn debug_started(&mut self) {}
     pub(crate) fn debug_finished(&mut self) {}
 
@@ -33,5 +35,5 @@ impl Debug {
     }
 
     #[allow(missing_docs)]
-    pub fn draw(&mut self, _frame: &mut graphics::Frame) {}
+    pub fn draw(&mut self, _frame: &mut graphics::Frame<'_>) {}
 }

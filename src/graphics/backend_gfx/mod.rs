@@ -1,14 +1,16 @@
 mod font;
 mod format;
-mod pipeline;
+mod quad;
 mod surface;
 pub mod texture;
+mod triangle;
 mod types;
 
 pub use font::Font;
-pub use pipeline::Instance;
+pub use quad::Quad;
 pub use surface::{winit, Surface};
 pub use texture::Texture;
+pub use triangle::Vertex;
 pub use types::TargetView;
 
 use gfx::{self, Device};
@@ -16,7 +18,6 @@ use gfx_device_gl as gl;
 
 use crate::graphics::{Color, Transformation};
 use crate::Result;
-use pipeline::Pipeline;
 
 /// A link between your game and a graphics processor.
 ///
@@ -35,7 +36,8 @@ pub struct Gpu {
     device: gl::Device,
     factory: gl::Factory,
     encoder: gfx::Encoder<gl::Resources, gl::CommandBuffer>,
-    pipeline: Pipeline,
+    triangle_pipeline: triangle::Pipeline,
+    quad_pipeline: quad::Pipeline,
 }
 
 impl Gpu {
@@ -49,15 +51,22 @@ impl Gpu {
         let mut encoder: gfx::Encoder<gl::Resources, gl::CommandBuffer> =
             factory.create_command_buffer().into();
 
-        let pipeline =
-            Pipeline::new(&mut factory, &mut encoder, surface.target());
+        let triangle_pipeline = triangle::Pipeline::new(
+            &mut factory,
+            &mut encoder,
+            surface.target(),
+        );
+
+        let quad_pipeline =
+            quad::Pipeline::new(&mut factory, &mut encoder, surface.target());
 
         Ok((
             Gpu {
                 device,
                 factory,
                 encoder,
-                pipeline,
+                triangle_pipeline,
+                quad_pipeline,
             },
             surface,
         ))
@@ -107,20 +116,37 @@ impl Gpu {
         Font::from_bytes(&mut self.factory, bytes)
     }
 
-    pub(super) fn draw_texture_quads(
+    pub(super) fn draw_triangles(
         &mut self,
-        texture: &Texture,
-        instances: &[Instance],
+        vertices: &[Vertex],
+        indices: &[u16],
         view: &TargetView,
         transformation: &Transformation,
     ) {
-        self.pipeline.bind_texture(texture);
+        self.triangle_pipeline.draw(
+            &mut self.factory,
+            &mut self.encoder,
+            vertices,
+            indices,
+            transformation,
+            view,
+        );
+    }
 
-        self.pipeline.draw_quads(
+    pub(super) fn draw_texture_quads(
+        &mut self,
+        texture: &Texture,
+        instances: &[Quad],
+        view: &TargetView,
+        transformation: &Transformation,
+    ) {
+        self.quad_pipeline.bind_texture(texture);
+
+        self.quad_pipeline.draw_textured(
             &mut self.encoder,
             instances,
-            &transformation,
-            &view,
+            transformation,
+            view,
         );
     }
 

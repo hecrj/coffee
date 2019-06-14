@@ -1,6 +1,6 @@
 use std::time;
 
-/// The timer of your game.
+/// The timer of your game state.
 ///
 /// A [`Timer`] is updated once per frame, and it ticks [`Game::TICKS_PER_SECOND`]
 /// times every second. When the timer ticks, your game is updated.

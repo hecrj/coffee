@@ -29,15 +29,17 @@ pub struct Debug {
     update_durations: TimeBuffer,
     draw_start: time::Instant,
     draw_durations: TimeBuffer,
+    ui_start: time::Instant,
+    ui_durations: TimeBuffer,
     debug_start: time::Instant,
     debug_durations: TimeBuffer,
-    text: Vec<graphics::Text>,
+    text: Vec<(String, String)>,
     draw_rate: u16,
     frames_until_refresh: u16,
 }
 
 impl Debug {
-    pub(crate) fn new(gpu: &mut graphics::Gpu, draw_rate: u16) -> Self {
+    pub(crate) fn new(gpu: &mut graphics::Gpu) -> Self {
         let now = time::Instant::now();
 
         Self {
@@ -54,10 +56,12 @@ impl Debug {
             update_durations: TimeBuffer::new(200),
             draw_start: now,
             draw_durations: TimeBuffer::new(200),
+            ui_start: now,
+            ui_durations: TimeBuffer::new(200),
             debug_start: now,
             debug_durations: TimeBuffer::new(200),
             text: Vec::new(),
-            draw_rate,
+            draw_rate: 10,
             frames_until_refresh: 0,
         }
     }
@@ -70,9 +74,9 @@ impl Debug {
         self.load_duration = time::Instant::now() - self.load_start;
     }
 
-    /// Get the time spent running [`Game::new`].
+    /// Get the time spent loading your [`Game`].
     ///
-    /// [`Game::new`]: trait.Game.html#tymethod.new
+    /// [`Game`]: trait.Game.html
     pub fn load_duration(&self) -> time::Duration {
         self.load_duration
     }
@@ -143,6 +147,21 @@ impl Debug {
         self.draw_durations.average()
     }
 
+    pub(crate) fn ui_started(&mut self) {
+        self.ui_start = time::Instant::now();
+    }
+
+    pub(crate) fn ui_finished(&mut self) {
+        self.ui_durations.push(time::Instant::now() - self.ui_start);
+    }
+
+    /// Get the average time spent rendering the [`UserInterface`].
+    ///
+    /// [`UserInterface`]: ui/trait.UserInterface.html
+    pub fn ui_duration(&self) -> time::Duration {
+        self.ui_durations.average()
+    }
+
     pub(crate) fn toggle(&mut self) {
         self.enabled = !self.enabled;
         self.frames_until_refresh = 0;
@@ -161,26 +180,22 @@ impl Debug {
     ///
     /// [`Game::debug`]: trait.Game.html#tymethod.debug
     pub fn debug_duration(&self) -> time::Duration {
-        self.draw_durations.average()
+        self.debug_durations.average()
     }
 
     pub(crate) fn is_enabled(&self) -> bool {
         self.enabled
     }
 
-    /// Draw the debug information.
-    pub fn draw(&mut self, frame: &mut graphics::Frame) {
+    /// Draws the debug information.
+    pub fn draw(&mut self, frame: &mut graphics::Frame<'_>) {
         if self.frames_until_refresh <= 0 {
             self.text.clear();
-            self.refresh_text(frame);
+            self.refresh_text();
             self.frames_until_refresh = self.draw_rate.max(1);
         }
 
-        for text in &self.text {
-            self.font.add(text.clone());
-        }
-
-        self.font.draw(&mut frame.as_target());
+        self.draw_text(frame);
         self.frames_until_refresh -= 1;
     }
 
@@ -189,8 +204,7 @@ impl Debug {
     const TITLE_WIDTH: f32 = 150.0;
     const SHADOW_OFFSET: f32 = 2.0;
 
-    fn refresh_text(&mut self, frame: &mut graphics::Frame) {
-        let bounds = (frame.width(), frame.height());
+    fn refresh_text(&mut self) {
         let frame_duration = self.frame_durations.average();
         let frame_micros = (frame_duration.as_secs() as u32 * 1_000_000
             + frame_duration.subsec_micros())
@@ -200,73 +214,70 @@ impl Debug {
         let rows = [
             ("Load:", self.load_duration, None),
             ("Interact:", self.interact_duration, None),
-            ("Update:", self.update_durations.average(), None),
-            ("Draw:", self.draw_durations.average(), None),
-            ("Debug:", self.debug_durations.average(), None),
+            ("Update:", self.update_duration(), None),
+            ("Draw:", self.draw_duration(), None),
+            ("UI:", self.ui_duration(), None),
+            ("Debug:", self.debug_duration(), None),
             ("Frame:", frame_duration, Some(fps.to_string() + " fps")),
         ];
 
-        for (i, (title, duration, extra)) in rows.iter().enumerate() {
-            for text in
-                Self::duration_row(i, bounds, title, duration, extra).iter()
-            {
-                self.text.push(text.clone());
-            }
+        for (title, duration, extra) in rows.iter() {
+            let formatted_duration = match extra {
+                Some(string) => format_duration(duration) + " (" + string + ")",
+                None => format_duration(duration),
+            };
+
+            self.text.push((String::from(*title), formatted_duration));
         }
     }
 
-    fn duration_row(
-        row: usize,
-        bounds: (f32, f32),
-        title: &str,
-        duration: &time::Duration,
-        extra: &Option<String>,
-    ) -> [graphics::Text; 4] {
-        let y = row as f32 * Self::ROW_HEIGHT;
-        let formatted_duration = match extra {
-            Some(string) => format_duration(duration) + " (" + &string + ")",
-            None => format_duration(duration),
-        };
+    fn draw_text(&mut self, frame: &mut graphics::Frame<'_>) {
+        for (row, (key, value)) in self.text.iter().enumerate() {
+            let y = row as f32 * Self::ROW_HEIGHT;
 
-        [
-            graphics::Text {
-                content: String::from(title),
+            self.font.add(graphics::Text {
+                content: key,
                 position: graphics::Point::new(
                     Self::MARGIN + Self::SHADOW_OFFSET,
                     Self::MARGIN + y + Self::SHADOW_OFFSET,
                 ),
-                bounds,
                 size: 20.0,
                 color: graphics::Color::BLACK,
-            },
-            graphics::Text {
-                content: String::from(title),
+                ..graphics::Text::default()
+            });
+
+            self.font.add(graphics::Text {
+                content: key,
                 position: graphics::Point::new(Self::MARGIN, Self::MARGIN + y),
-                bounds,
                 size: 20.0,
                 color: graphics::Color::WHITE,
-            },
-            graphics::Text {
-                content: formatted_duration.clone(),
+                ..graphics::Text::default()
+            });
+
+            self.font.add(graphics::Text {
+                content: value,
                 position: graphics::Point::new(
                     Self::MARGIN + Self::TITLE_WIDTH + Self::SHADOW_OFFSET,
                     Self::MARGIN + y + Self::SHADOW_OFFSET,
                 ),
-                bounds,
                 size: 20.0,
                 color: graphics::Color::BLACK,
-            },
-            graphics::Text {
-                content: formatted_duration,
+                ..graphics::Text::default()
+            });
+
+            self.font.add(graphics::Text {
+                content: value,
                 position: graphics::Point::new(
                     Self::MARGIN + Self::TITLE_WIDTH,
                     Self::MARGIN + y,
                 ),
-                bounds,
                 size: 20.0,
                 color: graphics::Color::WHITE,
-            },
-        ]
+                ..graphics::Text::default()
+            });
+        }
+
+        self.font.draw(&mut frame.as_target());
     }
 }
 
@@ -293,7 +304,7 @@ fn format_duration(duration: &time::Duration) -> String {
 }
 
 impl std::fmt::Debug for Debug {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
             "Debug {{ load: {:?}, interact: {:?}, update: {:?}, draw: {:?}, frame: {:?} }}",

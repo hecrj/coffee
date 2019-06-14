@@ -2,21 +2,21 @@ use std::fmt;
 use std::rc::Rc;
 
 use super::types::TargetView;
-use crate::graphics::gpu::pipeline::{self, Pipeline};
+use crate::graphics::gpu::quad::{self, Pipeline};
 use crate::graphics::Transformation;
 
 #[derive(Clone)]
 pub struct Texture {
     texture: Rc<wgpu::Texture>,
     view: TargetView,
-    binding: Rc<pipeline::TextureBinding>,
+    binding: Rc<quad::TextureBinding>,
     width: u16,
     height: u16,
     layers: u16,
 }
 
 impl fmt::Debug for Texture {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
             "Texture {{ width: {}, height: {}, layers: {} }}",
@@ -93,7 +93,7 @@ impl Texture {
         &self.view
     }
 
-    pub(super) fn binding(&self) -> &pipeline::TextureBinding {
+    pub(super) fn binding(&self) -> &quad::TextureBinding {
         &self.binding
     }
 
@@ -161,7 +161,7 @@ fn create_texture_array(
     height: u16,
     layers: Option<&[&[u8]]>,
     usage: wgpu::TextureUsageFlags,
-) -> (wgpu::Texture, wgpu::TextureView, pipeline::TextureBinding) {
+) -> (wgpu::Texture, wgpu::TextureView, quad::TextureBinding) {
     let extent = wgpu::Extent3d {
         width: width as u32,
         height: height as u32,

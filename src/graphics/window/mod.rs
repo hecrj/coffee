@@ -21,6 +21,7 @@ pub struct Window {
     surface: gpu::Surface,
     width: f32,
     height: f32,
+    is_fullscreen: bool,
 }
 
 impl Window {
@@ -38,8 +39,12 @@ impl Window {
 
         settings.size = (width, height);
 
-        let (gpu, surface) =
-            Gpu::for_window(settings.into_builder(), event_loop.raw())?;
+        let is_fullscreen = settings.fullscreen;
+
+        let (gpu, surface) = Gpu::for_window(
+            settings.into_builder(event_loop.raw()),
+            event_loop.raw(),
+        )?;
 
         let window = surface.window();
 
@@ -55,6 +60,7 @@ impl Window {
             .unwrap_or((width as f32, height as f32));
 
         Ok(Window {
+            is_fullscreen,
             gpu,
             surface,
             width,
@@ -74,8 +80,25 @@ impl Window {
     ///
     /// [`Frame`]: struct.Frame.html
     /// [`Window`]: struct.Window.html
-    pub fn frame(&mut self) -> Frame {
+    pub(crate) fn frame(&mut self) -> Frame<'_> {
         Frame::new(self)
+    }
+
+    /// Toggles the [`Window`]'s fullscreen state.
+    ///
+    /// [`Window`]: struct.Window.html
+    pub fn toggle_fullscreen(&mut self) {
+        let window = self.surface.window();
+
+        let monitor = if self.is_fullscreen {
+            None
+        } else {
+            Some(window.get_primary_monitor())
+        };
+
+        window.set_fullscreen(monitor);
+
+        self.is_fullscreen = !self.is_fullscreen;
     }
 
     /// Get the width of the [`Window`].
@@ -109,10 +132,14 @@ impl Window {
         self.width = physical_size.width as f32;
         self.height = physical_size.height as f32;
     }
+
+    pub(crate) fn update_cursor(&mut self, new_cursor: winit::MouseCursor) {
+        self.surface.window().set_cursor(new_cursor);
+    }
 }
 
 impl std::fmt::Debug for Window {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
             "Window {{ width: {}, height: {} }}",
