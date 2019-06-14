@@ -27,6 +27,10 @@ pub trait Renderer {
     ///
     /// This will be called when [`Element::explain`] has been used. It should
     /// _explain_ the [`Layout`] graphically.
+    ///
+    /// [`Layout`]: struct.Layout.html
+    /// [`Element`]: struct.Element.html
+    /// [`Element::explain`]: struct.Element.html#method.explain
     fn explain(&mut self, layout: &Layout<'_>, color: Color);
 
     /// Flushes the renderer to draw on the given [`Frame`].
