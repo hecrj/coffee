@@ -1,65 +1,17 @@
 //! An example that showcases gamepad events
-use coffee::graphics::{
-    Color, Font, Frame, Point, Text, Window, WindowSettings,
-};
+use coffee::graphics::{Color, Frame, Window, WindowSettings};
 use coffee::input::{self, gamepad, Input};
 use coffee::load::Task;
-use coffee::{Game, Result, Timer};
+use coffee::ui::{Align, Column, Element, Justify, Renderer, Text};
+use coffee::{Game, Result, Timer, UserInterface};
 
 fn main() -> Result<()> {
-    GamepadExample::run(WindowSettings {
+    <GamepadExample as UserInterface>::run(WindowSettings {
         title: String::from("Gamepad - Coffee"),
         size: (1280, 1024),
         resizable: false,
         fullscreen: false,
     })
-}
-
-struct GamepadExample {
-    font: Font,
-    last_event: String,
-}
-
-impl Game for GamepadExample {
-    type Input = Gamepad;
-    type LoadingScreen = ();
-
-    fn load(_window: &Window) -> Task<GamepadExample> {
-        Font::load(include_bytes!("../resources/font/Inconsolata-Regular.ttf"))
-            .map(|font| GamepadExample {
-                font,
-                last_event: "None".to_string(),
-            })
-    }
-
-    fn interact(&mut self, gamepad: &mut Gamepad, _window: &mut Window) {
-        if let Some(event) = gamepad.last_event {
-            self.last_event = format!("{:#?}", event);
-        }
-    }
-
-    fn draw(&mut self, frame: &mut Frame, _timer: &Timer) {
-        frame.clear(Color::BLACK);
-
-        // Draw simple text UI
-        self.font.add(Text {
-            content: "Last Gamepad Event:",
-            position: Point::new(10.0, frame.height() - 250.0),
-            size: 20.0,
-            color: Color::WHITE,
-            ..Text::default()
-        });
-
-        self.font.add(Text {
-            content: &self.last_event.clone(),
-            position: Point::new(10.0, frame.height() - 225.0),
-            size: 16.0,
-            color: Color::WHITE,
-            ..Text::default()
-        });
-
-        self.font.draw(&mut frame.as_target());
-    }
 }
 
 struct Gamepad {
@@ -81,4 +33,57 @@ impl Input for Gamepad {
     }
 
     fn clear(&mut self) {}
+}
+
+struct GamepadExample {
+    last_event: String,
+}
+
+impl Game for GamepadExample {
+    type Input = Gamepad;
+    type LoadingScreen = ();
+
+    fn load(_window: &Window) -> Task<GamepadExample> {
+        Task::new(|| GamepadExample {
+            last_event: "None".to_string(),
+        })
+    }
+
+    fn interact(&mut self, gamepad: &mut Gamepad, _window: &mut Window) {
+        if let Some(event) = gamepad.last_event {
+            self.last_event = format!("{:#?}", event);
+        }
+    }
+
+    fn draw(&mut self, frame: &mut Frame, _timer: &Timer) {
+        frame.clear(Color {
+            r: 0.3,
+            g: 0.3,
+            b: 0.6,
+            a: 1.0,
+        });
+    }
+}
+
+impl UserInterface for GamepadExample {
+    type Message = ();
+    type Renderer = Renderer;
+
+    fn react(&mut self, _msg: ()) {}
+
+    fn layout(&mut self, window: &Window) -> Element<()> {
+        Column::new()
+            .width(window.width() as u32)
+            .height(window.height() as u32)
+            .align_items(Align::Center)
+            .justify_content(Justify::Center)
+            .push(
+                Column::new()
+                    .max_width(500)
+                    .spacing(20)
+                    .push(Text::new("Last gamepad event:").size(30))
+                    .push(Text::new(&self.last_event)),
+            )
+            .into()
+    }
 }
