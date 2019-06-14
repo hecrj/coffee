@@ -30,7 +30,7 @@ impl Event {
                 Some(Event::Keyboard(keyboard_event))
             }
             input::Event::Mouse(mouse_event) => Some(Event::Mouse(mouse_event)),
-            input::Event::Gamepad { id, event } => {
+            input::Event::Gamepad { id, event, .. } => {
                 Some(Event::Gamepad { id, event })
             }
             _ => None,

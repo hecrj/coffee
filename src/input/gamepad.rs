@@ -9,6 +9,7 @@ pub use gilrs::Button;
 
 use gilrs::Gilrs;
 use std::convert::TryInto;
+use std::time::SystemTime;
 
 /// A gamepad identifier.
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
@@ -36,13 +37,13 @@ impl Tracker {
         }
     }
 
-    pub fn next_event(&mut self) -> Option<(Id, Event)> {
-        while let Some(gilrs::Event { id, event, .. }) =
+    pub fn next_event(&mut self) -> Option<(Id, Event, SystemTime)> {
+        while let Some(gilrs::Event { id, event, time }) =
             self.context.next_event()
         {
             match event.try_into() {
                 Ok(gamepad_event) => {
-                    return Some((Id(id), gamepad_event));
+                    return Some((Id(id), gamepad_event, time));
                 }
                 Err(_) => {}
             }

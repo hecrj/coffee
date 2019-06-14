@@ -1,5 +1,7 @@
 use crate::input::{gamepad, keyboard, mouse, window};
 
+use std::time::SystemTime;
+
 /// An input event.
 ///
 /// Input events in your [`Game`] are processed by the [`Game::Input`] associated
@@ -25,6 +27,9 @@ pub enum Event {
 
         /// The gamepad event
         event: gamepad::Event,
+
+        /// The time of the event
+        time: SystemTime,
     },
 
     /// A window event

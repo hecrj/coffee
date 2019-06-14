@@ -307,8 +307,8 @@ pub(crate) fn process_gamepad_events<I: Input>(
     input: &mut I,
 ) {
     if let Some(tracker) = gamepads {
-        while let Some((id, event)) = tracker.next_event() {
-            input.update(input::Event::Gamepad { id, event });
+        while let Some((id, event, time)) = tracker.next_event() {
+            input.update(input::Event::Gamepad { id, event, time });
         }
     }
 }
