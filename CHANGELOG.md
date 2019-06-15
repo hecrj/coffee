@@ -78,6 +78,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Font::load` has been renamed to `Font::load_from_bytes` for consistency. [#55]
 - The performance of the particles example has been improved considerably on all
   platforms. [#37]
+- The `input` example uses the new `ui` module now.
 
 ### Removed
 - The `Game::View` associated type. Implementors of the `Game` trait are also
