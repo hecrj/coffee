@@ -100,7 +100,7 @@ impl Game for MyGame {
 }
 ```
 
-Examine the [documentation] and the [examples] to learn more!
+Browse the [documentation] and the [examples] to learn more!
 
 [documentation]: https://docs.rs/coffee
 [examples]: https://github.com/hecrj/coffee/tree/master/examples
