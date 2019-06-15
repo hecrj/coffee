@@ -35,7 +35,7 @@ impl Default for Quad {
 /// Most methods accept generic types that can be turned into quads. This allows
 /// you to use your own quad-based type.
 pub trait IntoQuad {
-    /// Turn the implementor into a quad.
+    /// Turns the implementor into a quad.
     ///
     /// `x_unit` and `y_unit` are conversion factors for the [`source`] field.
     /// Use them to convert absolute resource coordinates into relative

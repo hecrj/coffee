@@ -21,7 +21,7 @@ pub struct Image {
 }
 
 impl Image {
-    /// Load an [`Image`] from the given path.
+    /// Loads an [`Image`] from the given path.
     ///
     /// [`Image`]: struct.Image.html
     pub fn new<P: AsRef<Path>>(gpu: &mut Gpu, path: P) -> Result<Image> {
@@ -35,7 +35,7 @@ impl Image {
         Image::from_image(gpu, image)
     }
 
-    /// Create a [`Task`] that loads an [`Image`] from the given path.
+    /// Creates a [`Task`] that loads an [`Image`] from the given path.
     ///
     /// [`Task`]: ../load/struct.Task.html
     /// [`Image`]: struct.Image.html
@@ -45,7 +45,7 @@ impl Image {
         Task::using_gpu(move |gpu| Image::new(gpu, &p))
     }
 
-    /// Create an [`Image`] from a [`DynamicImage`] of the [`image` crate].
+    /// Creates an [`Image`] from a [`DynamicImage`] of the [`image` crate].
     ///
     /// [`Image`]: struct.Image.html
     /// [`DynamicImage`]: https://docs.rs/image/0.21.1/image/enum.DynamicImage.html
@@ -59,7 +59,7 @@ impl Image {
         Ok(Image { texture })
     }
 
-    /// Create an [`Image`] representing a color palette.
+    /// Creates an [`Image`] representing a color palette.
     ///
     /// Each [`Color`] will be a pixel of the image, arranged horizontally.
     ///
@@ -82,23 +82,24 @@ impl Image {
         )
     }
 
-    /// Get the width of the [`Image`].
+    /// Returns the width of the [`Image`].
     ///
     /// [`Image`]: struct.Image.html
     pub fn width(&self) -> u16 {
         self.texture.width()
     }
 
-    /// Get the height of the [`Image`].
+    /// Returns the height of the [`Image`].
     ///
     /// [`Image`]: struct.Image.html
     pub fn height(&self) -> u16 {
         self.texture.height()
     }
 
-    /// Draw the [`Image`].
+    /// Draws the [`Image`] on the given [`Target`].
     ///
     /// [`Image`]: struct.Image.html
+    /// [`Target`]: struct.Target.html
     #[inline]
     pub fn draw<Q: IntoQuad>(&self, quad: Q, target: &mut Target<'_>) {
         target.draw_texture_quads(

@@ -17,7 +17,7 @@ impl Transformation {
         Transformation(nalgebra::Matrix4::identity())
     }
 
-    /// Obtain an orthographic projection.
+    /// Creates an orthographic projection.
     ///
     /// You should rarely need this. On creation, a [`Target`] is automatically
     /// set up with the correct orthographic projection.
@@ -29,7 +29,7 @@ impl Transformation {
         ))
     }
 
-    /// Obtain a translate transformation.
+    /// Creates a translate transformation.
     ///
     /// You can use this to pan your camera, for example.
     pub fn translate(translation: Vector) -> Transformation {
@@ -38,14 +38,14 @@ impl Transformation {
         ))
     }
 
-    /// Obtain a uniform scale transformation.
+    /// Creates a uniform scale transformation.
     ///
     /// You can use this to zoom your camera, for example.
     pub fn scale(scale: f32) -> Transformation {
         Transformation(nalgebra::Matrix4::new_scaling(scale))
     }
 
-    /// Obtain a non-uniform scale transformation.
+    /// Creates a non-uniform scale transformation.
     ///
     /// It allows you to scale each axis independently. You should rarely need
     /// this.
@@ -55,10 +55,9 @@ impl Transformation {
         ))
     }
 
-    /// Obtain a rotation transformation.
+    /// Creates a rotation transformation (in radians).
     ///
     /// You can use this to rotate your camera, for example.
-    /// Note: Rotation is in radians.
     pub fn rotate(rotation: f32) -> Transformation {
         Transformation(nalgebra::Matrix4::new_rotation(nalgebra::Vector3::new(
             0.0, 0.0, rotation,

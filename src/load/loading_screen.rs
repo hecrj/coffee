@@ -17,8 +17,8 @@ mod progress_bar;
 
 pub use progress_bar::ProgressBar;
 
-use super::{Progress, Task};
 use crate::graphics;
+use crate::load::{Progress, Task};
 use crate::Result;
 
 /// A loading screen keeps track of the progress of a task and provides feedback

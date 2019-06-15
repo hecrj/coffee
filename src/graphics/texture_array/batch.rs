@@ -11,7 +11,7 @@ pub struct Batch {
 }
 
 impl Batch {
-    /// Create a new [`Batch`] from a [`TextureArray`].
+    /// Creates a new [`Batch`] from a [`TextureArray`].
     ///
     /// [`Batch`]: struct.Batch.html
     /// [`TextureArray`]: struct.TextureArray.html
@@ -22,7 +22,7 @@ impl Batch {
         }
     }
 
-    /// Add a quad to the [`Batch`] that will be rendered using the texture
+    /// Adds a quad to the [`Batch`] that will be rendered using the texture
     /// represented by the given [`Index`].
     ///
     /// [`Batch`]: struct.Batch.html
@@ -42,9 +42,10 @@ impl Batch {
         self.instances.push(instance);
     }
 
-    /// Draw the [`Batch`].
+    /// Draws the [`Batch`] on the given [`Target`].
     ///
     /// [`Batch`]: struct.Batch.html
+    /// [`Target`]: ../struct.Target.html
     pub fn draw(&self, target: &mut Target<'_>) {
         target.draw_texture_quads(
             &self.texture_array.texture,

@@ -5,8 +5,9 @@ use coffee::graphics::{
 use coffee::load::Task;
 use coffee::ui::{
     button, Align, Button, Column, Element, Justify, Renderer, Text,
+    UserInterface,
 };
-use coffee::{Game, Result, Timer, UserInterface};
+use coffee::{Game, Result, Timer};
 
 pub fn main() -> Result<()> {
     <Counter as UserInterface>::run(WindowSettings {

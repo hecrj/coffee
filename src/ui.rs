@@ -24,8 +24,7 @@
 //!
 //! ```
 //! use coffee::graphics::{Color, Window};
-//! use coffee::ui::{button, Button, Column, Element, Renderer, Text};
-//! use coffee::UserInterface;
+//! use coffee::ui::{button, Button, Column, Element, Renderer, Text, UserInterface};
 //! # use coffee::graphics::{Frame, WindowSettings};
 //! # use coffee::input::KeyboardAndMouse;
 //! # use coffee::load::{loading_screen::ProgressBar, Task};

@@ -4,9 +4,9 @@ use coffee::graphics::{
 use coffee::load::Task;
 use coffee::ui::{
     button, slider, Align, Button, Checkbox, Column, Element, Justify, Radio,
-    Renderer, Row, Slider, Text,
+    Renderer, Row, Slider, Text, UserInterface,
 };
-use coffee::{Game, Result, Timer, UserInterface};
+use coffee::{Game, Result, Timer};
 
 fn main() -> Result<()> {
     <Tour as UserInterface>::run(WindowSettings {

@@ -1,8 +1,8 @@
 use crate::graphics::window;
 use crate::graphics::{Frame, Window, WindowSettings};
-use crate::input::{self, gamepad, keyboard, mouse};
+use crate::input::{self, gamepad, keyboard, mouse, Input};
 use crate::load::{LoadingScreen, Task};
-use crate::{Debug, Input, Result, Timer};
+use crate::{Debug, Result, Timer};
 
 /// The entrypoint of the engine. It describes your game logic.
 ///
@@ -155,6 +155,8 @@ pub trait Game {
     }
 
     /// Runs the [`Game`] with the given [`WindowSettings`].
+    ///
+    /// You probably want to call this in your `main` function to run your game!
     ///
     /// [`Game`]: trait.Game.html
     /// [`WindowSettings`]: graphics/struct.WindowSettings.html

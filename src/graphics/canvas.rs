@@ -14,7 +14,7 @@ pub struct Canvas {
 }
 
 impl Canvas {
-    /// Create a new [`Canvas`] with the given size.
+    /// Creates a new [`Canvas`] with the given size.
     ///
     /// [`Canvas`]: struct.Canvas.html
     pub fn new(gpu: &mut Gpu, width: u16, height: u16) -> Result<Canvas> {
@@ -23,7 +23,7 @@ impl Canvas {
         })
     }
 
-    /// Create a [`Task`] that produces a new [`Canvas`] with the given size.
+    /// Creates a [`Task`] that produces a new [`Canvas`] with the given size.
     ///
     /// [`Task`]: ../load/struct.Task.html
     /// [`Canvas`]: struct.Canvas.html
@@ -31,21 +31,21 @@ impl Canvas {
         Task::using_gpu(move |gpu| Canvas::new(gpu, width, height))
     }
 
-    /// Get the width of the [`Canvas`].
+    /// Returns the width of the [`Canvas`].
     ///
     /// [`Canvas`]: struct.Canvas.html
     pub fn width(&self) -> u16 {
         self.drawable.texture().width()
     }
 
-    /// Get the height of the [`Canvas`].
+    /// Returns the height of the [`Canvas`].
     ///
     /// [`Canvas`]: struct.Canvas.html
     pub fn height(&self) -> u16 {
         self.drawable.texture().height()
     }
 
-    /// View the [`Canvas`] as a [`Target`].
+    /// Views the [`Canvas`] as a [`Target`].
     ///
     /// [`Canvas`]: struct.Canvas.html
     /// [`Target`]: struct.Target.html
@@ -61,7 +61,7 @@ impl Canvas {
         )
     }
 
-    /// Render the [`Canvas`] on the given [`Target`].
+    /// Renders the [`Canvas`] on the given [`Target`].
     ///
     /// [`Canvas`]: struct.Canvas.html
     /// [`Target`]: struct.Target.html

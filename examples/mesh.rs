@@ -5,9 +5,10 @@ use coffee::graphics::{
 use coffee::input::KeyboardAndMouse;
 use coffee::load::Task;
 use coffee::ui::{
-    slider, Align, Column, Element, Justify, Radio, Renderer, Row, Slider, Text,
+    slider, Align, Column, Element, Justify, Radio, Renderer, Row, Slider,
+    Text, UserInterface,
 };
-use coffee::{Game, Result, Timer, UserInterface};
+use coffee::{Game, Result, Timer};
 
 use std::ops::RangeInclusive;
 

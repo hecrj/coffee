@@ -18,27 +18,32 @@ bugs. [Feel free to contribute!]
 [Feel free to contribute!]: #contributing--feedback
 
 ## Features
-  * Responsive, customizable GUI with built-in widgets
-  * Declarative, type-safe asset loading
-  * Loading screens with progress tracking
+  * [Responsive, customizable GUI]
+  * Declarative, type-safe loading screens with progress tracking
   * Built-in [debug view with performance metrics]
-  * Fixed timestep
+  * Fixed, deterministic timestep
   * Explicit, easy to use, hardware-accelerated 2D graphics API
   * Multiplatform support leveraging OpenGL, Vulkan, Metal, D3D11, and D3D12
+  * [Explicit and efficient batched draws]
+  * [Mesh support]
   * Texture array support
-  * Explicit and efficient batched draws
   * Off-screen rendering
   * TrueType font rendering
   * Gamepad support
 
+And more! Check out the [examples] to see them in action.
+
+[Responsive, customizable GUI]: https://gfycat.com/gloomyweakhammerheadshark
 [debug view with performance metrics]: https://github.com/hecrj/coffee/blob/master/images/debug.png
+[Explicit and efficient batched draws]: https://gfycat.com/beautifulseparatebeetle
+[Mesh support]: https://gfycat.com/academicglossykingfisher
 
 ## Usage
 Add `coffee` as a dependency in your `Cargo.toml` and enable a graphics backend
 feature (`opengl`, `vulkan`, `metal`, `dx11`, or `dx12`):
 
 ```toml
-coffee = { version = "0.2", features = ["opengl"] }
+coffee = { version = "0.3", features = ["opengl"] }
 ```
 
 Rust is quite slow in debug mode. If you experience performance issues when
@@ -95,7 +100,7 @@ impl Game for MyGame {
 }
 ```
 
-Check out the [documentation] and the [examples] to learn more!
+Browse the [documentation] and the [examples] to learn more!
 
 [documentation]: https://docs.rs/coffee
 [examples]: https://github.com/hecrj/coffee/tree/master/examples

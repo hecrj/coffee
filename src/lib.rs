@@ -2,19 +2,27 @@
 //! and type-safety.
 //!
 //! # Features
-//!   * Responsive, customizable GUI with built-in widgets
-//!   * Declarative, type-safe asset loading
-//!   * Loading screens with progress tracking
+//!   * [Responsive, customizable GUI]
+//!   * Declarative, type-safe loading screens with progress tracking
 //!   * Built-in [debug view with performance metrics]
-//!   * Fixed timestep
+//!   * Fixed, deterministic timestep
 //!   * Explicit, easy to use, hardware-accelerated 2D graphics API
 //!   * Multiplatform support leveraging OpenGL, Vulkan, Metal, D3D11, and D3D12
+//!   * [Explicit and efficient batched draws]
+//!   * [Mesh support]
 //!   * Texture array support
-//!   * Explicit and efficient batched draws
 //!   * Off-screen rendering
 //!   * TrueType font rendering
+//!   * Gamepad support
 //!
-//! Check out the [repository] for more details!
+//! Check out the [repository] and the [examples] for more details!
+//!
+//! [Responsive, customizable GUI]: https://gfycat.com/gloomyweakhammerheadshark
+//! [debug view with performance metrics]: struct.Debug.html
+//! [Explicit and efficient batched draws]: https://gfycat.com/beautifulseparatebeetle
+//! [Mesh support]: https://gfycat.com/academicglossykingfisher
+//! [examples]: https://github.com/hecrj/coffee/tree/master/examples
+//! [repository]: https://github.com/hecrj/coffee
 //!
 //! # Usage
 //! To get started, implement the [`Game`] trait. Then, call [`Game::run`] with
@@ -58,8 +66,6 @@
 //! }
 //! ```
 //!
-//! [debug view with performance metrics]: struct.Debug.html
-//! [repository]: https://github.com/hecrj/coffee
 //! [`Game`]: trait.Game.html
 //! [`Game::run`]: trait.Game.html#method.run
 //! [`WindowSettings`]: graphics/struct.WindowSettings.html
@@ -81,7 +87,5 @@ pub mod ui;
 
 pub use debug::Debug;
 pub use game::Game;
-pub use input::Input;
 pub use result::{Error, Result};
 pub use timer::Timer;
-pub use ui::UserInterface;
