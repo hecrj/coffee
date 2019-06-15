@@ -1,7 +1,7 @@
 use rayon::prelude::*;
 
 use crate::graphics::gpu;
-use crate::graphics::{Image, IntoQuad, Point, Target, Transformation, Vector};
+use crate::graphics::{Image, IntoQuad, Target};
 
 /// A collection of quads that will be drawn all at once using the same
 /// [`Image`].
@@ -42,15 +42,11 @@ impl Batch {
         self.instances.push(instance);
     }
 
-    /// Draw the [`Batch`] at the given position.
+    /// Draw the [`Batch`].
     ///
     /// [`Batch`]: struct.Batch.html
-    pub fn draw(&self, position: Point, target: &mut Target<'_>) {
-        let mut translated = target.transform(Transformation::translate(
-            Vector::new(position.x, position.y),
-        ));
-
-        translated.draw_texture_quads(&self.image.texture, &self.instances[..]);
+    pub fn draw(&self, target: &mut Target<'_>) {
+        target.draw_texture_quads(&self.image.texture, &self.instances[..]);
     }
 
     /// Clear the [`Batch`] contents.

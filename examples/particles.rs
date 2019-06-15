@@ -156,8 +156,7 @@ impl Game for Particles {
         self.batch.par_extend(sprites);
 
         // Draw particles all at once!
-        self.batch
-            .draw(Point::new(0.0, 0.0), &mut frame.as_target());
+        self.batch.draw(&mut frame.as_target());
     }
 }
 
