@@ -3,8 +3,7 @@
 //!
 //! # Features
 //!   * [Responsive, customizable GUI]
-//!   * Declarative, type-safe asset loading
-//!   * Loading screens with progress tracking
+//!   * Declarative, type-safe loading screens with progress tracking
 //!   * Built-in [debug view with performance metrics]
 //!   * Fixed, deterministic timestep
 //!   * Explicit, easy to use, hardware-accelerated 2D graphics API
@@ -15,15 +14,14 @@
 //!   * Off-screen rendering
 //!   * TrueType font rendering
 //!   * Gamepad support
-//!   * [Great examples]
 //!
-//! Check out the [repository] for more details!
+//! Check out the [repository] and the [examples] for more details!
 //!
 //! [Responsive, customizable GUI]: https://gfycat.com/gloomyweakhammerheadshark
 //! [debug view with performance metrics]: struct.Debug.html
 //! [Explicit and efficient batched draws]: https://gfycat.com/beautifulseparatebeetle
 //! [Mesh support]: https://gfycat.com/academicglossykingfisher
-//! [Great examples]: https://github.com/hecrj/coffee/tree/master/examples
+//! [examples]: https://github.com/hecrj/coffee/tree/master/examples
 //! [repository]: https://github.com/hecrj/coffee
 //!
 //! # Usage

@@ -19,8 +19,7 @@ bugs. [Feel free to contribute!]
 
 ## Features
   * [Responsive, customizable GUI]
-  * Declarative, type-safe asset loading
-  * Loading screens with progress tracking
+  * Declarative, type-safe loading screens with progress tracking
   * Built-in [debug view with performance metrics]
   * Fixed, deterministic timestep
   * Explicit, easy to use, hardware-accelerated 2D graphics API
@@ -31,13 +30,13 @@ bugs. [Feel free to contribute!]
   * Off-screen rendering
   * TrueType font rendering
   * Gamepad support
-  * [Great examples]
+
+And more! Check out the [examples] to see them in action.
 
 [Responsive, customizable GUI]: https://gfycat.com/gloomyweakhammerheadshark
 [debug view with performance metrics]: https://github.com/hecrj/coffee/blob/master/images/debug.png
 [Explicit and efficient batched draws]: https://gfycat.com/beautifulseparatebeetle
 [Mesh support]: https://gfycat.com/academicglossykingfisher
-[Great examples]: https://github.com/hecrj/coffee/tree/master/examples
 
 ## Usage
 Add `coffee` as a dependency in your `Cargo.toml` and enable a graphics backend
