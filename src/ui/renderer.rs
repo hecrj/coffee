@@ -4,7 +4,7 @@ mod radio;
 mod slider;
 mod text;
 
-use crate::graphics::{Batch, Color, Font, Frame, Image, Mesh, Point, Shape};
+use crate::graphics::{Batch, Color, Font, Frame, Image, Mesh, Shape};
 use crate::load::{Join, Task};
 use crate::ui::core;
 
@@ -58,7 +58,7 @@ impl core::Renderer for Renderer {
     fn flush(&mut self, frame: &mut Frame<'_>) {
         let target = &mut frame.as_target();
 
-        self.sprites.draw(Point::new(0.0, 0.0), target);
+        self.sprites.draw(target);
         self.sprites.clear();
 
         self.font.borrow_mut().draw(target);
