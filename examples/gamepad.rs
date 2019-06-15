@@ -2,8 +2,10 @@
 use coffee::graphics::{Color, Frame, Window, WindowSettings};
 use coffee::input::{self, gamepad, Input};
 use coffee::load::Task;
-use coffee::ui::{Align, Column, Element, Justify, Renderer, Text};
-use coffee::{Game, Result, Timer, UserInterface};
+use coffee::ui::{
+    Align, Column, Element, Justify, Renderer, Text, UserInterface,
+};
+use coffee::{Game, Result, Timer};
 
 fn main() -> Result<()> {
     <GamepadExample as UserInterface>::run(WindowSettings {

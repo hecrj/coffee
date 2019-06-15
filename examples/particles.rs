@@ -11,8 +11,8 @@ use coffee::graphics::{
 };
 use coffee::input::{keyboard, KeyboardAndMouse};
 use coffee::load::{loading_screen::ProgressBar, Join, Task};
-use coffee::ui::{Checkbox, Column, Element, Justify, Renderer};
-use coffee::{Game, Result, Timer, UserInterface};
+use coffee::ui::{Checkbox, Column, Element, Justify, Renderer, UserInterface};
+use coffee::{Game, Result, Timer};
 
 fn main() -> Result<()> {
     <Particles as UserInterface>::run(WindowSettings {

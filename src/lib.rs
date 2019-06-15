@@ -82,7 +82,5 @@ pub mod ui;
 
 pub use debug::Debug;
 pub use game::Game;
-pub use input::Input;
 pub use result::{Error, Result};
 pub use timer::Timer;
-pub use ui::UserInterface;

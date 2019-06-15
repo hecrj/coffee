@@ -1,8 +1,8 @@
 use crate::graphics::window;
 use crate::graphics::{Frame, Window, WindowSettings};
-use crate::input::{self, gamepad, keyboard, mouse};
+use crate::input::{self, gamepad, keyboard, mouse, Input};
 use crate::load::{LoadingScreen, Task};
-use crate::{Debug, Input, Result, Timer};
+use crate::{Debug, Result, Timer};
 
 /// The entrypoint of the engine. It describes your game logic.
 ///
