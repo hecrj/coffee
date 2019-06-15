@@ -2,17 +2,20 @@
 use std::collections::HashSet;
 
 use coffee::graphics::{
-    Color, Font, Frame, Image, Point, Quad, Rectangle, Text, Vector, Window,
+    Color, Frame, Image, Point, Rectangle, Sprite, Vector, Window,
     WindowSettings,
 };
 use coffee::input::{self, keyboard, mouse, Input};
-use coffee::load::{loading_screen::ProgressBar, Join, Task};
+use coffee::load::Task;
+use coffee::ui::{
+    Align, Column, Element, Justify, Renderer, Row, Text, UserInterface,
+};
 use coffee::{Game, Result, Timer};
 
 fn main() -> Result<()> {
-    InputExample::run(WindowSettings {
+    <InputExample as UserInterface>::run(WindowSettings {
         title: String::from("Input - Coffee"),
-        size: (720, 240),
+        size: (1280, 1024),
         resizable: false,
         fullscreen: false,
     })
@@ -80,7 +83,6 @@ impl Input for CustomInput {
 
 struct InputExample {
     palette: Image,
-    font: Font,
     cursor_position: Point,
     mouse_wheel: Point,
     keys_pressed: HashSet<keyboard::KeyCode>,
@@ -90,40 +92,23 @@ struct InputExample {
 
 impl InputExample {
     const MAX_TEXTSIZE: usize = 40;
+}
 
-    const COLORS: [Color; 1] = [Color {
-        r: 1.0,
-        g: 0.0,
-        b: 0.0,
-        a: 1.0,
-    }];
+impl Game for InputExample {
+    type Input = CustomInput;
+    type LoadingScreen = ();
 
-    fn load() -> Task<InputExample> {
-        (
-            Task::using_gpu(|gpu| Image::from_colors(gpu, &Self::COLORS)),
-            Font::load_from_bytes(include_bytes!(
-                "../resources/font/Inconsolata-Regular.ttf"
-            )),
-        )
-            .join()
-            .map(|(palette, font)| InputExample {
+    fn load(_window: &Window) -> Task<InputExample> {
+        Task::using_gpu(|gpu| Image::from_colors(gpu, &[Color::BLACK])).map(
+            |palette| InputExample {
                 palette,
-                font,
                 cursor_position: Point::new(0.0, 0.0),
                 mouse_wheel: Point::new(0.0, 0.0),
                 keys_pressed: HashSet::new(),
                 mouse_buttons_pressed: HashSet::new(),
                 text_buffer: String::with_capacity(Self::MAX_TEXTSIZE),
-            })
-    }
-}
-
-impl Game for InputExample {
-    type Input = CustomInput;
-    type LoadingScreen = ProgressBar;
-
-    fn load(_window: &Window) -> Task<InputExample> {
-        Task::stage("Loading...", InputExample::load())
+            },
+        )
     }
 
     fn interact(&mut self, input: &mut CustomInput, _window: &mut Window) {
@@ -151,29 +136,37 @@ impl Game for InputExample {
     }
 
     fn draw(&mut self, frame: &mut Frame, _timer: &Timer) {
-        frame.clear(Color::BLACK);
+        frame.clear(Color {
+            r: 0.3,
+            g: 0.3,
+            b: 0.6,
+            a: 1.0,
+        });
 
-        // This closure simplifies some of the boilerplate.
-        let add_aligned_text =
-            |font: &mut Font, label: &str, content: &str, x: f32, y: f32| {
-                font.add(Text {
-                    content: label,
-                    position: Point::new(x, y),
-                    bounds: (frame.width(), frame.height()),
-                    size: 20.0,
-                    color: Color::WHITE,
-                    ..Text::default()
-                });
-                font.add(Text {
-                    content: content,
-                    position: Point::new(x + 260.0, y),
-                    bounds: (frame.width(), frame.height()),
-                    size: 20.0,
-                    color: Color::WHITE,
-                    ..Text::default()
-                });
-            };
+        // Draw a small square at the mouse cursor's position.
+        self.palette.draw(
+            Sprite {
+                source: Rectangle {
+                    x: 0,
+                    y: 0,
+                    width: 1,
+                    height: 1,
+                },
+                position: self.cursor_position - Vector::new(3.0, 3.0),
+                scale: (6.0, 6.0),
+            },
+            &mut frame.as_target(),
+        );
+    }
+}
 
+impl UserInterface for InputExample {
+    type Message = ();
+    type Renderer = Renderer;
+
+    fn react(&mut self, _msg: ()) {}
+
+    fn layout(&mut self, window: &Window) -> Element<()> {
         let keys = self
             .keys_pressed
             .iter()
@@ -188,47 +181,33 @@ impl Game for InputExample {
             .collect::<Vec<_>>()
             .join(", ");
 
-        add_aligned_text(&mut self.font, "Pressed keys:", &keys, 20.0, 20.0);
+        let content = Column::new()
+            .max_width(800)
+            .spacing(20)
+            .push(label_and_value("Pressed keys:", &keys))
+            .push(label_and_value("Text buffer (type):", &self.text_buffer))
+            .push(label_and_value("Pressed mouse buttons:", &mouse_buttons))
+            .push(label_and_value(
+                "Last mouse wheel scroll:",
+                &format!("{}, {}", self.mouse_wheel.x, self.mouse_wheel.y),
+            ));
 
-        add_aligned_text(
-            &mut self.font,
-            "Text Buffer (type):",
-            &self.text_buffer,
-            20.0,
-            50.0,
-        );
-
-        add_aligned_text(
-            &mut self.font,
-            "Pressed mouse buttons:",
-            &mouse_buttons,
-            20.0,
-            80.0,
-        );
-
-        add_aligned_text(
-            &mut self.font,
-            "Last mouse wheel scroll:",
-            &format!("{}, {}", self.mouse_wheel.x, self.mouse_wheel.y),
-            20.0,
-            110.0,
-        );
-
-        self.font.draw(&mut frame.as_target());
-
-        // Draw a small square at the mouse cursor's position.
-        self.palette.draw(
-            Quad {
-                source: Rectangle {
-                    x: 0.0,
-                    y: 0.0,
-                    width: 1.0,
-                    height: 1.0,
-                },
-                position: self.cursor_position - Vector::new(3.0, 3.0),
-                size: (6.0, 6.0),
-            },
-            &mut frame.as_target(),
-        );
+        Column::new()
+            .width(window.width() as u32)
+            .height(window.height() as u32)
+            .padding(20)
+            .align_items(Align::Center)
+            .justify_content(Justify::Center)
+            .push(content)
+            .into()
     }
+}
+
+fn label_and_value(label: &str, value: &str) -> Element<'static, ()> {
+    Row::new()
+        .spacing(20)
+        .align_items(Align::Stretch)
+        .push(Text::new(label))
+        .push(Text::new(value))
+        .into()
 }
