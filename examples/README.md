@@ -13,7 +13,7 @@ you want to learn about a specific release, check out [the release list].
 
 [the release list]: https://github.com/hecrj/coffee/releases
 
-## Particles
+## [Particles](particles.rs)
 
 A particle gravity simulator that showcases a loading screen, input handling,
 and graphics interpolation with batched drawing and font rendering. Move the
@@ -34,7 +34,7 @@ cargo run --example particles --features vulkan,debug --release
 [particles_gfycat]: https://gfycat.com/beautifulseparatebeetle
 
 
-## User Interface
+## [User Interface](ui.rs)
 
 A tour showcasing the different built-in widgets available for building
 responsive user interfaces in Coffee.
@@ -51,7 +51,7 @@ cargo run --example ui --features opengl,debug --release
 [gui_gfycat]: https://gfycat.com/gloomyweakhammerheadshark
 
 
-## Mesh
+## [Mesh](mesh.rs)
 
 A simple mesh viewer showcasing the `Mesh` and `Shape` types.
 
