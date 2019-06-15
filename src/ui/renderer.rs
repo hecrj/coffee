@@ -119,7 +119,7 @@ impl Default for Configuration {
                     ))?,
                 )
             }),
-            font: Font::load(include_bytes!(
+            font: Font::load_from_bytes(include_bytes!(
                 "../../resources/font/Inconsolata-Regular.ttf"
             )),
         }

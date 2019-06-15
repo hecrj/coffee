@@ -101,7 +101,7 @@ impl InputExample {
     fn load() -> Task<InputExample> {
         (
             Task::using_gpu(|gpu| Image::from_colors(gpu, &Self::COLORS)),
-            Font::load(include_bytes!(
+            Font::load_from_bytes(include_bytes!(
                 "../resources/font/Inconsolata-Regular.ttf"
             )),
         )

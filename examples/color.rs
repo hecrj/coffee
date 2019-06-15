@@ -32,7 +32,7 @@ impl Colors {
             Task::using_gpu(|gpu| {
                 Image::from_colors(gpu, &[Self::PRUSSIAN_BLUE])
             }),
-            Font::load(include_bytes!(
+            Font::load_from_bytes(include_bytes!(
                 "../resources/font/Inconsolata-Regular.ttf"
             )),
         )
