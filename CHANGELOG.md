@@ -70,6 +70,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   variants can be found. [#29]
 - `input::KeyCode` has been moved to `input::keyboard::KeyCode`. [#29]
 - `input::MouseButton` has been moved to `input::mouse::Button`. [#29]
+- `Batch::draw` and `texture_array::Batch::draw` do not take a `position`
+  argument anymore. Using `Target::transform` before drawing is preferred. [#53]
 - The performance of the particles example has been improved considerably on all
   platforms. [#37]
 
@@ -86,6 +88,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#35]: https://github.com/hecrj/coffee/pull/35
 [#37]: https://github.com/hecrj/coffee/pull/37
 [#50]: https://github.com/hecrj/coffee/pull/50
+[#53]: https://github.com/hecrj/coffee/pull/53
 [Elm]: https://elm-lang.org
 [The Elm Architecture]: https://guide.elm-lang.org/architecture/
 [`stretch`]: https://github.com/vislyhq/stretch
