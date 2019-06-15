@@ -18,7 +18,7 @@ bugs. [Feel free to contribute!]
 [Feel free to contribute!]: #contributing--feedback
 
 ## Features
-  * Responsive, customizable GUI
+  * [Responsive, customizable GUI]
   * Declarative, type-safe asset loading
   * Loading screens with progress tracking
   * Built-in [debug view with performance metrics]
@@ -26,12 +26,16 @@ bugs. [Feel free to contribute!]
   * Explicit, easy to use, hardware-accelerated 2D graphics API
   * Multiplatform support leveraging OpenGL, Vulkan, Metal, D3D11, and D3D12
   * Texture array support
-  * Explicit and efficient batched draws
+  * [Mesh support]
+  * [Explicit and efficient batched draws]
   * Off-screen rendering
   * TrueType font rendering
   * Gamepad support
 
+[Responsive, customizable GUI]: https://gfycat.com/gloomyweakhammerheadshark
 [debug view with performance metrics]: https://github.com/hecrj/coffee/blob/master/images/debug.png
+[Mesh support]: https://gfycat.com/academicglossykingfisher
+[Explicit and efficient batched draws]: https://gfycat.com/beautifulseparatebeetle
 
 ## Usage
 Add `coffee` as a dependency in your `Cargo.toml` and enable a graphics backend

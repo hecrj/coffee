@@ -28,17 +28,41 @@ view:
 cargo run --example particles --features vulkan,debug --release
 ```
 
-![Particles example][particles]
+[![Particles][particles]][particles_gfycat]
 
 [particles]: https://github.com/hecrj/coffee/blob/master/images/examples/particles.png?raw=true
+[particles_gfycat]: https://gfycat.com/beautifulseparatebeetle
+
 
 ## User Interface
 
 A tour showcasing the different built-in widgets available for building
 responsive user interfaces in Coffee.
 
+The user must interact with the different widgets in order to reach the end.
+
 ```
 cargo run --example ui --features opengl,debug --release
 ```
 
-[![GUI](https://thumbs.gfycat.com/LivelyOnlyHypacrosaurus-size_restricted.gif)](https://gfycat.com/livelyonlyhypacrosaurus)
+[![GUI][gui_gif]][gui_gfycat]
+
+[gui_gif]: https://thumbs.gfycat.com/GloomyWeakHammerheadshark-small.gif
+[gui_gfycat]: https://gfycat.com/gloomyweakhammerheadshark
+
+
+## Mesh
+
+A simple mesh viewer showcasing the `Mesh` and `Shape` types.
+
+It renders different shapes and the user is able to tweak some settings using
+the user interface.
+
+```
+cargo run --example mesh --features opengl,debug --release
+```
+
+[![GUI][mesh_gif]][mesh_gfycat]
+
+[mesh_gif]: https://thumbs.gfycat.com/AcademicGlossyKingfisher-small.gif
+[mesh_gfycat]: https://gfycat.com/academicglossykingfisher
