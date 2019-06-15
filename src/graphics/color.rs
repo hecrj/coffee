@@ -31,12 +31,16 @@ impl Color {
         a: 1.0,
     };
 
-    /// Create a new color from components in the [0, 1.0] range.
+    /// Creates a new [`Color`] from components in the [0, 1.0] range.
+    ///
+    /// [`Color`]: struct.Color.html
     pub fn new(r: f32, g: f32, b: f32, a: f32) -> Color {
         Color { r, g, b, a }
     }
 
-    /// Create a new color from its RGB components in the [0, 255] range.
+    /// Creates a new [`Color`] from its RGB components in the [0, 255] range.
+    ///
+    /// [`Color`]: struct.Color.html
     pub fn from_rgb(r: u8, g: u8, b: u8) -> Color {
         Color {
             r: r as f32 / 255.0,
@@ -46,7 +50,9 @@ impl Color {
         }
     }
 
-    /// Get the color components in the [0, 255] range.
+    /// Returns the [`Color`] components in the [0, 255] range.
+    ///
+    /// [`Color`]: struct.Color.html
     pub fn to_rgba(&self) -> [u8; 4] {
         [
             (self.r * 255.0).round() as u8,

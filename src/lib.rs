@@ -2,7 +2,7 @@
 //! and type-safety.
 //!
 //! # Features
-//!   * Responsive, customizable GUI with built-in widgets
+//!   * Responsive, customizable GUI
 //!   * Declarative, type-safe asset loading
 //!   * Loading screens with progress tracking
 //!   * Built-in [debug view with performance metrics]
@@ -13,6 +13,7 @@
 //!   * Explicit and efficient batched draws
 //!   * Off-screen rendering
 //!   * TrueType font rendering
+//!   * Gamepad support
 //!
 //! Check out the [repository] for more details!
 //!

@@ -74,7 +74,7 @@ impl Debug {
         self.load_duration = time::Instant::now() - self.load_start;
     }
 
-    /// Get the time spent loading your [`Game`].
+    /// Returns the time spent loading your [`Game`].
     ///
     /// [`Game`]: trait.Game.html
     pub fn load_duration(&self) -> time::Duration {
@@ -89,7 +89,7 @@ impl Debug {
             .push(time::Instant::now() - self.frame_start);
     }
 
-    /// Get the average time spent per frame.
+    /// Returns the average time spent per frame.
     ///
     /// It includes time spent on V-Sync, if enabled.
     pub fn frame_duration(&self) -> time::Duration {
@@ -104,7 +104,7 @@ impl Debug {
         self.interact_duration = time::Instant::now() - self.interact_start;
     }
 
-    /// Get the average time spent processing events and running
+    /// Returns the average time spent processing events and running
     /// [`Game::interact`].
     ///
     /// [`Game::interact`]: trait.Game.html#method.interact
@@ -121,7 +121,7 @@ impl Debug {
             .push(time::Instant::now() - self.update_start);
     }
 
-    /// Get the average time spent running [`Game::update`].
+    /// Returns the average time spent running [`Game::update`].
     ///
     /// [`Game::update`]: trait.Game.html#tymethod.update
     pub fn update_duration(&self) -> time::Duration {
@@ -140,7 +140,7 @@ impl Debug {
         }
     }
 
-    /// Get the average time spent running [`Game::draw`].
+    /// Returns the average time spent running [`Game::draw`].
     ///
     /// [`Game::draw`]: trait.Game.html#tymethod.draw
     pub fn draw_duration(&self) -> time::Duration {
@@ -155,7 +155,7 @@ impl Debug {
         self.ui_durations.push(time::Instant::now() - self.ui_start);
     }
 
-    /// Get the average time spent rendering the [`UserInterface`].
+    /// Returns the average time spent rendering the [`UserInterface`].
     ///
     /// [`UserInterface`]: ui/trait.UserInterface.html
     pub fn ui_duration(&self) -> time::Duration {
@@ -176,7 +176,7 @@ impl Debug {
             .push(time::Instant::now() - self.debug_start);
     }
 
-    /// Get the average time spent running [`Game::debug`].
+    /// Returns the average time spent running [`Game::debug`].
     ///
     /// [`Game::debug`]: trait.Game.html#tymethod.debug
     pub fn debug_duration(&self) -> time::Duration {
@@ -187,7 +187,9 @@ impl Debug {
         self.enabled
     }
 
-    /// Draws the debug information.
+    /// Draws the [`Debug`] information.
+    ///
+    /// [`Debug`]: struct.Debug.html
     pub fn draw(&mut self, frame: &mut graphics::Frame<'_>) {
         if self.frames_until_refresh <= 0 {
             self.text.clear();

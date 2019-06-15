@@ -3,36 +3,36 @@ use crate::graphics::{Point, Rectangle};
 /// A geometric figure.
 #[derive(Debug, Clone, PartialEq)]
 pub enum Shape {
-    /// A rectangle.
+    /// A rectangle
     Rectangle(Rectangle<f32>),
 
-    /// A circle.
+    /// A circle
     Circle {
-        /// The center of the circle.
+        /// The center of the circle
         center: Point,
 
-        /// The radius of the circle.
+        /// The radius of the circle
         radius: f32,
     },
 
-    /// An ellipse.
+    /// An ellipse
     Ellipse {
         /// The center of the ellipse
         center: Point,
 
-        /// The horizontal radius of the ellipse.
+        /// The horizontal radius of the ellipse
         horizontal_radius: f32,
 
-        /// The vertical radius of the ellipse.
+        /// The vertical radius of the ellipse
         vertical_radius: f32,
 
-        /// The rotation of the ellipse in radians.
+        /// The rotation of the ellipse in radians
         rotation: f32,
     },
 
-    /// A polyline.
+    /// A polyline
     Polyline {
-        /// The points of the polyline.
+        /// The points of the polyline
         points: Vec<Point>,
     },
 }

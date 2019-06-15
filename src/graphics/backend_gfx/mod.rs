@@ -24,13 +24,11 @@ use crate::Result;
 /// It is necessary to perform any kind of graphical operation, like loading
 /// resources and drawing.
 ///
-/// [`Game`] provides a value of this type in the [`interact`] method. A [`Gpu`]
-/// can also be obtained from a [`Window`].
+/// A [`Gpu`] can be obtained from a [`Window`] or a [`Frame`].
 ///
 /// [`Gpu`]: struct.Gpu.html
-/// [`Game`]: ../trait.Game.html
-/// [`interact`]: ../trait.Game.html#tymethod.interact
 /// [`Window`]: struct.Window.html
+/// [`Frame`]: struct.Frame.html
 #[allow(missing_debug_implementations)]
 pub struct Gpu {
     device: gl::Device,

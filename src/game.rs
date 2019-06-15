@@ -156,6 +156,8 @@ pub trait Game {
 
     /// Runs the [`Game`] with the given [`WindowSettings`].
     ///
+    /// You probably want to call this in your `main` function to run your game!
+    ///
     /// [`Game`]: trait.Game.html
     /// [`WindowSettings`]: graphics/struct.WindowSettings.html
     fn run(window_settings: WindowSettings) -> Result<()>

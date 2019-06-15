@@ -15,7 +15,7 @@ pub struct Batch {
 }
 
 impl Batch {
-    /// Create a new [`Batch`] using the given [`Image`].
+    /// Creates a new [`Batch`] using the given [`Image`].
     ///
     /// [`Batch`]: struct.Batch.html
     /// [`Image`]: struct.Image.html
@@ -31,7 +31,7 @@ impl Batch {
         }
     }
 
-    /// Add a quad to the [`Batch`].
+    /// Adds a quad to the [`Batch`].
     ///
     /// [`Batch`]: struct.Batch.html
     #[inline]
@@ -42,14 +42,15 @@ impl Batch {
         self.instances.push(instance);
     }
 
-    /// Draw the [`Batch`].
+    /// Draws the [`Batch`] on the given [`Target`].
     ///
     /// [`Batch`]: struct.Batch.html
+    /// [`Target`]: struct.Target.html
     pub fn draw(&self, target: &mut Target<'_>) {
         target.draw_texture_quads(&self.image.texture, &self.instances[..]);
     }
 
-    /// Clear the [`Batch`] contents.
+    /// Clears the [`Batch`] contents.
     ///
     /// This is useful to avoid creating a new batch every frame and
     /// reallocating the same memory.
@@ -81,7 +82,7 @@ impl<Q: IntoQuad> Extend<Q> for Batch {
     }
 }
 
-/// Extend the [`Batch`] using a parallel iterator from [`rayon`].
+/// Extends the [`Batch`] using a parallel iterator from [`rayon`].
 ///
 /// If you are dealing with many thousands of quads, `par_extend` can help you
 /// speed up your drawing by using multiple threads to populate a [`Batch`].

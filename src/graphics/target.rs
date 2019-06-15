@@ -42,7 +42,7 @@ impl<'a> Target<'a> {
         target
     }
 
-    /// Create a new [`Target`] applying the given transformation.
+    /// Creates a new [`Target`] applying the given transformation.
     ///
     /// This is equivalent to multiplying to current [`Target`] transform by the
     /// provided transform.
@@ -84,7 +84,7 @@ impl<'a> Target<'a> {
         }
     }
 
-    /// Clear the [`Target`] with the given [`Color`].
+    /// Clears the [`Target`] with the given [`Color`].
     ///
     /// [`Target`]: struct.Target.html
     /// [`Color`]: struct.Color.html

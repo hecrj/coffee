@@ -19,7 +19,7 @@ pub struct Builder {
 }
 
 impl Builder {
-    /// Create a new [`Builder`] of a [`TextureArray`] of the given size.
+    /// Creates a new [`Builder`] of a [`TextureArray`] of the given size.
     ///
     /// [`Builder`]: struct.Builder.html
     /// [`TextureArray`]: struct.TextureArray.html
@@ -32,7 +32,7 @@ impl Builder {
         }
     }
 
-    /// Load a new image from the given path and add it to the produced
+    /// Loads a new image from the given path and adds it to the produced
     /// [`TextureArray`].
     ///
     /// The [`Builder`] will try to fit multiple images in the same layer of the
@@ -84,7 +84,7 @@ impl Builder {
         }
     }
 
-    /// Build the [`TextureArray`].
+    /// Builds the [`TextureArray`].
     ///
     /// [`TextureArray`]: struct.TextureArray.html
     pub fn build(&mut self, gpu: &mut Gpu) -> TextureArray {

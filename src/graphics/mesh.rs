@@ -151,9 +151,10 @@ impl Mesh {
         }
     }
 
-    /// Draws the [`Mesh`] .
+    /// Draws the [`Mesh`] on the given [`Target`].
     ///
     /// [`Mesh`]: struct.Mesh.html
+    /// [`Target`]: struct.Target.html
     pub fn draw(&self, target: &mut Target<'_>) {
         target.draw_triangles(&self.buffers.vertices, &self.buffers.indices);
     }

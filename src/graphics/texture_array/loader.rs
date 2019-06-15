@@ -60,7 +60,7 @@ pub struct Loader {
 }
 
 impl Loader {
-    /// Create a new [`Loader`] that produces a [`TextureArray`] of the given
+    /// Creates a new [`Loader`] that produces a [`TextureArray`] of the given
     /// size.
     ///
     /// [`Loader`]: struct.Loader.html
@@ -73,7 +73,7 @@ impl Loader {
         }
     }
 
-    /// Queue an image to be added to the produced [`TextureArray`] and obtain
+    /// Queues an image to be added to the produced [`TextureArray`] and obtain
     /// a [`Key`] to its [`Index`].
     ///
     /// [`TextureArray`]: struct.TextureArray.html
@@ -84,7 +84,7 @@ impl Loader {
         Key(self.paths.len() - 1)
     }
 
-    /// Finish the [`Loader`] definition and obtain a [`Task`] that produces
+    /// Finishes the [`Loader`] definition and obtain a [`Task`] that produces
     /// a value from the loaded [`TextureArray`] and its [`Indices`].
     ///
     /// [`Loader`]: struct.Loader.html

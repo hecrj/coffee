@@ -68,7 +68,7 @@ impl Window {
         })
     }
 
-    /// Get the [`Gpu`] linked to the [`Window`].
+    /// Returns the [`Gpu`] linked to the [`Window`].
     ///
     /// [`Gpu`]: struct.Gpu.html
     /// [`Window`]: struct.Window.html
@@ -76,10 +76,6 @@ impl Window {
         &mut self.gpu
     }
 
-    /// Get the next [`Frame`] that will be shown on the [`Window`].
-    ///
-    /// [`Frame`]: struct.Frame.html
-    /// [`Window`]: struct.Window.html
     pub(crate) fn frame(&mut self) -> Frame<'_> {
         Frame::new(self)
     }
@@ -101,14 +97,14 @@ impl Window {
         self.is_fullscreen = !self.is_fullscreen;
     }
 
-    /// Get the width of the [`Window`].
+    /// Returns the width of the [`Window`].
     ///
     /// [`Window`]: struct.Window.html
     pub fn width(&self) -> f32 {
         self.width
     }
 
-    /// Get the height of the [`Window`].
+    /// Returns the height of the [`Window`].
     ///
     /// [`Window`]: struct.Window.html
     pub fn height(&self) -> f32 {
