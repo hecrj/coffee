@@ -18,7 +18,7 @@ bugs. [Feel free to contribute!]
 [Feel free to contribute!]: #contributing--feedback
 
 ## Features
-  * Responsive, customizable GUI with built-in widgets
+  * Responsive, customizable GUI
   * Declarative, type-safe asset loading
   * Loading screens with progress tracking
   * Built-in [debug view with performance metrics]
@@ -38,7 +38,7 @@ Add `coffee` as a dependency in your `Cargo.toml` and enable a graphics backend
 feature (`opengl`, `vulkan`, `metal`, `dx11`, or `dx12`):
 
 ```toml
-coffee = { version = "0.2", features = ["opengl"] }
+coffee = { version = "0.3", features = ["opengl"] }
 ```
 
 Rust is quite slow in debug mode. If you experience performance issues when

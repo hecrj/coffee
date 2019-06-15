@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+
+## [0.3.0] - 2019-06-15
 ### Added
 - __Responsive GUI support!__ The new `ui` module can be used to extend a `Game`
   and build a user interface. [#35]
@@ -20,11 +23,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - __Mesh support__. The types `Shape` and `Mesh` have been introduced.
   Rectangles, circles, ellipses, and polylines can now be drawn with ease using
   fill or stroke modes. [#50]
+- The `Game::LoadingScreen` associated type. Given that all the `Game`
+  associated types implement a trait with a `load` method, wiring a loading
+  screen now is as simple as writing its name. Because of this, the `Game::new`
+  method is no longer necessary and it is dropped. [#35]
 - `Input` trait. It allows to implement reusable input handlers. [#35]
 - `KeyboardAndMouse` input handler. Useful to quickstart development and have
   easy access to the keyboard and the mouse from the get-go. [#35]
-- `CursorTaken` and `CursorReturned` input events. They are fired when the cursor
-  is used/freed by the user interface. [#35]
+- `CursorTaken` and `CursorReturned` mouse input events. They are fired when the
+  cursor is used/freed by the user interface. [#35]
 - Off-screen text rendering support. `Font::draw` now supports any `Target`
   instead of a window `Frame`. [#25]
 - `Game::debug` performance tracking. Time spent on this method is now shown in
@@ -45,22 +52,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Sprite::scale`. It can be used to change the `Sprite` size when drawed.
 - `Default` implementation for `Sprite`. [#35]
 - `Debug::ui_duration`. It returns the average time spent running the UI runtime.
-- Multiple gravity centers based on mouse clicks in the particles example. [#30]
+- A counter example as an introduction to the new UI architecture. [#35]
+- A user interface example that introduces the different built-in widgets. [#35]
 - A gamepad example that displays the last gamepad event. [#29]
+- A mesh example that showcases the different ways to use the new `Mesh` and
+  `Shape` types. [#50]
+- Multiple gravity centers based on mouse clicks in the particles example. [#30]
 
 ### Changed
-- The `View` associated type has been removed. Thus, implementors of the `Game`
-  trait are also meant to hold the game assets. This simplifies the API
-  considerably, and it helps model your game state-view relationship with
-  precision, avoiding inconsistencies. [#35]
 - The `Game::Input` associated type now has to implement the new `Input` trait.
   This splits code quite nicely, as the `on_input` method moves away from `Game`.
   It also makes `Input` implementors reusable. For instance, a `KeyboardAndMouse`
   type has been implemented that can be used out of the box! [#35]
-- The `Game::LoadingScreen` associated type has been introduced. Given that all
-  the `Game` associated types implement a trait with a `load` method, wiring a
-  loading screen now is as simple as writing its name. Because of this, the
-  `Game::new` method is no longer necessary and it is dropped. [#35]
 - `Game::draw` now takes a `Frame` directly instead of a `Window`. [#35]
 - `LoadingScreen::on_progress` has been renamed to `LoadingScreen::draw` and it
   now receives a `Frame` instead of a `Window`. [#35]
@@ -76,6 +79,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   platforms. [#37]
 
 ### Removed
+- The `Game::View` associated type. Implementors of the `Game` trait are also
+  meant to hold the game assets now. This simplifies the API considerably, and
+  it helps model your game state-view relationship with precision, avoiding
+  inconsistencies. [#35]
 - `Game::new`. `Game::load` should be used instead. [#35]
 - `Game::on_input`. Input handlers now must be implemented using the new `Input`
   trait. [#35]
@@ -150,7 +157,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Coffee starts being developed.
 
 
-[Unreleased]: https://github.com/hecrj/coffee/compare/0.2.0...HEAD
+[Unreleased]: https://github.com/hecrj/coffee/compare/0.3.0...HEAD
+[0.3.0]: https://github.com/hecrj/coffee/compare/0.2.0...0.3.0
 [0.2.0]: https://github.com/hecrj/coffee/compare/0.1.1...0.2.0
 [0.1.1]: https://github.com/hecrj/coffee/compare/0.1.0...0.1.1
 [0.1.0]: https://github.com/hecrj/coffee/releases/tag/0.1.0
