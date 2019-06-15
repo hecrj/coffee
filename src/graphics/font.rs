@@ -11,17 +11,25 @@ impl Font {
     pub(crate) const DEFAULT: &'static [u8] =
         include_bytes!("../../resources/font/Inconsolata-Regular.ttf");
 
-    /// Loads a font from raw data.
+    /// Loads a [`Font`] from raw data.
+    ///
+    /// [`Font`]: struct.Font.html
     pub fn from_bytes(gpu: &mut Gpu, bytes: &'static [u8]) -> Result<Font> {
         Ok(Font(gpu.upload_font(bytes)))
     }
 
-    /// Creates a task that loads a font from raw data.
-    pub fn load(bytes: &'static [u8]) -> Task<Font> {
+    /// Creates a [`Task`] that loads a [`Font`] from raw data.
+    ///
+    /// [`Task`]: ../load/struct.Task.html
+    /// [`Font`]: struct.Font.html
+    pub fn load_from_bytes(bytes: &'static [u8]) -> Task<Font> {
         Task::using_gpu(move |gpu| Font::from_bytes(gpu, bytes))
     }
 
-    /// Adds text to this font.
+    /// Adds [`Text`] to this [`Font`].
+    ///
+    /// [`Text`]: struct.Text.html
+    /// [`Font`]: struct.Font.html
     pub fn add(&mut self, text: Text<'_>) {
         self.0.add(text)
     }
