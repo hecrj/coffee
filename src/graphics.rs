@@ -61,7 +61,7 @@
 //!         frame.clear(Color::BLACK);
 //!
 //!         // Use your resources here...
-//!         // view.image.draw(Sprite { ... }, &mut frame.as_target());
+//!         // self.image.draw(Sprite { ... }, &mut frame.as_target());
 //!     }
 //! }
 //! ```
