@@ -5,6 +5,9 @@ use crate::graphics::{Color, Transformation};
 ///
 /// In Coffee, all the draw operations need an explicit [`Target`].
 ///
+/// The default coordinate system of a [`Target`] has the origin in its
+/// upper-left corner, with Y increasing downwards.
+///
 /// You can obtain one from a [`Frame`] or a [`Canvas`].
 ///
 /// [`Target`]: struct.Target.html
@@ -44,8 +47,8 @@ impl<'a> Target<'a> {
 
     /// Creates a new [`Target`] applying the given transformation.
     ///
-    /// This is equivalent to multiplying to current [`Target`] transform by the
-    /// provided transform.
+    /// This is equivalent to multiplying the current [`Target`] transform by
+    /// the provided transform.
     ///
     /// You can use blocks to emulate a transformation stack! Imagine we want to
     /// apply a camera translation with some zoom, but only use it to draw a
