@@ -300,7 +300,7 @@ fn format_duration(duration: &time::Duration) -> String {
                 + &format!("{:03}", (duration.subsec_micros() - millis * 1000))
                 + " ms"
         } else {
-            duration.subsec_micros().to_string() + " us"
+            duration.subsec_micros().to_string() + " µs"
         }
     }
 }
