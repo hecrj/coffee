@@ -37,6 +37,9 @@ impl Surface {
         &self.window
     }
 
+    // Only needed for backend_gfx
+    pub fn resize(&self, size: winit::dpi::PhysicalSize) {}
+
     pub fn target(&self) -> &TargetView {
         &self.target
     }

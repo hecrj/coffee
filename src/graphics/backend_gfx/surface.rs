@@ -39,6 +39,10 @@ impl Surface {
         self.context.window()
     }
 
+    pub fn resize(&self, size: winit::dpi::PhysicalSize) {
+        self.context.resize(size)
+    }
+
     pub fn target(&self) -> &TargetView {
         &self.target
     }
