@@ -120,12 +120,10 @@ impl Window {
     }
 
     pub(crate) fn resize(&mut self, new_size: winit::dpi::LogicalSize) {
-        self.surface.update_viewport(&mut self.gpu);
-
         let dpi = self.surface.window().get_hidpi_factor();
         let physical_size = new_size.to_physical(dpi);
 
-        self.surface.resize(physical_size);
+        self.surface.resize(&mut self.gpu, physical_size);
 
         self.width = physical_size.width as f32;
         self.height = physical_size.height as f32;
