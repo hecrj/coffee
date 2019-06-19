@@ -50,7 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   using multiple threads, useful to improve performance when dealing with many
   thousands of quads. [#37]
 - `Text` alignment. It can be defined using the new `HorizontalAlignment` and
-- `VerticalAlignment` types in the `graphics` module. [#35]
+  `VerticalAlignment` types in the `graphics` module. [#35]
 - `Font::measure`. It allows to measure the dimensions of any `Text`. [#35]
 - `Rectangle::contains`. It returns whether or not a `Rectangle` contains a
   given `Point`. [#35]
