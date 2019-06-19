@@ -20,8 +20,18 @@ impl Surface {
     ) -> Surface {
         let surface = instance.create_surface(&window);
 
+        let size = window
+            .get_inner_size()
+            // TODO: Find out when and why the "inner size" might not be available
+            // and do something smarter here.
+            .unwrap_or(winit::dpi::LogicalSize {
+                width: 1280.0,
+                height: 1024.0,
+            })
+            .to_physical(window.get_hidpi_factor());
+
         let (swap_chain, extent, buffer, target) =
-            new_swap_chain(device, &surface, &window);
+            new_swap_chain(device, &surface, size);
 
         Surface {
             window,
@@ -41,9 +51,9 @@ impl Surface {
         &self.target
     }
 
-    pub fn update_viewport(&mut self, gpu: &mut Gpu) {
+    pub fn resize(&mut self, gpu: &mut Gpu, size: winit::dpi::PhysicalSize) {
         let (swap_chain, extent, buffer, target) =
-            new_swap_chain(&gpu.device, &self.surface, &self.window);
+            new_swap_chain(&gpu.device, &self.surface, size);
 
         self.swap_chain = swap_chain;
         self.extent = extent;
@@ -93,18 +103,8 @@ impl Surface {
 fn new_swap_chain(
     device: &wgpu::Device,
     surface: &wgpu::Surface,
-    window: &winit::Window,
+    size: winit::dpi::PhysicalSize,
 ) -> (wgpu::SwapChain, wgpu::Extent3d, wgpu::Texture, TargetView) {
-    let size = window
-        .get_inner_size()
-        // TODO: Find out when and why the "inner size" might not be available
-        // and do something smarter here.
-        .unwrap_or(winit::dpi::LogicalSize {
-            width: 1280.0,
-            height: 1024.0,
-        })
-        .to_physical(window.get_hidpi_factor());
-
     let swap_chain = device.create_swap_chain(
         surface,
         &wgpu::SwapChainDescriptor {

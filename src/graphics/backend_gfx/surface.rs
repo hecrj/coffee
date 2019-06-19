@@ -43,7 +43,9 @@ impl Surface {
         &self.target
     }
 
-    pub fn update_viewport(&mut self, _gpu: &mut Gpu) {
+    pub fn resize(&mut self, _gpu: &mut Gpu, size: winit::dpi::PhysicalSize) {
+        self.context.resize(size);
+
         let dimensions = self.target.get_dimensions();
 
         if let Some((target, _depth)) = gfx_window_glutin::update_views_raw(
