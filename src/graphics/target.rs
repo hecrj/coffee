@@ -3,12 +3,12 @@ use crate::graphics::{Color, Transformation};
 
 /// A rendering target.
 ///
-/// In Coffee, all the draw operations need an explicit [`Target`].
+/// In Coffee, all the draw operations need an explicit [`Target`]. You can
+/// obtain one from a [`Frame`] or a [`Canvas`].
 ///
-/// The default coordinate system of a [`Target`] has the origin in its
-/// upper-left corner, with Y increasing downwards.
-///
-/// You can obtain one from a [`Frame`] or a [`Canvas`].
+/// The default coordinate system of a [`Target`] has the origin `(0, 0)` at
+/// its top-left corner and `(Target::width, Target::height)` at its bottom-right
+/// corner.
 ///
 /// [`Target`]: struct.Target.html
 /// [`Frame`]: struct.Frame.html
