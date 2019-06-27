@@ -35,10 +35,11 @@ impl Gpu {
             power_preference: wgpu::PowerPreference::HighPerformance,
         });
 
-        let mut device = adapter.create_device(&wgpu::DeviceDescriptor {
+        let mut device = adapter.request_device(&wgpu::DeviceDescriptor {
             extensions: wgpu::Extensions {
                 anisotropic_filtering: false,
             },
+            limits: wgpu::Limits::default(),
         });
 
         let quad_pipeline = quad::Pipeline::new(&mut device);
@@ -71,6 +72,7 @@ impl Gpu {
         let _ = self.encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
             color_attachments: &[wgpu::RenderPassColorAttachmentDescriptor {
                 attachment: &view,
+                resolve_target: None,
                 load_op: wgpu::LoadOp::Clear,
                 store_op: wgpu::StoreOp::Store,
                 clear_color: wgpu::Color { r, g, b, a },

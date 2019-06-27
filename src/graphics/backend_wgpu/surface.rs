@@ -75,8 +75,8 @@ impl Surface {
         encoder.copy_texture_to_texture(
             wgpu::TextureCopyView {
                 texture: &self.buffer,
-                level: 0,
-                slice: 0,
+                array_layer: 0,
+                mip_level: 0,
                 origin: wgpu::Origin3d {
                     x: 0.0,
                     y: 0.0,
@@ -85,8 +85,8 @@ impl Surface {
             },
             wgpu::TextureCopyView {
                 texture: &output.texture,
-                level: 0,
-                slice: 0,
+                array_layer: 0,
+                mip_level: 0,
                 origin: wgpu::Origin3d {
                     x: 0.0,
                     y: 0.0,
@@ -108,8 +108,8 @@ fn new_swap_chain(
     let swap_chain = device.create_swap_chain(
         surface,
         &wgpu::SwapChainDescriptor {
-            usage: wgpu::TextureUsageFlags::OUTPUT_ATTACHMENT
-                | wgpu::TextureUsageFlags::TRANSFER_DST,
+            usage: wgpu::TextureUsage::OUTPUT_ATTACHMENT
+                | wgpu::TextureUsage::TRANSFER_DST,
             format: wgpu::TextureFormat::Bgra8Unorm,
             width: size.width.round() as u32,
             height: size.height.round() as u32,
@@ -125,10 +125,12 @@ fn new_swap_chain(
     let buffer = device.create_texture(&wgpu::TextureDescriptor {
         size: extent,
         dimension: wgpu::TextureDimension::D2,
-        array_size: 1,
+        array_layer_count: 1,
+        mip_level_count: 1,
+        sample_count: 1,
         format: wgpu::TextureFormat::Bgra8UnormSrgb,
-        usage: wgpu::TextureUsageFlags::OUTPUT_ATTACHMENT
-            | wgpu::TextureUsageFlags::TRANSFER_SRC,
+        usage: wgpu::TextureUsage::OUTPUT_ATTACHMENT
+            | wgpu::TextureUsage::TRANSFER_SRC,
     });
 
     let target = Rc::new(buffer.create_default_view());

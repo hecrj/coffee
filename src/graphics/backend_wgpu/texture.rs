@@ -41,8 +41,7 @@ impl Texture {
             width,
             height,
             Some(&[&bgra.into_raw()[..]]),
-            wgpu::TextureUsageFlags::TRANSFER_DST
-                | wgpu::TextureUsageFlags::SAMPLED,
+            wgpu::TextureUsage::TRANSFER_DST | wgpu::TextureUsage::SAMPLED,
         );
 
         Texture {
@@ -75,8 +74,7 @@ impl Texture {
             width,
             height,
             Some(&raw_layers[..]),
-            wgpu::TextureUsageFlags::TRANSFER_DST
-                | wgpu::TextureUsageFlags::SAMPLED,
+            wgpu::TextureUsage::TRANSFER_DST | wgpu::TextureUsage::SAMPLED,
         );
 
         Texture {
@@ -124,8 +122,7 @@ impl Drawable {
             width,
             height,
             None,
-            wgpu::TextureUsageFlags::OUTPUT_ATTACHMENT
-                | wgpu::TextureUsageFlags::SAMPLED,
+            wgpu::TextureUsage::OUTPUT_ATTACHMENT | wgpu::TextureUsage::SAMPLED,
         );
 
         let texture = Texture {
@@ -160,7 +157,7 @@ fn create_texture_array(
     width: u16,
     height: u16,
     layers: Option<&[&[u8]]>,
-    usage: wgpu::TextureUsageFlags,
+    usage: wgpu::TextureUsage,
 ) -> (wgpu::Texture, wgpu::TextureView, quad::TextureBinding) {
     let extent = wgpu::Extent3d {
         width: width as u32,
@@ -172,7 +169,9 @@ fn create_texture_array(
 
     let texture = device.create_texture(&wgpu::TextureDescriptor {
         size: extent,
-        array_size: layer_count,
+        array_layer_count: layer_count,
+        mip_level_count: 1,
+        sample_count: 1,
         dimension: wgpu::TextureDimension::D2,
         format: wgpu::TextureFormat::Bgra8UnormSrgb,
         usage,
@@ -185,10 +184,7 @@ fn create_texture_array(
             layers.iter().cloned().flatten().cloned().collect();
 
         let temp_buf = device
-            .create_buffer_mapped(
-                slice.len(),
-                wgpu::BufferUsageFlags::TRANSFER_SRC,
-            )
+            .create_buffer_mapped(slice.len(), wgpu::BufferUsage::TRANSFER_SRC)
             .fill_from_slice(&slice[..]);
 
         let mut encoder =
@@ -205,8 +201,8 @@ fn create_texture_array(
             },
             wgpu::TextureCopyView {
                 texture: &texture,
-                level: 0,
-                slice: 0,
+                array_layer: 0,
+                mip_level: 0,
                 origin: wgpu::Origin3d {
                     x: 0.0,
                     y: 0.0,
