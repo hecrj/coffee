@@ -184,7 +184,7 @@ impl Pipeline {
         let index_buffer = device
             .create_buffer_mapped(
                 indices.len(),
-                wgpu::BufferUsage::TRANSFER_SRC,
+                wgpu::BufferUsage::INDEX,
             )
             .fill_from_slice(indices);
 
