@@ -169,7 +169,7 @@ fn create_texture_array(
 
     let texture = device.create_texture(&wgpu::TextureDescriptor {
         size: extent,
-        array_layer_count: layer_count,
+        array_layer_count: layer_count.max(2),
         mip_level_count: 1,
         sample_count: 1,
         dimension: wgpu::TextureDimension::D2,
