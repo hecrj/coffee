@@ -19,12 +19,14 @@ maintenance = { status = "actively-developed" }
 features = ["opengl", "debug"]
 
 [features]
-default = []
+default = ["empty"]
 opengl = ["gfx", "gfx_core", "glutin", "gfx_device_gl", "gfx_window_glutin", "gfx_glyph", "gfx_winit"]
 vulkan = ["wgpu", "wgpu/vulkan", "wgpu_glyph"]
 metal = ["wgpu", "wgpu/metal", "wgpu_glyph"]
 dx11 = ["wgpu", "wgpu/dx11", "wgpu_glyph"]
 dx12 = ["wgpu", "wgpu/dx12", "wgpu_glyph"]
+web = ["wgpu", "wgpu/web", "wgpu_glyph", "instant/wasm-bindgen", "instant/now"]
+empty = ["wgpu", "wgpu_glyph"]
 debug = []
 
 [dependencies]
@@ -33,8 +35,10 @@ nalgebra = "0.18"
 rayon = "1.0"
 stretch = "0.2"
 twox-hash = "1.3"
+seahash = "3.0"
 lyon_tessellation = "0.13"
 gilrs = "0.7"
+instant = "0.1"
 
 # gfx (OpenGL)
 gfx = { version = "0.18", optional = true }
@@ -51,4 +55,20 @@ wgpu_glyph = { version = "0.3", optional = true }
 
 [dev-dependencies]
 # Example dependencies
-rand = "0.6"
+rand = { version = "0.6", features = ["wasm-bindgen"] }
+
+[target.'cfg(target_arch = "wasm32")'.dev-dependencies]
+log = "0.4"
+wasm-bindgen = "0.2"
+console_error_panic_hook = "0.1.6"
+console_log = "0.1.2"
+
+[patch.crates-io]
+wgpu = { git = "https://github.com/hecrj/wgpu-rs", branch = "web" }
+wgpu_glyph = { git = "https://github.com/hecrj/wgpu_glyph", branch = "web" }
+wgpu-native = { git = "https://github.com/hecrj/wgpu", branch = "web" }
+gfx-hal = { git = "https://github.com/hecrj/gfx", branch = "web" }
+gfx-backend-empty = { git = "https://github.com/hecrj/gfx", branch = "web" }
+gfx-backend-gl = { git = "https://github.com/hecrj/gfx", branch = "web" }
+winit = { git = "https://github.com/hecrj/winit", branch = "web" }
+instant = { git = "https://github.com/hecrj/instant", branch = "fix/illegal-invocation" }

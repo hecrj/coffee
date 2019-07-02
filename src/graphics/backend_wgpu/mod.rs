@@ -26,28 +26,34 @@ pub struct Gpu {
 
 impl Gpu {
     pub(super) fn for_window(
-        builder: winit::WindowBuilder,
-        events_loop: &winit::EventsLoop,
+        builder: winit::window::WindowBuilder,
+        event_loop: &winit::event_loop::EventLoop<()>,
     ) -> Result<(Gpu, Surface)> {
+        let window = builder
+            .build(event_loop)
+            .map_err(|error| Error::WindowCreation(error.to_string()))?;
+
+        #[cfg(not(feature = "web"))]
         let instance = wgpu::Instance::new();
+
+        #[cfg(feature = "web")]
+        let instance = wgpu::Instance::new(&window);
 
         let adapter = instance.get_adapter(&wgpu::AdapterDescriptor {
             power_preference: wgpu::PowerPreference::HighPerformance,
         });
 
-        let mut device = adapter.create_device(&wgpu::DeviceDescriptor {
+        let mut device = adapter.request_device(&wgpu::DeviceDescriptor {
             extensions: wgpu::Extensions {
                 anisotropic_filtering: false,
             },
+            limits: wgpu::Limits::default(),
         });
+
+        let surface = Surface::new(window, &instance, &device);
 
         let quad_pipeline = quad::Pipeline::new(&mut device);
         let triangle_pipeline = triangle::Pipeline::new(&mut device);
-
-        let window = builder
-            .build(events_loop)
-            .map_err(|error| Error::WindowCreation(error.to_string()))?;
-        let surface = Surface::new(window, &instance, &device);
 
         let encoder =
             device.create_command_encoder(&wgpu::CommandEncoderDescriptor {
@@ -71,6 +77,7 @@ impl Gpu {
         let _ = self.encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
             color_attachments: &[wgpu::RenderPassColorAttachmentDescriptor {
                 attachment: &view,
+                resolve_target: None,
                 load_op: wgpu::LoadOp::Clear,
                 store_op: wgpu::StoreOp::Store,
                 clear_color: wgpu::Color { r, g, b, a },

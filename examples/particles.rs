@@ -1,10 +1,6 @@
 //! A particle gravity simulator that showcases a loading screen, input
 //! handling, and graphics interpolation with batched drawing and font
 //! rendering. Move the mouse around to attract the particles.
-use rand::Rng;
-use rayon::prelude::*;
-use std::{thread, time};
-
 use coffee::graphics::{
     Batch, Color, Frame, Image, Point, Rectangle, Sprite, Vector, Window,
     WindowSettings,
@@ -13,6 +9,24 @@ use coffee::input::{keyboard, KeyboardAndMouse};
 use coffee::load::{loading_screen::ProgressBar, Join, Task};
 use coffee::ui::{Checkbox, Column, Element, Justify, Renderer, UserInterface};
 use coffee::{Game, Result, Timer};
+
+use rand::Rng;
+
+#[cfg(target_arch = "wasm32")]
+use wasm_bindgen::prelude::*;
+
+#[cfg(target_arch = "wasm32")]
+#[wasm_bindgen(start)]
+pub fn wasm_main() {
+    #[cfg(debug_assertions)]
+    {
+        use log::Level;
+        console_log::init_with_level(Level::Trace).expect("error initializing log");
+    }
+
+    std::panic::set_hook(Box::new(console_error_panic_hook::hook));
+    main().expect("Run main");
+}
 
 fn main() -> Result<()> {
     <Particles as UserInterface>::run(WindowSettings {
@@ -74,13 +88,9 @@ impl Game for Particles {
                 Self::generate(window.width(), window.height()),
             ),
             Task::stage("Loading assets...", Self::load_palette()),
-            Task::stage(
-                "Showing off the loading screen for a bit...",
-                Task::new(|| thread::sleep(time::Duration::from_secs(2))),
-            ),
         )
             .join()
-            .map(|(particles, palette, _)| Particles {
+            .map(|(particles, palette)| Particles {
                 particles,
                 gravity_centers: vec![Point::new(0.0, 0.0)],
                 batch: Batch::new(palette),
@@ -106,7 +116,7 @@ impl Game for Particles {
         let gravity_centers = self.gravity_centers.clone();
 
         // Update particles in parallel! <3 rayon
-        self.particles.par_iter_mut().for_each(move |particle| {
+        self.particles.iter_mut().for_each(move |particle| {
             particle.acceleration = gravity_centers
                 .iter()
                 .map(|gravity_center| {
@@ -133,7 +143,7 @@ impl Game for Particles {
         };
 
         // Generate sprites in parallel! <3 rayon
-        let sprites = self.particles.par_iter().map(|particle| {
+        let sprites = self.particles.iter().map(|particle| {
             let velocity =
                 particle.velocity + particle.acceleration * delta_factor;
 
@@ -153,7 +163,7 @@ impl Game for Particles {
         self.batch.clear();
 
         // Use the parallel iterator to populate the batch efficiently
-        self.batch.par_extend(sprites);
+        self.batch.extend(sprites);
 
         // Draw particles all at once!
         self.batch.draw(&mut frame.as_target());

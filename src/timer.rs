@@ -1,3 +1,4 @@
+use instant::Instant;
 use std::time;
 
 /// The timer of your game state.
@@ -11,7 +12,7 @@ use std::time;
 pub struct Timer {
     target_ticks: u16,
     target_delta: time::Duration,
-    last_tick: time::Instant,
+    last_tick: Instant,
     accumulated_delta: time::Duration,
     has_ticked: bool,
 }
@@ -28,14 +29,14 @@ impl Timer {
                 target_seconds as u64,
                 target_nanos as u32,
             ),
-            last_tick: time::Instant::now(),
+            last_tick: Instant::now(),
             accumulated_delta: time::Duration::from_secs(0),
             has_ticked: false,
         }
     }
 
     pub(crate) fn update(&mut self) {
-        let now = time::Instant::now();
+        let now = Instant::now();
         let diff = now - self.last_tick;
 
         self.last_tick = now;

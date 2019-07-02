@@ -4,7 +4,7 @@ use super::{Gpu, TargetView};
 pub use wgpu::winit;
 
 pub struct Surface {
-    window: winit::Window,
+    window: winit::window::Window,
     surface: wgpu::Surface,
     swap_chain: wgpu::SwapChain,
     extent: wgpu::Extent3d,
@@ -14,21 +14,17 @@ pub struct Surface {
 
 impl Surface {
     pub fn new(
-        window: winit::Window,
+        window: winit::window::Window,
         instance: &wgpu::Instance,
         device: &wgpu::Device,
     ) -> Surface {
+        #[cfg(not(feature = "web"))]
         let surface = instance.create_surface(&window);
 
-        let size = window
-            .get_inner_size()
-            // TODO: Find out when and why the "inner size" might not be available
-            // and do something smarter here.
-            .unwrap_or(winit::dpi::LogicalSize {
-                width: 1280.0,
-                height: 1024.0,
-            })
-            .to_physical(window.get_hidpi_factor());
+        #[cfg(feature = "web")]
+        let surface = instance.get_surface();
+
+        let size = window.inner_size().to_physical(window.hidpi_factor());
 
         let (swap_chain, extent, buffer, target) =
             new_swap_chain(device, &surface, size);
@@ -43,7 +39,7 @@ impl Surface {
         }
     }
 
-    pub fn window(&self) -> &winit::Window {
+    pub fn window(&self) -> &winit::window::Window {
         &self.window
     }
 
@@ -75,8 +71,8 @@ impl Surface {
         encoder.copy_texture_to_texture(
             wgpu::TextureCopyView {
                 texture: &self.buffer,
-                level: 0,
-                slice: 0,
+                array_layer: 0,
+                mip_level: 0,
                 origin: wgpu::Origin3d {
                     x: 0.0,
                     y: 0.0,
@@ -85,8 +81,8 @@ impl Surface {
             },
             wgpu::TextureCopyView {
                 texture: &output.texture,
-                level: 0,
-                slice: 0,
+                array_layer: 0,
+                mip_level: 0,
                 origin: wgpu::Origin3d {
                     x: 0.0,
                     y: 0.0,
@@ -98,6 +94,10 @@ impl Surface {
 
         gpu.device.get_queue().submit(&[encoder.finish()]);
     }
+
+    pub fn request_redraw(&mut self) {
+        self.window.request_redraw();
+    }
 }
 
 fn new_swap_chain(
@@ -108,9 +108,9 @@ fn new_swap_chain(
     let swap_chain = device.create_swap_chain(
         surface,
         &wgpu::SwapChainDescriptor {
-            usage: wgpu::TextureUsageFlags::OUTPUT_ATTACHMENT
-                | wgpu::TextureUsageFlags::TRANSFER_DST,
-            format: wgpu::TextureFormat::Bgra8Unorm,
+            usage: wgpu::TextureUsage::OUTPUT_ATTACHMENT
+                | wgpu::TextureUsage::TRANSFER_DST,
+            format: wgpu::TextureFormat::Rgba8Unorm,
             width: size.width.round() as u32,
             height: size.height.round() as u32,
         },
@@ -125,10 +125,12 @@ fn new_swap_chain(
     let buffer = device.create_texture(&wgpu::TextureDescriptor {
         size: extent,
         dimension: wgpu::TextureDimension::D2,
-        array_size: 1,
-        format: wgpu::TextureFormat::Bgra8UnormSrgb,
-        usage: wgpu::TextureUsageFlags::OUTPUT_ATTACHMENT
-            | wgpu::TextureUsageFlags::TRANSFER_SRC,
+        array_layer_count: 1,
+        mip_level_count: 1,
+        sample_count: 1,
+        format: wgpu::TextureFormat::Rgba8UnormSrgb,
+        usage: wgpu::TextureUsage::OUTPUT_ATTACHMENT
+            | wgpu::TextureUsage::TRANSFER_SRC,
     });
 
     let target = Rc::new(buffer.create_default_view());

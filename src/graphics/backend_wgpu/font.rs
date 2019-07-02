@@ -6,7 +6,7 @@ use crate::graphics::{
 use wgpu_glyph::GlyphCruncher;
 
 pub struct Font {
-    glyphs: wgpu_glyph::GlyphBrush<'static>,
+    glyphs: wgpu_glyph::GlyphBrush<'static, std::hash::BuildHasherDefault<seahash::SeaHasher>>,
 }
 
 impl Font {
@@ -14,7 +14,8 @@ impl Font {
         Font {
             glyphs: wgpu_glyph::GlyphBrushBuilder::using_font_bytes(bytes)
                 .texture_filter_method(wgpu::FilterMode::Nearest)
-                .build(device, wgpu::TextureFormat::Bgra8UnormSrgb),
+                .section_hasher(std::hash::BuildHasherDefault::<seahash::SeaHasher>::default())
+                .build(device, wgpu::TextureFormat::Rgba8UnormSrgb),
         }
     }
 

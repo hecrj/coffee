@@ -2,5 +2,5 @@
 
 mod event;
 
-pub use crate::graphics::window::winit::VirtualKeyCode as KeyCode;
+pub use crate::graphics::window::winit::event::VirtualKeyCode as KeyCode;
 pub use event::Event;

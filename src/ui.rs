@@ -164,12 +164,12 @@ pub type Row<'a, Message> = widget::Row<'a, Message, Renderer>;
 /// [`Renderer`]: struct.Renderer.html
 pub type Element<'a, Message> = self::core::Element<'a, Message, Renderer>;
 
-use crate::game;
-use crate::graphics::{window, Point, Window, WindowSettings};
-use crate::input::{self, gamepad, mouse, Input as _};
-use crate::load::{Join, LoadingScreen};
+use crate::game::{self, Loop as _};
+use crate::graphics::{Point, Window, WindowSettings};
+use crate::input::{self, mouse, Input as _};
+use crate::load::Task;
 use crate::ui::core::{Event, Interface, MouseCursor, Renderer as _};
-use crate::{Debug, Game, Result, Timer};
+use crate::{Debug, Game, Result};
 
 /// The user interface of your game.
 ///
@@ -261,142 +261,40 @@ pub trait UserInterface: Game {
     where
         Self: 'static + Sized,
     {
-        // Set up window
-        let event_loop = &mut window::EventLoop::new();
-        let window = &mut Window::new(window_settings, &event_loop)?;
-        let mut debug = Debug::new(window.gpu());
-
-        // Load game
-        debug.loading_started();
-        let mut loading_screen = Self::LoadingScreen::new(window.gpu())?;
-        let load = (
-            Self::load(window),
-            Self::Renderer::load(Self::configuration()),
-        )
-            .join();
-        let (game, renderer) = &mut loading_screen.run(load, window)?;
-        let input = &mut Input::new();
-        let mut gamepads = gamepad::Tracker::new();
-        debug.loading_finished();
-
-        // Game loop
-        let mut timer = Timer::new(Self::TICKS_PER_SECOND);
-        let mut alive = true;
-        let messages = &mut Vec::new();
-        let mut mouse_cursor = MouseCursor::OutOfBounds;
-        let mut ui_cache =
-            Interface::compute(game.layout(window), &renderer).cache();
-
-        while alive {
-            debug.frame_started();
-            timer.update();
-
-            while timer.tick() {
-                interact(
-                    game,
-                    input,
-                    &mut debug,
-                    window,
-                    event_loop,
-                    gamepads.as_mut(),
-                    &mut alive,
-                );
-
-                debug.update_started();
-                game.update(window);
-                debug.update_finished();
-            }
-
-            if !timer.has_ticked() {
-                interact(
-                    game,
-                    input,
-                    &mut debug,
-                    window,
-                    event_loop,
-                    gamepads.as_mut(),
-                    &mut alive,
-                );
-            }
-
-            debug.draw_started();
-            game.draw(&mut window.frame(), &timer);
-            debug.draw_finished();
-
-            debug.ui_started();
-            let mut interface = Interface::compute_with_cache(
-                game.layout(window),
-                &renderer,
-                ui_cache,
-            );
-
-            let cursor_position = input.cursor_position;
-            input.ui_events.drain(..).for_each(|event| {
-                interface.on_event(event, cursor_position, messages)
-            });
-
-            let new_cursor = interface.draw(
-                renderer,
-                &mut window.frame(),
-                input.cursor_position,
-            );
-
-            ui_cache = interface.cache();
-
-            if new_cursor != mouse_cursor {
-                if new_cursor == MouseCursor::OutOfBounds {
-                    input.update(input::Event::Mouse(
-                        mouse::Event::CursorReturned,
-                    ));
-                } else if mouse_cursor == MouseCursor::OutOfBounds {
-                    input
-                        .update(input::Event::Mouse(mouse::Event::CursorTaken));
-                }
-
-                window.update_cursor(new_cursor.into());
-                mouse_cursor = new_cursor;
-            }
-
-            for message in messages.drain(..) {
-                game.react(message);
-            }
-            debug.ui_finished();
-
-            if debug.is_enabled() {
-                debug.debug_started();
-                game.debug(
-                    &mut input.game_input,
-                    &mut window.frame(),
-                    &mut debug,
-                );
-                debug.debug_finished();
-            }
-
-            window.swap_buffers();
-            debug.frame_finished();
-        }
-
-        Ok(())
+        Loop::<Self>::run(window_settings)
     }
 }
 
-struct Input<I: input::Input> {
-    game_input: I,
+struct Loop<UI: UserInterface> {
+    renderer: UI::Renderer,
+    messages: Vec<UI::Message>,
+    mouse_cursor: MouseCursor,
+    cache: Option<core::Cache>,
     cursor_position: Point,
-    ui_events: Vec<Event>,
+    events: Vec<Event>,
 }
 
-impl<I: input::Input> input::Input for Input<I> {
-    fn new() -> Input<I> {
-        Input {
-            game_input: I::new(),
+impl<UI: UserInterface> game::Loop<UI> for Loop<UI> {
+    type Attributes = UI::Renderer;
+
+    fn new(renderer: UI::Renderer, game: &mut UI, window: &Window) -> Self {
+        let cache = Interface::compute(game.layout(window), &renderer).cache();
+        Loop {
+            renderer,
+            messages: Vec::new(),
+            mouse_cursor: MouseCursor::OutOfBounds,
+            cache: Some(cache),
             cursor_position: Point::new(0.0, 0.0),
-            ui_events: Vec::new(),
+            events: Vec::new(),
         }
     }
 
-    fn update(&mut self, event: input::Event) {
-        self.game_input.update(event);
+    fn load(_window: &Window) -> Task<UI::Renderer> {
+        UI::Renderer::load(UI::configuration())
+    }
+
+    fn on_input(&mut self, input: &mut UI::Input, event: input::Event) {
+        input.update(event);
 
         match event {
             input::Event::Mouse(mouse::Event::CursorMoved { x, y }) => {
@@ -406,34 +304,53 @@ impl<I: input::Input> input::Input for Input<I> {
         };
 
         if let Some(ui_event) = Event::from_input(event) {
-            self.ui_events.push(ui_event);
+            self.events.push(ui_event);
         }
     }
 
-    fn clear(&mut self) {
-        self.game_input.clear();
+    fn after_draw(
+        &mut self,
+        ui: &mut UI,
+        input: &mut UI::Input,
+        window: &mut Window,
+        debug: &mut Debug,
+    ) {
+        debug.ui_started();
+        let mut interface = Interface::compute_with_cache(
+            ui.layout(window),
+            &self.renderer,
+            self.cache.take().unwrap(),
+        );
+
+        let cursor_position = self.cursor_position;
+        let messages = &mut self.messages;
+
+        self.events.drain(..).for_each(|event| {
+            interface.on_event(event, cursor_position, messages)
+        });
+
+        let new_cursor = interface.draw(
+            &mut self.renderer,
+            &mut window.frame(),
+            cursor_position,
+        );
+
+        self.cache = Some(interface.cache());
+
+        if new_cursor != self.mouse_cursor {
+            if new_cursor == MouseCursor::OutOfBounds {
+                input.update(input::Event::Mouse(mouse::Event::CursorReturned));
+            } else if self.mouse_cursor == MouseCursor::OutOfBounds {
+                input.update(input::Event::Mouse(mouse::Event::CursorTaken));
+            }
+
+            window.update_cursor(new_cursor.into());
+            self.mouse_cursor = new_cursor;
+        }
+
+        for message in messages.drain(..) {
+            ui.react(message);
+        }
+        debug.ui_finished();
     }
-}
-
-fn interact<G: Game>(
-    game: &mut G,
-    input: &mut Input<G::Input>,
-    debug: &mut Debug,
-    window: &mut Window,
-    event_loop: &mut window::EventLoop,
-    gamepads: Option<&mut gamepad::Tracker>,
-    alive: &mut bool,
-) {
-    debug.interact_started();
-
-    event_loop.poll(|event| {
-        game::process_window_event(game, input, debug, window, alive, event)
-    });
-
-    game::process_gamepad_events(gamepads, input);
-
-    game.interact(&mut input.game_input, window);
-    input.clear();
-
-    debug.interact_finished();
 }

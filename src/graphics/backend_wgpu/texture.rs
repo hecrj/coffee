@@ -31,18 +31,17 @@ impl Texture {
         pipeline: &Pipeline,
         image: &image::DynamicImage,
     ) -> Texture {
-        let bgra = image.to_bgra();
-        let width = bgra.width() as u16;
-        let height = bgra.height() as u16;
+        let rgba = image.to_rgba();
+        let width = rgba.width() as u16;
+        let height = rgba.height() as u16;
 
         let (texture, view, binding) = create_texture_array(
             device,
             pipeline,
             width,
             height,
-            Some(&[&bgra.into_raw()[..]]),
-            wgpu::TextureUsageFlags::TRANSFER_DST
-                | wgpu::TextureUsageFlags::SAMPLED,
+            Some(&[&rgba.into_raw()[..]]),
+            wgpu::TextureUsage::TRANSFER_DST | wgpu::TextureUsage::SAMPLED,
         );
 
         Texture {
@@ -60,14 +59,14 @@ impl Texture {
         pipeline: &Pipeline,
         layers: &[image::DynamicImage],
     ) -> Texture {
-        let first_layer = &layers[0].to_bgra();
+        let first_layer = &layers[0].to_rgba();
         let width = first_layer.width() as u16;
         let height = first_layer.height() as u16;
 
-        let bgra: Vec<Vec<u8>> =
-            layers.iter().map(|i| i.to_bgra().into_raw()).collect();
+        let rgba: Vec<Vec<u8>> =
+            layers.iter().map(|i| i.to_rgba().into_raw()).collect();
 
-        let raw_layers: Vec<&[u8]> = bgra.iter().map(|i| &i[..]).collect();
+        let raw_layers: Vec<&[u8]> = rgba.iter().map(|i| &i[..]).collect();
 
         let (texture, view, binding) = create_texture_array(
             device,
@@ -75,8 +74,7 @@ impl Texture {
             width,
             height,
             Some(&raw_layers[..]),
-            wgpu::TextureUsageFlags::TRANSFER_DST
-                | wgpu::TextureUsageFlags::SAMPLED,
+            wgpu::TextureUsage::TRANSFER_DST | wgpu::TextureUsage::SAMPLED,
         );
 
         Texture {
@@ -124,8 +122,7 @@ impl Drawable {
             width,
             height,
             None,
-            wgpu::TextureUsageFlags::OUTPUT_ATTACHMENT
-                | wgpu::TextureUsageFlags::SAMPLED,
+            wgpu::TextureUsage::OUTPUT_ATTACHMENT | wgpu::TextureUsage::SAMPLED,
         );
 
         let texture = Texture {
@@ -160,7 +157,7 @@ fn create_texture_array(
     width: u16,
     height: u16,
     layers: Option<&[&[u8]]>,
-    usage: wgpu::TextureUsageFlags,
+    usage: wgpu::TextureUsage,
 ) -> (wgpu::Texture, wgpu::TextureView, quad::TextureBinding) {
     let extent = wgpu::Extent3d {
         width: width as u32,
@@ -172,9 +169,11 @@ fn create_texture_array(
 
     let texture = device.create_texture(&wgpu::TextureDescriptor {
         size: extent,
-        array_size: layer_count,
+        array_layer_count: layer_count.max(2),
+        mip_level_count: 1,
+        sample_count: 1,
         dimension: wgpu::TextureDimension::D2,
-        format: wgpu::TextureFormat::Bgra8UnormSrgb,
+        format: wgpu::TextureFormat::Rgba8UnormSrgb,
         usage,
     });
 
@@ -185,10 +184,7 @@ fn create_texture_array(
             layers.iter().cloned().flatten().cloned().collect();
 
         let temp_buf = device
-            .create_buffer_mapped(
-                slice.len(),
-                wgpu::BufferUsageFlags::TRANSFER_SRC,
-            )
+            .create_buffer_mapped(slice.len(), wgpu::BufferUsage::TRANSFER_SRC)
             .fill_from_slice(&slice[..]);
 
         let mut encoder =
@@ -205,8 +201,8 @@ fn create_texture_array(
             },
             wgpu::TextureCopyView {
                 texture: &texture,
-                level: 0,
-                slice: 0,
+                array_layer: 0,
+                mip_level: 0,
                 origin: wgpu::Origin3d {
                     x: 0.0,
                     y: 0.0,
@@ -220,7 +216,7 @@ fn create_texture_array(
     }
 
     let view = texture.create_view(&wgpu::TextureViewDescriptor {
-        format: wgpu::TextureFormat::Bgra8UnormSrgb,
+        format: wgpu::TextureFormat::Rgba8UnormSrgb,
         dimension: wgpu::TextureViewDimension::D2Array,
         aspect: wgpu::TextureAspectFlags::COLOR,
         base_mip_level: 0,

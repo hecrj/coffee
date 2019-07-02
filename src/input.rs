@@ -8,7 +8,7 @@ pub mod window;
 mod event;
 mod keyboard_and_mouse;
 
-pub use crate::graphics::window::winit::ElementState as ButtonState;
+pub use crate::graphics::window::winit::event::ElementState as ButtonState;
 pub use event::Event;
 pub use keyboard_and_mouse::KeyboardAndMouse;
 

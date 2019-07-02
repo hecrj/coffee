@@ -1,9 +1,7 @@
-mod event;
 mod frame;
 mod settings;
 
 pub(crate) use crate::graphics::gpu::winit;
-pub(crate) use event::{Event, EventLoop};
 
 pub use frame::Frame;
 pub use settings::Settings;
@@ -27,12 +25,12 @@ pub struct Window {
 impl Window {
     pub(crate) fn new(
         mut settings: Settings,
-        event_loop: &EventLoop,
+        event_loop: &winit::event_loop::EventLoop<()>,
     ) -> Result<Window> {
         let (mut width, mut height) = settings.size;
 
         // Try to revert DPI
-        let dpi = event_loop.raw().get_primary_monitor().get_hidpi_factor();
+        let dpi = event_loop.primary_monitor().hidpi_factor();
 
         width = (width as f64 / dpi).round() as u32;
         height = (height as f64 / dpi).round() as u32;
@@ -41,23 +39,20 @@ impl Window {
 
         let is_fullscreen = settings.fullscreen;
 
-        let (gpu, surface) = Gpu::for_window(
-            settings.into_builder(event_loop.raw()),
-            event_loop.raw(),
-        )?;
+        let (gpu, surface) =
+            Gpu::for_window(settings.into_builder(event_loop), event_loop)?;
 
         let window = surface.window();
 
-        let (width, height) = window
-            .get_inner_size()
-            .map(|inner_size| {
-                let dpi = window.get_hidpi_factor();
-                (
-                    (inner_size.width * dpi) as f32,
-                    (inner_size.height * dpi) as f32,
-                )
-            })
-            .unwrap_or((width as f32, height as f32));
+        let (width, height) = {
+            let inner_size = window.inner_size();
+            let dpi = window.hidpi_factor();
+
+            (
+                (inner_size.width * dpi) as f32,
+                (inner_size.height * dpi) as f32,
+            )
+        };
 
         Ok(Window {
             is_fullscreen,
@@ -89,7 +84,7 @@ impl Window {
         let monitor = if self.is_fullscreen {
             None
         } else {
-            Some(window.get_primary_monitor())
+            Some(window.primary_monitor())
         };
 
         window.set_fullscreen(monitor);
@@ -112,15 +107,19 @@ impl Window {
     }
 
     pub(crate) fn dpi(&self) -> f64 {
-        self.surface.window().get_hidpi_factor()
+        self.surface.window().hidpi_factor()
     }
 
     pub(crate) fn swap_buffers(&mut self) {
         self.surface.swap_buffers(&mut self.gpu);
     }
 
+    pub(crate) fn request_redraw(&mut self) {
+        self.surface.request_redraw();
+    }
+
     pub(crate) fn resize(&mut self, new_size: winit::dpi::LogicalSize) {
-        let dpi = self.surface.window().get_hidpi_factor();
+        let dpi = self.surface.window().hidpi_factor();
         let physical_size = new_size.to_physical(dpi);
 
         self.surface.resize(&mut self.gpu, physical_size);
@@ -129,8 +128,11 @@ impl Window {
         self.height = physical_size.height as f32;
     }
 
-    pub(crate) fn update_cursor(&mut self, new_cursor: winit::MouseCursor) {
-        self.surface.window().set_cursor(new_cursor);
+    pub(crate) fn update_cursor(
+        &mut self,
+        new_cursor: winit::window::CursorIcon,
+    ) {
+        self.surface.window().set_cursor_icon(new_cursor);
     }
 }
 

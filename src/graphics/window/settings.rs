@@ -19,17 +19,17 @@ pub struct Settings {
 impl Settings {
     pub(super) fn into_builder(
         self,
-        events_loop: &winit::EventsLoop,
-    ) -> winit::WindowBuilder {
+        events_loop: &winit::event_loop::EventLoop<()>,
+    ) -> winit::window::WindowBuilder {
         let monitor = if self.fullscreen {
-            Some(events_loop.get_primary_monitor())
+            Some(events_loop.primary_monitor())
         } else {
             None
         };
 
-        winit::WindowBuilder::new()
+        winit::window::WindowBuilder::new()
             .with_title(self.title)
-            .with_dimensions(winit::dpi::LogicalSize {
+            .with_inner_size(winit::dpi::LogicalSize {
                 width: self.size.0 as f64,
                 height: self.size.1 as f64,
             })

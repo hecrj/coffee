@@ -2,5 +2,5 @@
 
 mod event;
 
-pub use crate::graphics::window::winit::MouseButton as Button;
+pub use crate::graphics::window::winit::event::MouseButton as Button;
 pub use event::Event;

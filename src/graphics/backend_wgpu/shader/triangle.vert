@@ -7,7 +7,7 @@ layout (set = 0, binding = 0) uniform Globals {
     mat4 u_Transform;
 };
 
-layout(location = 0) flat out vec4 v_Color;
+layout(location = 0) out vec4 v_Color;
 
 void main() {
     v_Color = a_Color;
