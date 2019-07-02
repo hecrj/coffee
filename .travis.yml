@@ -29,5 +29,6 @@ matrix:
   fast_finish: true
 script:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then chmod +x spirvtest && ./spirvtest; fi
-  - cargo test --verbose --features opengl
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cargo test --verbose --features vulkan --release; fi
+  #- cargo test --verbose --features opengl
+  #- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cargo test --verbose --features vulkan --release; fi
+  - cargo test --verbose

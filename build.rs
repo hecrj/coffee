@@ -3,7 +3,8 @@
     feature = "vulkan",
     feature = "metal",
     feature = "dx11",
-    feature = "dx12"
+    feature = "dx12",
+    all(debug_assertions, feature = "empty")
 )))]
 compile_error!(
     "You need to enable a graphics backend feature. \

@@ -4,7 +4,7 @@ use super::{Gpu, TargetView};
 pub use wgpu::winit;
 
 pub struct Surface {
-    window: winit::Window,
+    window: winit::window::Window,
     surface: wgpu::Surface,
     swap_chain: wgpu::SwapChain,
     extent: wgpu::Extent3d,
@@ -14,21 +14,13 @@ pub struct Surface {
 
 impl Surface {
     pub fn new(
-        window: winit::Window,
+        window: winit::window::Window,
         instance: &wgpu::Instance,
         device: &wgpu::Device,
     ) -> Surface {
         let surface = instance.create_surface(&window);
 
-        let size = window
-            .get_inner_size()
-            // TODO: Find out when and why the "inner size" might not be available
-            // and do something smarter here.
-            .unwrap_or(winit::dpi::LogicalSize {
-                width: 1280.0,
-                height: 1024.0,
-            })
-            .to_physical(window.get_hidpi_factor());
+        let size = window.inner_size().to_physical(window.hidpi_factor());
 
         let (swap_chain, extent, buffer, target) =
             new_swap_chain(device, &surface, size);
@@ -43,7 +35,7 @@ impl Surface {
         }
     }
 
-    pub fn window(&self) -> &winit::Window {
+    pub fn window(&self) -> &winit::window::Window {
         &self.window
     }
 
@@ -97,6 +89,10 @@ impl Surface {
         );
 
         gpu.device.get_queue().submit(&[encoder.finish()]);
+    }
+
+    pub fn request_redraw(&mut self) {
+        self.window.request_redraw();
     }
 }
 

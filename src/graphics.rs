@@ -94,14 +94,16 @@ use backend_gfx as gpu;
     feature = "vulkan",
     feature = "metal",
     feature = "dx11",
-    feature = "dx12"
+    feature = "dx12",
+    all(debug_assertions, feature = "empty")
 ))]
 mod backend_wgpu;
 #[cfg(any(
     feature = "vulkan",
     feature = "metal",
     feature = "dx11",
-    feature = "dx12"
+    feature = "dx12",
+    all(debug_assertions, feature = "empty")
 ))]
 use backend_wgpu as gpu;
 
