@@ -75,7 +75,7 @@ impl Pipeline {
                 },
                 primitive_topology: wgpu::PrimitiveTopology::TriangleList,
                 color_states: &[wgpu::ColorStateDescriptor {
-                    format: wgpu::TextureFormat::Bgra8UnormSrgb,
+                    format: wgpu::TextureFormat::Rgba8UnormSrgb,
                     color_blend: wgpu::BlendDescriptor {
                         src_factor: wgpu::BlendFactor::SrcAlpha,
                         dst_factor: wgpu::BlendFactor::OneMinusSrcAlpha,

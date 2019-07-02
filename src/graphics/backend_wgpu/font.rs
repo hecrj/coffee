@@ -15,7 +15,7 @@ impl Font {
             glyphs: wgpu_glyph::GlyphBrushBuilder::using_font_bytes(bytes)
                 .texture_filter_method(wgpu::FilterMode::Nearest)
                 .section_hasher(std::hash::BuildHasherDefault::<seahash::SeaHasher>::default())
-                .build(device, wgpu::TextureFormat::Bgra8UnormSrgb),
+                .build(device, wgpu::TextureFormat::Rgba8UnormSrgb),
         }
     }
 

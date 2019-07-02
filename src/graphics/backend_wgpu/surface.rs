@@ -110,7 +110,7 @@ fn new_swap_chain(
         &wgpu::SwapChainDescriptor {
             usage: wgpu::TextureUsage::OUTPUT_ATTACHMENT
                 | wgpu::TextureUsage::TRANSFER_DST,
-            format: wgpu::TextureFormat::Bgra8Unorm,
+            format: wgpu::TextureFormat::Rgba8Unorm,
             width: size.width.round() as u32,
             height: size.height.round() as u32,
         },
@@ -128,7 +128,7 @@ fn new_swap_chain(
         array_layer_count: 1,
         mip_level_count: 1,
         sample_count: 1,
-        format: wgpu::TextureFormat::Bgra8UnormSrgb,
+        format: wgpu::TextureFormat::Rgba8UnormSrgb,
         usage: wgpu::TextureUsage::OUTPUT_ATTACHMENT
             | wgpu::TextureUsage::TRANSFER_SRC,
     });

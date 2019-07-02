@@ -31,16 +31,16 @@ impl Texture {
         pipeline: &Pipeline,
         image: &image::DynamicImage,
     ) -> Texture {
-        let bgra = image.to_bgra();
-        let width = bgra.width() as u16;
-        let height = bgra.height() as u16;
+        let rgba = image.to_rgba();
+        let width = rgba.width() as u16;
+        let height = rgba.height() as u16;
 
         let (texture, view, binding) = create_texture_array(
             device,
             pipeline,
             width,
             height,
-            Some(&[&bgra.into_raw()[..]]),
+            Some(&[&rgba.into_raw()[..]]),
             wgpu::TextureUsage::TRANSFER_DST | wgpu::TextureUsage::SAMPLED,
         );
 
@@ -59,14 +59,14 @@ impl Texture {
         pipeline: &Pipeline,
         layers: &[image::DynamicImage],
     ) -> Texture {
-        let first_layer = &layers[0].to_bgra();
+        let first_layer = &layers[0].to_rgba();
         let width = first_layer.width() as u16;
         let height = first_layer.height() as u16;
 
-        let bgra: Vec<Vec<u8>> =
-            layers.iter().map(|i| i.to_bgra().into_raw()).collect();
+        let rgba: Vec<Vec<u8>> =
+            layers.iter().map(|i| i.to_rgba().into_raw()).collect();
 
-        let raw_layers: Vec<&[u8]> = bgra.iter().map(|i| &i[..]).collect();
+        let raw_layers: Vec<&[u8]> = rgba.iter().map(|i| &i[..]).collect();
 
         let (texture, view, binding) = create_texture_array(
             device,
@@ -173,7 +173,7 @@ fn create_texture_array(
         mip_level_count: 1,
         sample_count: 1,
         dimension: wgpu::TextureDimension::D2,
-        format: wgpu::TextureFormat::Bgra8UnormSrgb,
+        format: wgpu::TextureFormat::Rgba8UnormSrgb,
         usage,
     });
 
@@ -216,7 +216,7 @@ fn create_texture_array(
     }
 
     let view = texture.create_view(&wgpu::TextureViewDescriptor {
-        format: wgpu::TextureFormat::Bgra8UnormSrgb,
+        format: wgpu::TextureFormat::Rgba8UnormSrgb,
         dimension: wgpu::TextureViewDimension::D2Array,
         aspect: wgpu::TextureAspectFlags::COLOR,
         base_mip_level: 0,
