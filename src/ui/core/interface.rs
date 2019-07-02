@@ -2,7 +2,7 @@ use std::hash::Hasher;
 use stretch::result;
 
 use crate::graphics::{Frame, Point};
-use crate::ui::core::{self, Element, Event, Layout, MouseCursor};
+use crate::ui::core::{self, Element, Event, Layout, MouseCursor, hasher};
 
 pub struct Interface<'a, Message, Renderer> {
     hash: u64,
@@ -23,7 +23,7 @@ where
         root: Element<'a, Message, Renderer>,
         renderer: &Renderer,
     ) -> Interface<'a, Message, Renderer> {
-        let hasher = &mut twox_hash::XxHash::default();
+        let hasher = &mut hasher::Hasher::default();
         root.hash(hasher);
 
         let hash = hasher.finish();
@@ -37,7 +37,7 @@ where
         renderer: &Renderer,
         cache: Cache,
     ) -> Interface<'a, Message, Renderer> {
-        let hasher = &mut twox_hash::XxHash::default();
+        let hasher = &mut hasher::Hasher::default();
         root.hash(hasher);
 
         let hash = hasher.finish();
