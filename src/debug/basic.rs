@@ -1,3 +1,4 @@
+use instant::Instant;
 use std::time;
 
 use crate::graphics;
@@ -19,19 +20,19 @@ use crate::graphics;
 pub struct Debug {
     font: graphics::Font,
     enabled: bool,
-    load_start: time::Instant,
+    load_start: Instant,
     load_duration: time::Duration,
-    frame_start: time::Instant,
+    frame_start: Instant,
     frame_durations: TimeBuffer,
-    interact_start: time::Instant,
+    interact_start: Instant,
     interact_duration: time::Duration,
-    update_start: time::Instant,
+    update_start: Instant,
     update_durations: TimeBuffer,
-    draw_start: time::Instant,
+    draw_start: Instant,
     draw_durations: TimeBuffer,
-    ui_start: time::Instant,
+    ui_start: Instant,
     ui_durations: TimeBuffer,
-    debug_start: time::Instant,
+    debug_start: Instant,
     debug_durations: TimeBuffer,
     text: Vec<(String, String)>,
     draw_rate: u16,
@@ -40,7 +41,7 @@ pub struct Debug {
 
 impl Debug {
     pub(crate) fn new(gpu: &mut graphics::Gpu) -> Self {
-        let now = time::Instant::now();
+        let now = Instant::now();
 
         Self {
             font: graphics::Font::from_bytes(gpu, graphics::Font::DEFAULT)
@@ -67,11 +68,11 @@ impl Debug {
     }
 
     pub(crate) fn loading_started(&mut self) {
-        self.load_start = time::Instant::now();
+        self.load_start = Instant::now();
     }
 
     pub(crate) fn loading_finished(&mut self) {
-        self.load_duration = time::Instant::now() - self.load_start;
+        self.load_duration = Instant::now() - self.load_start;
     }
 
     /// Returns the time spent loading your [`Game`].
@@ -82,11 +83,10 @@ impl Debug {
     }
 
     pub(crate) fn frame_started(&mut self) {
-        self.frame_start = time::Instant::now();
+        self.frame_start = Instant::now();
     }
     pub(crate) fn frame_finished(&mut self) {
-        self.frame_durations
-            .push(time::Instant::now() - self.frame_start);
+        self.frame_durations.push(Instant::now() - self.frame_start);
     }
 
     /// Returns the average time spent per frame.
@@ -97,11 +97,11 @@ impl Debug {
     }
 
     pub(crate) fn interact_started(&mut self) {
-        self.interact_start = time::Instant::now();
+        self.interact_start = Instant::now();
     }
 
     pub(crate) fn interact_finished(&mut self) {
-        self.interact_duration = time::Instant::now() - self.interact_start;
+        self.interact_duration = Instant::now() - self.interact_start;
     }
 
     /// Returns the average time spent processing events and running
@@ -113,12 +113,12 @@ impl Debug {
     }
 
     pub(crate) fn update_started(&mut self) {
-        self.update_start = time::Instant::now();
+        self.update_start = Instant::now();
     }
 
     pub(crate) fn update_finished(&mut self) {
         self.update_durations
-            .push(time::Instant::now() - self.update_start);
+            .push(Instant::now() - self.update_start);
     }
 
     /// Returns the average time spent running [`Game::update`].
@@ -129,11 +129,11 @@ impl Debug {
     }
 
     pub(crate) fn draw_started(&mut self) {
-        self.draw_start = time::Instant::now();
+        self.draw_start = Instant::now();
     }
 
     pub(crate) fn draw_finished(&mut self) {
-        let duration = time::Instant::now() - self.draw_start;
+        let duration = Instant::now() - self.draw_start;
 
         if duration.subsec_micros() > 0 {
             self.draw_durations.push(duration);
@@ -148,11 +148,11 @@ impl Debug {
     }
 
     pub(crate) fn ui_started(&mut self) {
-        self.ui_start = time::Instant::now();
+        self.ui_start = Instant::now();
     }
 
     pub(crate) fn ui_finished(&mut self) {
-        self.ui_durations.push(time::Instant::now() - self.ui_start);
+        self.ui_durations.push(Instant::now() - self.ui_start);
     }
 
     /// Returns the average time spent rendering the [`UserInterface`].
@@ -168,12 +168,11 @@ impl Debug {
     }
 
     pub(crate) fn debug_started(&mut self) {
-        self.debug_start = time::Instant::now();
+        self.debug_start = Instant::now();
     }
 
     pub(crate) fn debug_finished(&mut self) {
-        self.debug_durations
-            .push(time::Instant::now() - self.debug_start);
+        self.debug_durations.push(Instant::now() - self.debug_start);
     }
 
     /// Returns the average time spent running [`Game::debug`].
