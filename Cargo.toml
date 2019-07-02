@@ -57,6 +57,12 @@ wgpu_glyph = { version = "0.3", optional = true }
 # Example dependencies
 rand = { version = "0.6", features = ["wasm-bindgen"] }
 
+[target.'cfg(target_arch = "wasm32")'.dev-dependencies]
+log = "0.4"
+wasm-bindgen = "0.2"
+console_error_panic_hook = "0.1.6"
+console_log = "0.1.2"
+
 [patch.crates-io]
 wgpu = { git = "https://github.com/hecrj/wgpu-rs", branch = "web" }
 wgpu_glyph = { git = "https://github.com/hecrj/wgpu_glyph", branch = "web" }

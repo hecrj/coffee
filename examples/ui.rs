@@ -1,12 +1,28 @@
 use coffee::graphics::{
     Color, Frame, HorizontalAlignment, Window, WindowSettings,
 };
-use coffee::load::Task;
+use coffee::load::{loading_screen::ProgressBar, Task};
 use coffee::ui::{
     button, slider, Align, Button, Checkbox, Column, Element, Justify, Radio,
     Renderer, Row, Slider, Text, UserInterface,
 };
 use coffee::{Game, Result, Timer};
+
+#[cfg(target_arch = "wasm32")]
+use wasm_bindgen::prelude::*;
+
+#[cfg(target_arch = "wasm32")]
+#[wasm_bindgen(start)]
+pub fn wasm_main() {
+    #[cfg(debug_assertions)]
+    {
+        use log::Level;
+        console_log::init_with_level(Level::Trace).expect("error initializing log");
+    }
+
+    std::panic::set_hook(Box::new(console_error_panic_hook::hook));
+    main().expect("Run main");
+}
 
 fn main() -> Result<()> {
     <Tour as UserInterface>::run(WindowSettings {
@@ -25,7 +41,7 @@ struct Tour {
 
 impl Game for Tour {
     type Input = ();
-    type LoadingScreen = ();
+    type LoadingScreen = ProgressBar;
 
     fn load(_window: &Window) -> Task<Tour> {
         Task::new(|| Tour {
