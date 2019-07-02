@@ -4,6 +4,7 @@
     feature = "metal",
     feature = "dx11",
     feature = "dx12",
+    feature = "web",
     all(debug_assertions, feature = "empty")
 )))]
 compile_error!(

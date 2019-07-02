@@ -95,6 +95,7 @@ use backend_gfx as gpu;
     feature = "metal",
     feature = "dx11",
     feature = "dx12",
+    feature = "web",
     all(debug_assertions, feature = "empty")
 ))]
 mod backend_wgpu;
@@ -103,6 +104,7 @@ mod backend_wgpu;
     feature = "metal",
     feature = "dx11",
     feature = "dx12",
+    feature = "web",
     all(debug_assertions, feature = "empty")
 ))]
 use backend_wgpu as gpu;

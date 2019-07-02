@@ -25,6 +25,7 @@ vulkan = ["wgpu", "wgpu/vulkan", "wgpu_glyph"]
 metal = ["wgpu", "wgpu/metal", "wgpu_glyph"]
 dx11 = ["wgpu", "wgpu/dx11", "wgpu_glyph"]
 dx12 = ["wgpu", "wgpu/dx12", "wgpu_glyph"]
+web = ["wgpu", "wgpu/web", "wgpu_glyph"]
 empty = ["wgpu", "wgpu_glyph"]
 debug = []
 
@@ -52,7 +53,7 @@ wgpu_glyph = { version = "0.3", optional = true }
 
 [dev-dependencies]
 # Example dependencies
-rand = "0.6"
+rand = { version = "0.6", features = ["wasm-bindgen"] }
 
 [patch.crates-io]
 wgpu = { git = "https://github.com/hecrj/wgpu-rs", branch = "web" }

@@ -18,7 +18,11 @@ impl Surface {
         instance: &wgpu::Instance,
         device: &wgpu::Device,
     ) -> Surface {
+        #[cfg(not(feature = "web"))]
         let surface = instance.create_surface(&window);
+
+        #[cfg(feature = "web")]
+        let surface = instance.get_surface();
 
         let size = window.inner_size().to_physical(window.hidpi_factor());
 

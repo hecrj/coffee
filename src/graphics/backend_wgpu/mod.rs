@@ -33,7 +33,11 @@ impl Gpu {
             .build(event_loop)
             .map_err(|error| Error::WindowCreation(error.to_string()))?;
 
+        #[cfg(not(feature = "web"))]
         let instance = wgpu::Instance::new();
+
+        #[cfg(feature = "web")]
+        let instance = wgpu::Instance::new(&window);
 
         let adapter = instance.get_adapter(&wgpu::AdapterDescriptor {
             power_preference: wgpu::PowerPreference::HighPerformance,
