@@ -48,7 +48,7 @@ impl core::Renderer for Renderer {
 
     fn explain(&mut self, layout: &core::Layout<'_>, color: Color) {
         self.explain_mesh
-            .stroke(Shape::Rectangle(layout.bounds()), color, 1);
+            .stroke(Shape::Rectangle(layout.bounds()), color, 1.0);
 
         layout
             .children()

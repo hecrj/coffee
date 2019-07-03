@@ -117,7 +117,7 @@ impl Game for Example {
                 mesh.fill(shape, self.color);
             }
             ModeOption::Stroke => {
-                mesh.stroke(shape, self.color, self.stroke_width);
+                mesh.stroke(shape, self.color, self.stroke_width as f32);
             }
         }
 
