@@ -52,7 +52,7 @@
 //! #   type LoadingScreen = ();
 //! #
 //! #   fn load(window: &Window) -> Task<MyGame> {
-//! #       Task::new(|| MyGame)
+//! #       Task::succeed(|| MyGame)
 //! #   }
 //! #
 //!     // ...

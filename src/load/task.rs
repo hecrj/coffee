@@ -30,8 +30,8 @@ use crate::Result;
 ///
 /// ```
 /// # use coffee::load::Task;
-/// # let load_image = Task::new(|| ());
-/// # let load_texture_array = Task::new(|| ());
+/// # let load_image = Task::succeed(|| ());
+/// # let load_texture_array = Task::succeed(|| ());
 /// #
 /// use coffee::load::Join;
 ///
@@ -90,13 +90,13 @@ impl<T> Task<T> {
     ///     }
     /// }
     ///
-    /// let generate_map = Task::new(Map::generate);
+    /// let generate_map = Task::new(|| Ok(Map::generate()));
     /// ```
     ///
     /// [`Task`]: struct.Task.html
     pub fn new<F>(f: F) -> Task<T>
     where
-        F: 'static + Fn() -> T,
+        F: 'static + Fn() -> Result<T>,
     {
         Task {
             total_work: 1,
@@ -105,9 +105,34 @@ impl<T> Task<T> {
 
                 worker.notify_progress(1);
 
-                Ok(result)
+                result
             }),
         }
+    }
+
+    /// Creates a new [`Task`] from a lazy operation that cannot fail.
+    ///
+    /// ```rust
+    /// # use coffee::load::Task;
+    /// struct Map {
+    ///     // ...
+    /// }
+    ///
+    /// impl Map {
+    ///     pub fn generate() -> Map {
+    ///         Map { /*...*/ }
+    ///     }
+    /// }
+    ///
+    /// let generate_map = Task::succeed(Map::generate);
+    /// ```
+    ///
+    /// [`Task`]: struct.Task.html
+    pub fn succeed<F>(f: F) -> Task<T>
+    where
+        F: 'static + Fn() -> T,
+    {
+        Task::new(move || Ok(f()))
     }
 
     /// Creates a new [`Task`] that uses a [`Gpu`].
@@ -165,13 +190,13 @@ impl<T> Task<T> {
     /// # }
     /// # struct TerrainAssets;
     /// # impl TerrainAssets {
-    /// # fn load() -> Task<()> { Task::new(|| ()) }
+    /// # fn load() -> Task<()> { Task::succeed(|| ()) }
     /// # }
     /// use coffee::load::Join;
     ///
     /// let load_game =
     ///     (
-    ///         Task::stage("Generating map...", Task::new(Map::generate)),
+    ///         Task::stage("Generating map...", Task::succeed(Map::generate)),
     ///         Task::stage("Loading terrain...", TerrainAssets::load())
     ///     )
     ///         .join();

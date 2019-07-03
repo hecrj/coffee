@@ -28,7 +28,7 @@ impl Game for Tour {
     type LoadingScreen = ();
 
     fn load(_window: &Window) -> Task<Tour> {
-        Task::new(|| Tour {
+        Task::succeed(|| Tour {
             steps: Steps::new(),
             back_button: button::State::new(),
             next_button: button::State::new(),

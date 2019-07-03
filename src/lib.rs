@@ -54,7 +54,7 @@
 //!
 //!     fn load(_window: &Window) -> Task<MyGame> {
 //!         // Load your game assets here. Check out the `load` module!
-//!         Task::new(|| MyGame { /* ... */ })
+//!         Task::succeed(|| MyGame { /* ... */ })
 //!     }
 //!
 //!     fn draw(&mut self, frame: &mut Frame, _timer: &Timer) {
