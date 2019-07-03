@@ -55,7 +55,7 @@ impl Game for Example {
     type LoadingScreen = ();
 
     fn load(_window: &Window) -> Task<Example> {
-        Task::new(move || Example {
+        Task::succeed(move || Example {
             shape: ShapeOption::Rectangle,
             mode: ModeOption::Fill,
             color: Color::WHITE,

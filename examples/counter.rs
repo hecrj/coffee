@@ -29,7 +29,7 @@ impl Game for Counter {
     type LoadingScreen = ();
 
     fn load(_window: &Window) -> Task<Counter> {
-        Task::new(|| Counter {
+        Task::succeed(|| Counter {
             value: 0,
             increment_button: button::State::new(),
             decrement_button: button::State::new(),

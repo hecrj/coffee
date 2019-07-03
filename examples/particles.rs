@@ -41,7 +41,7 @@ impl Particles {
     const CENTER_MASS: f32 = 200.0;
 
     fn generate(max_x: f32, max_y: f32) -> Task<Vec<Particle>> {
-        Task::new(move || {
+        Task::succeed(move || {
             let rng = &mut rand::thread_rng();
 
             (0..Self::AMOUNT)
@@ -76,7 +76,7 @@ impl Game for Particles {
             Task::stage("Loading assets...", Self::load_palette()),
             Task::stage(
                 "Showing off the loading screen for a bit...",
-                Task::new(|| thread::sleep(time::Duration::from_secs(2))),
+                Task::succeed(|| thread::sleep(time::Duration::from_secs(2))),
             ),
         )
             .join()
