@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - `Mesh::stroke` now takes an `f32` as `line_width` instead of a `u16`.
 - `Task::new` now supports a lazy operation that can fail. [#66]
+- Face culling has been disabled for Vulkan, Metal, D3D11, and D3D12 backends.
+  In OpenGL face culling was already disabled.
 
 ### Fixed
 - Incorrect buffer sizes in the `Mesh` pipeline. This caused vertices to entirely
