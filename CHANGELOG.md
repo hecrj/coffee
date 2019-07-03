@@ -5,12 +5,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- `Task::succeed` replaces the old `Task::new`. [#66]
+
 ### Changed
 - `Mesh::stroke` now takes an `f32` as `line_width` instead of a `u16`.
+- `Task::new` now supports a lazy operation that can fail. [#66]
 
 ### Fixed
 - Incorrect buffer sizes in the `Mesh` pipeline. This caused vertices to entirely
   disappear when rendering big meshes, leading to a potential crash.
+
+[#66]: https://github.com/hecrj/coffee/pull/66
+
 
 ## [0.3.1] - 2019-06-20
 ### Added
