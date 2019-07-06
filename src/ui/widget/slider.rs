@@ -178,7 +178,7 @@ where
 /// The local state of a [`Slider`].
 ///
 /// [`Slider`]: struct.Slider.html
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct State {
     is_dragging: bool,
 }
@@ -188,7 +188,7 @@ impl State {
     ///
     /// [`State`]: struct.State.html
     pub fn new() -> State {
-        State { is_dragging: false }
+        State::default()
     }
 
     /// Returns whether the associated [`Slider`] is currently being dragged or
