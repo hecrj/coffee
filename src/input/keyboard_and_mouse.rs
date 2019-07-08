@@ -1,7 +1,8 @@
 use super::{keyboard, mouse, ButtonState, Event, Input};
 use crate::graphics::Point;
 
-use std::collections::HashSet;
+use crate::input::mouse::WheelMovement;
+use std::collections::{HashMap, HashSet};
 
 /// A simple keyboard and mouse input tracker.
 ///
@@ -11,17 +12,24 @@ use std::collections::HashSet;
 #[derive(Debug)]
 pub struct KeyboardAndMouse {
     cursor_position: Point,
+    mouse_wheel_movement: WheelMovement,
     is_cursor_taken: bool,
-    is_mouse_pressed: bool,
-    left_clicks: Vec<Point>,
+    is_cursor_within_window: bool,
+    mouse_button_clicks: HashMap<mouse::Button, Vec<Point>>,
     pressed_keys: HashSet<keyboard::KeyCode>,
     released_keys: HashSet<keyboard::KeyCode>,
+    pressed_mouse_buttons: HashSet<mouse::Button>,
 }
 
 impl KeyboardAndMouse {
     /// Returns the current cursor position.
     pub fn cursor_position(&self) -> Point {
         self.cursor_position
+    }
+
+    /// Returns the mouse wheel movements during the last interaction.
+    pub fn mouse_wheel_movement(&self) -> WheelMovement {
+        self.mouse_wheel_movement
     }
 
     /// Returns true if the cursor is currently not available.
@@ -34,12 +42,9 @@ impl KeyboardAndMouse {
         self.is_cursor_taken
     }
 
-    /// Returns the positions of the mouse clicks during the last interaction.
-    ///
-    /// Clicks performed while the mouse cursor is not available are
-    /// automatically ignored.
-    pub fn left_clicks(&self) -> &[Point] {
-        &self.left_clicks
+    /// Returns true if the cursor is currently within the game window.
+    pub fn is_cursor_within_window(&self) -> bool {
+        self.is_cursor_within_window
     }
 
     /// Returns true if the given key is currently pressed.
@@ -51,17 +56,35 @@ impl KeyboardAndMouse {
     pub fn was_key_released(&self, key_code: keyboard::KeyCode) -> bool {
         self.released_keys.contains(&key_code)
     }
+
+    /// Returns true if the given button is currently pressed.
+    pub fn is_mouse_button_pressed(&self, button: mouse::Button) -> bool {
+        self.pressed_mouse_buttons.contains(&button)
+    }
+
+    /// Returns the positions of the mouse clicks during the last interaction.
+    ///
+    /// Clicks performed while the mouse cursor is not available are
+    /// automatically ignored.
+    pub fn mouse_button_clicks(&self, button: mouse::Button) -> &[Point] {
+        self.mouse_button_clicks
+            .get(&button)
+            .map(|v| &v[..])
+            .unwrap_or(&[])
+    }
 }
 
 impl Input for KeyboardAndMouse {
     fn new() -> KeyboardAndMouse {
         KeyboardAndMouse {
             cursor_position: Point::new(0.0, 0.0),
+            mouse_wheel_movement: WheelMovement::new(0.0, 0.0),
             is_cursor_taken: false,
-            is_mouse_pressed: false,
-            left_clicks: Vec::new(),
+            is_cursor_within_window: false,
+            mouse_button_clicks: HashMap::new(),
             pressed_keys: HashSet::new(),
             released_keys: HashSet::new(),
+            pressed_mouse_buttons: HashSet::new(),
         }
     }
 
@@ -77,32 +100,37 @@ impl Input for KeyboardAndMouse {
                 mouse::Event::CursorReturned => {
                     self.is_cursor_taken = false;
                 }
-                mouse::Event::Input {
-                    button: mouse::Button::Left,
-                    state,
-                } => match state {
-                    ButtonState::Pressed => {
-                        self.is_mouse_pressed = !self.is_cursor_taken;
-                    }
-                    ButtonState::Released => {
-                        if !self.is_cursor_taken && self.is_mouse_pressed {
-                            self.left_clicks.push(self.cursor_position);
+                mouse::Event::Input { state, button } => {
+                    match state {
+                        ButtonState::Pressed => {
+                            if !self.is_cursor_taken {
+                                let _ =
+                                    self.pressed_mouse_buttons.insert(button);
+                            }
                         }
+                        ButtonState::Released => {
+                            if !self.is_cursor_taken
+                                && self.is_mouse_button_pressed(button)
+                            {
+                                self.mouse_button_clicks
+                                    .entry(button)
+                                    .or_insert_with(|| Vec::new())
+                                    .push(self.cursor_position);
+                            }
 
-                        self.is_mouse_pressed = false;
-                    }
-                },
-                mouse::Event::Input { .. } => {
-                    // TODO: Track other buttons!
+                            let _ = self.pressed_mouse_buttons.remove(&button);
+                        }
+                    };
                 }
                 mouse::Event::CursorEntered => {
-                    // TODO: Track it!
+                    self.is_cursor_within_window = true;
                 }
                 mouse::Event::CursorLeft => {
-                    // TODO: Track it!
+                    self.is_cursor_within_window = false;
                 }
-                mouse::Event::WheelScrolled { .. } => {
-                    // TODO: Track it!
+                mouse::Event::WheelScrolled { delta_x, delta_y } => {
+                    self.mouse_wheel_movement.horizontal += delta_x;
+                    self.mouse_wheel_movement.vertical += delta_y;
                 }
             },
             Event::Keyboard(keyboard_event) => match keyboard_event {
@@ -129,7 +157,11 @@ impl Input for KeyboardAndMouse {
     }
 
     fn clear(&mut self) {
-        self.left_clicks.clear();
+        self.mouse_button_clicks
+            .values_mut()
+            .for_each(|v| v.clear());
         self.released_keys.clear();
+        self.mouse_wheel_movement.horizontal = 0.0;
+        self.mouse_wheel_movement.vertical = 0.0;
     }
 }

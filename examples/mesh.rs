@@ -2,7 +2,7 @@ use coffee::graphics::{
     Color, Frame, HorizontalAlignment, Mesh, Point, Rectangle, Shape, Window,
     WindowSettings,
 };
-use coffee::input::KeyboardAndMouse;
+use coffee::input::{mouse, KeyboardAndMouse};
 use coffee::load::Task;
 use coffee::ui::{
     slider, Align, Column, Element, Justify, Radio, Renderer, Row, Slider,
@@ -74,7 +74,7 @@ impl Game for Example {
     fn interact(&mut self, input: &mut KeyboardAndMouse, _window: &mut Window) {
         match self.shape {
             ShapeOption::Polyline => {
-                self.polyline_points.extend(input.left_clicks());
+                self.polyline_points.extend(input.mouse_button_clicks(mouse::Button::Left));
             }
             _ => {}
         }

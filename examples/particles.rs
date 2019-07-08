@@ -9,7 +9,7 @@ use coffee::graphics::{
     Batch, Color, Frame, Image, Point, Rectangle, Sprite, Vector, Window,
     WindowSettings,
 };
-use coffee::input::{keyboard, KeyboardAndMouse};
+use coffee::input::{keyboard, mouse, KeyboardAndMouse};
 use coffee::load::{loading_screen::ProgressBar, Join, Task};
 use coffee::ui::{Checkbox, Column, Element, Justify, Renderer, UserInterface};
 use coffee::{Game, Result, Timer};
@@ -91,7 +91,8 @@ impl Game for Particles {
     fn interact(&mut self, input: &mut KeyboardAndMouse, window: &mut Window) {
         self.gravity_centers[0] = input.cursor_position();
 
-        self.gravity_centers.extend(input.left_clicks());
+        self.gravity_centers
+            .extend(input.mouse_button_clicks(mouse::Button::Left));
 
         if input.was_key_released(keyboard::KeyCode::I) {
             self.interpolate = !self.interpolate;
