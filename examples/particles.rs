@@ -92,7 +92,7 @@ impl Game for Particles {
         self.gravity_centers[0] = input.cursor_position();
 
         self.gravity_centers
-            .extend(input.button_clicks(mouse::Button::Left));
+            .extend(input.mouse_button_clicks(mouse::Button::Left));
 
         if input.was_key_released(keyboard::KeyCode::I) {
             self.interpolate = !self.interpolate;
