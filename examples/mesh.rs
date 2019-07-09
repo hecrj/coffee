@@ -74,7 +74,7 @@ impl Game for Example {
     fn interact(&mut self, input: &mut KeyboardAndMouse, _window: &mut Window) {
         match self.shape {
             ShapeOption::Polyline => {
-                self.polyline_points.extend(input.mouse_button_clicks(mouse::Button::Left));
+                self.polyline_points.extend(input.mouse().button_clicks(mouse::Button::Left));
             }
             _ => {}
         }
