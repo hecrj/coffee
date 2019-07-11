@@ -33,7 +33,7 @@ impl Mouse {
         self.cursor_position
     }
 
-    /// Returns the mouse wheel movements during the last interaction.
+    /// Returns the wheel movements during the last interaction.
     pub fn wheel_movement(&self) -> WheelMovement {
         self.wheel_movement
     }
@@ -43,12 +43,14 @@ impl Mouse {
     /// This mostly happens when the cursor is currently over a
     /// [`UserInterface`].
     ///
-    /// [`UserInterface`]: ../ui/trait.UserInterface.html
+    /// [`UserInterface`]: ../../ui/trait.UserInterface.html
     pub fn is_cursor_taken(&self) -> bool {
         self.is_cursor_taken
     }
 
-    /// Returns true if the cursor is currently within the game window.
+    /// Returns true if the cursor is currently within the [`Window`].
+    ///
+    /// [`Window`]: ../../graphics/struct.Window.html
     pub fn is_cursor_within_window(&self) -> bool {
         self.is_cursor_within_window
     }
@@ -58,10 +60,10 @@ impl Mouse {
         self.pressed_buttons.contains(&button)
     }
 
-    /// Returns the positions of the mouse clicks during the last interaction.
+    /// Returns the positions of the clicks during the last interaction.
     ///
-    /// Clicks performed while the mouse cursor is not available are
-    /// automatically ignored.
+    /// Clicks performed while the cursor is not available are automatically
+    /// ignored.
     pub fn button_clicks(&self, button: Button) -> &[Point] {
         self.button_clicks
             .get(&button)

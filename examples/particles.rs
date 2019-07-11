@@ -90,11 +90,12 @@ impl Game for Particles {
 
     fn interact(&mut self, input: &mut KeyboardAndMouse, window: &mut Window) {
         let mouse = input.mouse();
+        let keyboard = input.keyboard();
+
         self.gravity_centers[0] = mouse.cursor_position();
         self.gravity_centers
             .extend(mouse.button_clicks(mouse::Button::Left));
 
-        let keyboard = input.keyboard();
         if keyboard.was_key_released(keyboard::KeyCode::I) {
             self.interpolate = !self.interpolate;
         }

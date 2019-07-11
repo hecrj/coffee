@@ -1,6 +1,6 @@
-use super::{Event, Input};
-use super::mouse::Mouse;
 use super::keyboard::Keyboard;
+use super::mouse::Mouse;
+use super::{Event, Input};
 
 /// A simple keyboard and mouse input tracker.
 ///
@@ -10,16 +10,20 @@ use super::keyboard::Keyboard;
 #[derive(Debug)]
 pub struct KeyboardAndMouse {
     mouse: Mouse,
-    keyboard: Keyboard
+    keyboard: Keyboard,
 }
 
 impl KeyboardAndMouse {
-    /// Returns the mouse input tracker.
+    /// Returns the [`Mouse`] input.
+    ///
+    /// [`Mouse`]: mouse/struct.Mouse.html
     pub fn mouse(&self) -> &Mouse {
         &self.mouse
     }
 
-    /// Returns the mouse input tracker.
+    /// Returns the [`Keyboard`] input.
+    ///
+    /// [`Keyboard`]: keyboard/struct.Keyboard.html
     pub fn keyboard(&self) -> &Keyboard {
         &self.keyboard
     }
@@ -29,7 +33,7 @@ impl Input for KeyboardAndMouse {
     fn new() -> KeyboardAndMouse {
         KeyboardAndMouse {
             mouse: Mouse::new(),
-            keyboard: Keyboard::new()
+            keyboard: Keyboard::new(),
         }
     }
 
