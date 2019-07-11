@@ -17,7 +17,7 @@ use std::collections::{HashMap, HashSet};
 /// You can use this as your [`Game::Input`] directly!
 ///
 /// [`Game::Input`]: ../trait.Game.html#associatedtype.Input
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Mouse {
     cursor_position: Point,
     wheel_movement: WheelMovement,
