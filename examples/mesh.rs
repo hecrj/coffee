@@ -2,7 +2,7 @@ use coffee::graphics::{
     Color, Frame, HorizontalAlignment, Mesh, Point, Rectangle, Shape, Window,
     WindowSettings,
 };
-use coffee::input::{mouse, KeyboardAndMouse};
+use coffee::input::mouse::{self, Mouse};
 use coffee::load::Task;
 use coffee::ui::{
     slider, Align, Column, Element, Justify, Radio, Renderer, Row, Slider,
@@ -51,7 +51,7 @@ enum ModeOption {
 }
 
 impl Game for Example {
-    type Input = KeyboardAndMouse;
+    type Input = Mouse;
     type LoadingScreen = ();
 
     fn load(_window: &Window) -> Task<Example> {
@@ -71,10 +71,11 @@ impl Game for Example {
         })
     }
 
-    fn interact(&mut self, input: &mut KeyboardAndMouse, _window: &mut Window) {
+    fn interact(&mut self, input: &mut Mouse, _window: &mut Window) {
         match self.shape {
             ShapeOption::Polyline => {
-                self.polyline_points.extend(input.mouse_button_clicks(mouse::Button::Left));
+                self.polyline_points
+                    .extend(input.button_clicks(mouse::Button::Left));
             }
             _ => {}
         }
