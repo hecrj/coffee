@@ -86,7 +86,10 @@ impl Color {
     ///
     /// [`Color`]: struct.Color.html
     pub fn from_rgb_u32(color: u32) -> Color {
-        debug_assert!(color <= 0xFFFFFF, "Color contains value higher than 0xFFFFFF");
+        debug_assert!(
+            color <= 0xFFFFFF,
+            "Color contains value higher than 0xFFFFFF"
+        );
         let r = ((color & 0xFF0000) >> 16) as u8;
         let g = ((color & 0x00FF00) >> 8) as u8;
         let b = ((color & 0x0000FF) >> 0) as u8;
