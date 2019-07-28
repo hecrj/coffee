@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Default` implementation for `ui::widget::slider::State`.
 - `Default`, `Clone`, `Copy`, `PartialEq`, and `Eq` implementations for
   `ui::widget::button::State`.
+- `Color::RED`, `Color::GREEN`, `Color::BLUE` constants.
+- `Color::from_rgb_u32`: Constructs a `Color` from `0xRRGGBB`.
 
 ### Changed
 - `Mesh::stroke` now takes an `f32` as `line_width` instead of a `u16`.
