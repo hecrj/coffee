@@ -50,6 +50,16 @@ impl Color {
         }
     }
 
+    /// Creates a new [`Color`] from its RGB representation (0xRRGGBB).
+    ///
+    /// [`Color`]: struct.Color.html
+    pub fn from_rgb_u32(color: u32) -> Color {
+        let r = ((color & 0xFF0000) >> 16) as u8;
+        let g = ((color & 0x00FF00) >> 8) as u8;
+        let b = ((color & 0x0000FF) >> 0) as u8;
+        Color::from_rgb(r, g, b)
+    }
+
     /// Returns the [`Color`] components in the [0, 255] range.
     ///
     /// [`Color`]: struct.Color.html
