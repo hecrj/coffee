@@ -1,4 +1,4 @@
-use nalgebra::{Matrix3, Matrix4, Projective2, Vector3, U3, U4};
+use nalgebra::{Matrix4, Point3, Vector3};
 use std::ops::Mul;
 
 use crate::graphics::point::Point;
@@ -67,36 +67,34 @@ impl Transformation {
 
     /// Transforms the given point by this transformation.
     pub fn transform_point(self, point: Point) -> Point {
-        self.0
-            .fixed_slice::<U3, U3>(0, 0)
-            .to_owned()
-            .transform_point(&point)
+        let point = self.0.transform_point(&Point3::new(point.x, point.y, 0.0));
+        Point::new(point.x, point.y)
     }
 
     /// Transforms the given vector by this transformation.
     pub fn transform_vector(self, vector: Vector) -> Vector {
-        self.0
-            .fixed_slice::<U3, U3>(0, 0)
-            .to_owned()
-            .transform_vector(&vector)
+        let vector = self
+            .0
+            .transform_vector(&Vector3::new(vector.x, vector.y, 0.0));
+        Vector::new(vector.x, vector.y)
     }
 
     /// Transforms the given point by the inverse of this transformation.
     pub fn inverse_transform_point(self, point: Point) -> Point {
-        self.0.fixed_slice::<U3, U3>(0, 0)
-            .to_owned()
+        let point = self.0
             .try_inverse()
             .expect("Transformation matrix should only contain invertible operations")
-            .transform_point(&point)
+            .transform_point(&Point3::new(point.x, point.y, 0.0));
+        Point::new(point.x, point.y)
     }
 
     /// Transforms the given vector by the inverse of this transformation.
     pub fn inverse_transform_vector(self, vector: Vector) -> Vector {
-        self.0.fixed_slice::<U3, U3>(0, 0)
-            .to_owned()
+        let vector = self.0
             .try_inverse()
             .expect("Transformation matrix should only contain invertible operations")
-            .transform_vector(&vector)
+            .transform_vector(&Vector3::new(vector.x, vector.y, 0.0));
+        Vector::new(vector.x, vector.y)
     }
 }
 
@@ -124,19 +122,14 @@ impl From<Transformation> for [f32; 16] {
     }
 }
 
-impl From<Projective2<f32>> for Transformation {
-    fn from(projective2: Projective2<f32>) -> Self {
-        let mut matrix =
-            projective2.to_homogeneous().fixed_resize::<U4, U4>(0.0);
-        matrix[15] = 1.0;
+impl From<Matrix4<f32>> for Transformation {
+    fn from(matrix: Matrix4<f32>) -> Self {
         Transformation(matrix)
     }
 }
 
-impl Into<Projective2<f32>> for Transformation {
-    fn into(self) -> Projective2<f32> {
-        Projective2::from_matrix_unchecked(Matrix3::from(
-            self.0.fixed_slice::<U3, U3>(0, 0),
-        ))
+impl Into<Matrix4<f32>> for Transformation {
+    fn into(self) -> Matrix4<f32> {
+        self.0
     }
 }
