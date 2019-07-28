@@ -59,14 +59,14 @@ impl Color {
     ///
     /// [`Color`]: struct.Color.html
     pub fn new(r: f32, g: f32, b: f32, a: f32) -> Color {
-        debug_assert!(r >= 0.0, "Color values should be in the [0, 1.0] range");
-        debug_assert!(r <= 1.0, "Color values should be in the [0, 1.0] range");
-        debug_assert!(g >= 0.0, "Color values should be in the [0, 1.0] range");
-        debug_assert!(g <= 1.0, "Color values should be in the [0, 1.0] range");
-        debug_assert!(b >= 0.0, "Color values should be in the [0, 1.0] range");
-        debug_assert!(b <= 1.0, "Color values should be in the [0, 1.0] range");
-        debug_assert!(a >= 0.0, "Color values should be in the [0, 1.0] range");
-        debug_assert!(a <= 1.0, "Color values should be in the [0, 1.0] range");
+        debug_assert!(r >= 0.0, "Red component is < 0.0");
+        debug_assert!(r <= 1.0, "Red component is > 1.0");
+        debug_assert!(g >= 0.0, "Green component is < 0.0");
+        debug_assert!(g <= 1.0, "Green component is > 1.0");
+        debug_assert!(b >= 0.0, "Blue component is < 0.0");
+        debug_assert!(b <= 1.0, "Blue component is > 1.0");
+        debug_assert!(a >= 0.0, "Alpha component is < 0.0");
+        debug_assert!(a <= 1.0, "Alpha component is > 1.0");
         Color { r, g, b, a }
     }
 
