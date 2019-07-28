@@ -31,6 +31,30 @@ impl Color {
         a: 1.0,
     };
 
+    /// Red color.
+    pub const RED: Self = Self {
+        r: 1.0,
+        g: 0.0,
+        b: 0.0,
+        a: 1.0,
+    };
+
+    /// Green color.
+    pub const GREEN: Self = Self {
+        r: 0.0,
+        g: 1.0,
+        b: 0.0,
+        a: 1.0,
+    };
+
+    /// Blue color.
+    pub const BLUE: Self = Self {
+        r: 0.0,
+        g: 0.0,
+        b: 1.0,
+        a: 1.0,
+    };
+
     /// Creates a new [`Color`] from components in the [0, 1.0] range.
     ///
     /// [`Color`]: struct.Color.html
