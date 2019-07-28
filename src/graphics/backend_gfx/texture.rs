@@ -6,6 +6,7 @@ use gfx_device_gl as gl;
 
 use super::format::{Channel, Surface};
 use super::types::{RawTexture, ShaderResource, TargetView};
+use crate::graphics::vector::Vector;
 use crate::graphics::Transformation;
 
 #[derive(Clone, Debug)]
@@ -139,7 +140,7 @@ impl Drawable {
     }
 
     pub fn render_transformation() -> Transformation {
-        Transformation::nonuniform_scale(1.0, -1.0)
+        Transformation::nonuniform_scale(Vector::new(1.0, -1.0))
     }
 }
 
