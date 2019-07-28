@@ -59,6 +59,14 @@ impl Color {
     ///
     /// [`Color`]: struct.Color.html
     pub fn new(r: f32, g: f32, b: f32, a: f32) -> Color {
+        debug_assert!(r >= 0.0, "Color values should be in the [0, 1.0] range");
+        debug_assert!(r <= 1.0, "Color values should be in the [0, 1.0] range");
+        debug_assert!(g >= 0.0, "Color values should be in the [0, 1.0] range");
+        debug_assert!(g <= 1.0, "Color values should be in the [0, 1.0] range");
+        debug_assert!(b >= 0.0, "Color values should be in the [0, 1.0] range");
+        debug_assert!(b <= 1.0, "Color values should be in the [0, 1.0] range");
+        debug_assert!(a >= 0.0, "Color values should be in the [0, 1.0] range");
+        debug_assert!(a <= 1.0, "Color values should be in the [0, 1.0] range");
         Color { r, g, b, a }
     }
 
@@ -78,6 +86,7 @@ impl Color {
     ///
     /// [`Color`]: struct.Color.html
     pub fn from_rgb_u32(color: u32) -> Color {
+        debug_assert!(color <= 0xFFFFFF, "Color contains value higher than 0xFFFFFF");
         let r = ((color & 0xFF0000) >> 16) as u8;
         let g = ((color & 0x00FF00) >> 8) as u8;
         let b = ((color & 0x0000FF) >> 0) as u8;
