@@ -64,38 +64,6 @@ impl Transformation {
     pub fn rotate(rotation: f32) -> Transformation {
         Transformation(Matrix4::new_rotation(Vector3::new(0.0, 0.0, rotation)))
     }
-
-    /// Transforms the given point by this transformation.
-    pub fn transform_point(self, point: Point) -> Point {
-        let point = self.0.transform_point(&Point3::new(point.x, point.y, 0.0));
-        Point::new(point.x, point.y)
-    }
-
-    /// Transforms the given vector by this transformation.
-    pub fn transform_vector(self, vector: Vector) -> Vector {
-        let vector = self
-            .0
-            .transform_vector(&Vector3::new(vector.x, vector.y, 0.0));
-        Vector::new(vector.x, vector.y)
-    }
-
-    /// Transforms the given point by the inverse of this transformation.
-    pub fn inverse_transform_point(self, point: Point) -> Point {
-        let point = self.0
-            .try_inverse()
-            .expect("Transformation matrix should only contain invertible operations")
-            .transform_point(&Point3::new(point.x, point.y, 0.0));
-        Point::new(point.x, point.y)
-    }
-
-    /// Transforms the given vector by the inverse of this transformation.
-    pub fn inverse_transform_vector(self, vector: Vector) -> Vector {
-        let vector = self.0
-            .try_inverse()
-            .expect("Transformation matrix should only contain invertible operations")
-            .transform_vector(&Vector3::new(vector.x, vector.y, 0.0));
-        Vector::new(vector.x, vector.y)
-    }
 }
 
 impl Mul for Transformation {
