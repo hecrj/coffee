@@ -6,24 +6,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- `Task::succeed` replaces the old `Task::new`. [#66]
+- `Task::succeed`, which replaces the old `Task::new`. [#66]
 - `Default` implementation for `ui::widget::slider::State`.
 - `Default`, `Clone`, `Copy`, `PartialEq`, and `Eq` implementations for
   `ui::widget::button::State`.
-- `Color::RED`, `Color::GREEN`, `Color::BLUE` constants.
-- `Color::from_rgb_u32`: Constructs a `Color` from `0xRRGGBB`.
+- Additional color constants: `Color::RED`, `Color::GREEN`, and `Color::BLUE`. [#77]
+- `Color::from_rgb_u32`, which allows to constructs a `Color` using an
+  hexadecimal literal (`0xRRGGBB`). [#77]
+- `From<nalgebra::Matrix3>` and `Into<nalgebra::Matrix3>` implementations for
+  `Transformation`. [#78]
 
 ### Changed
 - `Mesh::stroke` now takes an `f32` as `line_width` instead of a `u16`.
 - `Task::new` now supports a lazy operation that can fail. [#66]
 - Face culling has been disabled for Vulkan, Metal, D3D11, and D3D12 backends.
   In OpenGL, face culling was already disabled.
+- `Transformation::nonuniform_scale` now takes a `Vector`. [#78]
 
 ### Fixed
 - Incorrect buffer sizes in the `Mesh` pipeline. This caused vertices to entirely
   disappear when rendering big meshes, leading to a potential crash.
 
 [#66]: https://github.com/hecrj/coffee/pull/66
+[#77]: https://github.com/hecrj/coffee/pull/77
+[#78]: https://github.com/hecrj/coffee/pull/78
 
 
 ## [0.3.1] - 2019-06-20
