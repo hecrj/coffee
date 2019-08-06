@@ -74,7 +74,7 @@ pub trait LoadingScreen {
         task: Task<T>,
         window: &mut graphics::Window,
     ) -> Result<T> {
-        task.run(window, |progress, window| {
+        task.run_with_window(window, |progress, window| {
             self.draw(progress, &mut window.frame());
             window.swap_buffers();
         })

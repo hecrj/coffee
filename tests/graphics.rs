@@ -17,8 +17,14 @@ fn graphics() -> Result<()> {
     })
 }
 
-pub enum Runner {
-    Pending(Vec<Task<Test>>),
+struct Runner {
+    state: State,
+}
+
+pub enum State {
+    Pending {
+        tests: Vec<Task<Test>>,
+    },
     Drawing {
         remaining: Vec<Task<Test>>,
         current: Test,
@@ -38,18 +44,62 @@ impl Game for Runner {
     type Input = ();
 
     fn load(_window: &Window) -> Task<Runner> {
-        Task::succeed(|| Runner::Pending(Test::all()))
+        Task::succeed(|| Runner {
+            state: State::Pending { tests: Test::all() },
+        })
     }
 
     fn draw(&mut self, frame: &mut Frame, _timer: &Timer) {
         frame.clear(Color::BLACK);
 
-        // TODO: Update logic
+        // We need to own the current state to avoid awkward copies.
+        // TODO: Not sure if there is a better way to do this.
+        // Something like `replace` but taking a closure would be nice.
+        let state = std::mem::replace(&mut self.state, State::Finished);
+
+        self.state = match state {
+            State::Pending { mut tests } => {
+                if let Some(load_first) = tests.pop() {
+                    State::Drawing {
+                        remaining: tests,
+                        current: load_first
+                            .run(frame.gpu())
+                            .expect("Load test"),
+                        done: Vec::new(),
+                    }
+                } else {
+                    State::Finished
+                }
+            }
+            State::Drawing {
+                mut remaining,
+                current,
+                mut done,
+            } => {
+                let drawing = current.draw(frame.gpu());
+                done.push(drawing);
+
+                if let Some(load_next) = remaining.pop() {
+                    State::Drawing {
+                        remaining,
+                        current: load_next.run(frame.gpu()).expect("Load test"),
+                        done,
+                    }
+                } else {
+                    State::Diffing { tests: done }
+                }
+            }
+            State::Diffing { mut tests } => State::Reporting {
+                results: tests.drain(..).map(|t| t.diff()).collect(),
+            },
+            State::Reporting { .. } => State::Finished,
+            State::Finished => State::Finished,
+        }
     }
 
     fn is_finished(&self) -> bool {
-        match self {
-            Runner::Finished => true,
+        match self.state {
+            State::Finished => true,
             _ => false,
         }
     }
