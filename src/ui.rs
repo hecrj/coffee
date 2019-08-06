@@ -287,7 +287,7 @@ pub trait UserInterface: Game {
         let mut ui_cache =
             Interface::compute(game.layout(window), &renderer).cache();
 
-        while alive {
+        while alive && !game.is_finished() {
             debug.frame_started();
             timer.update();
 
