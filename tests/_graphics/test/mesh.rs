@@ -1,18 +1,55 @@
-use coffee::graphics::{Canvas, Gpu};
+use coffee::graphics::{self, Canvas, Color, Point, Shape};
 use coffee::load::Task;
 
 pub struct Mesh {}
 
 impl Mesh {
-    pub fn load() -> Task<Mesh> {
-        Task::succeed(|| Mesh {})
-    }
+    pub fn draw() -> Task<Canvas> {
+        Task::using_gpu(|gpu| {
+            let mut canvas =
+                Canvas::new(gpu, 300, 300).expect("Canvas creation");
 
-    pub fn draw(self, gpu: &mut Gpu) -> Canvas {
-        let canvas = Canvas::new(gpu, 400, 400).expect("Canvas creation");
+            let mut mesh = graphics::Mesh::new();
 
-        // TODO: Draw some meshes here
+            mesh.stroke(
+                Shape::Circle {
+                    center: Point::new(150.0, 150.0),
+                    radius: 40.0,
+                },
+                Color::RED,
+                1.0,
+            );
 
-        canvas
+            mesh.stroke(
+                Shape::Circle {
+                    center: Point::new(150.0, 150.0),
+                    radius: 40.0,
+                },
+                Color::RED,
+                1.0,
+            );
+
+            mesh.stroke(
+                Shape::Circle {
+                    center: Point::new(150.0, 150.0),
+                    radius: 80.0,
+                },
+                Color::GREEN,
+                2.0,
+            );
+
+            mesh.stroke(
+                Shape::Circle {
+                    center: Point::new(150.0, 150.0),
+                    radius: 120.0,
+                },
+                Color::BLUE,
+                3.0,
+            );
+
+            mesh.draw(&mut canvas.as_target(gpu));
+
+            Ok(canvas)
+        })
     }
 }

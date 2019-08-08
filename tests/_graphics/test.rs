@@ -1,35 +1,31 @@
-use coffee::graphics::Gpu;
+use coffee::graphics::Canvas;
 use coffee::load::Task;
 
 mod mesh;
 
 pub use mesh::Mesh;
 
-pub enum Test {
-    Mesh(Mesh),
+pub struct Test {
+    name: Name,
+    output: Canvas,
+}
+
+#[derive(Clone, Copy)]
+pub enum Name {
+    Mesh,
 }
 
 impl Test {
     pub fn all() -> Vec<Task<Test>> {
-        vec![Mesh::load().map(Test::Mesh)]
+        vec![(Name::Mesh, Mesh::draw)]
+            .iter()
+            .cloned()
+            .map(|(name, draw)| draw().map(move |output| Test { name, output }))
+            .collect()
     }
 
-    pub fn draw(self, gpu: &mut Gpu) -> Drawing {
-        let name = self.name();
-
-        let canvas = match self {
-            Test::Mesh(mesh) => mesh.draw(gpu),
-        };
-
-        // TODO: Save canvas to image here
-
-        Drawing { name }
-    }
-
-    fn name(&self) -> &'static str {
-        match self {
-            Test::Mesh(_) => "mesh",
-        }
+    pub fn output(&self) -> &Canvas {
+        &self.output
     }
 }
 
