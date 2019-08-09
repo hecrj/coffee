@@ -25,15 +25,15 @@ struct Runner {
 
 pub enum State {
     Pending {
-        tests: Vec<Task<Test>>,
+        tests: Vec<Test>,
     },
     Drawing {
-        remaining: Vec<Task<Test>>,
-        current: Test,
-        done: Vec<test::Drawing>,
+        remaining: Vec<Test>,
+        current: test::Execution,
+        done: Vec<test::Output>,
     },
     Diffing {
-        tests: Vec<test::Drawing>,
+        outputs: Vec<test::Output>,
     },
     Reporting {
         results: Vec<test::Result>,
@@ -54,22 +54,20 @@ impl Game for Runner {
     }
 
     fn interact(&mut self, keyboard: &mut Keyboard, window: &mut Window) {
+        let now = time::Instant::now();
+
         // We need to own the current state to avoid awkward copies.
         // TODO: Not sure if there is a better way to do this.
         // Something like `replace` but taking a closure would be nice.
-        let now = time::Instant::now();
-
         let state =
             std::mem::replace(&mut self.state, State::Finished { at: now });
 
         self.state = match state {
             State::Pending { mut tests } => {
-                if let Some(load_first) = tests.pop() {
+                if let Some(first) = tests.pop() {
                     State::Drawing {
                         remaining: tests,
-                        current: load_first
-                            .run(window.gpu())
-                            .expect("Load test"),
+                        current: first.run(window.gpu()),
                         done: Vec::new(),
                     }
                 } else {
@@ -82,16 +80,16 @@ impl Game for Runner {
                 mut done,
             } => {
                 if keyboard.was_key_released(keyboard::KeyCode::Right) {
-                    if let Some(load_next) = remaining.pop() {
+                    done.push(current.store(window.gpu()));
+
+                    if let Some(next) = remaining.pop() {
                         State::Drawing {
                             remaining,
-                            current: load_next
-                                .run(window.gpu())
-                                .expect("Load test"),
+                            current: next.run(window.gpu()),
                             done,
                         }
                     } else {
-                        State::Diffing { tests: done }
+                        State::Diffing { outputs: done }
                     }
                 } else {
                     State::Drawing {
@@ -101,8 +99,8 @@ impl Game for Runner {
                     }
                 }
             }
-            State::Diffing { tests } => State::Reporting {
-                results: tests.iter().map(|t| t.diff()).collect(),
+            State::Diffing { outputs } => State::Reporting {
+                results: outputs.iter().map(|t| t.diff()).collect(),
             },
             State::Reporting { .. } => State::Finished { at: now },
             State::Finished { .. } => state,
@@ -114,7 +112,7 @@ impl Game for Runner {
 
         match &self.state {
             State::Drawing { current, .. } => {
-                let canvas = current.output();
+                let canvas = current.canvas();
 
                 canvas.draw(
                     Quad {

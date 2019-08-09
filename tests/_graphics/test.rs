@@ -1,39 +1,67 @@
-use coffee::graphics::Canvas;
-use coffee::load::Task;
+use coffee::graphics::{Canvas, Gpu};
 
 mod mesh;
 
-pub use mesh::Mesh;
-
-pub struct Test {
-    name: Name,
-    output: Canvas,
-}
+use mesh::Mesh;
 
 #[derive(Clone, Copy)]
-pub enum Name {
+pub enum Test {
     Mesh,
 }
 
 impl Test {
-    pub fn all() -> Vec<Task<Test>> {
-        vec![(Name::Mesh, Mesh::draw)]
-            .iter()
-            .cloned()
-            .map(|(name, draw)| draw().map(move |output| Test { name, output }))
-            .collect()
+    pub fn all() -> Vec<Test> {
+        vec![Test::Mesh]
     }
 
-    pub fn output(&self) -> &Canvas {
-        &self.output
+    pub fn run(&self, gpu: &mut Gpu) -> Execution {
+        let draw = match self {
+            Test::Mesh => Mesh::draw(),
+        };
+
+        Execution {
+            test: *self,
+            canvas: draw
+                .run(gpu)
+                .expect(&format!("Run test: {}", self.to_string())),
+        }
     }
 }
 
-pub struct Drawing {
-    name: &'static str,
+impl std::string::ToString for Test {
+    fn to_string(&self) -> String {
+        let name = match self {
+            Test::Mesh => "mesh",
+        };
+
+        String::from(name)
+    }
 }
 
-impl Drawing {
+pub struct Execution {
+    test: Test,
+    canvas: Canvas,
+}
+
+impl Execution {
+    pub fn canvas(&self) -> &Canvas {
+        &self.canvas
+    }
+
+    pub fn store(self, gpu: &mut Gpu) -> Output {
+        Output {
+            test: self.test,
+            pixels: self.canvas.read_pixels(gpu),
+        }
+    }
+}
+
+pub struct Output {
+    test: Test,
+    pixels: Vec<u8>,
+}
+
+impl Output {
     pub fn diff(&self) -> Result {
         // TODO: Perform image diffing
         Result::Failed

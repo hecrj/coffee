@@ -110,6 +110,13 @@ impl Gpu {
         texture::Drawable::new(&mut self.factory, width, height)
     }
 
+    pub(super) fn read_drawable_texture_pixels(
+        &mut self,
+        _drawable: &texture::Drawable,
+    ) -> Vec<u8> {
+        unimplemented! {}
+    }
+
     pub(super) fn upload_font(&mut self, bytes: &'static [u8]) -> Font {
         Font::from_bytes(&mut self.factory, bytes)
     }

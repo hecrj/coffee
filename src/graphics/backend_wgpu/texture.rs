@@ -7,7 +7,7 @@ use crate::graphics::Transformation;
 
 #[derive(Clone)]
 pub struct Texture {
-    texture: Rc<wgpu::Texture>,
+    raw: Rc<wgpu::Texture>,
     view: TargetView,
     binding: Rc<quad::TextureBinding>,
     width: u16,
@@ -46,7 +46,7 @@ impl Texture {
         );
 
         Texture {
-            texture: Rc::new(texture),
+            raw: Rc::new(texture),
             view: Rc::new(view),
             binding: Rc::new(binding),
             width,
@@ -80,7 +80,7 @@ impl Texture {
         );
 
         Texture {
-            texture: Rc::new(texture),
+            raw: Rc::new(texture),
             view: Rc::new(view),
             binding: Rc::new(binding),
             width,
@@ -129,7 +129,7 @@ impl Drawable {
         );
 
         let texture = Texture {
-            texture: Rc::new(texture),
+            raw: Rc::new(texture),
             view: Rc::new(view),
             binding: Rc::new(binding),
             width,
@@ -146,6 +146,68 @@ impl Drawable {
 
     pub fn target(&self) -> &TargetView {
         self.texture().view()
+    }
+
+    pub fn read_pixels(&self, device: &mut wgpu::Device) -> Vec<u8> {
+        let texture = self.texture();
+
+        let buffer_size =
+            8 * 4 * texture.width() as u32 * texture.height() as u32;
+        let buffer = device.create_buffer(&wgpu::BufferDescriptor {
+            size: buffer_size,
+            usage: wgpu::BufferUsageFlags::TRANSFER_DST
+                | wgpu::BufferUsageFlags::MAP_READ,
+        });
+
+        let mut encoder =
+            device.create_command_encoder(&wgpu::CommandEncoderDescriptor {
+                todo: 0,
+            });
+
+        encoder.copy_texture_to_buffer(
+            wgpu::TextureCopyView {
+                texture: &texture.raw,
+                level: 0,
+                slice: 0,
+                origin: wgpu::Origin3d {
+                    x: 0.0,
+                    y: 0.0,
+                    z: 0.0,
+                },
+            },
+            wgpu::BufferCopyView {
+                buffer: &buffer,
+                offset: 0,
+                row_pitch: 4 * texture.width() as u32,
+                image_height: texture.height() as u32,
+            },
+            wgpu::Extent3d {
+                width: texture.width() as u32,
+                height: texture.height() as u32,
+                depth: 1,
+            },
+        );
+
+        device.get_queue().submit(&[encoder.finish()]);
+
+        use std::sync::Mutex;
+
+        let pixels: Mutex<Option<Vec<u8>>> = Mutex::new(None);
+
+        buffer.map_read_async(0, buffer_size, |result| {
+            match result {
+                wgpu::BufferMapAsyncResult::Success(data) => {
+                    *pixels.lock().unwrap() = Some(data.to_vec());
+                }
+                wgpu::BufferMapAsyncResult::Error => {
+                    *pixels.lock().unwrap() = Some(vec![]);
+                }
+            };
+        });
+
+        while pixels.lock().unwrap().is_none() {}
+
+        pixels.into_inner().unwrap().unwrap()
     }
 
     pub fn render_transformation() -> Transformation {
