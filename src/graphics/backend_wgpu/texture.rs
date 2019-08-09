@@ -122,7 +122,9 @@ impl Drawable {
             width,
             height,
             None,
-            wgpu::TextureUsage::OUTPUT_ATTACHMENT | wgpu::TextureUsage::SAMPLED,
+            wgpu::TextureUsage::OUTPUT_ATTACHMENT
+                | wgpu::TextureUsage::SAMPLED
+                | wgpu::TextureUsage::TRANSFER_SRC,
         );
 
         let texture = Texture {
@@ -145,15 +147,19 @@ impl Drawable {
         self.texture().view()
     }
 
-    pub fn read_pixels(&self, device: &mut wgpu::Device) -> Vec<u8> {
+    pub fn read_pixels(
+        &self,
+        device: &mut wgpu::Device,
+    ) -> image::DynamicImage {
         let texture = self.texture();
 
-        let buffer_size =
-            8 * 4 * texture.width() as u32 * texture.height() as u32;
+        let buffer_size = 4 * texture.width() as u64 * texture.height() as u64;
+
         let buffer = device.create_buffer(&wgpu::BufferDescriptor {
             size: buffer_size,
-            usage: wgpu::BufferUsageFlags::TRANSFER_DST
-                | wgpu::BufferUsageFlags::MAP_READ,
+            usage: wgpu::BufferUsage::TRANSFER_DST
+                | wgpu::BufferUsage::TRANSFER_SRC
+                | wgpu::BufferUsage::MAP_READ,
         });
 
         let mut encoder =
@@ -164,8 +170,8 @@ impl Drawable {
         encoder.copy_texture_to_buffer(
             wgpu::TextureCopyView {
                 texture: &texture.raw,
-                level: 0,
-                slice: 0,
+                mip_level: 0,
+                array_layer: 0,
                 origin: wgpu::Origin3d {
                     x: 0.0,
                     y: 0.0,
@@ -187,24 +193,35 @@ impl Drawable {
 
         device.get_queue().submit(&[encoder.finish()]);
 
-        use std::sync::Mutex;
+        use std::cell::RefCell;
 
-        let pixels: Mutex<Option<Vec<u8>>> = Mutex::new(None);
+        let pixels: Rc<RefCell<Option<Vec<u8>>>> = Rc::new(RefCell::new(None));
+        let write = pixels.clone();
 
-        buffer.map_read_async(0, buffer_size, |result| {
+        buffer.map_read_async(0, buffer_size, move |result| {
             match result {
-                wgpu::BufferMapAsyncResult::Success(data) => {
-                    *pixels.lock().unwrap() = Some(data.to_vec());
+                Ok(mapping) => {
+                    *write.borrow_mut() = Some(mapping.data.to_vec());
                 }
-                wgpu::BufferMapAsyncResult::Error => {
-                    *pixels.lock().unwrap() = Some(vec![]);
+                Err(_) => {
+                    *write.borrow_mut() = Some(vec![]);
                 }
             };
         });
 
-        while pixels.lock().unwrap().is_none() {}
+        device.poll(true);
 
-        pixels.into_inner().unwrap().unwrap()
+        let data = pixels.borrow();
+        let bgra = data.clone().unwrap();
+
+        image::DynamicImage::ImageBgra8(
+            image::ImageBuffer::from_raw(
+                texture.width() as u32,
+                texture.height() as u32,
+                bgra,
+            )
+            .expect("Create BGRA8 image"),
+        )
     }
 
     pub fn render_transformation() -> Transformation {

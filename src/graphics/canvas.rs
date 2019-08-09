@@ -80,7 +80,7 @@ impl Canvas {
     /// _Note:_ This is a very slow operation.
     ///
     /// [`Canvas`]: struct.Canvas.html
-    pub fn read_pixels(&self, gpu: &mut Gpu) -> Vec<u8> {
+    pub fn read_pixels(&self, gpu: &mut Gpu) -> image::DynamicImage {
         gpu.read_drawable_texture_pixels(&self.drawable)
     }
 }

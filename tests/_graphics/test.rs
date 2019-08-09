@@ -23,7 +23,7 @@ impl Test {
             test: *self,
             canvas: draw
                 .run(gpu)
-                .expect(&format!("Run test: {}", self.to_string())),
+                .expect(&format!("Run test \"{}\"", self.to_string())),
         }
     }
 }
@@ -51,14 +51,14 @@ impl Execution {
     pub fn store(self, gpu: &mut Gpu) -> Output {
         Output {
             test: self.test,
-            pixels: self.canvas.read_pixels(gpu),
+            image: self.canvas.read_pixels(gpu),
         }
     }
 }
 
 pub struct Output {
     test: Test,
-    pixels: Vec<u8>,
+    image: image::DynamicImage,
 }
 
 impl Output {

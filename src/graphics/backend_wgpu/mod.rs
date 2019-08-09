@@ -111,7 +111,7 @@ impl Gpu {
     pub(super) fn read_drawable_texture_pixels(
         &mut self,
         drawable: &texture::Drawable,
-    ) -> Vec<u8> {
+    ) -> image::DynamicImage {
         drawable.read_pixels(&mut self.device)
     }
 

@@ -50,5 +50,5 @@ wgpu = { version = "0.2", optional = true, git = "https://github.com/gfx-rs/wgpu
 wgpu_glyph = { version = "0.3", optional = true, git = "https://github.com/hecrj/wgpu_glyph" }
 
 [dev-dependencies]
-# Example dependencies
 rand = "0.6"
+env_logger = "0.6"

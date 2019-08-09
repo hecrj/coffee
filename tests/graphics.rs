@@ -11,6 +11,8 @@ use _graphics::{test, Test};
 #[test]
 #[ignore]
 fn graphics() -> Result<()> {
+    env_logger::init();
+
     Runner::run(WindowSettings {
         title: String::from("Graphics test suite - Coffee"),
         size: (1280, 1024),
