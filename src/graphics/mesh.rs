@@ -93,7 +93,7 @@ impl Mesh {
     /// [`Shape`]: enum.Shape.html
     /// [`Mesh`]: struct.Mesh.html
     #[inline]
-    pub fn stroke(&mut self, shape: Shape, color: Color, width: u16) {
+    pub fn stroke(&mut self, shape: Shape, color: Color, width: f32) {
         let mut builder = lyon::BuffersBuilder::new(
             &mut self.buffers,
             WithColor(color.into_linear()),
@@ -146,7 +146,7 @@ impl Mesh {
                     &Self::stroke_options(width),
                     &mut builder,
                 )
-                .expect("Fill polyline");
+                .expect("Stroke polyline");
             }
         }
     }
@@ -163,8 +163,8 @@ impl Mesh {
         lyon::FillOptions::DEFAULT.with_normals(false)
     }
 
-    fn stroke_options(width: u16) -> lyon::StrokeOptions {
-        lyon::StrokeOptions::DEFAULT.with_line_width(width as f32)
+    fn stroke_options(width: f32) -> lyon::StrokeOptions {
+        lyon::StrokeOptions::DEFAULT.with_line_width(width)
     }
 }
 

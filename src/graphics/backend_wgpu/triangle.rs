@@ -68,7 +68,7 @@ impl Pipeline {
                 }),
                 rasterization_state: wgpu::RasterizationStateDescriptor {
                     front_face: wgpu::FrontFace::Ccw,
-                    cull_mode: wgpu::CullMode::Back,
+                    cull_mode: wgpu::CullMode::None,
                     depth_bias: 0,
                     depth_bias_slope_scale: 0.0,
                     depth_bias_clamp: 0.0,
@@ -110,12 +110,13 @@ impl Pipeline {
             });
 
         let vertices = device.create_buffer(&wgpu::BufferDescriptor {
-            size: Self::INITIAL_BUFFER_SIZE as u64,
+            size: mem::size_of::<Vertex>() as u64
+                * Self::INITIAL_BUFFER_SIZE as u64,
             usage: wgpu::BufferUsage::VERTEX,
         });
 
         let indices = device.create_buffer(&wgpu::BufferDescriptor {
-            size: Self::INITIAL_BUFFER_SIZE as u64,
+            size: Self::INITIAL_BUFFER_SIZE as u64 * 2,
             usage: wgpu::BufferUsage::INDEX,
         });
 
@@ -162,12 +163,12 @@ impl Pipeline {
             let new_size = vertices.len().max(indices.len()) as u32;
 
             self.vertices = device.create_buffer(&wgpu::BufferDescriptor {
-                size: new_size as u64,
+                size: mem::size_of::<Vertex>() as u64 * new_size as u64,
                 usage: wgpu::BufferUsage::VERTEX,
             });
 
             self.indices = device.create_buffer(&wgpu::BufferDescriptor {
-                size: new_size as u64,
+                size: new_size as u64 * 2,
                 usage: wgpu::BufferUsage::INDEX,
             });
 

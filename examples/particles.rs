@@ -9,7 +9,7 @@ use coffee::graphics::{
     Batch, Color, Frame, Image, Point, Rectangle, Sprite, Vector, Window,
     WindowSettings,
 };
-use coffee::input::{keyboard, KeyboardAndMouse};
+use coffee::input::{keyboard, mouse, KeyboardAndMouse};
 use coffee::load::{loading_screen::ProgressBar, Join, Task};
 use coffee::ui::{Checkbox, Column, Element, Justify, Renderer, UserInterface};
 use coffee::{Game, Result, Timer};
@@ -41,7 +41,7 @@ impl Particles {
     const CENTER_MASS: f32 = 200.0;
 
     fn generate(max_x: f32, max_y: f32) -> Task<Vec<Particle>> {
-        Task::new(move || {
+        Task::succeed(move || {
             let rng = &mut rand::thread_rng();
 
             (0..Self::AMOUNT)
@@ -76,7 +76,7 @@ impl Game for Particles {
             Task::stage("Loading assets...", Self::load_palette()),
             Task::stage(
                 "Showing off the loading screen for a bit...",
-                Task::new(|| thread::sleep(time::Duration::from_secs(2))),
+                Task::succeed(|| thread::sleep(time::Duration::from_secs(2))),
             ),
         )
             .join()
@@ -89,15 +89,18 @@ impl Game for Particles {
     }
 
     fn interact(&mut self, input: &mut KeyboardAndMouse, window: &mut Window) {
-        self.gravity_centers[0] = input.cursor_position();
+        let mouse = input.mouse();
+        let keyboard = input.keyboard();
 
-        self.gravity_centers.extend(input.left_clicks());
+        self.gravity_centers[0] = mouse.cursor_position();
+        self.gravity_centers
+            .extend(mouse.button_clicks(mouse::Button::Left));
 
-        if input.was_key_released(keyboard::KeyCode::I) {
+        if keyboard.was_key_released(keyboard::KeyCode::I) {
             self.interpolate = !self.interpolate;
         }
 
-        if input.was_key_released(keyboard::KeyCode::F) {
+        if keyboard.was_key_released(keyboard::KeyCode::F) {
             window.toggle_fullscreen();
         }
     }
