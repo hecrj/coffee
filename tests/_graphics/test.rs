@@ -1,10 +1,14 @@
-use coffee::graphics::{Canvas, Gpu};
+use coffee::graphics::{Canvas, Gpu, Image};
 
 mod mesh;
 
 use mesh::Mesh;
 
-#[derive(Clone, Copy)]
+use std::fs::File;
+use std::io::Read;
+use std::path::PathBuf;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Test {
     Mesh,
 }
@@ -14,12 +18,12 @@ impl Test {
         vec![Test::Mesh]
     }
 
-    pub fn run(&self, gpu: &mut Gpu) -> Execution {
+    pub fn run(&self, gpu: &mut Gpu) -> Drawing {
         let draw = match self {
             Test::Mesh => Mesh::draw(),
         };
 
-        Execution {
+        Drawing {
             test: *self,
             canvas: draw
                 .run(gpu)
@@ -38,37 +42,132 @@ impl std::string::ToString for Test {
     }
 }
 
-pub struct Execution {
+pub struct Drawing {
     test: Test,
     canvas: Canvas,
 }
 
-impl Execution {
+impl Drawing {
+    pub fn test(&self) -> Test {
+        self.test
+    }
+
     pub fn canvas(&self) -> &Canvas {
         &self.canvas
     }
 
-    pub fn store(self, gpu: &mut Gpu) -> Output {
-        Output {
-            test: self.test,
-            image: self.canvas.read_pixels(gpu),
+    pub fn save_as_model(&self, gpu: &mut Gpu) {
+        let image = self.canvas.read_pixels(gpu);
+
+        image
+            .to_rgba()
+            .save(self.model_path())
+            .expect(&format!("Save \"{:?}\" drawing", self.test));
+    }
+
+    pub fn differences(
+        &self,
+        gpu: &mut Gpu,
+    ) -> Result<Option<Differences>, Error> {
+        let model = {
+            let mut buf = Vec::new();
+            let mut reader = File::open(self.model_path())?;
+            let _ = reader.read_to_end(&mut buf)?;
+            image::load_from_memory(&buf)?
+        };
+
+        let image = self.canvas.read_pixels(gpu);
+
+        let model_rgba = model.to_rgba();
+        let image_rgba = image.to_rgba();
+
+        if model_rgba
+            .pixels()
+            .zip(image_rgba.pixels())
+            .all(|(a, b)| a == b)
+        {
+            Ok(None)
+        } else {
+            let differences: Vec<u8> = model_rgba
+                .pixels()
+                .zip(image_rgba.pixels())
+                .flat_map(|(a, b)| {
+                    if a == b {
+                        &[0, 0, 0, 0]
+                    } else {
+                        &[255, 0, 0, 255]
+                    }
+                })
+                .cloned()
+                .collect();
+
+            let image = image::RgbaImage::from_raw(
+                self.canvas.width() as u32,
+                self.canvas.height() as u32,
+                differences,
+            )
+            .expect("Create diff image");
+
+            let image =
+                Image::from_image(gpu, image::DynamicImage::ImageRgba8(image))
+                    .expect("Upload diff image");
+
+            Ok(Some(Differences {
+                test: self.test,
+                canvas: self.canvas.clone(),
+                image,
+            }))
         }
     }
-}
 
-pub struct Output {
-    test: Test,
-    image: image::DynamicImage,
-}
+    fn model_path(&self) -> PathBuf {
+        let mut path = PathBuf::new();
 
-impl Output {
-    pub fn diff(&self) -> Result {
-        // TODO: Perform image diffing
-        Result::Failed
+        path.push("tests");
+        path.push("_graphics");
+        path.push("models");
+        path.push(self.test.to_string());
+        path.set_extension("png");
+
+        path
     }
 }
 
-pub enum Result {
-    Passed,
-    Failed,
+#[derive(Debug)]
+pub struct Differences {
+    test: Test,
+    canvas: Canvas,
+    image: Image,
+}
+
+impl Differences {
+    pub fn test(&self) -> Test {
+        self.test
+    }
+
+    pub fn canvas(&self) -> &Canvas {
+        &self.canvas
+    }
+
+    pub fn image(&self) -> &Image {
+        &self.image
+    }
+}
+
+#[derive(Debug)]
+pub enum Error {
+    ModelImageNotFound(std::io::Error),
+    ModelImageIsInvalid(image::ImageError),
+}
+
+impl From<std::io::Error> for Error {
+    fn from(error: std::io::Error) -> Error {
+        Error::ModelImageNotFound(error)
+    }
+}
+
+impl From<image::ImageError> for Error {
+    fn from(error: image::ImageError) -> Error {
+        Error::ModelImageIsInvalid(error)
+    }
 }

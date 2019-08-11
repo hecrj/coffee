@@ -1,16 +1,28 @@
+//! TODO
 use std::hash::Hash;
 
 use crate::graphics::{Point, Rectangle};
 use crate::ui::core::{
-    Event, Hasher, Layout, MouseCursor, Node, Style, Widget,
+    Element, Event, Hasher, Layout, MouseCursor, Node, Style, Widget,
 };
 
+/// TODO
 pub struct Panel<'a, Message, Renderer> {
     style: Style,
-    content: Box<Widget<Message, Renderer> + 'a>,
+    content: Box<dyn Widget<Message, Renderer> + 'a>,
+}
+
+impl<'a, Message, Renderer> std::fmt::Debug for Panel<'a, Message, Renderer> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Panel")
+            .field("style", &self.style)
+            .field("content", &self.content)
+            .finish()
+    }
 }
 
 impl<'a, Message, Renderer> Panel<'a, Message, Renderer> {
+    /// TODO
     pub fn new(content: impl Widget<Message, Renderer> + 'a) -> Self {
         Panel {
             style: Style::default().padding(20),
@@ -18,11 +30,13 @@ impl<'a, Message, Renderer> Panel<'a, Message, Renderer> {
         }
     }
 
+    /// TODO
     pub fn width(mut self, width: u32) -> Self {
         self.style = self.style.width(width);
         self
     }
 
+    /// TODO
     pub fn max_width(mut self, max_width: u32) -> Self {
         self.style = self.style.max_width(max_width);
         self
@@ -41,7 +55,7 @@ where
     fn on_event(
         &mut self,
         event: Event,
-        layout: Layout,
+        layout: Layout<'_>,
         cursor_position: Point,
         messages: &mut Vec<Message>,
     ) {
@@ -56,7 +70,7 @@ where
     fn draw(
         &self,
         renderer: &mut Renderer,
-        layout: Layout,
+        layout: Layout<'_>,
         cursor_position: Point,
     ) -> MouseCursor {
         let bounds = layout.bounds();
@@ -89,6 +103,21 @@ where
     }
 }
 
+/// TODO
 pub trait Renderer {
+    /// TODO
     fn draw(&mut self, bounds: Rectangle<f32>);
+}
+
+impl<'a, Message, Renderer> From<Panel<'a, Message, Renderer>>
+    for Element<'a, Message, Renderer>
+where
+    Renderer: 'static + self::Renderer,
+    Message: 'static,
+{
+    fn from(
+        panel: Panel<'a, Message, Renderer>,
+    ) -> Element<'a, Message, Renderer> {
+        Element::new(panel)
+    }
 }

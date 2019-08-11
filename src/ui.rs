@@ -74,7 +74,7 @@
 //!     type Renderer = Renderer;
 //!
 //!     // The update logic, called when a message is produced
-//!     fn react(&mut self, message: Message) {
+//!     fn react(&mut self, message: Message, _window: &mut Window) {
 //!         // We update the counter value after an interaction here
 //!         match message {
 //!             Message::IncrementPressed => {
@@ -144,7 +144,9 @@ pub mod widget;
 #[doc(no_inline)]
 pub use self::core::{Align, Justify};
 pub use renderer::{Configuration, Renderer};
-pub use widget::{button, slider, Button, Checkbox, Radio, Slider, Text};
+pub use widget::{
+    button, slider, Button, Checkbox, Panel, Radio, Slider, Text,
+};
 
 /// A [`Column`] using the built-in [`Renderer`].
 ///
@@ -226,7 +228,7 @@ pub trait UserInterface: Game {
     /// [`Game::interact`]: ../trait.Game.html#method.interact
     /// [`Game::Input`]: ../trait.Game.html#associatedtype.Input
     /// [`Message`]: #associatedtype.Message
-    fn react(&mut self, message: Self::Message);
+    fn react(&mut self, message: Self::Message, window: &mut Window);
 
     /// Produces the layout of the user interface.
     ///
@@ -358,7 +360,7 @@ pub trait UserInterface: Game {
             }
 
             for message in messages.drain(..) {
-                game.react(message);
+                game.react(message, window);
             }
             debug.ui_finished();
 

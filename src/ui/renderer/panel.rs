@@ -1,5 +1,5 @@
 use crate::graphics::{Point, Rectangle, Sprite};
-use crate::ui::core::widget::panel;
+use crate::ui::widget::panel;
 use crate::ui::Renderer;
 
 const PANEL_WIDTH: u16 = 28;

@@ -130,7 +130,7 @@ impl UserInterface for Example {
     type Message = Message;
     type Renderer = Renderer;
 
-    fn react(&mut self, msg: Message) {
+    fn react(&mut self, msg: Message, _window: &mut Window) {
         match msg {
             Message::ShapeSelected(shape) => {
                 self.shape = shape;

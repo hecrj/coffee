@@ -23,15 +23,6 @@ impl Mesh {
             mesh.stroke(
                 Shape::Circle {
                     center: Point::new(150.0, 150.0),
-                    radius: 40.0,
-                },
-                Color::RED,
-                1.0,
-            );
-
-            mesh.stroke(
-                Shape::Circle {
-                    center: Point::new(150.0, 150.0),
                     radius: 80.0,
                 },
                 Color::GREEN,

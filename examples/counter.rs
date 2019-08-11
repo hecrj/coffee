@@ -56,7 +56,7 @@ impl UserInterface for Counter {
     type Message = Message;
     type Renderer = Renderer;
 
-    fn react(&mut self, message: Message) {
+    fn react(&mut self, message: Message, _window: &mut Window) {
         match message {
             Message::IncrementPressed => {
                 self.value += 1;

@@ -164,7 +164,7 @@ impl UserInterface for InputExample {
     type Message = ();
     type Renderer = Renderer;
 
-    fn react(&mut self, _msg: ()) {}
+    fn react(&mut self, _msg: (), _window: &mut Window) {}
 
     fn layout(&mut self, window: &Window) -> Element<()> {
         let keys = self
