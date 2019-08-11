@@ -113,7 +113,7 @@ impl Gpu {
     pub(super) fn read_drawable_texture_pixels(
         &mut self,
         _drawable: &texture::Drawable,
-    ) -> Vec<u8> {
+    ) -> image::DynamicImage {
         unimplemented! {}
     }
 
