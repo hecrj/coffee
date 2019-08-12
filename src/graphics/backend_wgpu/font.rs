@@ -6,7 +6,7 @@ use crate::graphics::{
 use wgpu_glyph::GlyphCruncher;
 
 pub struct Font {
-    glyphs: wgpu_glyph::GlyphBrush<'static>,
+    glyphs: wgpu_glyph::GlyphBrush<'static, ()>,
 }
 
 impl Font {
@@ -42,10 +42,10 @@ impl Font {
     ) {
         self.glyphs
             .draw_queued_with_transform(
-                transformation.into(),
                 device,
                 encoder,
                 target,
+                transformation.into(),
             )
             .expect("Draw font");
     }

@@ -15,17 +15,15 @@ pub struct Pipeline {
 impl Pipeline {
     pub fn new(device: &mut wgpu::Device) -> Pipeline {
         let sampler = device.create_sampler(&wgpu::SamplerDescriptor {
-            r_address_mode: wgpu::AddressMode::ClampToEdge,
-            s_address_mode: wgpu::AddressMode::ClampToEdge,
-            t_address_mode: wgpu::AddressMode::ClampToEdge,
+            address_mode_u: wgpu::AddressMode::ClampToEdge,
+            address_mode_v: wgpu::AddressMode::ClampToEdge,
+            address_mode_w: wgpu::AddressMode::ClampToEdge,
             mag_filter: wgpu::FilterMode::Nearest,
             min_filter: wgpu::FilterMode::Nearest,
             mipmap_filter: wgpu::FilterMode::Nearest,
             lod_min_clamp: -100.0,
             lod_max_clamp: 100.0,
-            max_anisotropy: 0,
             compare_function: wgpu::CompareFunction::Always,
-            border_color: wgpu::BorderColor::TransparentBlack,
         });
 
         let constant_layout =
@@ -33,12 +31,12 @@ impl Pipeline {
                 bindings: &[
                     wgpu::BindGroupLayoutBinding {
                         binding: 0,
-                        visibility: wgpu::ShaderStageFlags::VERTEX,
+                        visibility: wgpu::ShaderStage::VERTEX,
                         ty: wgpu::BindingType::UniformBuffer,
                     },
                     wgpu::BindGroupLayoutBinding {
                         binding: 1,
-                        visibility: wgpu::ShaderStageFlags::FRAGMENT,
+                        visibility: wgpu::ShaderStage::FRAGMENT,
                         ty: wgpu::BindingType::Sampler,
                     },
                 ],
@@ -49,8 +47,7 @@ impl Pipeline {
         let transform_buffer = device
             .create_buffer_mapped(
                 16,
-                wgpu::BufferUsageFlags::UNIFORM
-                    | wgpu::BufferUsageFlags::TRANSFER_DST,
+                wgpu::BufferUsage::UNIFORM | wgpu::BufferUsage::TRANSFER_DST,
             )
             .fill_from_slice(&matrix[..]);
 
@@ -76,7 +73,7 @@ impl Pipeline {
             device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
                 bindings: &[wgpu::BindGroupLayoutBinding {
                     binding: 0,
-                    visibility: wgpu::ShaderStageFlags::FRAGMENT,
+                    visibility: wgpu::ShaderStage::FRAGMENT,
                     ty: wgpu::BindingType::SampledTexture,
                 }],
             });
@@ -98,10 +95,10 @@ impl Pipeline {
                     module: &vs_module,
                     entry_point: "main",
                 },
-                fragment_stage: wgpu::PipelineStageDescriptor {
+                fragment_stage: Some(wgpu::PipelineStageDescriptor {
                     module: &fs_module,
                     entry_point: "main",
-                },
+                }),
                 rasterization_state: wgpu::RasterizationStateDescriptor {
                     front_face: wgpu::FrontFace::Cw,
                     cull_mode: wgpu::CullMode::None,
@@ -112,51 +109,51 @@ impl Pipeline {
                 primitive_topology: wgpu::PrimitiveTopology::TriangleList,
                 color_states: &[wgpu::ColorStateDescriptor {
                     format: wgpu::TextureFormat::Bgra8UnormSrgb,
-                    color: wgpu::BlendDescriptor {
+                    color_blend: wgpu::BlendDescriptor {
                         src_factor: wgpu::BlendFactor::SrcAlpha,
                         dst_factor: wgpu::BlendFactor::OneMinusSrcAlpha,
                         operation: wgpu::BlendOperation::Add,
                     },
-                    alpha: wgpu::BlendDescriptor {
+                    alpha_blend: wgpu::BlendDescriptor {
                         src_factor: wgpu::BlendFactor::One,
                         dst_factor: wgpu::BlendFactor::OneMinusSrcAlpha,
                         operation: wgpu::BlendOperation::Add,
                     },
-                    write_mask: wgpu::ColorWriteFlags::ALL,
+                    write_mask: wgpu::ColorWrite::ALL,
                 }],
                 depth_stencil_state: None,
                 index_format: wgpu::IndexFormat::Uint16,
                 vertex_buffers: &[
                     wgpu::VertexBufferDescriptor {
-                        stride: mem::size_of::<Vertex>() as u32,
+                        stride: mem::size_of::<Vertex>() as u64,
                         step_mode: wgpu::InputStepMode::Vertex,
                         attributes: &[wgpu::VertexAttributeDescriptor {
-                            attribute_index: 0,
+                            shader_location: 0,
                             format: wgpu::VertexFormat::Float2,
                             offset: 0,
                         }],
                     },
                     wgpu::VertexBufferDescriptor {
-                        stride: mem::size_of::<Quad>() as u32,
+                        stride: mem::size_of::<Quad>() as u64,
                         step_mode: wgpu::InputStepMode::Instance,
                         attributes: &[
                             wgpu::VertexAttributeDescriptor {
-                                attribute_index: 1,
+                                shader_location: 1,
                                 format: wgpu::VertexFormat::Float4,
                                 offset: 0,
                             },
                             wgpu::VertexAttributeDescriptor {
-                                attribute_index: 2,
+                                shader_location: 2,
                                 format: wgpu::VertexFormat::Float2,
                                 offset: 4 * 4,
                             },
                             wgpu::VertexAttributeDescriptor {
-                                attribute_index: 3,
+                                shader_location: 3,
                                 format: wgpu::VertexFormat::Float2,
                                 offset: 4 * (4 + 2),
                             },
                             wgpu::VertexAttributeDescriptor {
-                                attribute_index: 4,
+                                shader_location: 4,
                                 format: wgpu::VertexFormat::Uint,
                                 offset: 4 * (4 + 2 + 2),
                             },
@@ -167,23 +164,16 @@ impl Pipeline {
             });
 
         let vertices = device
-            .create_buffer_mapped(
-                QUAD_VERTS.len(),
-                wgpu::BufferUsageFlags::VERTEX,
-            )
+            .create_buffer_mapped(QUAD_VERTS.len(), wgpu::BufferUsage::VERTEX)
             .fill_from_slice(&QUAD_VERTS);
 
         let indices = device
-            .create_buffer_mapped(
-                QUAD_INDICES.len(),
-                wgpu::BufferUsageFlags::INDEX,
-            )
+            .create_buffer_mapped(QUAD_INDICES.len(), wgpu::BufferUsage::INDEX)
             .fill_from_slice(&QUAD_INDICES);
 
         let instances = device.create_buffer(&wgpu::BufferDescriptor {
-            size: mem::size_of::<Quad>() as u32 * Quad::MAX as u32,
-            usage: wgpu::BufferUsageFlags::VERTEX
-                | wgpu::BufferUsageFlags::TRANSFER_DST,
+            size: mem::size_of::<Quad>() as u64 * Quad::MAX as u64,
+            usage: wgpu::BufferUsage::VERTEX | wgpu::BufferUsage::TRANSFER_DST,
         });
 
         Pipeline {
@@ -225,7 +215,7 @@ impl Pipeline {
         let matrix: [f32; 16] = transformation.clone().into();
 
         let transform_buffer = device
-            .create_buffer_mapped(16, wgpu::BufferUsageFlags::TRANSFER_SRC)
+            .create_buffer_mapped(16, wgpu::BufferUsage::TRANSFER_SRC)
             .fill_from_slice(&matrix[..]);
 
         encoder.copy_buffer_to_buffer(
@@ -244,10 +234,7 @@ impl Pipeline {
             let amount = end - i;
 
             let instance_buffer = device
-                .create_buffer_mapped(
-                    amount,
-                    wgpu::BufferUsageFlags::TRANSFER_SRC,
-                )
+                .create_buffer_mapped(amount, wgpu::BufferUsage::TRANSFER_SRC)
                 .fill_from_slice(&instances[i..end]);
 
             encoder.copy_buffer_to_buffer(
@@ -255,7 +242,7 @@ impl Pipeline {
                 0,
                 &self.instances,
                 0,
-                (mem::size_of::<Quad>() * amount) as u32,
+                (mem::size_of::<Quad>() * amount) as u64,
             );
             {
                 let mut render_pass =
@@ -263,6 +250,7 @@ impl Pipeline {
                         color_attachments: &[
                             wgpu::RenderPassColorAttachmentDescriptor {
                                 attachment: target,
+                                resolve_target: None,
                                 load_op: wgpu::LoadOp::Load,
                                 store_op: wgpu::StoreOp::Store,
                                 clear_color: wgpu::Color {
@@ -277,8 +265,8 @@ impl Pipeline {
                     });
 
                 render_pass.set_pipeline(&self.pipeline);
-                render_pass.set_bind_group(0, &self.constants);
-                render_pass.set_bind_group(1, &texture.0);
+                render_pass.set_bind_group(0, &self.constants, &[]);
+                render_pass.set_bind_group(1, &texture.0, &[]);
                 render_pass.set_index_buffer(&self.indices, 0);
                 render_pass.set_vertex_buffers(&[
                     (&self.vertices, 0),
