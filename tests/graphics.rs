@@ -1,3 +1,4 @@
+#![cfg(not(target_os = "windows"))]
 use coffee::graphics::{
     Color, Frame, Gpu, Point, Quad, Window, WindowSettings,
 };
