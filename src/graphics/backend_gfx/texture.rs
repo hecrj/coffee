@@ -1,6 +1,8 @@
 use image;
 
 use gfx::format::{ChannelTyped, SurfaceTyped};
+use gfx::memory::Typed;
+use gfx::traits::FactoryExt;
 use gfx_core::factory::Factory;
 use gfx_device_gl as gl;
 
@@ -11,7 +13,7 @@ use crate::graphics::Transformation;
 
 #[derive(Clone, Debug)]
 pub struct Texture {
-    texture: RawTexture,
+    raw: RawTexture,
     view: ShaderResource,
     width: u16,
     height: u16,
@@ -27,7 +29,7 @@ impl Texture {
         let width = rgba.width() as u16;
         let height = rgba.height() as u16;
 
-        let (texture, view) = create_texture_array(
+        let (raw, view) = create_texture_array(
             factory,
             width,
             height,
@@ -37,7 +39,7 @@ impl Texture {
         );
 
         Texture {
-            texture,
+            raw,
             view,
             width,
             height,
@@ -58,7 +60,7 @@ impl Texture {
 
         let raw_layers: Vec<&[u8]> = rgba.iter().map(|i| &i[..]).collect();
 
-        let (texture, view) = create_texture_array(
+        let (raw, view) = create_texture_array(
             factory,
             width,
             height,
@@ -68,7 +70,7 @@ impl Texture {
         );
 
         Texture {
-            texture,
+            raw,
             view,
             width,
             height,
@@ -77,7 +79,7 @@ impl Texture {
     }
 
     pub(super) fn handle(&self) -> &RawTexture {
-        &self.texture
+        &self.raw
     }
 
     pub(super) fn view(&self) -> &ShaderResource {
@@ -101,17 +103,18 @@ pub struct Drawable {
 
 impl Drawable {
     pub fn new(factory: &mut gl::Factory, width: u16, height: u16) -> Drawable {
-        let (texture, view) = create_texture_array(
+        let (raw, view) = create_texture_array(
             factory,
             width,
             height,
             None,
             gfx::memory::Bind::SHADER_RESOURCE
-                | gfx::memory::Bind::RENDER_TARGET,
+                | gfx::memory::Bind::RENDER_TARGET
+                | gfx::memory::Bind::TRANSFER_SRC,
         );
 
         let texture = Texture {
-            texture,
+            raw,
             view,
             width,
             height,
@@ -137,6 +140,53 @@ impl Drawable {
 
     pub fn target(&self) -> &TargetView {
         &self.target
+    }
+
+    pub fn read_pixels(
+        &self,
+        device: &mut gl::Device,
+        factory: &mut gl::Factory,
+    ) -> image::DynamicImage {
+        let width = self.texture.width();
+        let height = self.texture.height();
+
+        let download = factory
+            .create_download_buffer::<u8>(width as usize * height as usize * 4)
+            .expect("Create download buffer");
+
+        let mut encoder: gfx::Encoder<gl::Resources, gl::CommandBuffer> =
+            factory.create_command_buffer().into();
+
+        encoder
+            .copy_texture_to_buffer_raw(
+                &self.texture.raw,
+                None,
+                gfx::texture::RawImageInfo {
+                    xoffset: 0,
+                    yoffset: 0,
+                    zoffset: 0,
+                    width,
+                    height,
+                    depth: 0,
+                    format: <gfx::format::Srgba8 as gfx::format::Formatted>::get_format(),
+                    mipmap: 0,
+                },
+                download.raw(),
+                0,
+            )
+            .expect("Copy texture to raw buffer");
+
+        encoder.flush(device);
+
+        let reader = factory.read_mapping(&download).expect("Read mapping");
+
+        let mut rgba = Vec::with_capacity(width as usize * height as usize * 4);
+        rgba.extend(reader.into_iter());
+
+        image::DynamicImage::ImageRgba8(
+            image::ImageBuffer::from_raw(width as u32, height as u32, rgba)
+                .expect("Create RGBA8 image"),
+        )
     }
 
     pub fn render_transformation() -> Transformation {
