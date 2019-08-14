@@ -26,10 +26,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Incorrect buffer sizes in the `Mesh` pipeline. This caused vertices to entirely
   disappear when rendering big meshes, leading to a potential crash.
+- Validation error when rendering meshes using Vulkan, Metal, D3D11, or D3D12. [#81]
 
 [#66]: https://github.com/hecrj/coffee/pull/66
 [#77]: https://github.com/hecrj/coffee/pull/77
 [#78]: https://github.com/hecrj/coffee/pull/78
+[#81]: https://github.com/hecrj/coffee/pull/81
 
 
 ## [0.3.1] - 2019-06-20
