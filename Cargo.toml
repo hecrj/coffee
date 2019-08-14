@@ -50,5 +50,4 @@ wgpu = { version = "0.2", optional = true }
 wgpu_glyph = { version = "0.3", optional = true }
 
 [dev-dependencies]
-# Example dependencies
 rand = "0.6"
