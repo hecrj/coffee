@@ -47,7 +47,7 @@ gfx_winit = { package = "winit", version = "0.19", optional = true }
 
 # wgpu (Vulkan, Metal, D3D)
 wgpu = { version = "0.2", optional = true, git = "https://github.com/gfx-rs/wgpu-rs", rev = "5522c912f7e2f4f33a1167fb0c8ee4549f066dcf" }
-wgpu_glyph = { version = "0.3", optional = true, git = "https://github.com/hecrj/wgpu_glyph" }
+wgpu_glyph = { version = "0.3", optional = true, git = "https://github.com/hecrj/wgpu_glyph", rev = "0577e4d2be6b035a14aa0c5d82b143aaf26c1bd3" }
 
 [dev-dependencies]
 rand = "0.6"

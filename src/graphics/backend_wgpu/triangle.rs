@@ -112,12 +112,12 @@ impl Pipeline {
         let vertices = device.create_buffer(&wgpu::BufferDescriptor {
             size: mem::size_of::<Vertex>() as u64
                 * Self::INITIAL_BUFFER_SIZE as u64,
-            usage: wgpu::BufferUsage::VERTEX,
+            usage: wgpu::BufferUsage::VERTEX | wgpu::BufferUsage::TRANSFER_DST,
         });
 
         let indices = device.create_buffer(&wgpu::BufferDescriptor {
             size: Self::INITIAL_BUFFER_SIZE as u64 * 2,
-            usage: wgpu::BufferUsage::INDEX,
+            usage: wgpu::BufferUsage::INDEX | wgpu::BufferUsage::TRANSFER_DST,
         });
 
         Pipeline {
@@ -164,12 +164,14 @@ impl Pipeline {
 
             self.vertices = device.create_buffer(&wgpu::BufferDescriptor {
                 size: mem::size_of::<Vertex>() as u64 * new_size as u64,
-                usage: wgpu::BufferUsage::VERTEX,
+                usage: wgpu::BufferUsage::VERTEX
+                    | wgpu::BufferUsage::TRANSFER_DST,
             });
 
             self.indices = device.create_buffer(&wgpu::BufferDescriptor {
                 size: new_size as u64 * 2,
-                usage: wgpu::BufferUsage::INDEX,
+                usage: wgpu::BufferUsage::INDEX
+                    | wgpu::BufferUsage::TRANSFER_DST,
             });
 
             self.buffer_size = new_size;
