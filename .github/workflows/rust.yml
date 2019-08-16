@@ -12,7 +12,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@master
-    - uses: hecrj/setup-rust-action@master
+    - uses: hecrj/setup-rust-action@v1
       with:
         rust-version: ${{ matrix.rust }}
     - name: Install libinput
