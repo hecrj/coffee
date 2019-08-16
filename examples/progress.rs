@@ -4,7 +4,7 @@ use coffee::graphics::{
 };
 use coffee::load::Task;
 use coffee::ui::{
-    button, Align, Button, Column, Element, Justify, Renderer, Text,
+    Align, Column, Element, Justify, Renderer, Text,
     UserInterface, ProgressBar,
 };
 use coffee::{Game, Result, Timer};
@@ -72,6 +72,7 @@ impl UserInterface for Progress {
             )
             .push(
                 ProgressBar::new(self.value)
+                    .width(400),
             )
             .into()
     }

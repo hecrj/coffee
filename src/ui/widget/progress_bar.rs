@@ -25,7 +25,6 @@ use std::hash::Hash;
 /// let progress = 0.75;
 ///
 /// ProgressBar::new(progress)
-///     .width(300);
 /// ```
 #[derive(Debug)]
 pub struct ProgressBar {
@@ -40,7 +39,7 @@ impl ProgressBar {
     pub fn new(progress: f32) -> Self {
         ProgressBar {
             progress,
-            style: Style::default().min_width(100),
+            style: Style::default().fill_width(),
         }
     }
 
@@ -73,7 +72,7 @@ where
         &self,
         renderer: &mut Renderer,
         layout: Layout<'_>,
-        cursor_position: Point,
+        _cursor_position: Point,
     ) -> MouseCursor {
         renderer.draw(
             layout.bounds(),
