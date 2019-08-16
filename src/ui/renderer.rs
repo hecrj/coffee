@@ -1,5 +1,6 @@
 mod button;
 mod checkbox;
+mod progress_bar;
 mod radio;
 mod slider;
 mod text;
