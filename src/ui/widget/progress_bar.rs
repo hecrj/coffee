@@ -24,7 +24,7 @@ use std::hash::Hash;
 ///
 /// let progress = 0.75;
 ///
-/// ProgressBar::new(progress)
+/// ProgressBar::new(progress);
 /// ```
 #[derive(Debug)]
 pub struct ProgressBar {
