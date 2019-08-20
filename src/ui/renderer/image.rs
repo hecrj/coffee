@@ -29,7 +29,7 @@ impl image::Renderer for Renderer {
             scale,
         });
 
-        self.user_sprites.push(batch);
+        self.images.push(batch);
     }
 }
 

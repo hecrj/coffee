@@ -23,7 +23,7 @@ use std::rc::Rc;
 /// [`UserInterface::configuration`]: trait.UserInterface.html#method.configuration
 pub struct Renderer {
     pub(crate) sprites: Batch,
-    pub(crate) user_sprites: Vec<Batch>,
+    pub(crate) images: Vec<Batch>,
     pub(crate) font: Rc<RefCell<Font>>,
     explain_mesh: Mesh,
 }
@@ -32,7 +32,7 @@ impl std::fmt::Debug for Renderer {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Renderer")
             .field("sprites", &self.sprites)
-            .field("user_sprites", &self.user_sprites)
+            .field("images", &self.images)
             .finish()
     }
 }
@@ -45,7 +45,7 @@ impl core::Renderer for Renderer {
             .join()
             .map(|(sprites, font)| Renderer {
                 sprites: Batch::new(sprites),
-                user_sprites: Vec::new(),
+                images: Vec::new(),
                 font: Rc::new(RefCell::new(font)),
                 explain_mesh: Mesh::new(),
             })
@@ -66,11 +66,11 @@ impl core::Renderer for Renderer {
         self.sprites.draw(target);
         self.sprites.clear();
 
-        for sprite in &self.user_sprites {
-            sprite.draw(target);
+        for image in &self.images {
+            image.draw(target);
         }
 
-        self.user_sprites.clear();
+        self.images.clear();
 
         self.font.borrow_mut().draw(target);
 

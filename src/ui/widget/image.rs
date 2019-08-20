@@ -92,7 +92,7 @@ where
         renderer.draw(
             layout.bounds(),
             self.image.clone(),
-            self.source.clone(),
+            self.source,
         );
 
         MouseCursor::OutOfBounds
