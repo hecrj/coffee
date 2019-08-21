@@ -88,7 +88,7 @@ impl Game for MyGame {
 
     fn load(_window: &Window) -> Task<MyGame> {
         // Load your game assets here. Check out the `load` module!
-        Task::succeed(|| MyGame { /* ... */ })
+        Task::new(|| MyGame { /* ... */ })
     }
 
     fn draw(&mut self, frame: &mut Frame, _timer: &Timer) {
