@@ -1,6 +1,5 @@
-name: CI
+name: Integration
 on: [push]
-
 jobs:
   test:
     runs-on: ${{ matrix.os }}
@@ -27,6 +26,7 @@ jobs:
   diff_shaders:
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@master
     - name: Download glslangValidator
       run: |
         mkdir glslang
