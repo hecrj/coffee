@@ -36,7 +36,7 @@ jobs:
         cd ..
     - name: Check differences in compiled shaders
       run: |
-        export PATH=${TRAVIS_BUILD_DIR}/glslang/bin:$PATH
+        export PATH=${GITHUB_WORKSPACE}/glslang/bin:$PATH
         glslangValidator --version
         chmod +x tests/diff_shaders
         ./tests/diff_shaders
