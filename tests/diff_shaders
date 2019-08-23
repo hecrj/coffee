@@ -1,5 +1,5 @@
 #!/bin/bash
-# Script to ensure compiled SPIR-V matches it's source on CI.
+# Script to ensure compiled SPIR-V matches its source on CI.
 
 shader_dir="src/graphics/backend_wgpu/shader/*"
 
@@ -31,5 +31,3 @@ for file in $shader_dir; do
         fi
     fi
 done
-
-
