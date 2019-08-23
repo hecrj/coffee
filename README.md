@@ -138,8 +138,8 @@ on. Try to share you thoughts first! Feel free to open a new issue if you want
 to discuss new ideas.
 
 Any kind of feedback is welcome! You can open an issue or, if you want to talk,
-you can find me (and a bunch of awesome folks) over the `#game-dev` channel in
-the [Rust Community Discord]. I go by `@lone_scientist` there.
+you can find me (and a bunch of awesome folks) over the `#games-and-graphics`
+channel in the [Rust Community Discord]. I go by `@lone_scientist` there.
 
 [issues]: https://github.com/hecrj/coffee/issues
 [Rust Community Discord]: https://bit.ly/rust-community
