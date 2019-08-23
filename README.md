@@ -4,6 +4,7 @@
 [![Documentation](https://docs.rs/coffee/badge.svg)](https://docs.rs/coffee)
 [![Crates.io](https://img.shields.io/crates/v/coffee.svg)](https://crates.io/crates/coffee)
 [![License](https://img.shields.io/crates/l/coffee.svg)](https://github.com/hecrj/coffee/blob/master/LICENSE)
+[![Gitter chat](https://badges.gitter.im/hecrj/coffee.png)](https://gitter.im/hecrj/coffee)
 
 An opinionated 2D game engine for Rust focused on simplicity, explicitness, and
 type-safety.
