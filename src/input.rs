@@ -10,7 +10,9 @@ mod keyboard_and_mouse;
 
 pub use crate::graphics::window::winit::event::ElementState as ButtonState;
 pub use event::Event;
+pub use keyboard::Keyboard;
 pub use keyboard_and_mouse::KeyboardAndMouse;
+pub use mouse::Mouse;
 
 /// The input of your [`Game`].
 ///
@@ -43,9 +45,7 @@ pub trait Input {
 }
 
 impl Input for () {
-    fn new() -> () {
-        ()
-    }
+    fn new() {}
 
     fn update(&mut self, _event: Event) {}
 

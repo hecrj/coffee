@@ -47,7 +47,7 @@
 //! #     type LoadingScreen = ProgressBar;
 //! #
 //! #     fn load(_window: &Window) -> Task<Counter> {
-//! #         Task::new(|| Counter {
+//! #         Task::succeed(|| Counter {
 //! #             value: 0,
 //! #             increment_button: button::State::new(),
 //! #             decrement_button: button::State::new(),
@@ -144,7 +144,10 @@ pub mod widget;
 #[doc(no_inline)]
 pub use self::core::{Align, Justify};
 pub use renderer::{Configuration, Renderer};
-pub use widget::{button, slider, Button, Checkbox, Radio, Slider, Text};
+pub use widget::{
+    button, image, progress_bar, slider, Button, Checkbox, Image, ProgressBar,
+    Radio, Slider, Text,
+};
 
 /// A [`Column`] using the built-in [`Renderer`].
 ///

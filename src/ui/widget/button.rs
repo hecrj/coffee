@@ -196,7 +196,7 @@ where
 /// The local state of a [`Button`].
 ///
 /// [`Button`]: struct.Button.html
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct State {
     is_pressed: bool,
 }
@@ -206,7 +206,7 @@ impl State {
     ///
     /// [`State`]: struct.State.html
     pub fn new() -> State {
-        State { is_pressed: false }
+        State::default()
     }
 
     /// Returns whether the associated [`Button`] is currently being pressed or

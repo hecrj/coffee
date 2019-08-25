@@ -1,5 +1,7 @@
 mod button;
 mod checkbox;
+mod image;
+mod progress_bar;
 mod radio;
 mod slider;
 mod text;
@@ -21,6 +23,7 @@ use std::rc::Rc;
 /// [`UserInterface::configuration`]: trait.UserInterface.html#method.configuration
 pub struct Renderer {
     pub(crate) sprites: Batch,
+    pub(crate) images: Vec<Batch>,
     pub(crate) font: Rc<RefCell<Font>>,
     explain_mesh: Mesh,
 }
@@ -29,6 +32,7 @@ impl std::fmt::Debug for Renderer {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Renderer")
             .field("sprites", &self.sprites)
+            .field("images", &self.images)
             .finish()
     }
 }
@@ -41,6 +45,7 @@ impl core::Renderer for Renderer {
             .join()
             .map(|(sprites, font)| Renderer {
                 sprites: Batch::new(sprites),
+                images: Vec::new(),
                 font: Rc::new(RefCell::new(font)),
                 explain_mesh: Mesh::new(),
             })
@@ -48,7 +53,7 @@ impl core::Renderer for Renderer {
 
     fn explain(&mut self, layout: &core::Layout<'_>, color: Color) {
         self.explain_mesh
-            .stroke(Shape::Rectangle(layout.bounds()), color, 1);
+            .stroke(Shape::Rectangle(layout.bounds()), color, 1.0);
 
         layout
             .children()
@@ -60,6 +65,12 @@ impl core::Renderer for Renderer {
 
         self.sprites.draw(target);
         self.sprites.clear();
+
+        for image in &self.images {
+            image.draw(target);
+        }
+
+        self.images.clear();
 
         self.font.borrow_mut().draw(target);
 
@@ -114,7 +125,7 @@ impl Default for Configuration {
             sprites: Task::using_gpu(|gpu| {
                 Image::from_image(
                     gpu,
-                    image::load_from_memory(include_bytes!(
+                    ::image::load_from_memory(include_bytes!(
                         "../../resources/ui.png"
                     ))?,
                 )

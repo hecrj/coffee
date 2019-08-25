@@ -25,7 +25,7 @@ use std::hash::Hash;
 ///
 /// Text::new("I <3 coffee!")
 ///     .size(40)
-///     .color(Color { r: 0.0, g: 0.0, b: 1.0, a: 1.0 });
+///     .color(Color::BLUE);
 /// ```
 ///
 /// ![Text drawn by the built-in renderer](https://github.com/hecrj/coffee/blob/bda9818f823dfcb8a7ad0ff4940b4d4b387b5208/images/ui/text.png?raw=true)

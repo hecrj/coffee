@@ -1,7 +1,7 @@
 mod frame;
 mod settings;
 
-pub(crate) use crate::graphics::gpu::winit;
+pub(crate) use winit;
 
 pub use frame::Frame;
 pub use settings::Settings;
@@ -87,7 +87,8 @@ impl Window {
             Some(window.primary_monitor())
         };
 
-        window.set_fullscreen(monitor);
+        window
+            .set_fullscreen(monitor.map(winit::window::Fullscreen::Borderless));
 
         self.is_fullscreen = !self.is_fullscreen;
     }

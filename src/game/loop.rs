@@ -65,9 +65,12 @@ pub trait Loop<Game: super::Game> {
 
         event_loop.run(move |event, _, control_flow| match event {
             winit::event::Event::NewEvents(_) => {
-                debug.interact_started();
+                // TODO: Wait for `winit` for make `RedrawRequested` consistent
+                // debug.interact_started();
             }
             winit::event::Event::EventsCleared => {
+                debug.interact_started();
+
                 if let Some(tracker) = &mut gamepads {
                     while let Some((id, event, time)) = tracker.next_event() {
                         game_loop.on_input(
@@ -216,7 +219,7 @@ where
     }
 
     fn load(_window: &Window) -> Task<Self::Attributes> {
-        Task::new(|| ())
+        Task::succeed(|| ())
     }
 
     fn after_draw(

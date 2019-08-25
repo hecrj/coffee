@@ -46,7 +46,7 @@ impl Game for GamepadExample {
     type LoadingScreen = ();
 
     fn load(_window: &Window) -> Task<GamepadExample> {
-        Task::new(|| GamepadExample {
+        Task::succeed(|| GamepadExample {
             last_event: "None".to_string(),
         })
     }

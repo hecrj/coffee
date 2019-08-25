@@ -157,6 +157,15 @@ pub trait Game {
         true
     }
 
+    /// Returns whether the game is finished or not.
+    ///
+    /// If this function returns true, the game will be closed gracefully.
+    ///
+    /// By default, it always returns false.
+    fn is_finished(&self) -> bool {
+        false
+    }
+
     /// Runs the [`Game`] with the given [`WindowSettings`].
     ///
     /// You probably want to call this in your `main` function to run your game!

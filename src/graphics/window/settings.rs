@@ -34,6 +34,6 @@ impl Settings {
                 height: self.size.1 as f64,
             })
             .with_resizable(self.resizable)
-            .with_fullscreen(monitor)
+            .with_fullscreen(monitor.map(winit::window::Fullscreen::Borderless))
     }
 }

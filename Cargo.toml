@@ -19,13 +19,12 @@ maintenance = { status = "actively-developed" }
 features = ["opengl", "debug"]
 
 [features]
-default = ["empty"]
-opengl = ["gfx", "gfx_core", "glutin", "gfx_device_gl", "gfx_window_glutin", "gfx_glyph", "gfx_winit"]
+default = []
+opengl = ["gfx", "gfx_core", "glutin", "gfx_device_gl", "gfx_glyph"]
 vulkan = ["wgpu", "wgpu/vulkan", "wgpu_glyph"]
 metal = ["wgpu", "wgpu/metal", "wgpu_glyph"]
 dx11 = ["wgpu", "wgpu/dx11", "wgpu_glyph"]
 dx12 = ["wgpu", "wgpu/dx12", "wgpu_glyph"]
-empty = ["wgpu", "wgpu_glyph"]
 debug = []
 
 [dependencies]
@@ -36,29 +35,19 @@ stretch = "0.2"
 twox-hash = "1.3"
 lyon_tessellation = "0.13"
 gilrs = "0.7"
+winit = "0.20.0-alpha3"
+raw-window-handle = "0.1"
 
 # gfx (OpenGL)
 gfx = { version = "0.18", optional = true }
 gfx_core = { version = "0.9", optional = true }
-glutin = { version = "0.20", optional = true }
 gfx_device_gl = { version = "0.16", optional = true }
-gfx_window_glutin = { version = "0.30", optional = true }
 gfx_glyph = { version = "0.15", optional = true }
-gfx_winit = { package = "winit", version = "0.19", optional = true }
+glutin = { version = "0.22.0-alpha3", optional = true }
 
 # wgpu (Vulkan, Metal, D3D)
-wgpu = { version = "0.2", optional = true }
-wgpu_glyph = { version = "0.3", optional = true }
+wgpu = { version = "0.3", optional = true }
+wgpu_glyph = { version = "0.4", optional = true }
 
 [dev-dependencies]
-# Example dependencies
 rand = "0.6"
-
-[patch.crates-io]
-wgpu = { git = "https://github.com/hecrj/wgpu-rs", branch = "web" }
-wgpu_glyph = { git = "https://github.com/hecrj/wgpu_glyph", branch = "web" }
-wgpu-native = { git = "https://github.com/hecrj/wgpu", branch = "web" }
-gfx-hal = { git = "https://github.com/hecrj/gfx", branch = "web" }
-gfx-backend-empty = { git = "https://github.com/hecrj/gfx", branch = "web" }
-gfx-backend-gl = { git = "https://github.com/hecrj/gfx", branch = "web" }
-winit = { git = "https://github.com/hecrj/winit", branch = "web" }

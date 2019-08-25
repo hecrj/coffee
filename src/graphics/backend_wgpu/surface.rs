@@ -1,7 +1,6 @@
 use std::rc::Rc;
 
 use super::{Gpu, TargetView};
-pub use wgpu::winit;
 
 pub struct Surface {
     window: winit::window::Window,
@@ -18,8 +17,9 @@ impl Surface {
         instance: &wgpu::Instance,
         device: &wgpu::Device,
     ) -> Surface {
-        let surface = instance.create_surface(&window);
+        use raw_window_handle::HasRawWindowHandle as _;
 
+        let surface = instance.create_surface(window.raw_window_handle());
         let size = window.inner_size().to_physical(window.hidpi_factor());
 
         let (swap_chain, extent, buffer, target) =
@@ -105,10 +105,11 @@ fn new_swap_chain(
         surface,
         &wgpu::SwapChainDescriptor {
             usage: wgpu::TextureUsage::OUTPUT_ATTACHMENT
-                | wgpu::TextureUsage::TRANSFER_DST,
+                | wgpu::TextureUsage::COPY_DST,
             format: wgpu::TextureFormat::Bgra8Unorm,
             width: size.width.round() as u32,
             height: size.height.round() as u32,
+            present_mode: wgpu::PresentMode::Vsync,
         },
     );
 
@@ -126,7 +127,7 @@ fn new_swap_chain(
         sample_count: 1,
         format: wgpu::TextureFormat::Bgra8UnormSrgb,
         usage: wgpu::TextureUsage::OUTPUT_ATTACHMENT
-            | wgpu::TextureUsage::TRANSFER_SRC,
+            | wgpu::TextureUsage::COPY_SRC,
     });
 
     let target = Rc::new(buffer.create_default_view());

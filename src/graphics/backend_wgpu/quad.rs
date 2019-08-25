@@ -32,7 +32,7 @@ impl Pipeline {
                     wgpu::BindGroupLayoutBinding {
                         binding: 0,
                         visibility: wgpu::ShaderStage::VERTEX,
-                        ty: wgpu::BindingType::UniformBuffer,
+                        ty: wgpu::BindingType::UniformBuffer { dynamic: false },
                     },
                     wgpu::BindGroupLayoutBinding {
                         binding: 1,
@@ -47,7 +47,7 @@ impl Pipeline {
         let transform_buffer = device
             .create_buffer_mapped(
                 16,
-                wgpu::BufferUsage::UNIFORM | wgpu::BufferUsage::TRANSFER_DST,
+                wgpu::BufferUsage::UNIFORM | wgpu::BufferUsage::COPY_DST,
             )
             .fill_from_slice(&matrix[..]);
 
@@ -74,7 +74,10 @@ impl Pipeline {
                 bindings: &[wgpu::BindGroupLayoutBinding {
                     binding: 0,
                     visibility: wgpu::ShaderStage::FRAGMENT,
-                    ty: wgpu::BindingType::SampledTexture,
+                    ty: wgpu::BindingType::SampledTexture {
+                        multisampled: false,
+                        dimension: wgpu::TextureViewDimension::D2Array,
+                    },
                 }],
             });
 
@@ -83,29 +86,36 @@ impl Pipeline {
                 bind_group_layouts: &[&constant_layout, &texture_layout],
             });
 
-        let vs_module =
-            device.create_shader_module(include_bytes!("shader/quad.vert.spv"));
-        let fs_module =
-            device.create_shader_module(include_bytes!("shader/quad.frag.spv"));
+        let vs = include_bytes!("shader/quad.vert.spv");
+        let vs_module = device.create_shader_module(
+            &wgpu::read_spirv(std::io::Cursor::new(&vs[..]))
+                .expect("Read quad vertex shader as SPIR-V"),
+        );
+
+        let fs = include_bytes!("shader/quad.frag.spv");
+        let fs_module = device.create_shader_module(
+            &wgpu::read_spirv(std::io::Cursor::new(&fs[..]))
+                .expect("Read quad fragment shader as SPIR-V"),
+        );
 
         let pipeline =
             device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
                 layout: &layout,
-                vertex_stage: wgpu::PipelineStageDescriptor {
+                vertex_stage: wgpu::ProgrammableStageDescriptor {
                     module: &vs_module,
                     entry_point: "main",
                 },
-                fragment_stage: Some(wgpu::PipelineStageDescriptor {
+                fragment_stage: Some(wgpu::ProgrammableStageDescriptor {
                     module: &fs_module,
                     entry_point: "main",
                 }),
-                rasterization_state: wgpu::RasterizationStateDescriptor {
+                rasterization_state: Some(wgpu::RasterizationStateDescriptor {
                     front_face: wgpu::FrontFace::Cw,
-                    cull_mode: wgpu::CullMode::Back,
+                    cull_mode: wgpu::CullMode::None,
                     depth_bias: 0,
                     depth_bias_slope_scale: 0.0,
                     depth_bias_clamp: 0.0,
-                },
+                }),
                 primitive_topology: wgpu::PrimitiveTopology::TriangleList,
                 color_states: &[wgpu::ColorStateDescriptor {
                     format: wgpu::TextureFormat::Bgra8UnormSrgb,
@@ -161,6 +171,8 @@ impl Pipeline {
                     },
                 ],
                 sample_count: 1,
+                sample_mask: !0,
+                alpha_to_coverage_enabled: false,
             });
 
         let vertices = device
@@ -173,7 +185,7 @@ impl Pipeline {
 
         let instances = device.create_buffer(&wgpu::BufferDescriptor {
             size: mem::size_of::<Quad>() as u64 * Quad::MAX as u64,
-            usage: wgpu::BufferUsage::VERTEX | wgpu::BufferUsage::TRANSFER_DST,
+            usage: wgpu::BufferUsage::VERTEX | wgpu::BufferUsage::COPY_DST,
         });
 
         Pipeline {
@@ -215,7 +227,7 @@ impl Pipeline {
         let matrix: [f32; 16] = transformation.clone().into();
 
         let transform_buffer = device
-            .create_buffer_mapped(16, wgpu::BufferUsage::TRANSFER_SRC)
+            .create_buffer_mapped(16, wgpu::BufferUsage::COPY_SRC)
             .fill_from_slice(&matrix[..]);
 
         encoder.copy_buffer_to_buffer(
@@ -234,7 +246,7 @@ impl Pipeline {
             let amount = end - i;
 
             let instance_buffer = device
-                .create_buffer_mapped(amount, wgpu::BufferUsage::TRANSFER_SRC)
+                .create_buffer_mapped(amount, wgpu::BufferUsage::COPY_SRC)
                 .fill_from_slice(&instances[i..end]);
 
             encoder.copy_buffer_to_buffer(
@@ -268,10 +280,10 @@ impl Pipeline {
                 render_pass.set_bind_group(0, &self.constants, &[]);
                 render_pass.set_bind_group(1, &texture.0, &[]);
                 render_pass.set_index_buffer(&self.indices, 0);
-                render_pass.set_vertex_buffers(&[
-                    (&self.vertices, 0),
-                    (&self.instances, 0),
-                ]);
+                render_pass.set_vertex_buffers(
+                    0,
+                    &[(&self.vertices, 0), (&self.instances, 0)],
+                );
 
                 render_pass.draw_indexed(
                     0..QUAD_INDICES.len() as u32,

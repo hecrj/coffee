@@ -7,7 +7,7 @@ mod types;
 
 pub use font::Font;
 pub use quad::Quad;
-pub use surface::{winit, Surface};
+pub use surface::Surface;
 pub use texture::Texture;
 pub use triangle::Vertex;
 pub use types::TargetView;
@@ -35,7 +35,7 @@ impl Gpu {
 
         let instance = wgpu::Instance::new();
 
-        let adapter = instance.get_adapter(&wgpu::AdapterDescriptor {
+        let adapter = instance.request_adapter(&wgpu::RequestAdapterOptions {
             power_preference: wgpu::PowerPreference::HighPerformance,
         });
 
@@ -68,7 +68,7 @@ impl Gpu {
     }
 
     pub(super) fn clear(&mut self, view: &TargetView, color: Color) {
-        let [r, g, b, a]: [f32; 4] = color.into_linear();
+        let [r, g, b, a] = color.into_linear();
 
         let _ = self.encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
             color_attachments: &[wgpu::RenderPassColorAttachmentDescriptor {
@@ -76,7 +76,12 @@ impl Gpu {
                 resolve_target: None,
                 load_op: wgpu::LoadOp::Clear,
                 store_op: wgpu::StoreOp::Store,
-                clear_color: wgpu::Color { r, g, b, a },
+                clear_color: wgpu::Color {
+                    r: r as f64,
+                    g: g as f64,
+                    b: b as f64,
+                    a: a as f64,
+                },
             }],
             depth_stencil_attachment: None,
         });

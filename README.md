@@ -4,6 +4,7 @@
 [![Documentation](https://docs.rs/coffee/badge.svg)](https://docs.rs/coffee)
 [![Crates.io](https://img.shields.io/crates/v/coffee.svg)](https://crates.io/crates/coffee)
 [![License](https://img.shields.io/crates/l/coffee.svg)](https://github.com/hecrj/coffee/blob/master/LICENSE)
+[![Gitter chat](https://badges.gitter.im/hecrj/coffee.png)](https://gitter.im/hecrj/coffee)
 
 An opinionated 2D game engine for Rust focused on simplicity, explicitness, and
 type-safety.
@@ -88,7 +89,7 @@ impl Game for MyGame {
 
     fn load(_window: &Window) -> Task<MyGame> {
         // Load your game assets here. Check out the `load` module!
-        Task::new(|| MyGame { /* ... */ })
+        Task::succeed(|| MyGame { /* ... */ })
     }
 
     fn draw(&mut self, frame: &mut Frame, _timer: &Timer) {
@@ -137,8 +138,8 @@ on. Try to share you thoughts first! Feel free to open a new issue if you want
 to discuss new ideas.
 
 Any kind of feedback is welcome! You can open an issue or, if you want to talk,
-you can find me (and a bunch of awesome folks) over the `#game-dev` channel in
-the [Rust Community Discord]. I go by `@lone_scientist` there.
+you can find me (and a bunch of awesome folks) over the `#games-and-graphics`
+channel in the [Rust Community Discord]. I go by `@lone_scientist` there.
 
 [issues]: https://github.com/hecrj/coffee/issues
 [Rust Community Discord]: https://bit.ly/rust-community

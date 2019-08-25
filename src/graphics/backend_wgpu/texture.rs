@@ -41,7 +41,7 @@ impl Texture {
             width,
             height,
             Some(&[&bgra.into_raw()[..]]),
-            wgpu::TextureUsage::TRANSFER_DST | wgpu::TextureUsage::SAMPLED,
+            wgpu::TextureUsage::COPY_DST | wgpu::TextureUsage::SAMPLED,
         );
 
         Texture {
@@ -74,7 +74,7 @@ impl Texture {
             width,
             height,
             Some(&raw_layers[..]),
-            wgpu::TextureUsage::TRANSFER_DST | wgpu::TextureUsage::SAMPLED,
+            wgpu::TextureUsage::COPY_DST | wgpu::TextureUsage::SAMPLED,
         );
 
         Texture {
@@ -184,7 +184,7 @@ fn create_texture_array(
             layers.iter().cloned().flatten().cloned().collect();
 
         let temp_buf = device
-            .create_buffer_mapped(slice.len(), wgpu::BufferUsage::TRANSFER_SRC)
+            .create_buffer_mapped(slice.len(), wgpu::BufferUsage::COPY_SRC)
             .fill_from_slice(&slice[..]);
 
         let mut encoder =
@@ -218,11 +218,11 @@ fn create_texture_array(
     let view = texture.create_view(&wgpu::TextureViewDescriptor {
         format: wgpu::TextureFormat::Bgra8UnormSrgb,
         dimension: wgpu::TextureViewDimension::D2Array,
-        aspect: wgpu::TextureAspectFlags::COLOR,
+        aspect: wgpu::TextureAspect::All,
         base_mip_level: 0,
         level_count: 1,
         base_array_layer: 0,
-        array_count: layer_count,
+        array_layer_count: layer_count,
     });
 
     let binding = pipeline.create_texture_binding(device, &view);

@@ -27,6 +27,8 @@ mod row;
 
 pub mod button;
 pub mod checkbox;
+pub mod image;
+pub mod progress_bar;
 pub mod radio;
 pub mod slider;
 pub mod text;
@@ -34,6 +36,8 @@ pub mod text;
 pub use button::Button;
 pub use checkbox::Checkbox;
 pub use column::Column;
+pub use self::image::Image;
+pub use progress_bar::ProgressBar;
 pub use radio::Radio;
 pub use row::Row;
 pub use slider::Slider;
