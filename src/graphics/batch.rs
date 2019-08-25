@@ -59,11 +59,6 @@ impl Batch {
     pub fn clear(&mut self) {
         self.instances.clear();
     }
-
-    ///
-    pub fn len(&self) -> usize {
-        self.instances.len()
-    }
 }
 
 impl std::fmt::Debug for Batch {
