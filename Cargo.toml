@@ -51,3 +51,6 @@ wgpu_glyph = { version = "0.4", optional = true }
 
 [dev-dependencies]
 rand = "0.6"
+
+[patch.crates-io]
+winit = { git = "https://github.com/hecrj/winit", branch = "redraw-requested-2.0" }

@@ -65,12 +65,9 @@ pub trait Loop<Game: super::Game> {
 
         event_loop.run(move |event, _, control_flow| match event {
             winit::event::Event::NewEvents(_) => {
-                // TODO: Wait for `winit` for make `RedrawRequested` consistent
-                // debug.interact_started();
-            }
-            winit::event::Event::EventsCleared => {
                 debug.interact_started();
-
+            }
+            winit::event::Event::MainEventsCleared => {
                 if let Some(tracker) = &mut gamepads {
                     while let Some((id, event, time)) = tracker.next_event() {
                         game_loop.on_input(
@@ -90,32 +87,32 @@ pub trait Loop<Game: super::Game> {
                     debug.update_finished();
                 }
             }
-            winit::event::Event::WindowEvent { event, .. } => match event {
-                winit::event::WindowEvent::RedrawRequested => {
-                    debug.draw_started();
-                    game.draw(&mut window.frame(), &timer);
-                    debug.draw_finished();
+            winit::event::Event::RedrawRequested { .. } => {
+                debug.draw_started();
+                game.draw(&mut window.frame(), &timer);
+                debug.draw_finished();
 
-                    game_loop.after_draw(
-                        &mut game,
-                        &mut input,
-                        &mut window,
-                        &mut debug,
-                    );
+                game_loop.after_draw(
+                    &mut game,
+                    &mut input,
+                    &mut window,
+                    &mut debug,
+                );
 
-                    if debug.is_enabled() {
-                        debug.debug_started();
-                        game.debug(&input, &mut window.frame(), &mut debug);
-                        debug.debug_finished();
-                    }
-
-                    window.swap_buffers();
-                    debug.frame_finished();
-
-                    debug.frame_started();
-                    window.request_redraw();
-                    timer.update();
+                if debug.is_enabled() {
+                    debug.debug_started();
+                    game.debug(&input, &mut window.frame(), &mut debug);
+                    debug.debug_finished();
                 }
+
+                window.swap_buffers();
+                debug.frame_finished();
+
+                debug.frame_started();
+                window.request_redraw();
+                timer.update();
+            }
+            winit::event::Event::WindowEvent { event, .. } => match event {
                 winit::event::WindowEvent::CloseRequested => {
                     if game.on_close_request() {
                         *control_flow = winit::event_loop::ControlFlow::Exit;
