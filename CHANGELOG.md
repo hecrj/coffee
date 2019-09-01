@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.3.2] - 2019-09-01
+### Fixed
+- Incorrect buffer sizes in the `Mesh` pipeline. This caused vertices to entirely
+  disappear when rendering big meshes, leading to a potential crash.
+  [79651405673ecd16da21b887a622f6650b29f38f]
+- Validation error when rendering meshes using Vulkan, Metal, D3D11, or D3D12. [#81]
+
+[#81]: https://github.com/hecrj/coffee/pull/81
+[79651405673ecd16da21b887a622f6650b29f38f]: https://github.com/hecrj/coffee/commit/79651405673ecd16da21b887a622f6650b29f38f
+
+
 ## [0.3.1] - 2019-06-20
 ### Added
 - Documentation about the default coordinate system of a `Target`.
@@ -175,7 +186,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Coffee starts being developed.
 
 
-[Unreleased]: https://github.com/hecrj/coffee/compare/0.3.1...HEAD
+[Unreleased]: https://github.com/hecrj/coffee/compare/0.3.2...HEAD
+[0.3.2]: https://github.com/hecrj/coffee/compare/0.3.1...0.3.2
 [0.3.1]: https://github.com/hecrj/coffee/compare/0.3.0...0.3.1
 [0.3.0]: https://github.com/hecrj/coffee/compare/0.2.0...0.3.0
 [0.2.0]: https://github.com/hecrj/coffee/compare/0.1.1...0.2.0
