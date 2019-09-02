@@ -1,7 +1,8 @@
 use crate::graphics::{Point, Rectangle, Sprite};
 use crate::ui::core::MouseCursor;
-use crate::ui::widget::checkbox;
 use crate::ui::Renderer;
+
+use iced::widget::checkbox;
 
 const SPRITE: Rectangle<u16> = Rectangle {
     x: 98,
@@ -13,9 +14,9 @@ const SPRITE: Rectangle<u16> = Rectangle {
 impl checkbox::Renderer for Renderer {
     fn draw(
         &mut self,
-        cursor_position: Point,
-        bounds: Rectangle<f32>,
-        text_bounds: Rectangle<f32>,
+        cursor_position: iced::Point,
+        bounds: iced::Rectangle,
+        text_bounds: iced::Rectangle,
         is_checked: bool,
     ) -> MouseCursor {
         let mouse_over = bounds.contains(cursor_position)

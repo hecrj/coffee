@@ -33,9 +33,17 @@ impl Rectangle<f32> {
     /// [`Point`]: type.Point.html
     /// [`Rectangle`]: struct.Rectangle.html
     pub fn center(&self) -> Point {
-        Point::new(
-            self.x + self.width / 2.0, 
-            self.y + self.height / 2.0,
-        )
+        Point::new(self.x + self.width / 2.0, self.y + self.height / 2.0)
+    }
+}
+
+impl From<iced::Rectangle> for Rectangle<f32> {
+    fn from(rectangle: iced::Rectangle) -> Rectangle<f32> {
+        Rectangle {
+            x: rectangle.x,
+            y: rectangle.y,
+            width: rectangle.width,
+            height: rectangle.height,
+        }
     }
 }

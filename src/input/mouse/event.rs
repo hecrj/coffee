@@ -48,3 +48,32 @@ pub enum Event {
         delta_y: f32,
     },
 }
+
+#[doc(hidden)]
+impl From<Event> for Option<iced::input::mouse::Event> {
+    fn from(event: Event) -> Option<iced::input::mouse::Event> {
+        match event {
+            Event::CursorEntered => {
+                Some(iced::input::mouse::Event::CursorEntered)
+            }
+            Event::CursorLeft => Some(iced::input::mouse::Event::CursorEntered),
+            Event::CursorMoved { x, y } => {
+                Some(iced::input::mouse::Event::CursorMoved { x, y })
+            }
+            Event::Input { state, button } => {
+                Some(iced::input::mouse::Event::Input {
+                    state: state.into(),
+                    button: button.into(),
+                })
+            }
+            Event::WheelScrolled { delta_x, delta_y } => {
+                Some(iced::input::mouse::Event::WheelScrolled {
+                    delta_x,
+                    delta_y,
+                })
+            }
+            Event::CursorTaken => None,
+            Event::CursorReturned => None,
+        }
+    }
+}

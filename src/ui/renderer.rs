@@ -51,15 +51,6 @@ impl core::Renderer for Renderer {
             })
     }
 
-    fn explain(&mut self, layout: &core::Layout<'_>, color: Color) {
-        self.explain_mesh
-            .stroke(Shape::Rectangle(layout.bounds()), color, 1.0);
-
-        layout
-            .children()
-            .for_each(|layout| self.explain(&layout, color));
-    }
-
     fn flush(&mut self, frame: &mut Frame<'_>) {
         let target = &mut frame.as_target();
 
@@ -78,6 +69,22 @@ impl core::Renderer for Renderer {
             self.explain_mesh.draw(target);
             self.explain_mesh = Mesh::new();
         }
+    }
+}
+
+impl iced::renderer::Debugger for Renderer {
+    type Color = Color;
+
+    fn explain(&mut self, layout: &core::Layout<'_>, color: Color) {
+        self.explain_mesh.stroke(
+            Shape::Rectangle(layout.bounds().into()),
+            color,
+            1.0,
+        );
+
+        layout
+            .children()
+            .for_each(|layout| self.explain(&layout, color));
     }
 }
 
