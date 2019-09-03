@@ -1,4 +1,5 @@
 /target
+tests/_graphics/models
 **/*.rs.bk
 Cargo.lock
-tests/_graphics/models
+*.DS_Store

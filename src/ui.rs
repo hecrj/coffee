@@ -145,7 +145,8 @@ pub mod widget;
 pub use self::core::{Align, Justify};
 pub use renderer::{Configuration, Renderer};
 pub use widget::{
-    button, slider, Button, Checkbox, Panel, Radio, Slider, Text,
+    button, image, progress_bar, slider, Button, Checkbox, Image, Panel,
+    ProgressBar, Radio, Slider, Text,
 };
 
 /// A [`Column`] using the built-in [`Renderer`].

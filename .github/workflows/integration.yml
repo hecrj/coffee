@@ -1,0 +1,53 @@
+name: Integration
+on: [push]
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+        rust: [stable]
+        backend: [opengl, vulkan]
+        include:
+        - os: ubuntu-latest
+          rust: stable
+          backend: vulkan
+          release: yes
+        exclude:
+        - os: ubuntu-latest
+          rust: beta
+          backend: vulkan
+        - os: windows-latest
+          backend: vulkan
+        - os: macOS-latest
+          backend: vulkan
+    steps:
+    - uses: hecrj/setup-rust-action@v1
+      with:
+        rust-version: ${{ matrix.rust }}
+    - name: Install libinput
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get -qq update
+        sudo apt-get install -y libudev-dev
+    - uses: actions/checkout@master
+    - name: Run tests
+      run: cargo test --verbose --features ${{ matrix.backend }} ${{ matrix.release && '--release' || '' }}
+
+  diff_shaders:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Download glslangValidator
+      run: |
+        mkdir glslang
+        cd glslang
+        wget https://github.com/KhronosGroup/glslang/releases/download/7.11.3214/glslang-master-linux-Release.zip
+        unzip -u -q glslang-master-linux-Release.zip
+        cd ..
+    - name: Check differences in compiled shaders
+      run: |
+        export PATH=${GITHUB_WORKSPACE}/glslang/bin:$PATH
+        glslangValidator --version
+        chmod +x tests/diff_shaders
+        ./tests/diff_shaders
