@@ -61,7 +61,8 @@ impl Drawing {
         let model_directory = model_path.parent().expect("Get model directory");
         let image = self.canvas.read_pixels(gpu);
 
-        std::fs::create_dir(model_directory).expect("Create model directory");
+        std::fs::create_dir_all(model_directory)
+            .expect("Create model directory");
 
         image
             .to_rgba()
