@@ -145,8 +145,8 @@ pub mod widget;
 pub use self::core::{Align, Justify};
 pub use renderer::{Configuration, Renderer};
 pub use widget::{
-    button, image, progress_bar, slider, Button, Checkbox, Image, Panel,
-    ProgressBar, Radio, Slider, Text,
+    button, image, progress_bar, slider, Button, Checkbox, Image, ProgressBar,
+    Radio, Slider, Text,
 };
 
 /// A [`Column`] using the built-in [`Renderer`].
@@ -160,6 +160,12 @@ pub type Column<'a, Message> = widget::Column<'a, Message, Renderer>;
 /// [`Row`]: widget/struct.Row.html
 /// [`Renderer`]: struct.Renderer.html
 pub type Row<'a, Message> = widget::Row<'a, Message, Renderer>;
+
+/// A [`Panel`] using the built-in [`Renderer`].
+///
+/// [`Panel`]: widget/panel/struct.Panel.html
+/// [`Renderer`]: struct.Renderer.html
+pub type Panel<'a, Message> = widget::Panel<'a, Message, Renderer>;
 
 /// An [`Element`] using the built-in [`Renderer`].
 ///

@@ -9,7 +9,7 @@
 //! ```
 //!
 //! However, if you want to use a custom renderer, you will need to work with
-//! the definitions of [`Row`] and [`Column`] found in this module.
+//! the definitions of [`Row`], [`Column`], and [`Panel`] found in this module.
 //!
 //! # Customization
 //! Every drawable widget has its own module with a `Renderer` trait that must
@@ -21,6 +21,7 @@
 //! [`ui` module]: ../index.html
 //! [`Row`]: struct.Row.html
 //! [`Column`]: struct.Column.html
+//! [`Panel`]: struct.Panel.html
 //! [`Renderer`]: ../struct.Renderer.html
 mod column;
 mod row;
