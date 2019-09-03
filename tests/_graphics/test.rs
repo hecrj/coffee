@@ -57,7 +57,11 @@ impl Drawing {
     }
 
     pub fn save_as_model(&self, gpu: &mut Gpu) {
+        let model_path = self.model_path();
+        let model_directory = model_path.parent().expect("Get model directory");
         let image = self.canvas.read_pixels(gpu);
+
+        std::fs::create_dir(model_directory).expect("Create model directory");
 
         image
             .to_rgba()
