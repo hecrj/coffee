@@ -5,7 +5,7 @@ use lyon_tessellation as lyon;
 /// A set of shapes that can be drawn.
 #[derive(Debug, Clone)]
 pub struct Mesh {
-    buffers: lyon::VertexBuffers<gpu::Vertex, u16>,
+    buffers: lyon::VertexBuffers<gpu::Vertex, u32>,
 }
 
 impl Mesh {

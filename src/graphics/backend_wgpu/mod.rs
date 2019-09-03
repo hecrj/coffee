@@ -122,7 +122,7 @@ impl Gpu {
     pub(super) fn draw_triangles(
         &mut self,
         vertices: &[Vertex],
-        indices: &[u16],
+        indices: &[u32],
         view: &TargetView,
         transformation: &Transformation,
     ) {

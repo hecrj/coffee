@@ -98,7 +98,7 @@ impl<'a> Target<'a> {
     pub(super) fn draw_triangles(
         &mut self,
         vertices: &[Vertex],
-        indices: &[u16],
+        indices: &[u32],
     ) {
         self.gpu.draw_triangles(
             vertices,
