@@ -74,7 +74,7 @@
 //!     type Renderer = Renderer;
 //!
 //!     // The update logic, called when a message is produced
-//!     fn react(&mut self, message: Message) {
+//!     fn react(&mut self, message: Message, _window: &mut Window) {
 //!         // We update the counter value after an interaction here
 //!         match message {
 //!             Message::IncrementPressed => {
@@ -145,8 +145,8 @@ pub mod widget;
 pub use self::core::{Align, Justify};
 pub use renderer::{Configuration, Renderer};
 pub use widget::{
-    button, slider, Button, Checkbox, Radio, Slider, Text, progress_bar, ProgressBar,
-    image, Image,
+    button, image, progress_bar, slider, Button, Checkbox, Image, ProgressBar,
+    Radio, Slider, Text,
 };
 
 /// A [`Column`] using the built-in [`Renderer`].
@@ -160,6 +160,12 @@ pub type Column<'a, Message> = widget::Column<'a, Message, Renderer>;
 /// [`Row`]: widget/struct.Row.html
 /// [`Renderer`]: struct.Renderer.html
 pub type Row<'a, Message> = widget::Row<'a, Message, Renderer>;
+
+/// A [`Panel`] using the built-in [`Renderer`].
+///
+/// [`Panel`]: widget/panel/struct.Panel.html
+/// [`Renderer`]: struct.Renderer.html
+pub type Panel<'a, Message> = widget::Panel<'a, Message, Renderer>;
 
 /// An [`Element`] using the built-in [`Renderer`].
 ///
@@ -229,7 +235,7 @@ pub trait UserInterface: Game {
     /// [`Game::interact`]: ../trait.Game.html#method.interact
     /// [`Game::Input`]: ../trait.Game.html#associatedtype.Input
     /// [`Message`]: #associatedtype.Message
-    fn react(&mut self, message: Self::Message);
+    fn react(&mut self, message: Self::Message, window: &mut Window);
 
     /// Produces the layout of the user interface.
     ///
@@ -361,7 +367,7 @@ pub trait UserInterface: Game {
             }
 
             for message in messages.drain(..) {
-                game.react(message);
+                game.react(message, window);
             }
             debug.ui_finished();
 

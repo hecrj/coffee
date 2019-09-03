@@ -51,3 +51,4 @@ wgpu_glyph = { version = "0.3", optional = true, git = "https://github.com/hecrj
 
 [dev-dependencies]
 rand = "0.6"
+env_logger = "0.6"

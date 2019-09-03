@@ -49,7 +49,7 @@ impl UserInterface for Tour {
     type Message = Message;
     type Renderer = Renderer;
 
-    fn react(&mut self, event: Message) {
+    fn react(&mut self, event: Message, _window: &mut Window) {
         match event {
             Message::BackPressed => {
                 self.steps.go_back();

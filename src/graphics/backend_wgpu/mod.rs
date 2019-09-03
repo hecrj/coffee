@@ -108,6 +108,13 @@ impl Gpu {
         )
     }
 
+    pub(super) fn read_drawable_texture_pixels(
+        &mut self,
+        drawable: &texture::Drawable,
+    ) -> image::DynamicImage {
+        drawable.read_pixels(&mut self.device)
+    }
+
     pub(super) fn upload_font(&mut self, bytes: &'static [u8]) -> Font {
         Font::from_bytes(&mut self.device, bytes)
     }
