@@ -30,7 +30,7 @@ gfx_defines! {
 
 pub struct Pipeline {
     data: pipe::Data<gl::Resources>,
-    indices: gfx::handle::Buffer<gl::Resources, u16>,
+    indices: gfx::handle::Buffer<gl::Resources, u32>,
     shader: Shader,
     globals: Globals,
 }
@@ -100,7 +100,7 @@ impl Pipeline {
         factory: &mut gl::Factory,
         encoder: &mut gfx::Encoder<gl::Resources, gl::CommandBuffer>,
         vertices: &[Vertex],
-        indices: &[u16],
+        indices: &[u32],
         transformation: &Transformation,
         view: &gfx::handle::RawRenderTargetView<gl::Resources>,
     ) {
@@ -122,7 +122,7 @@ impl Pipeline {
         {
             let vertices = factory
                 .create_buffer(
-                    Self::INITIAL_BUFFER_SIZE,
+                    self.data.vertices.len(),
                     gfx::buffer::Role::Vertex,
                     gfx::memory::Usage::Dynamic,
                     gfx::memory::Bind::SHADER_RESOURCE,
@@ -131,7 +131,7 @@ impl Pipeline {
 
             let indices = factory
                 .create_buffer(
-                    Self::INITIAL_BUFFER_SIZE,
+                    indices.len(),
                     gfx::buffer::Role::Index,
                     gfx::memory::Usage::Dynamic,
                     gfx::memory::Bind::empty(),
@@ -155,7 +155,7 @@ impl Pipeline {
             end: indices.len() as u32,
             base_vertex: 0,
             instances: None,
-            buffer: gfx::IndexBuffer::Index16(self.indices.clone()),
+            buffer: gfx::IndexBuffer::Index32(self.indices.clone()),
         };
 
         encoder.draw(&slice, &self.shader.state, &self.data);
