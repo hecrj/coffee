@@ -74,7 +74,7 @@ impl Timer {
     /// interpolation_. You can read more about it in [this excellent article].
     ///
     /// [`Game::draw`]: trait.Game.html#tymethod.draw
-    /// [this excellent article]: https://gafferongames.com/post/fix_your_timestep/
+    /// [this excellent article]: http://web.archive.org/web/20190506030345/https://gafferongames.com/post/fix_your_timestep/
     pub fn next_tick_proximity(&self) -> f32 {
         let delta = self.accumulated_delta;
 
