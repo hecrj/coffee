@@ -30,7 +30,7 @@ use std::hash::Hash;
 #[derive(Debug, Clone)]
 pub struct Text {
     content: String,
-    size: u16,
+    size: Option<u16>,
     color: Option<Color>,
     style: Style,
     horizontal_alignment: iced::text::HorizontalAlignment,
@@ -44,7 +44,7 @@ impl Text {
     pub fn new(label: &str) -> Self {
         Text {
             content: String::from(label),
-            size: 20,
+            size: None,
             color: None,
             style: Style::default().fill_width(),
             horizontal_alignment: iced::text::HorizontalAlignment::Left,
@@ -56,7 +56,7 @@ impl Text {
     ///
     /// [`Text`]: struct.Text.html
     pub fn size(mut self, size: u16) -> Self {
-        self.size = size;
+        self.size = Some(size);
         self
     }
 
@@ -72,7 +72,7 @@ impl Text {
     /// Sets the width of the [`Text`] boundaries in pixels.
     ///
     /// [`Text`]: struct.Text.html
-    pub fn width(mut self, width: u32) -> Self {
+    pub fn width(mut self, width: u16) -> Self {
         self.style = self.style.width(width);
         self
     }
@@ -80,7 +80,7 @@ impl Text {
     /// Sets the height of the [`Text`] boundaries in pixels.
     ///
     /// [`Text`]: struct.Text.html
-    pub fn height(mut self, height: u32) -> Self {
+    pub fn height(mut self, height: u16) -> Self {
         self.style = self.style.height(height);
         self
     }
@@ -112,7 +112,7 @@ where
     Renderer: iced::text::Renderer<Color>,
 {
     fn node(&self, renderer: &Renderer) -> Node {
-        renderer.node(self.style, &self.content, self.size as f32)
+        renderer.node(self.style, &self.content, self.size)
     }
 
     fn draw(
@@ -124,7 +124,7 @@ where
         renderer.draw(
             layout.bounds(),
             &self.content,
-            self.size as f32,
+            self.size,
             self.color,
             self.horizontal_alignment,
             self.vertical_alignment,

@@ -59,7 +59,7 @@ impl Image {
     /// Sets the width of the [`Image`] boundaries in pixels.
     ///
     /// [`Image`]: struct.Image.html
-    pub fn width(mut self, width: u32) -> Self {
+    pub fn width(mut self, width: u16) -> Self {
         self.style = self.style.width(width);
         self
     }
@@ -67,7 +67,7 @@ impl Image {
     /// Sets the height of the [`Image`] boundaries in pixels.
     ///
     /// [`Image`]: struct.Image.html
-    pub fn height(mut self, height: u32) -> Self {
+    pub fn height(mut self, height: u16) -> Self {
         self.style = self.style.height(height);
         self
     }
@@ -111,7 +111,7 @@ pub trait Renderer {
     ///   * the bounds of the [`Image`]
     ///   * the handle of the loaded [`Image`]
     ///   * the portion of the image that we wants to draw
-    ///   
+    ///
     /// [`Image`]: struct.Image.html
     fn draw(
         &mut self,

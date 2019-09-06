@@ -7,9 +7,10 @@ use std::cell::RefCell;
 use std::f32;
 
 impl text::Renderer<Color> for Renderer {
-    fn node(&self, style: Style, content: &str, size: f32) -> Node {
+    fn node(&self, style: Style, content: &str, size: Option<u16>) -> Node {
         let font = self.font.clone();
         let content = String::from(content);
+        let size = size.unwrap_or(20);
         let measure = RefCell::new(None);
 
         Node::with_measure(style, move |bounds| {
@@ -36,7 +37,7 @@ impl text::Renderer<Color> for Renderer {
 
                 let text = graphics::Text {
                     content: &content,
-                    size,
+                    size: f32::from(size),
                     bounds,
                     ..graphics::Text::default()
                 };
@@ -62,7 +63,7 @@ impl text::Renderer<Color> for Renderer {
         &mut self,
         bounds: iced::Rectangle,
         content: &str,
-        size: f32,
+        size: Option<u16>,
         color: Option<Color>,
         horizontal_alignment: text::HorizontalAlignment,
         vertical_alignment: text::VerticalAlignment,
@@ -72,7 +73,7 @@ impl text::Renderer<Color> for Renderer {
             position: Point::new(bounds.x, bounds.y),
             bounds: (bounds.width, bounds.height),
             color: color.unwrap_or(Color::WHITE),
-            size,
+            size: f32::from(size.unwrap_or(20)),
             horizontal_alignment: horizontal_alignment.into(),
             vertical_alignment: vertical_alignment.into(),
         });

@@ -38,10 +38,11 @@ impl LoadingScreen for ProgressBar {
             graphics::Quad {
                 position: graphics::Point::new(
                     50.0,
-                    frame.height() / 2.0 - 25.0,
+                    f32::from(frame.height()) / 2.0 - 25.0,
                 ),
                 size: (
-                    (frame.width() - 100.0) * (progress.percentage() / 100.0),
+                    (f32::from(frame.width()) - 100.0)
+                        * (progress.percentage() / 100.0),
                     50.0,
                 ),
                 ..Default::default()
@@ -54,7 +55,7 @@ impl LoadingScreen for ProgressBar {
                 content: stage,
                 position: graphics::Point::new(
                     50.0,
-                    frame.height() / 2.0 - 80.0,
+                    f32::from(frame.height()) / 2.0 - 80.0,
                 ),
                 size: 30.0,
                 color: graphics::Color::WHITE,
@@ -64,7 +65,10 @@ impl LoadingScreen for ProgressBar {
 
         self.font.add(graphics::Text {
             content: &(format!("{:.0}", progress.percentage()) + "%"),
-            position: graphics::Point::new(50.0, frame.height() / 2.0 + 50.0),
+            position: graphics::Point::new(
+                50.0,
+                f32::from(frame.height()) / 2.0 + 50.0,
+            ),
             size: 30.0,
             color: graphics::Color::WHITE,
             ..graphics::Text::default()

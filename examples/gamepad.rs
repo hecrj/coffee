@@ -75,8 +75,8 @@ impl UserInterface for GamepadExample {
 
     fn layout(&mut self, window: &Window) -> Element<()> {
         Column::new()
-            .width(window.width() as u32)
-            .height(window.height() as u32)
+            .width(window.width())
+            .height(window.height())
             .align_items(Align::Center)
             .justify_content(Justify::Center)
             .push(

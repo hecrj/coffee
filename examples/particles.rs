@@ -40,7 +40,7 @@ impl Particles {
     const G: f32 = 6.674;
     const CENTER_MASS: f32 = 200.0;
 
-    fn generate(max_x: f32, max_y: f32) -> Task<Vec<Particle>> {
+    fn generate(max_x: u16, max_y: u16) -> Task<Vec<Particle>> {
         Task::succeed(move || {
             let rng = &mut rand::thread_rng();
 
@@ -179,8 +179,8 @@ impl UserInterface for Particles {
         Column::new()
             .padding(20)
             .spacing(20)
-            .width(window.width() as u32)
-            .height(window.height() as u32)
+            .width(window.width())
+            .height(window.height())
             .justify_content(Justify::End)
             .push(Checkbox::new(
                 self.interpolate,
@@ -204,11 +204,11 @@ struct Particle {
 }
 
 impl Particle {
-    fn random<R: Rng>(max_x: f32, max_y: f32, rng: &mut R) -> Particle {
+    fn random<R: Rng>(max_x: u16, max_y: u16, rng: &mut R) -> Particle {
         Particle {
             position: Point::new(
-                rng.gen_range(0.0, max_x),
-                rng.gen_range(0.0, max_y),
+                f32::from(rng.gen_range(0, max_x)),
+                f32::from(rng.gen_range(0, max_y)),
             ),
             velocity: Vector::new(0.0, 0.0),
             acceleration: Vector::new(0.0, 0.0),

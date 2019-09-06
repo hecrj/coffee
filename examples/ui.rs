@@ -95,8 +95,8 @@ impl UserInterface for Tour {
             .push(controls);
 
         Column::new()
-            .width(window.width() as u32)
-            .height(window.height() as u32)
+            .width(window.width())
+            .height(window.height())
             .padding(20)
             .align_items(Align::Center)
             .justify_content(Justify::Center)

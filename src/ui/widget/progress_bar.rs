@@ -44,7 +44,7 @@ impl ProgressBar {
     /// Sets the width of the [`ProgressBar`] in pixels.
     ///
     /// [`ProgressBar`]: struct.ProgressBar.html
-    pub fn width(mut self, width: u32) -> Self {
+    pub fn width(mut self, width: u16) -> Self {
         self.style = self.style.width(width);
         self
     }
@@ -95,7 +95,7 @@ pub trait Renderer {
     /// It receives:
     ///   * the bounds of the [`ProgressBar`]
     ///   * the progress of the [`ProgressBar`]
-    ///   
+    ///
     /// [`ProgressBar`]: struct.ProgressBar.html
     fn draw(&mut self, bounds: Rectangle<f32>, progress: f32);
 }

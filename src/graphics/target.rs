@@ -23,21 +23,24 @@ impl<'a> Target<'a> {
     pub(super) fn new(
         gpu: &mut Gpu,
         view: TargetView,
-        width: f32,
-        height: f32,
+        width: u16,
+        height: u16,
     ) -> Target<'_> {
         Target {
             gpu,
             view,
-            transformation: Transformation::orthographic(width, height),
+            transformation: Transformation::orthographic(
+                f32::from(width),
+                f32::from(height),
+            ),
         }
     }
 
     pub(super) fn with_transformation(
         gpu: &mut Gpu,
         view: TargetView,
-        width: f32,
-        height: f32,
+        width: u16,
+        height: u16,
         transformation: Transformation,
     ) -> Target<'_> {
         let mut target = Self::new(gpu, view, width, height);
