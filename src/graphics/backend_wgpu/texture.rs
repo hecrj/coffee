@@ -150,6 +150,7 @@ impl Drawable {
     pub fn read_pixels(
         &self,
         device: &mut wgpu::Device,
+        mut encoder: wgpu::CommandEncoder,
     ) -> image::DynamicImage {
         let texture = self.texture();
 
@@ -161,11 +162,6 @@ impl Drawable {
                 | wgpu::BufferUsage::TRANSFER_SRC
                 | wgpu::BufferUsage::MAP_READ,
         });
-
-        let mut encoder =
-            device.create_command_encoder(&wgpu::CommandEncoderDescriptor {
-                todo: 0,
-            });
 
         encoder.copy_texture_to_buffer(
             wgpu::TextureCopyView {

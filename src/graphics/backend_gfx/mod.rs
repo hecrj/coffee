@@ -114,6 +114,8 @@ impl Gpu {
         &mut self,
         drawable: &texture::Drawable,
     ) -> image::DynamicImage {
+        self.flush();
+
         drawable.read_pixels(&mut self.device, &mut self.factory)
     }
 
