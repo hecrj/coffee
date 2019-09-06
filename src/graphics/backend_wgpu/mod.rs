@@ -112,7 +112,13 @@ impl Gpu {
         &mut self,
         drawable: &texture::Drawable,
     ) -> image::DynamicImage {
-        drawable.read_pixels(&mut self.device)
+        let new_encoder = self.device.create_command_encoder(
+            &wgpu::CommandEncoderDescriptor { todo: 0 },
+        );
+
+        let encoder = std::mem::replace(&mut self.encoder, new_encoder);
+
+        drawable.read_pixels(&mut self.device, encoder)
     }
 
     pub(super) fn upload_font(&mut self, bytes: &'static [u8]) -> Font {
