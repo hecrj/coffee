@@ -70,7 +70,7 @@ use crate::Result;
 /// [`map`]: #method.map
 pub struct Task<T> {
     total_work: u32,
-    function: Box<dyn Fn(&mut Worker<'_>) -> Result<T>>,
+    function: Box<dyn FnOnce(&mut Worker<'_>) -> Result<T>>,
 }
 
 impl<T> Task<T> {
@@ -96,7 +96,7 @@ impl<T> Task<T> {
     /// [`Task`]: struct.Task.html
     pub fn new<F>(f: F) -> Task<T>
     where
-        F: 'static + Fn() -> Result<T>,
+        F: 'static + FnOnce() -> Result<T>,
     {
         Task {
             total_work: 1,
@@ -130,7 +130,7 @@ impl<T> Task<T> {
     /// [`Task`]: struct.Task.html
     pub fn succeed<F>(f: F) -> Task<T>
     where
-        F: 'static + Fn() -> T,
+        F: 'static + FnOnce() -> T,
     {
         Task::new(move || Ok(f()))
     }
@@ -152,7 +152,7 @@ impl<T> Task<T> {
     /// [`Font::load_from_bytes`]: ../graphics/struct.Font.html#method.load_from_bytes
     pub fn using_gpu<F>(f: F) -> Task<T>
     where
-        F: 'static + Fn(&mut graphics::Gpu) -> Result<T>,
+        F: 'static + FnOnce(&mut graphics::Gpu) -> Result<T>,
     {
         Task::sequence(1, move |worker| {
             let result = f(worker.gpu());
@@ -165,7 +165,7 @@ impl<T> Task<T> {
 
     pub(crate) fn sequence<F>(total_work: u32, f: F) -> Task<T>
     where
-        F: 'static + Fn(&mut Worker<'_>) -> Result<T>,
+        F: 'static + FnOnce(&mut Worker<'_>) -> Result<T>,
     {
         Task {
             total_work,
@@ -216,7 +216,7 @@ impl<T> Task<T> {
         Task {
             total_work: task.total_work,
             function: Box::new(move |worker| {
-                worker.with_stage(title.clone(), &task.function)
+                worker.with_stage(title.clone(), task.function)
             }),
         }
     }
@@ -238,7 +238,7 @@ impl<T> Task<T> {
     pub fn map<F, A>(self, f: F) -> Task<A>
     where
         T: 'static,
-        F: 'static + Fn(T) -> A,
+        F: 'static + FnOnce(T) -> A,
     {
         Task {
             total_work: self.total_work,
@@ -332,7 +332,7 @@ impl<'a> Worker<'a> {
     pub fn with_stage<T>(
         &mut self,
         title: String,
-        f: &Box<dyn Fn(&mut Worker<'_>) -> T>,
+        f: Box<dyn FnOnce(&mut Worker<'_>) -> T>,
     ) -> T {
         match self {
             Worker::Headless(_) => f(self),
