@@ -38,12 +38,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - wheel movements [#67]
     - the cursor leaving/entering the game window [#67]
 
+### Fixed
+- Hang when `Game::TICKS_PER_SECOND` is set as `0`. [#99]
+
 [#66]: https://github.com/hecrj/coffee/pull/66
 [#67]: https://github.com/hecrj/coffee/pull/67
 [#69]: https://github.com/hecrj/coffee/pull/69
 [#77]: https://github.com/hecrj/coffee/pull/77
 [#78]: https://github.com/hecrj/coffee/pull/78
 [#79]: https://github.com/hecrj/coffee/pull/79
+[#99]: https://github.com/hecrj/coffee/pull/99
 
 
 ## [0.3.2] - 2019-09-01
