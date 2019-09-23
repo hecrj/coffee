@@ -21,7 +21,7 @@ impl Timer {
         let (target_seconds, target_nanos) = match ticks_per_second {
             0 => (std::u64::MAX, 0),
             1 => (1, 0),
-            _ => (0, ((1.0 / ticks_per_second as f64).fract() * 1e9) as u32),
+            _ => (0, ((1.0 / ticks_per_second as f64) * 1e9) as u32),
         };
 
         Timer {
