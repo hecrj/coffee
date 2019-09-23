@@ -18,16 +18,15 @@ pub struct Timer {
 
 impl Timer {
     pub(crate) fn new(ticks_per_second: u16) -> Timer {
-        let target = 1.0 / ticks_per_second as f64;
-        let target_seconds = target.trunc();
-        let target_nanos = target.fract() * 1e9;
+        let (target_seconds, target_nanos) = match ticks_per_second {
+            0 => (std::u64::MAX, 0),
+            1 => (1, 0),
+            _ => (0, ((1.0 / ticks_per_second as f64).fract() * 1e9) as u32),
+        };
 
         Timer {
             target_ticks: ticks_per_second,
-            target_delta: time::Duration::new(
-                target_seconds as u64,
-                target_nanos as u32,
-            ),
+            target_delta: time::Duration::new(target_seconds, target_nanos),
             last_tick: time::Instant::now(),
             accumulated_delta: time::Duration::from_secs(0),
             has_ticked: false,
