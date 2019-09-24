@@ -23,6 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   performing a slow task.
 - `ui::Image`, a simple widget to display a `graphics::Image` in your user
   interface.
+- `Mesh::new_with_tolerance`, which allows to control the tolerance of line
+  segment approximations. [#100]
 
 ### Changed
 - `Mesh::stroke` now takes an `f32` as `line_width` instead of a `u16`.
@@ -37,6 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - any button click [#67]
     - wheel movements [#67]
     - the cursor leaving/entering the game window [#67]
+- The `mesh` example now has a slider to control the tolerance. [#100]
 
 ### Fixed
 - Hang when `Game::TICKS_PER_SECOND` is set as `0`. [#99]
@@ -48,6 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#78]: https://github.com/hecrj/coffee/pull/78
 [#79]: https://github.com/hecrj/coffee/pull/79
 [#99]: https://github.com/hecrj/coffee/pull/99
+[#100]: https://github.com/hecrj/coffee/pull/100
 
 
 ## [0.3.2] - 2019-09-01
