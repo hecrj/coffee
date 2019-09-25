@@ -1,6 +1,6 @@
 # Coffee
 
-[![Build Status](https://travis-ci.org/hecrj/coffee.svg?branch=master)](https://travis-ci.org/hecrj/coffee)
+[![Integration status](https://github.com/hecrj/coffee/workflows/Integration/badge.svg)](https://github.com/hecrj/coffee/actions)
 [![Documentation](https://docs.rs/coffee/badge.svg)](https://docs.rs/coffee)
 [![Crates.io](https://img.shields.io/crates/v/coffee.svg)](https://crates.io/crates/coffee)
 [![License](https://img.shields.io/crates/l/coffee.svg)](https://github.com/hecrj/coffee/blob/master/LICENSE)
