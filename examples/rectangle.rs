@@ -10,6 +10,7 @@ fn main() -> coffee::Result<()> {
         size: (1280, 1024),
         resizable: true,
         fullscreen: false,
+        maximized: false,
     })
 }
 
