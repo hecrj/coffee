@@ -114,7 +114,7 @@ impl Drawing {
             .expect("Create diff image");
 
             let image =
-                Image::from_image(gpu, image::DynamicImage::ImageRgba8(image))
+                Image::from_image(gpu, &image::DynamicImage::ImageRgba8(image))
                     .expect("Upload diff image");
 
             Ok(Some(Differences {
