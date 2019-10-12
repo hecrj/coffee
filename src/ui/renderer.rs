@@ -126,7 +126,7 @@ impl Default for Configuration {
             sprites: Task::using_gpu(|gpu| {
                 Image::from_image(
                     gpu,
-                    ::image::load_from_memory(include_bytes!(
+                    &::image::load_from_memory(include_bytes!(
                         "../../resources/ui.png"
                     ))?,
                 )

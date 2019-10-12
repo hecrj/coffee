@@ -32,7 +32,7 @@ impl Image {
             image::load_from_memory(&buf)?
         };
 
-        Image::from_image(gpu, image)
+        Image::from_image(gpu, &image)
     }
 
     /// Creates a [`Task`] that loads an [`Image`] from the given path.
@@ -52,7 +52,7 @@ impl Image {
     /// [`image` crate]: https://docs.rs/image
     pub fn from_image(
         gpu: &mut Gpu,
-        image: image::DynamicImage,
+        image: &image::DynamicImage,
     ) -> Result<Image> {
         let texture = gpu.upload_texture(&image);
 
@@ -71,7 +71,7 @@ impl Image {
 
         Self::from_image(
             gpu,
-            image::DynamicImage::ImageRgba8(
+            &image::DynamicImage::ImageRgba8(
                 image::RgbaImage::from_raw(
                     colors.len() as u32,
                     1,
