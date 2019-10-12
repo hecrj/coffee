@@ -14,6 +14,9 @@ pub struct Settings {
 
     /// Defines whether or not the window should start in fullscreen mode.
     pub fullscreen: bool,
+
+    /// Defines whether or not the window should start maximized.
+    pub maximized: bool,
 }
 
 impl Settings {
@@ -35,5 +38,6 @@ impl Settings {
             })
             .with_resizable(self.resizable)
             .with_fullscreen(monitor)
+            .with_maximized(self.maximized)
     }
 }
