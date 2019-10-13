@@ -253,10 +253,7 @@ fn create_texture_array(
     });
 
     if let Some(layers) = layers {
-        // TODO: Learn more about iterators and find a way to improve this.
-        // Are these many copies needed?
-        let slice: Vec<u8> =
-            layers.iter().cloned().flatten().cloned().collect();
+        let slice: Vec<u8> = layers.iter().flatten().collect();
 
         let temp_buf = device
             .create_buffer_mapped(slice.len(), wgpu::BufferUsage::TRANSFER_SRC)
