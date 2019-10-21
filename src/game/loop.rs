@@ -61,7 +61,6 @@ pub trait Loop<Game: super::Game> {
         // Initialization
         debug.frame_started();
         timer.update();
-        window.request_redraw();
 
         event_loop.run(move |event, _, control_flow| match event {
             winit::event::Event::NewEvents(_) => {
@@ -86,6 +85,8 @@ pub trait Loop<Game: super::Game> {
                     game.update(&window);
                     debug.update_finished();
                 }
+
+                window.request_redraw();
 
                 if game.is_finished() {
                     *control_flow = winit::event_loop::ControlFlow::Exit;
