@@ -55,8 +55,8 @@ impl Canvas {
         Target::with_transformation(
             gpu,
             self.drawable.target().clone(),
-            texture.width() as f32,
-            texture.height() as f32,
+            texture.width(),
+            texture.height(),
             texture::Drawable::render_transformation(),
         )
     }

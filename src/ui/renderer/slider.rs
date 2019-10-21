@@ -1,7 +1,8 @@
 use crate::graphics::{Point, Rectangle, Sprite};
 use crate::ui::core::MouseCursor;
-use crate::ui::{slider, Renderer};
+use crate::ui::Renderer;
 
+use iced::slider;
 use std::ops::RangeInclusive;
 
 const RAIL: Rectangle<u16> = Rectangle {
@@ -21,8 +22,8 @@ const MARKER: Rectangle<u16> = Rectangle {
 impl slider::Renderer for Renderer {
     fn draw(
         &mut self,
-        cursor_position: Point,
-        bounds: Rectangle<f32>,
+        cursor_position: iced::Point,
+        bounds: iced::Rectangle,
         state: &slider::State,
         range: RangeInclusive<f32>,
         value: f32,

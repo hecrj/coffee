@@ -19,3 +19,21 @@ pub enum Event {
         character: char,
     },
 }
+
+#[doc(hidden)]
+impl From<Event> for iced::input::keyboard::Event {
+    fn from(event: Event) -> iced::input::keyboard::Event {
+        match event {
+            Event::Input { state, key_code } => {
+                iced::input::keyboard::Event::Input {
+                    state: state.into(),
+                    key_code: key_code.into(),
+                }
+            }
+
+            Event::TextEntered { character } => {
+                iced::input::keyboard::Event::CharacterReceived(character)
+            }
+        }
+    }
+}

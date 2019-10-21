@@ -33,12 +33,12 @@ impl<'a> Frame<'a> {
     }
 
     /// Get the width of the frame.
-    pub fn width(&self) -> f32 {
+    pub fn width(&self) -> u16 {
         self.window.width
     }
 
     /// Get the height of the frame.
-    pub fn height(&self) -> f32 {
+    pub fn height(&self) -> u16 {
         self.window.height
     }
 

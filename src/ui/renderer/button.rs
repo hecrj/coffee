@@ -29,8 +29,8 @@ const RIGHT: Rectangle<u16> = Rectangle {
 impl button::Renderer for Renderer {
     fn draw(
         &mut self,
-        cursor_position: Point,
-        mut bounds: Rectangle<f32>,
+        cursor_position: iced::Point,
+        mut bounds: iced::Rectangle,
         state: &button::State,
         label: &str,
         class: button::Class,

@@ -1,16 +1,14 @@
 //! Displays action progress to your users.
 
-use crate::graphics::{
-    Point, Rectangle,
-};
+use crate::graphics::Rectangle;
 use crate::ui::core::{
-    Style, Node, Element, MouseCursor, Layout, Hasher, Widget,
+    Element, Hasher, Layout, MouseCursor, Node, Style, Widget,
 };
 
 use std::hash::Hash;
 
 /// A widget that displays a progress of an action.
-/// 
+///
 /// It implements [`Widget`] when the associated [`core::Renderer`] implements
 /// the [`button::Renderer`] trait.
 ///
@@ -46,7 +44,7 @@ impl ProgressBar {
     /// Sets the width of the [`ProgressBar`] in pixels.
     ///
     /// [`ProgressBar`]: struct.ProgressBar.html
-    pub fn width(mut self, width: u32) -> Self {
+    pub fn width(mut self, width: u16) -> Self {
         self.style = self.style.width(width);
         self
     }
@@ -62,7 +60,7 @@ impl ProgressBar {
 
 impl<Message, Renderer> Widget<Message, Renderer> for ProgressBar
 where
-    Renderer: self::Renderer 
+    Renderer: self::Renderer,
 {
     fn node(&self, _renderer: &Renderer) -> Node {
         Node::new(self.style.height(50))
@@ -72,17 +70,14 @@ where
         &self,
         renderer: &mut Renderer,
         layout: Layout<'_>,
-        _cursor_position: Point,
+        _cursor_position: iced::Point,
     ) -> MouseCursor {
-        renderer.draw(
-            layout.bounds(),
-            self.progress,
-        );
+        renderer.draw(layout.bounds().into(), self.progress);
 
         MouseCursor::OutOfBounds
     }
 
-    fn hash(&self, state: &mut Hasher) {
+    fn hash_layout(&self, state: &mut Hasher) {
         self.style.hash(state);
     }
 }
@@ -100,20 +95,16 @@ pub trait Renderer {
     /// It receives:
     ///   * the bounds of the [`ProgressBar`]
     ///   * the progress of the [`ProgressBar`]
-    ///   
+    ///
     /// [`ProgressBar`]: struct.ProgressBar.html
-    fn draw(
-        &mut self,
-        bounds: Rectangle<f32>,
-        progress: f32,
-    );
+    fn draw(&mut self, bounds: Rectangle<f32>, progress: f32);
 }
 
-impl<'a, Message, Renderer> From<ProgressBar> for Element<'a, Message, Renderer>
+impl<'a, Message, Renderer> Into<Element<'a, Message, Renderer>> for ProgressBar
 where
     Renderer: self::Renderer,
 {
-    fn from(progress_bar: ProgressBar) -> Element<'a, Message, Renderer> {
-        Element::new(progress_bar)
+    fn into(self) -> Element<'a, Message, Renderer> {
+        Element::new(self)
     }
 }

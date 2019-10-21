@@ -4,8 +4,7 @@ use coffee::graphics::{
 };
 use coffee::load::Task;
 use coffee::ui::{
-    Align, Column, Element, Justify, Renderer, Text,
-    UserInterface, ProgressBar,
+    Align, Column, Element, Justify, ProgressBar, Renderer, Text, UserInterface,
 };
 use coffee::{Game, Result, Timer};
 
@@ -27,9 +26,7 @@ impl Game for Progress {
     type LoadingScreen = ();
 
     fn load(_window: &Window) -> Task<Progress> {
-        Task::succeed(|| Progress {
-            value: 0.0,
-        })
+        Task::succeed(|| Progress { value: 0.0 })
     }
 
     fn draw(&mut self, frame: &mut Frame, timer: &Timer) {
@@ -53,13 +50,12 @@ impl UserInterface for Progress {
     type Message = ();
     type Renderer = Renderer;
 
-    fn react(&mut self, _message: ()) {
-    }
+    fn react(&mut self, _message: ()) {}
 
     fn layout(&mut self, window: &Window) -> Element<()> {
         Column::new()
-            .width(window.width() as u32)
-            .height(window.height() as u32)
+            .width(window.width())
+            .height(window.height())
             .align_items(Align::Center)
             .justify_content(Justify::Center)
             .spacing(20)
@@ -70,10 +66,7 @@ impl UserInterface for Progress {
                     .horizontal_alignment(HorizontalAlignment::Center)
                     .vertical_alignment(VerticalAlignment::Center),
             )
-            .push(
-                ProgressBar::new(self.value)
-                    .width(400),
-            )
+            .push(ProgressBar::new(self.value).width(400))
             .into()
     }
 }

@@ -144,6 +144,7 @@ pub mod widget;
 #[doc(no_inline)]
 pub use self::core::{Align, Justify};
 pub use renderer::{Configuration, Renderer};
+#[doc(no_inline)]
 pub use widget::{
     button, image, progress_bar, slider, Button, Checkbox, Image, ProgressBar,
     Radio, Slider, Text,
@@ -168,10 +169,10 @@ pub type Row<'a, Message> = widget::Row<'a, Message, Renderer>;
 pub type Element<'a, Message> = self::core::Element<'a, Message, Renderer>;
 
 use crate::game::{self, Loop as _};
-use crate::graphics::{Point, Window, WindowSettings};
+use crate::graphics::{Window, WindowSettings};
 use crate::input::{self, mouse, Input as _};
 use crate::load::Task;
-use crate::ui::core::{Event, Interface, MouseCursor, Renderer as _};
+use crate::ui::core::{MouseCursor, Renderer as _};
 use crate::{Debug, Game, Result};
 
 /// The user interface of your game.
@@ -270,24 +271,19 @@ pub trait UserInterface: Game {
 
 struct Loop<UI: UserInterface> {
     renderer: UI::Renderer,
-    messages: Vec<UI::Message>,
     mouse_cursor: MouseCursor,
-    cache: Option<core::Cache>,
-    cursor_position: Point,
-    events: Vec<Event>,
+    cache: Option<iced::Cache>,
+    events: Vec<iced::Event>,
 }
 
 impl<UI: UserInterface> game::Loop<UI> for Loop<UI> {
     type Attributes = UI::Renderer;
 
-    fn new(renderer: UI::Renderer, game: &mut UI, window: &Window) -> Self {
-        let cache = Interface::compute(game.layout(window), &renderer).cache();
+    fn new(renderer: UI::Renderer, _game: &mut UI, _window: &Window) -> Self {
         Loop {
             renderer,
-            messages: Vec::new(),
             mouse_cursor: MouseCursor::OutOfBounds,
-            cache: Some(cache),
-            cursor_position: Point::new(0.0, 0.0),
+            cache: Some(iced::Cache::new()),
             events: Vec::new(),
         }
     }
@@ -299,14 +295,7 @@ impl<UI: UserInterface> game::Loop<UI> for Loop<UI> {
     fn on_input(&mut self, input: &mut UI::Input, event: input::Event) {
         input.update(event);
 
-        match event {
-            input::Event::Mouse(mouse::Event::CursorMoved { x, y }) => {
-                self.cursor_position = Point::new(x, y);
-            }
-            _ => {}
-        };
-
-        if let Some(ui_event) = Event::from_input(event) {
+        if let Some(ui_event) = event_from_input(event) {
             self.events.push(ui_event);
         }
     }
@@ -319,26 +308,18 @@ impl<UI: UserInterface> game::Loop<UI> for Loop<UI> {
         debug: &mut Debug,
     ) {
         debug.ui_started();
-        let mut interface = Interface::compute_with_cache(
+        let mut interface = iced::UserInterface::build(
             ui.layout(window),
-            &self.renderer,
             self.cache.take().unwrap(),
+            &self.renderer,
         );
 
-        let cursor_position = self.cursor_position;
-        let messages = &mut self.messages;
+        let messages = interface.update(self.events.drain(..));
 
-        self.events.drain(..).for_each(|event| {
-            interface.on_event(event, cursor_position, messages)
-        });
+        let new_cursor = interface.draw(&mut self.renderer);
+        self.renderer.flush(&mut window.frame());
 
-        let new_cursor = interface.draw(
-            &mut self.renderer,
-            &mut window.frame(),
-            cursor_position,
-        );
-
-        self.cache = Some(interface.cache());
+        self.cache = Some(interface.into_cache());
 
         if new_cursor != self.mouse_cursor {
             if new_cursor == MouseCursor::OutOfBounds {
@@ -351,9 +332,25 @@ impl<UI: UserInterface> game::Loop<UI> for Loop<UI> {
             self.mouse_cursor = new_cursor;
         }
 
-        for message in messages.drain(..) {
+        for message in messages {
             ui.react(message);
         }
         debug.ui_finished();
+    }
+}
+
+fn event_from_input(input_event: input::Event) -> Option<iced::Event> {
+    match input_event {
+        input::Event::Keyboard(keyboard_event) => {
+            Some(iced::Event::Keyboard(keyboard_event.into()))
+        }
+        input::Event::Mouse(mouse_event) => {
+            let mouse_event: Option<iced::input::mouse::Event> =
+                mouse_event.into();
+
+            mouse_event.map(iced::Event::Mouse)
+        }
+        input::Event::Gamepad { .. } => None,
+        input::Event::Window(..) => None,
     }
 }

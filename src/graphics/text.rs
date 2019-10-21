@@ -67,3 +67,59 @@ pub enum VerticalAlignment {
     /// Align bottom
     Bottom,
 }
+
+impl From<HorizontalAlignment> for iced::text::HorizontalAlignment {
+    fn from(
+        horizontal_alignment: HorizontalAlignment,
+    ) -> iced::text::HorizontalAlignment {
+        match horizontal_alignment {
+            HorizontalAlignment::Left => iced::text::HorizontalAlignment::Left,
+            HorizontalAlignment::Center => {
+                iced::text::HorizontalAlignment::Center
+            }
+            HorizontalAlignment::Right => {
+                iced::text::HorizontalAlignment::Right
+            }
+        }
+    }
+}
+
+impl From<iced::text::HorizontalAlignment> for HorizontalAlignment {
+    fn from(
+        horizontal_alignment: iced::text::HorizontalAlignment,
+    ) -> HorizontalAlignment {
+        match horizontal_alignment {
+            iced::text::HorizontalAlignment::Left => HorizontalAlignment::Left,
+            iced::text::HorizontalAlignment::Center => {
+                HorizontalAlignment::Center
+            }
+            iced::text::HorizontalAlignment::Right => {
+                HorizontalAlignment::Right
+            }
+        }
+    }
+}
+
+impl From<VerticalAlignment> for iced::text::VerticalAlignment {
+    fn from(
+        vertical_alignment: VerticalAlignment,
+    ) -> iced::text::VerticalAlignment {
+        match vertical_alignment {
+            VerticalAlignment::Top => iced::text::VerticalAlignment::Top,
+            VerticalAlignment::Center => iced::text::VerticalAlignment::Center,
+            VerticalAlignment::Bottom => iced::text::VerticalAlignment::Bottom,
+        }
+    }
+}
+
+impl From<iced::text::VerticalAlignment> for VerticalAlignment {
+    fn from(
+        vertical_alignment: iced::text::VerticalAlignment,
+    ) -> VerticalAlignment {
+        match vertical_alignment {
+            iced::text::VerticalAlignment::Top => VerticalAlignment::Top,
+            iced::text::VerticalAlignment::Center => VerticalAlignment::Center,
+            iced::text::VerticalAlignment::Bottom => VerticalAlignment::Bottom,
+        }
+    }
+}

@@ -90,20 +90,24 @@ impl Game for Example {
         });
 
         let mut mesh = Mesh::new();
+        let (x, y) = (
+            f32::from(frame.width()) / 4.0,
+            f32::from(frame.height()) / 2.0,
+        );
 
         let shape = match self.shape {
             ShapeOption::Rectangle => Shape::Rectangle(Rectangle {
-                x: frame.width() / 4.0 - 100.0,
-                y: frame.height() / 2.0 - 50.0,
+                x: x - 100.0,
+                y: y - 50.0,
                 width: 200.0,
                 height: 100.0,
             }),
             ShapeOption::Circle => Shape::Circle {
-                center: Point::new(frame.width() / 4.0, frame.height() / 2.0),
+                center: Point::new(x, y),
                 radius: self.radius,
             },
             ShapeOption::Ellipse => Shape::Ellipse {
-                center: Point::new(frame.width() / 4.0, frame.height() / 2.0),
+                center: Point::new(x, y),
                 horizontal_radius: self.radius,
                 vertical_radius: self.vertical_radius,
                 rotation: 0.0,
@@ -210,8 +214,8 @@ impl UserInterface for Example {
             controls.push(color_sliders(&mut self.color_sliders, self.color));
 
         Column::new()
-            .width(window.width() as u32)
-            .height(window.height() as u32)
+            .width(window.width())
+            .height(window.height())
             .padding(20)
             .align_items(Align::End)
             .justify_content(Justify::SpaceBetween)

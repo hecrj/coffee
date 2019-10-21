@@ -1,7 +1,8 @@
 use crate::graphics::{Point, Rectangle, Sprite};
 use crate::ui::core::MouseCursor;
-use crate::ui::widget::radio;
 use crate::ui::Renderer;
+
+use iced::widget::radio;
 
 const SPRITE: Rectangle<u16> = Rectangle {
     x: 98,
@@ -13,9 +14,9 @@ const SPRITE: Rectangle<u16> = Rectangle {
 impl radio::Renderer for Renderer {
     fn draw(
         &mut self,
-        cursor_position: Point,
-        bounds: Rectangle<f32>,
-        bounds_with_label: Rectangle<f32>,
+        cursor_position: iced::Point,
+        bounds: iced::Rectangle,
+        bounds_with_label: iced::Rectangle,
         is_selected: bool,
     ) -> MouseCursor {
         let mouse_over = bounds_with_label.contains(cursor_position);

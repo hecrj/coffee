@@ -1,10 +1,10 @@
 use coffee::graphics::{
-    Color, Frame, HorizontalAlignment, VerticalAlignment, Window,
-    WindowSettings, self,
+    self, Color, Frame, HorizontalAlignment, VerticalAlignment, Window,
+    WindowSettings,
 };
 use coffee::load::Task;
 use coffee::ui::{
-    Align, Column, Element, Justify, Renderer, Text, UserInterface, Image,
+    Align, Column, Element, Image, Justify, Renderer, Text, UserInterface,
 };
 use coffee::{Game, Result, Timer};
 
@@ -27,11 +27,7 @@ impl Game for ImageScreen {
 
     fn load(_window: &Window) -> Task<ImageScreen> {
         graphics::Image::load("resources/ui.png")
-            .map(|image| {
-                ImageScreen {
-                    image,
-                }
-            })
+            .map(|image| ImageScreen { image })
     }
 
     fn draw(&mut self, frame: &mut Frame, _timer: &Timer) {
@@ -48,13 +44,12 @@ impl UserInterface for ImageScreen {
     type Message = ();
     type Renderer = Renderer;
 
-    fn react(&mut self, _message: ()) {
-    }
+    fn react(&mut self, _message: ()) {}
 
     fn layout(&mut self, window: &Window) -> Element<()> {
         Column::new()
-            .width(window.width() as u32)
-            .height(window.height() as u32)
+            .width(window.width())
+            .height(window.height())
             .align_items(Align::Center)
             .justify_content(Justify::Center)
             .spacing(20)
@@ -65,10 +60,7 @@ impl UserInterface for ImageScreen {
                     .horizontal_alignment(HorizontalAlignment::Center)
                     .vertical_alignment(VerticalAlignment::Center),
             )
-            .push(
-                Image::new(&self.image)
-                    .height(250)
-            )
+            .push(Image::new(&self.image).height(250))
             .into()
     }
 }

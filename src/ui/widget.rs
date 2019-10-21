@@ -22,23 +22,23 @@
 //! [`Row`]: struct.Row.html
 //! [`Column`]: struct.Column.html
 //! [`Renderer`]: ../struct.Renderer.html
-mod column;
-mod row;
 
-pub mod button;
-pub mod checkbox;
+use crate::graphics::Color;
+
+mod text;
+
 pub mod image;
 pub mod progress_bar;
-pub mod radio;
-pub mod slider;
-pub mod text;
 
-pub use button::Button;
-pub use checkbox::Checkbox;
-pub use column::Column;
 pub use self::image::Image;
 pub use progress_bar::ProgressBar;
-pub use radio::Radio;
-pub use row::Row;
-pub use slider::Slider;
 pub use text::Text;
+
+#[doc(no_inline)]
+pub use iced::{button, slider, Button, Column, Row, Slider};
+
+/// A checkbox.
+pub type Checkbox<Message> = iced::Checkbox<Color, Message>;
+
+/// A radio button.
+pub type Radio<Message> = iced::Radio<Color, Message>;

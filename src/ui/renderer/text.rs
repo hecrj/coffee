@@ -1,17 +1,16 @@
-use crate::graphics::{
-    self, Color, HorizontalAlignment, Point, Rectangle, VerticalAlignment,
-};
+use crate::graphics::{self, Color, Point};
 use crate::ui::core::{Node, Number, Size, Style};
-use crate::ui::widget::text;
 use crate::ui::Renderer;
 
+use iced::text;
 use std::cell::RefCell;
 use std::f32;
 
-impl text::Renderer for Renderer {
-    fn node(&self, style: Style, content: &str, size: f32) -> Node {
+impl text::Renderer<Color> for Renderer {
+    fn node(&self, style: Style, content: &str, size: Option<u16>) -> Node {
         let font = self.font.clone();
         let content = String::from(content);
+        let size = size.unwrap_or(20);
         let measure = RefCell::new(None);
 
         Node::with_measure(style, move |bounds| {
@@ -38,7 +37,7 @@ impl text::Renderer for Renderer {
 
                 let text = graphics::Text {
                     content: &content,
-                    size,
+                    size: f32::from(size),
                     bounds,
                     ..graphics::Text::default()
                 };
@@ -62,21 +61,21 @@ impl text::Renderer for Renderer {
 
     fn draw(
         &mut self,
-        bounds: Rectangle<f32>,
+        bounds: iced::Rectangle,
         content: &str,
-        size: f32,
-        color: Color,
-        horizontal_alignment: HorizontalAlignment,
-        vertical_alignment: VerticalAlignment,
+        size: Option<u16>,
+        color: Option<Color>,
+        horizontal_alignment: text::HorizontalAlignment,
+        vertical_alignment: text::VerticalAlignment,
     ) {
         self.font.borrow_mut().add(graphics::Text {
             content,
             position: Point::new(bounds.x, bounds.y),
             bounds: (bounds.width, bounds.height),
-            color,
-            size,
-            horizontal_alignment,
-            vertical_alignment,
+            color: color.unwrap_or(Color::WHITE),
+            size: f32::from(size.unwrap_or(20)),
+            horizontal_alignment: horizontal_alignment.into(),
+            vertical_alignment: vertical_alignment.into(),
         });
     }
 }

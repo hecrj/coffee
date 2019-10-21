@@ -17,8 +17,8 @@ use crate::Result;
 pub struct Window {
     gpu: Gpu,
     surface: gpu::Surface,
-    width: f32,
-    height: f32,
+    width: u16,
+    height: u16,
     is_fullscreen: bool,
 }
 
@@ -58,8 +58,8 @@ impl Window {
             is_fullscreen,
             gpu,
             surface,
-            width,
-            height,
+            width: width as u16,
+            height: height as u16,
         })
     }
 
@@ -96,14 +96,14 @@ impl Window {
     /// Returns the width of the [`Window`].
     ///
     /// [`Window`]: struct.Window.html
-    pub fn width(&self) -> f32 {
+    pub fn width(&self) -> u16 {
         self.width
     }
 
     /// Returns the height of the [`Window`].
     ///
     /// [`Window`]: struct.Window.html
-    pub fn height(&self) -> f32 {
+    pub fn height(&self) -> u16 {
         self.height
     }
 
@@ -125,8 +125,8 @@ impl Window {
 
         self.surface.resize(&mut self.gpu, physical_size);
 
-        self.width = physical_size.width as f32;
-        self.height = physical_size.height as f32;
+        self.width = physical_size.width as u16;
+        self.height = physical_size.height as u16;
     }
 
     pub(crate) fn update_cursor(
