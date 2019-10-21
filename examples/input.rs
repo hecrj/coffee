@@ -18,6 +18,7 @@ fn main() -> Result<()> {
         size: (1280, 1024),
         resizable: false,
         fullscreen: false,
+        maximized: false,
     })
 }
 
@@ -164,7 +165,7 @@ impl UserInterface for InputExample {
     type Message = ();
     type Renderer = Renderer;
 
-    fn react(&mut self, _msg: ()) {}
+    fn react(&mut self, _msg: (), _window: &mut Window) {}
 
     fn layout(&mut self, window: &Window) -> Element<()> {
         let keys = self

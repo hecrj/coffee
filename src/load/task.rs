@@ -70,7 +70,7 @@ use crate::Result;
 /// [`map`]: #method.map
 pub struct Task<T> {
     total_work: u32,
-    function: Box<dyn Fn(&mut Worker<'_>) -> Result<T>>,
+    function: Box<dyn FnOnce(&mut Worker<'_>) -> Result<T>>,
 }
 
 impl<T> Task<T> {
@@ -96,7 +96,7 @@ impl<T> Task<T> {
     /// [`Task`]: struct.Task.html
     pub fn new<F>(f: F) -> Task<T>
     where
-        F: 'static + Fn() -> Result<T>,
+        F: 'static + FnOnce() -> Result<T>,
     {
         Task {
             total_work: 1,
@@ -130,7 +130,7 @@ impl<T> Task<T> {
     /// [`Task`]: struct.Task.html
     pub fn succeed<F>(f: F) -> Task<T>
     where
-        F: 'static + Fn() -> T,
+        F: 'static + FnOnce() -> T,
     {
         Task::new(move || Ok(f()))
     }
@@ -152,7 +152,7 @@ impl<T> Task<T> {
     /// [`Font::load_from_bytes`]: ../graphics/struct.Font.html#method.load_from_bytes
     pub fn using_gpu<F>(f: F) -> Task<T>
     where
-        F: 'static + Fn(&mut graphics::Gpu) -> Result<T>,
+        F: 'static + FnOnce(&mut graphics::Gpu) -> Result<T>,
     {
         Task::sequence(1, move |worker| {
             let result = f(worker.gpu());
@@ -165,7 +165,7 @@ impl<T> Task<T> {
 
     pub(crate) fn sequence<F>(total_work: u32, f: F) -> Task<T>
     where
-        F: 'static + Fn(&mut Worker<'_>) -> Result<T>,
+        F: 'static + FnOnce(&mut Worker<'_>) -> Result<T>,
     {
         Task {
             total_work,
@@ -216,7 +216,7 @@ impl<T> Task<T> {
         Task {
             total_work: task.total_work,
             function: Box::new(move |worker| {
-                worker.with_stage(title.clone(), &task.function)
+                worker.with_stage(title.clone(), task.function)
             }),
         }
     }
@@ -238,7 +238,7 @@ impl<T> Task<T> {
     pub fn map<F, A>(self, f: F) -> Task<A>
     where
         T: 'static,
-        F: 'static + Fn(T) -> A,
+        F: 'static + FnOnce(T) -> A,
     {
         Task {
             total_work: self.total_work,
@@ -249,21 +249,24 @@ impl<T> Task<T> {
         }
     }
 
-    /// Runs a [`Task`] and obtain the produced value.
+    /// Runs a [`Task`] and obtains the produced value.
+    ///
+    /// [`Task`]: struct.Task.html
+    pub fn run(self, gpu: &mut graphics::Gpu) -> Result<T> {
+        let mut worker = Worker::Headless(gpu);
+
+        (self.function)(&mut worker)
+    }
+
+    /// Runs a [`Task`] and obtains the produced value.
     ///
     /// You can provide a function to keep track of [`Progress`].
-    ///
-    /// As of now, this method needs a [`Window`] because tasks are mostly
-    /// meant to be used with loading screens. However, the [`Task`] abstraction
-    /// is generic enough to be useful in other scenarios and we could work on
-    /// removing this dependency. If you have a particular use case for them,
-    /// feel free to [open an issue] detailing it!
     ///
     /// [`Task`]: struct.Task.html
     /// [`Progress`]: struct.Progress.html
     /// [`Window`]: ../graphics/window/struct.Window.html
     /// [open an issue]: https://github.com/hecrj/coffee/issues
-    pub fn run<F>(
+    pub(crate) fn run_with_window<F>(
         self,
         window: &mut graphics::Window,
         mut on_progress: F,
@@ -271,7 +274,7 @@ impl<T> Task<T> {
     where
         F: FnMut(&Progress, &mut graphics::Window) -> (),
     {
-        let mut worker = Worker {
+        let mut worker = Worker::Windowed {
             window,
             listener: &mut on_progress,
             progress: Progress {
@@ -293,35 +296,62 @@ impl<T> std::fmt::Debug for Task<T> {
     }
 }
 
-pub(crate) struct Worker<'a> {
-    window: &'a mut graphics::Window,
-    listener: &'a mut dyn FnMut(&Progress, &mut graphics::Window) -> (),
-    progress: Progress,
+pub(crate) enum Worker<'a> {
+    Headless(&'a mut graphics::Gpu),
+    Windowed {
+        window: &'a mut graphics::Window,
+        listener: &'a mut dyn FnMut(&Progress, &mut graphics::Window) -> (),
+        progress: Progress,
+    },
 }
 
 impl<'a> Worker<'a> {
     pub fn gpu(&mut self) -> &mut graphics::Gpu {
-        self.window.gpu()
+        match self {
+            Worker::Headless(gpu) => gpu,
+            Worker::Windowed { window, .. } => window.gpu(),
+        }
     }
 
     pub fn notify_progress(&mut self, work: u32) {
-        self.progress.work_completed += work;
+        match self {
+            Worker::Headless(_) => {}
+            Worker::Windowed {
+                progress,
+                window,
+                listener,
+                ..
+            } => {
+                progress.work_completed += work;
 
-        (self.listener)(&self.progress, self.window);
+                listener(&progress, window);
+            }
+        };
     }
 
     pub fn with_stage<T>(
         &mut self,
         title: String,
-        f: &Box<dyn Fn(&mut Worker<'_>) -> T>,
+        f: Box<dyn FnOnce(&mut Worker<'_>) -> T>,
     ) -> T {
-        self.progress.stages.push(title);
-        self.notify_progress(0);
+        match self {
+            Worker::Headless(_) => f(self),
+            Worker::Windowed { .. } => {
+                if let Worker::Windowed { progress, .. } = self {
+                    progress.stages.push(title);
+                }
 
-        let result = f(self);
-        let _ = self.progress.stages.pop();
+                self.notify_progress(0);
 
-        result
+                let result = f(self);
+
+                if let Worker::Windowed { progress, .. } = self {
+                    let _ = progress.stages.pop();
+                }
+
+                result
+            }
+        }
     }
 }
 

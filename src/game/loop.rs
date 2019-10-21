@@ -86,6 +86,10 @@ pub trait Loop<Game: super::Game> {
                     game.update(&window);
                     debug.update_finished();
                 }
+
+                if game.is_finished() {
+                    *control_flow = winit::event_loop::ControlFlow::Exit;
+                }
             }
             winit::event::Event::RedrawRequested { .. } => {
                 debug.draw_started();

@@ -15,6 +15,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   hexadecimal literal (`0xRRGGBB`). [#77]
 - `From<nalgebra::Matrix3>` and `Into<nalgebra::Matrix3>` implementations for
   `Transformation`. [#78]
+- `Game::is_finished`, which allows to gracefully quit the game on demand. [#79]
+- `Canvas::read_pixels`, a method to read the contents of a `Canvas` as a
+  `DynamicImage` from the `image` crate.
+- `ui::Panel`, a dark box that can be used to wrap a widget.
+- `ui::ProgressBar`, a progress bar to give visual feedback to your users when
+  performing a slow task.
+- `ui::Image`, a simple widget to display a `graphics::Image` in your user
+  interface.
+- `Mesh::new_with_tolerance`, which allows to control the tolerance of line
+  segment approximations. [#100]
 
 ### Changed
 - `Mesh::stroke` now takes an `f32` as `line_width` instead of a `u16`.
@@ -22,16 +32,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Face culling has been disabled for Vulkan, Metal, D3D11, and D3D12 backends.
   In OpenGL, face culling was already disabled.
 - `Transformation::nonuniform_scale` now takes a `Vector`. [#78]
+- The logic of `KeyboardAndMouse` has been split into the new `Keyboard` and
+  `Mouse` input trackers. The new `mouse` and `keyboard` methods can be used to
+  obtain them, respectively. [#69]
+- The `Mouse` type can now track additional input:
+    - any button click [#67]
+    - wheel movements [#67]
+    - the cursor leaving/entering the game window [#67]
+- The `mesh` example now has a slider to control the tolerance. [#100]
 
+### Fixed
+- Hang when `Game::TICKS_PER_SECOND` is set as `0`. [#99]
+
+[#66]: https://github.com/hecrj/coffee/pull/66
+[#67]: https://github.com/hecrj/coffee/pull/67
+[#69]: https://github.com/hecrj/coffee/pull/69
+[#77]: https://github.com/hecrj/coffee/pull/77
+[#78]: https://github.com/hecrj/coffee/pull/78
+[#79]: https://github.com/hecrj/coffee/pull/79
+[#99]: https://github.com/hecrj/coffee/pull/99
+[#100]: https://github.com/hecrj/coffee/pull/100
+
+
+## [0.3.2] - 2019-09-01
 ### Fixed
 - Incorrect buffer sizes in the `Mesh` pipeline. This caused vertices to entirely
   disappear when rendering big meshes, leading to a potential crash.
+  [79651405673ecd16da21b887a622f6650b29f38f]
 - Validation error when rendering meshes using Vulkan, Metal, D3D11, or D3D12. [#81]
 
-[#66]: https://github.com/hecrj/coffee/pull/66
-[#77]: https://github.com/hecrj/coffee/pull/77
-[#78]: https://github.com/hecrj/coffee/pull/78
 [#81]: https://github.com/hecrj/coffee/pull/81
+[79651405673ecd16da21b887a622f6650b29f38f]: https://github.com/hecrj/coffee/commit/79651405673ecd16da21b887a622f6650b29f38f
 
 
 ## [0.3.1] - 2019-06-20
@@ -202,7 +233,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Coffee starts being developed.
 
 
-[Unreleased]: https://github.com/hecrj/coffee/compare/0.3.1...HEAD
+[Unreleased]: https://github.com/hecrj/coffee/compare/0.3.2...HEAD
+[0.3.2]: https://github.com/hecrj/coffee/compare/0.3.1...0.3.2
 [0.3.1]: https://github.com/hecrj/coffee/compare/0.3.0...0.3.1
 [0.3.0]: https://github.com/hecrj/coffee/compare/0.2.0...0.3.0
 [0.2.0]: https://github.com/hecrj/coffee/compare/0.1.1...0.2.0

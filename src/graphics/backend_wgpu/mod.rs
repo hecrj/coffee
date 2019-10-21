@@ -114,6 +114,19 @@ impl Gpu {
         )
     }
 
+    pub(super) fn read_drawable_texture_pixels(
+        &mut self,
+        drawable: &texture::Drawable,
+    ) -> image::DynamicImage {
+        let new_encoder = self.device.create_command_encoder(
+            &wgpu::CommandEncoderDescriptor { todo: 0 },
+        );
+
+        let encoder = std::mem::replace(&mut self.encoder, new_encoder);
+
+        drawable.read_pixels(&mut self.device, encoder)
+    }
+
     pub(super) fn upload_font(&mut self, bytes: &'static [u8]) -> Font {
         Font::from_bytes(&mut self.device, bytes)
     }
@@ -121,7 +134,7 @@ impl Gpu {
     pub(super) fn draw_triangles(
         &mut self,
         vertices: &[Vertex],
-        indices: &[u16],
+        indices: &[u32],
         view: &TargetView,
         transformation: &Transformation,
     ) {

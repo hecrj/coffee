@@ -3,17 +3,46 @@ use crate::graphics::{gpu, Color, Rectangle, Shape, Target};
 use lyon_tessellation as lyon;
 
 /// A set of shapes that can be drawn.
+///
+/// # Tolerance
+/// When shapes contain curves or arcs, they will be approximated using line
+/// segments. The `tolerance` parameter controls this approximation by
+/// establishing the maximum distance between a curve and its line segments.
+///
+/// The lower the tolerance provided, the better a [`Mesh`] will approximate
+/// a [`Shape`]. However, a lower tolerance can have a noticeable performance
+/// impact. Use it wisely!
+///
+/// [`Mesh`]: struct.Mesh.html
+/// [`Shape`]: enum.Shape.html
 #[derive(Debug, Clone)]
 pub struct Mesh {
-    buffers: lyon::VertexBuffers<gpu::Vertex, u16>,
+    tolerance: f32,
+    buffers: lyon::VertexBuffers<gpu::Vertex, u32>,
 }
 
 impl Mesh {
-    /// Creates a new empty [`Mesh`].
+    /// Creates a new empty [`Mesh`] with a default tolerance of `0.1`.
     ///
     /// [`Mesh`]: struct.Mesh.html
     pub fn new() -> Mesh {
         Mesh {
+            tolerance: 0.1,
+            buffers: lyon::VertexBuffers::new(),
+        }
+    }
+
+    /// Creates a new empty [`Mesh`] with the given tolerance.
+    ///
+    /// Providing a lower tolerance here can allow you to zoom in your [`Mesh`]
+    /// using a [`Transformation`] and still observe smooth curves. See
+    /// [Tolerance](#tolerance).
+    ///
+    /// [`Mesh`]: struct.Mesh.html
+    /// [`Transformation`]: struct.Transformation.html
+    pub fn new_with_tolerance(tolerance: f32) -> Mesh {
+        Mesh {
+            tolerance,
             buffers: lyon::VertexBuffers::new(),
         }
     }
@@ -45,7 +74,7 @@ impl Mesh {
             }) => {
                 let _ = lyon::basic_shapes::fill_rectangle(
                     &lyon::math::rect(x, y, width, height),
-                    &Self::fill_options(),
+                    &Self::fill_options(self.tolerance),
                     &mut builder,
                 )
                 .expect("Fill rectangle");
@@ -54,7 +83,7 @@ impl Mesh {
                 let _ = lyon::basic_shapes::fill_circle(
                     lyon::math::point(center.x, center.y),
                     radius,
-                    &Self::fill_options(),
+                    &Self::fill_options(self.tolerance),
                     &mut builder,
                 )
                 .expect("Fill circle");
@@ -69,7 +98,7 @@ impl Mesh {
                     lyon::math::point(center.x, center.y),
                     lyon::math::vector(horizontal_radius, vertical_radius),
                     lyon::math::Angle::radians(rotation),
-                    &Self::fill_options(),
+                    &Self::fill_options(self.tolerance),
                     &mut builder,
                 )
                 .expect("Fill ellipse");
@@ -80,7 +109,7 @@ impl Mesh {
                         .iter()
                         .map(|point| lyon::math::point(point.x, point.y)),
                     &mut lyon::FillTessellator::new(),
-                    &Self::fill_options(),
+                    &Self::fill_options(self.tolerance),
                     &mut builder,
                 )
                 .expect("Fill polyline");
@@ -108,7 +137,7 @@ impl Mesh {
             }) => {
                 let _ = lyon::basic_shapes::stroke_rectangle(
                     &lyon::math::rect(x, y, rect_width, height),
-                    &Self::stroke_options(width),
+                    &Self::stroke_options(self.tolerance, width),
                     &mut builder,
                 )
                 .expect("Stroke rectangle");
@@ -117,7 +146,7 @@ impl Mesh {
                 let _ = lyon::basic_shapes::stroke_circle(
                     lyon::math::point(center.x, center.y),
                     radius,
-                    &Self::stroke_options(width),
+                    &Self::stroke_options(self.tolerance, width),
                     &mut builder,
                 )
                 .expect("Stroke circle");
@@ -132,7 +161,7 @@ impl Mesh {
                     lyon::math::point(center.x, center.y),
                     lyon::math::vector(horizontal_radius, vertical_radius),
                     lyon::math::Angle::radians(rotation),
-                    &Self::stroke_options(width),
+                    &Self::stroke_options(self.tolerance, width),
                     &mut builder,
                 )
                 .expect("Stroke ellipse");
@@ -143,7 +172,7 @@ impl Mesh {
                         .iter()
                         .map(|point| lyon::math::point(point.x, point.y)),
                     false,
-                    &Self::stroke_options(width),
+                    &Self::stroke_options(self.tolerance, width),
                     &mut builder,
                 )
                 .expect("Stroke polyline");
@@ -159,12 +188,16 @@ impl Mesh {
         target.draw_triangles(&self.buffers.vertices, &self.buffers.indices);
     }
 
-    fn fill_options() -> lyon::FillOptions {
-        lyon::FillOptions::DEFAULT.with_normals(false)
+    fn fill_options(tolerance: f32) -> lyon::FillOptions {
+        lyon::FillOptions::DEFAULT
+            .with_tolerance(tolerance)
+            .with_normals(false)
     }
 
-    fn stroke_options(width: f32) -> lyon::StrokeOptions {
-        lyon::StrokeOptions::DEFAULT.with_line_width(width)
+    fn stroke_options(tolerance: f32, width: f32) -> lyon::StrokeOptions {
+        lyon::StrokeOptions::DEFAULT
+            .with_tolerance(tolerance)
+            .with_line_width(width)
     }
 }
 

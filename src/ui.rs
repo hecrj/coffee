@@ -74,7 +74,7 @@
 //!     type Renderer = Renderer;
 //!
 //!     // The update logic, called when a message is produced
-//!     fn react(&mut self, message: Message) {
+//!     fn react(&mut self, message: Message, _window: &mut Window) {
 //!         // We update the counter value after an interaction here
 //!         match message {
 //!             Message::IncrementPressed => {
@@ -161,6 +161,12 @@ pub type Column<'a, Message> = widget::Column<'a, Message, Renderer>;
 /// [`Renderer`]: struct.Renderer.html
 pub type Row<'a, Message> = widget::Row<'a, Message, Renderer>;
 
+/// A [`Panel`] using the built-in [`Renderer`].
+///
+/// [`Panel`]: widget/panel/struct.Panel.html
+/// [`Renderer`]: struct.Renderer.html
+pub type Panel<'a, Message> = widget::Panel<'a, Message, Renderer>;
+
 /// An [`Element`] using the built-in [`Renderer`].
 ///
 /// [`Element`]: core/struct.Element.html
@@ -229,7 +235,7 @@ pub trait UserInterface: Game {
     /// [`Game::interact`]: ../trait.Game.html#method.interact
     /// [`Game::Input`]: ../trait.Game.html#associatedtype.Input
     /// [`Message`]: #associatedtype.Message
-    fn react(&mut self, message: Self::Message);
+    fn react(&mut self, message: Self::Message, window: &mut Window);
 
     /// Produces the layout of the user interface.
     ///
@@ -352,7 +358,7 @@ impl<UI: UserInterface> game::Loop<UI> for Loop<UI> {
         }
 
         for message in messages.drain(..) {
-            ui.react(message);
+            ui.react(message, window);
         }
         debug.ui_finished();
     }

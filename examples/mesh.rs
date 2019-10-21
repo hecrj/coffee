@@ -18,18 +18,21 @@ fn main() -> Result<()> {
         size: (1280, 1024),
         resizable: false,
         fullscreen: false,
+        maximized: false,
     })
 }
 
 struct Example {
     shape: ShapeOption,
     mode: ModeOption,
+    tolerance: f32,
     stroke_width: u16,
     radius: f32,
     vertical_radius: f32,
     color: Color,
     polyline_points: Vec<Point>,
 
+    tolerance_slider: slider::State,
     stroke_width_slider: slider::State,
     radius_slider: slider::State,
     vertical_radius_slider: slider::State,
@@ -58,12 +61,14 @@ impl Game for Example {
         Task::succeed(move || Example {
             shape: ShapeOption::Rectangle,
             mode: ModeOption::Fill,
+            tolerance: 0.1,
             color: Color::WHITE,
             radius: 100.0,
             vertical_radius: 50.0,
             stroke_width: 2,
             polyline_points: Vec::new(),
 
+            tolerance_slider: slider::State::new(),
             stroke_width_slider: slider::State::new(),
             radius_slider: slider::State::new(),
             vertical_radius_slider: slider::State::new(),
@@ -89,7 +94,7 @@ impl Game for Example {
             a: 1.0,
         });
 
-        let mut mesh = Mesh::new();
+        let mut mesh = Mesh::new_with_tolerance(self.tolerance);
 
         let shape = match self.shape {
             ShapeOption::Rectangle => Shape::Rectangle(Rectangle {
@@ -130,13 +135,16 @@ impl UserInterface for Example {
     type Message = Message;
     type Renderer = Renderer;
 
-    fn react(&mut self, msg: Message) {
+    fn react(&mut self, msg: Message, _window: &mut Window) {
         match msg {
             Message::ShapeSelected(shape) => {
                 self.shape = shape;
             }
             Message::ModeSelected(mode) => {
                 self.mode = mode;
+            }
+            Message::ToleranceChanged(tolerance) => {
+                self.tolerance = tolerance;
             }
             Message::StrokeWidthChanged(stroke_width) => {
                 self.stroke_width = stroke_width;
@@ -206,8 +214,9 @@ impl UserInterface for Example {
             }
         }
 
-        controls =
-            controls.push(color_sliders(&mut self.color_sliders, self.color));
+        controls = controls
+            .push(color_sliders(&mut self.color_sliders, self.color))
+            .push(tolerance_slider(&mut self.tolerance_slider, self.tolerance));
 
         Column::new()
             .width(window.width() as u32)
@@ -225,6 +234,7 @@ impl UserInterface for Example {
 enum Message {
     ShapeSelected(ShapeOption),
     ModeSelected(ModeOption),
+    ToleranceChanged(f32),
     StrokeWidthChanged(u16),
     RadiusChanged(f32),
     VerticalRadiusChanged(f32),
@@ -254,6 +264,20 @@ fn shape_selector(current: ShapeOption) -> Element<'static, Message> {
         .push(Text::new("Shape:"))
         .push(options)
         .into()
+}
+
+fn tolerance_slider(
+    state: &mut slider::State,
+    tolerance: f32,
+) -> Element<Message> {
+    slider_with_label(
+        "Tolerance:",
+        state,
+        0.001..=20.0,
+        tolerance,
+        &format!("{:.*}", 3, tolerance),
+        Message::ToleranceChanged,
+    )
 }
 
 fn mode_selector(current: ModeOption) -> Element<'static, Message> {

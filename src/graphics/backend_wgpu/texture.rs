@@ -7,7 +7,7 @@ use crate::graphics::Transformation;
 
 #[derive(Clone)]
 pub struct Texture {
-    texture: Rc<wgpu::Texture>,
+    raw: Rc<wgpu::Texture>,
     view: TargetView,
     binding: Rc<quad::TextureBinding>,
     width: u16,
@@ -45,7 +45,7 @@ impl Texture {
         );
 
         Texture {
-            texture: Rc::new(texture),
+            raw: Rc::new(texture),
             view: Rc::new(view),
             binding: Rc::new(binding),
             width,
@@ -78,7 +78,7 @@ impl Texture {
         );
 
         Texture {
-            texture: Rc::new(texture),
+            raw: Rc::new(texture),
             view: Rc::new(view),
             binding: Rc::new(binding),
             width,
@@ -122,11 +122,13 @@ impl Drawable {
             width,
             height,
             None,
-            wgpu::TextureUsage::OUTPUT_ATTACHMENT | wgpu::TextureUsage::SAMPLED,
+            wgpu::TextureUsage::OUTPUT_ATTACHMENT
+                | wgpu::TextureUsage::SAMPLED
+                | wgpu::TextureUsage::COPY_SRC,
         );
 
         let texture = Texture {
-            texture: Rc::new(texture),
+            raw: Rc::new(texture),
             view: Rc::new(view),
             binding: Rc::new(binding),
             width,
@@ -143,6 +145,79 @@ impl Drawable {
 
     pub fn target(&self) -> &TargetView {
         self.texture().view()
+    }
+
+    pub fn read_pixels(
+        &self,
+        device: &mut wgpu::Device,
+        mut encoder: wgpu::CommandEncoder,
+    ) -> image::DynamicImage {
+        let texture = self.texture();
+
+        let buffer_size = 4 * texture.width() as u64 * texture.height() as u64;
+
+        let buffer = device.create_buffer(&wgpu::BufferDescriptor {
+            size: buffer_size,
+            usage: wgpu::BufferUsage::COPY_DST
+                | wgpu::BufferUsage::COPY_SRC
+                | wgpu::BufferUsage::MAP_READ,
+        });
+
+        encoder.copy_texture_to_buffer(
+            wgpu::TextureCopyView {
+                texture: &texture.raw,
+                mip_level: 0,
+                array_layer: 0,
+                origin: wgpu::Origin3d {
+                    x: 0.0,
+                    y: 0.0,
+                    z: 0.0,
+                },
+            },
+            wgpu::BufferCopyView {
+                buffer: &buffer,
+                offset: 0,
+                row_pitch: 4 * texture.width() as u32,
+                image_height: texture.height() as u32,
+            },
+            wgpu::Extent3d {
+                width: texture.width() as u32,
+                height: texture.height() as u32,
+                depth: 1,
+            },
+        );
+
+        device.get_queue().submit(&[encoder.finish()]);
+
+        use std::cell::RefCell;
+
+        let pixels: Rc<RefCell<Option<Vec<u8>>>> = Rc::new(RefCell::new(None));
+        let write = pixels.clone();
+
+        buffer.map_read_async(0, buffer_size, move |result| {
+            match result {
+                Ok(mapping) => {
+                    *write.borrow_mut() = Some(mapping.data.to_vec());
+                }
+                Err(_) => {
+                    *write.borrow_mut() = Some(vec![]);
+                }
+            };
+        });
+
+        device.poll(true);
+
+        let data = pixels.borrow();
+        let bgra = data.clone().unwrap();
+
+        image::DynamicImage::ImageBgra8(
+            image::ImageBuffer::from_raw(
+                texture.width() as u32,
+                texture.height() as u32,
+                bgra,
+            )
+            .expect("Create BGRA8 image"),
+        )
     }
 
     pub fn render_transformation() -> Transformation {

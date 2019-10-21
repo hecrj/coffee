@@ -96,7 +96,7 @@ impl Pipeline {
                     write_mask: wgpu::ColorWrite::ALL,
                 }],
                 depth_stencil_state: None,
-                index_format: wgpu::IndexFormat::Uint16,
+                index_format: wgpu::IndexFormat::Uint32,
                 vertex_buffers: &[wgpu::VertexBufferDescriptor {
                     stride: mem::size_of::<Vertex>() as u64,
                     step_mode: wgpu::InputStepMode::Vertex,
@@ -125,7 +125,8 @@ impl Pipeline {
         });
 
         let indices = device.create_buffer(&wgpu::BufferDescriptor {
-            size: Self::INITIAL_BUFFER_SIZE as u64 * 2,
+            size: mem::size_of::<u32>() as u64
+                * Self::INITIAL_BUFFER_SIZE as u64,
             usage: wgpu::BufferUsage::INDEX | wgpu::BufferUsage::COPY_DST,
         });
 
@@ -144,7 +145,7 @@ impl Pipeline {
         device: &mut wgpu::Device,
         encoder: &mut wgpu::CommandEncoder,
         vertices: &[Vertex],
-        indices: &[u16],
+        indices: &[u32],
         transformation: &Transformation,
         target: &wgpu::TextureView,
     ) {
@@ -177,7 +178,7 @@ impl Pipeline {
             });
 
             self.indices = device.create_buffer(&wgpu::BufferDescriptor {
-                size: new_size as u64 * 2,
+                size: mem::size_of::<u32>() as u64 * new_size as u64,
                 usage: wgpu::BufferUsage::INDEX | wgpu::BufferUsage::COPY_DST,
             });
 
@@ -205,7 +206,7 @@ impl Pipeline {
             0,
             &self.indices,
             0,
-            (mem::size_of::<u16>() * indices.len()) as u64,
+            (mem::size_of::<u32>() * indices.len()) as u64,
         );
 
         {
