@@ -1,5 +1,5 @@
 use crate::debug::Debug;
-use crate::graphics::window::winit;
+use crate::graphics::window::{winit, CursorIcon};
 use crate::graphics::{Window, WindowSettings};
 use crate::input::{self, gamepad, keyboard, mouse, window, Input};
 use crate::load::{Join, LoadingScreen, Task};
@@ -96,6 +96,10 @@ pub trait Loop<Game: super::Game> {
                 debug.draw_started();
                 game.draw(&mut window.frame(), &timer);
                 debug.draw_finished();
+
+                let cursor_icon = game.cursor_icon();
+                window.set_cursor_visible(cursor_icon != CursorIcon::Hidden);
+                window.update_cursor(cursor_icon.into());
 
                 game_loop.after_draw(
                     &mut game,

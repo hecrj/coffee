@@ -1,8 +1,10 @@
+mod cursor_icon;
 mod frame;
 mod settings;
 
 pub(crate) use winit;
 
+pub use cursor_icon::CursorIcon;
 pub use frame::Frame;
 pub use settings::Settings;
 
@@ -134,6 +136,10 @@ impl Window {
         new_cursor: winit::window::CursorIcon,
     ) {
         self.surface.window().set_cursor_icon(new_cursor);
+    }
+
+    pub(crate) fn set_cursor_visible(&self, visible: bool) {
+        self.surface.window().set_cursor_visible(visible);
     }
 }
 
