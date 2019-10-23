@@ -174,7 +174,7 @@ pub type Panel<'a, Message> = widget::Panel<'a, Message, Renderer>;
 pub type Element<'a, Message> = self::core::Element<'a, Message, Renderer>;
 
 use crate::game::{self, Loop as _};
-use crate::graphics::{Point, Window, WindowSettings};
+use crate::graphics::{CursorIcon, Point, Window, WindowSettings};
 use crate::input::{self, mouse, Input as _};
 use crate::load::Task;
 use crate::ui::core::{Event, Interface, MouseCursor, Renderer as _};
@@ -277,7 +277,8 @@ pub trait UserInterface: Game {
 struct Loop<UI: UserInterface> {
     renderer: UI::Renderer,
     messages: Vec<UI::Message>,
-    mouse_cursor: MouseCursor,
+    game_cursor: CursorIcon,
+    ui_cursor: MouseCursor,
     cache: Option<core::Cache>,
     cursor_position: Point,
     events: Vec<Event>,
@@ -291,7 +292,8 @@ impl<UI: UserInterface> game::Loop<UI> for Loop<UI> {
         Loop {
             renderer,
             messages: Vec::new(),
-            mouse_cursor: MouseCursor::OutOfBounds,
+            game_cursor: CursorIcon::Default,
+            ui_cursor: MouseCursor::OutOfBounds,
             cache: Some(cache),
             cursor_position: Point::new(0.0, 0.0),
             events: Vec::new(),
@@ -338,7 +340,7 @@ impl<UI: UserInterface> game::Loop<UI> for Loop<UI> {
             interface.on_event(event, cursor_position, messages)
         });
 
-        let new_cursor = interface.draw(
+        let new_ui_cursor = interface.draw(
             &mut self.renderer,
             &mut window.frame(),
             cursor_position,
@@ -346,15 +348,28 @@ impl<UI: UserInterface> game::Loop<UI> for Loop<UI> {
 
         self.cache = Some(interface.cache());
 
-        if new_cursor != self.mouse_cursor {
-            if new_cursor == MouseCursor::OutOfBounds {
+        if new_ui_cursor != self.ui_cursor {
+            if new_ui_cursor == MouseCursor::OutOfBounds {
                 input.update(input::Event::Mouse(mouse::Event::CursorReturned));
-            } else if self.mouse_cursor == MouseCursor::OutOfBounds {
+            } else if self.ui_cursor == MouseCursor::OutOfBounds {
                 input.update(input::Event::Mouse(mouse::Event::CursorTaken));
             }
 
-            window.update_cursor(new_cursor.into());
-            self.mouse_cursor = new_cursor;
+            self.ui_cursor = new_ui_cursor;
+        }
+        let new_game_cursor = ui.cursor_icon();
+        if new_game_cursor != self.game_cursor {
+            self.game_cursor = new_game_cursor;
+        }
+
+        // TODO: Only update the cursor if it has changed once `MouseCursor` & `CursorIcon` merges
+        // Use the game cursor if cursor is not on a UI element, use the mouse cursor otherwise
+        if self.ui_cursor == MouseCursor::OutOfBounds {
+            window.set_cursor_visible(self.game_cursor != CursorIcon::Hidden);
+            window.update_cursor(self.game_cursor.into());
+        } else {
+            window.set_cursor_visible(true);
+            window.update_cursor(self.ui_cursor.into());
         }
 
         for message in messages.drain(..) {
