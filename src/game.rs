@@ -2,7 +2,7 @@ mod r#loop;
 
 pub(crate) use r#loop::Loop;
 
-use crate::graphics::{window::CursorIcon, Frame, Window, WindowSettings};
+use crate::graphics::{CursorIcon, Frame, Window, WindowSettings};
 use crate::input::{keyboard, Input};
 use crate::load::{LoadingScreen, Task};
 use crate::{Debug, Result, Timer};

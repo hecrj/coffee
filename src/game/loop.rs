@@ -1,6 +1,6 @@
 use crate::debug::Debug;
-use crate::graphics::window::{winit, CursorIcon};
-use crate::graphics::{Window, WindowSettings};
+use crate::graphics::window::winit;
+use crate::graphics::{CursorIcon, Window, WindowSettings};
 use crate::input::{self, gamepad, keyboard, mouse, window, Input};
 use crate::load::{Join, LoadingScreen, Task};
 use crate::{Result, Timer};
@@ -96,10 +96,6 @@ pub trait Loop<Game: super::Game> {
                 debug.draw_started();
                 game.draw(&mut window.frame(), &timer);
                 debug.draw_finished();
-
-                let cursor_icon = game.cursor_icon();
-                window.set_cursor_visible(cursor_icon != CursorIcon::Hidden);
-                window.update_cursor(cursor_icon.into());
 
                 game_loop.after_draw(
                     &mut game,
@@ -208,7 +204,9 @@ fn try_into_input_event(
     }
 }
 
-pub struct Default {}
+pub struct Default {
+    cursor_icon: CursorIcon,
+}
 
 impl<Game: super::Game> Loop<Game> for Default
 where
@@ -221,7 +219,9 @@ where
         _game: &mut Game,
         _window: &Window,
     ) -> Self {
-        Self {}
+        Self {
+            cursor_icon: CursorIcon::default(),
+        }
     }
 
     fn load(_window: &Window) -> Task<Self::Attributes> {
@@ -230,10 +230,17 @@ where
 
     fn after_draw(
         &mut self,
-        _game: &mut Game,
+        game: &mut Game,
         _input: &mut Game::Input,
-        _window: &mut Window,
+        window: &mut Window,
         _debug: &mut Debug,
     ) {
+        // Update the cursor icon if it has changed
+        let game_cursor_icon = game.cursor_icon();
+        if self.cursor_icon != game_cursor_icon {
+            window.set_cursor_visible(game_cursor_icon != CursorIcon::Hidden);
+            window.update_cursor(game_cursor_icon.into());
+            self.cursor_icon = game_cursor_icon;
+        }
     }
 }

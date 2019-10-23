@@ -141,4 +141,4 @@ pub use text::{HorizontalAlignment, Text, VerticalAlignment};
 pub use texture_array::TextureArray;
 pub use transformation::Transformation;
 pub use vector::Vector;
-pub use window::{Frame, Settings as WindowSettings, Window};
+pub use window::{CursorIcon, Frame, Settings as WindowSettings, Window};
