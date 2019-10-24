@@ -22,6 +22,8 @@ pub struct Window {
     width: f32,
     height: f32,
     is_fullscreen: bool,
+    cursor_icon: winit::window::CursorIcon,
+    cursor_visible: bool,
 }
 
 impl Window {
@@ -62,6 +64,8 @@ impl Window {
             surface,
             width,
             height,
+            cursor_icon: winit::window::CursorIcon::Default,
+            cursor_visible: true,
         })
     }
 
@@ -135,11 +139,17 @@ impl Window {
         &mut self,
         new_cursor: winit::window::CursorIcon,
     ) {
-        self.surface.window().set_cursor_icon(new_cursor);
+        if self.cursor_icon != new_cursor {
+            self.surface.window().set_cursor_icon(new_cursor);
+            self.cursor_icon = new_cursor;
+        }
     }
 
-    pub(crate) fn set_cursor_visible(&self, visible: bool) {
-        self.surface.window().set_cursor_visible(visible);
+    pub(crate) fn set_cursor_visible(&mut self, visible: bool) {
+        if self.cursor_visible != visible {
+            self.surface.window().set_cursor_visible(visible);
+            self.cursor_visible = visible;
+        }
     }
 }
 

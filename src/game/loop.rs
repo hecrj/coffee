@@ -204,9 +204,7 @@ fn try_into_input_event(
     }
 }
 
-pub struct Default {
-    cursor_icon: CursorIcon,
-}
+pub struct Default {}
 
 impl<Game: super::Game> Loop<Game> for Default
 where
@@ -219,9 +217,7 @@ where
         _game: &mut Game,
         _window: &Window,
     ) -> Self {
-        Self {
-            cursor_icon: CursorIcon::default(),
-        }
+        Self {}
     }
 
     fn load(_window: &Window) -> Task<Self::Attributes> {
@@ -235,12 +231,8 @@ where
         window: &mut Window,
         _debug: &mut Debug,
     ) {
-        // Update the cursor icon if it has changed
-        let game_cursor_icon = game.cursor_icon();
-        if self.cursor_icon != game_cursor_icon {
-            window.set_cursor_visible(game_cursor_icon != CursorIcon::Hidden);
-            window.update_cursor(game_cursor_icon.into());
-            self.cursor_icon = game_cursor_icon;
-        }
+        let cursor_icon = game.cursor_icon();
+        window.set_cursor_visible(cursor_icon != CursorIcon::Hidden);
+        window.update_cursor(cursor_icon.into());
     }
 }
