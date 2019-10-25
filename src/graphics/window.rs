@@ -22,8 +22,7 @@ pub struct Window {
     width: f32,
     height: f32,
     is_fullscreen: bool,
-    cursor_icon: winit::window::CursorIcon,
-    cursor_visible: bool,
+    cursor_icon: Option<winit::window::CursorIcon>,
 }
 
 impl Window {
@@ -64,8 +63,7 @@ impl Window {
             surface,
             width,
             height,
-            cursor_icon: winit::window::CursorIcon::Default,
-            cursor_visible: true,
+            cursor_icon: Some(winit::window::CursorIcon::Default),
         })
     }
 
@@ -137,18 +135,16 @@ impl Window {
 
     pub(crate) fn update_cursor(
         &mut self,
-        new_cursor: winit::window::CursorIcon,
+        new_cursor: Option<winit::window::CursorIcon>,
     ) {
         if self.cursor_icon != new_cursor {
-            self.surface.window().set_cursor_icon(new_cursor);
+            if let Some(cursor_icon) = new_cursor {
+                self.surface.window().set_cursor_icon(cursor_icon);
+            }
+            self.surface
+                .window()
+                .set_cursor_visible(new_cursor.is_some());
             self.cursor_icon = new_cursor;
-        }
-    }
-
-    pub(crate) fn set_cursor_visible(&mut self, visible: bool) {
-        if self.cursor_visible != visible {
-            self.surface.window().set_cursor_visible(visible);
-            self.cursor_visible = visible;
         }
     }
 }

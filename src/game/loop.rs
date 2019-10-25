@@ -1,9 +1,10 @@
 use crate::debug::Debug;
 use crate::graphics::window::winit;
-use crate::graphics::{CursorIcon, Window, WindowSettings};
+use crate::graphics::{Window, WindowSettings};
 use crate::input::{self, gamepad, keyboard, mouse, window, Input};
 use crate::load::{Join, LoadingScreen, Task};
 use crate::{Result, Timer};
+use std::convert::TryInto;
 
 pub trait Loop<Game: super::Game> {
     type Attributes;
@@ -231,8 +232,6 @@ where
         window: &mut Window,
         _debug: &mut Debug,
     ) {
-        let cursor_icon = game.cursor_icon();
-        window.set_cursor_visible(cursor_icon != CursorIcon::Hidden);
-        window.update_cursor(cursor_icon.into());
+        window.update_cursor(game.cursor_icon().try_into().ok());
     }
 }

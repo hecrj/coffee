@@ -1,4 +1,5 @@
 use crate::graphics::window::winit;
+use std::convert::TryFrom;
 
 /// TODO
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -21,17 +22,18 @@ impl Default for CursorIcon {
     }
 }
 
-impl From<CursorIcon> for winit::window::CursorIcon {
-    fn from(cursor_icon: CursorIcon) -> winit::window::CursorIcon {
+impl TryFrom<CursorIcon> for winit::window::CursorIcon {
+    type Error = ();
+
+    fn try_from(
+        cursor_icon: CursorIcon,
+    ) -> Result<winit::window::CursorIcon, ()> {
         match cursor_icon {
-            // If the cursor is hidden, it doesn't matter which type it is, so the default makes
-            // the most sense.
-            CursorIcon::Default | CursorIcon::Hidden => {
-                winit::window::CursorIcon::Default
-            }
-            CursorIcon::Crosshair => winit::window::CursorIcon::Crosshair,
-            CursorIcon::Hand => winit::window::CursorIcon::Hand,
-            CursorIcon::Move => winit::window::CursorIcon::Move,
+            CursorIcon::Default => Ok(winit::window::CursorIcon::Default),
+            CursorIcon::Crosshair => Ok(winit::window::CursorIcon::Crosshair),
+            CursorIcon::Hand => Ok(winit::window::CursorIcon::Hand),
+            CursorIcon::Hidden => Err(()),
+            CursorIcon::Move => Ok(winit::window::CursorIcon::Move),
         }
     }
 }
