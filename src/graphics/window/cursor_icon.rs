@@ -1,7 +1,7 @@
 use crate::graphics::window::winit;
 use std::convert::TryFrom;
 
-/// TODO
+/// Describes the appearance of the mouse cursor.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum CursorIcon {
     /// The platform-dependent default cursor.

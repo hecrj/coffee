@@ -124,7 +124,9 @@ pub trait Game {
     /// [`Window`]: graphics/struct.Window.html
     fn update(&mut self, _window: &Window) {}
 
-    /// TODO!
+    /// Defines the cursor icon of the window.
+    ///
+    /// By default, it returns platform-dependent default cursor.
     fn cursor_icon(&self) -> CursorIcon {
         CursorIcon::Default
     }
