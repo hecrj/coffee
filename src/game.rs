@@ -2,7 +2,7 @@ mod r#loop;
 
 pub(crate) use r#loop::Loop;
 
-use crate::graphics::{Frame, Window, WindowSettings};
+use crate::graphics::{CursorIcon, Frame, Window, WindowSettings};
 use crate::input::{keyboard, Input};
 use crate::load::{LoadingScreen, Task};
 use crate::{Debug, Result, Timer};
@@ -123,6 +123,13 @@ pub trait Game {
     /// [`TICKS_PER_SECOND`]: #associatedconstant.TICKS_PER_SECOND
     /// [`Window`]: graphics/struct.Window.html
     fn update(&mut self, _window: &Window) {}
+
+    /// Defines the cursor icon of the window.
+    ///
+    /// By default, it returns platform-dependent default cursor.
+    fn cursor_icon(&self) -> CursorIcon {
+        CursorIcon::Default
+    }
 
     /// Displays debug information.
     ///

@@ -179,6 +179,7 @@ use crate::input::{self, mouse, Input as _};
 use crate::load::Task;
 use crate::ui::core::{Event, Interface, MouseCursor, Renderer as _};
 use crate::{Debug, Game, Result};
+use std::convert::TryInto;
 
 /// The user interface of your game.
 ///
@@ -353,8 +354,14 @@ impl<UI: UserInterface> game::Loop<UI> for Loop<UI> {
                 input.update(input::Event::Mouse(mouse::Event::CursorTaken));
             }
 
-            window.update_cursor(new_cursor.into());
             self.mouse_cursor = new_cursor;
+        }
+        // Use the game cursor if cursor is not on a UI element, use the mouse cursor otherwise
+        if self.mouse_cursor == MouseCursor::OutOfBounds {
+            let game_cursor = ui.cursor_icon();
+            window.update_cursor(game_cursor.try_into().ok());
+        } else {
+            window.update_cursor(Some(self.mouse_cursor.into()));
         }
 
         for message in messages.drain(..) {

@@ -1,8 +1,10 @@
+mod cursor_icon;
 mod frame;
 mod settings;
 
 pub(crate) use winit;
 
+pub use cursor_icon::CursorIcon;
 pub use frame::Frame;
 pub use settings::Settings;
 
@@ -20,6 +22,7 @@ pub struct Window {
     width: f32,
     height: f32,
     is_fullscreen: bool,
+    cursor_icon: Option<winit::window::CursorIcon>,
 }
 
 impl Window {
@@ -60,6 +63,7 @@ impl Window {
             surface,
             width,
             height,
+            cursor_icon: Some(winit::window::CursorIcon::Default),
         })
     }
 
@@ -131,9 +135,17 @@ impl Window {
 
     pub(crate) fn update_cursor(
         &mut self,
-        new_cursor: winit::window::CursorIcon,
+        new_cursor: Option<winit::window::CursorIcon>,
     ) {
-        self.surface.window().set_cursor_icon(new_cursor);
+        if self.cursor_icon != new_cursor {
+            if let Some(cursor_icon) = new_cursor {
+                self.surface.window().set_cursor_icon(cursor_icon);
+            }
+            self.surface
+                .window()
+                .set_cursor_visible(new_cursor.is_some());
+            self.cursor_icon = new_cursor;
+        }
     }
 }
 

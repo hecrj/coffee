@@ -4,6 +4,7 @@ use crate::graphics::{Window, WindowSettings};
 use crate::input::{self, gamepad, keyboard, mouse, window, Input};
 use crate::load::{Join, LoadingScreen, Task};
 use crate::{Result, Timer};
+use std::convert::TryInto;
 
 pub trait Loop<Game: super::Game> {
     type Attributes;
@@ -226,10 +227,11 @@ where
 
     fn after_draw(
         &mut self,
-        _game: &mut Game,
+        game: &mut Game,
         _input: &mut Game::Input,
-        _window: &mut Window,
+        window: &mut Window,
         _debug: &mut Debug,
     ) {
+        window.update_cursor(game.cursor_icon().try_into().ok());
     }
 }
