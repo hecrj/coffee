@@ -47,6 +47,11 @@ feature (`opengl`, `vulkan`, `metal`, `dx11`, or `dx12`):
 coffee = { version = "0.3", features = ["opengl"] }
 ```
 
+When running the included examples, you can enable your graphics backend like this, which runs snake.rs with OpenGL:
+```shell
+cargo run --example snake --features opengl
+```
+
 Rust is quite slow in debug mode. If you experience performance issues when
 drawing hundreds of sprites, enable compiler optimizations in your `Cargo.toml`.
 I recommend level 2 optimizations in order to stay closer to `--release`
