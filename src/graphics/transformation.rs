@@ -63,6 +63,28 @@ impl Transformation {
     pub fn rotate(rotation: f32) -> Transformation {
         Transformation(Matrix3::new_rotation(rotation))
     }
+
+    /// Projects a point via this transformation.
+    ///
+    /// Can be used to convert world-coordinates to screen-coordinates
+    /// for a camera, for example.
+    pub fn project(&self, point: Point) -> Point {
+        let inverse_mat = self.0.try_inverse().unwrap();
+
+        let projected = inverse_mat * Vector3::new(point.x, point.y, 1.0);
+
+        Point::new(projected.x, projected.y)
+    }
+
+    /// Does the inverse projection of a point via this transformation.
+    ///
+    /// Can be used to convert screen-coordinates to world-coordinates
+    /// for a camera, for example.
+    pub fn unproject(&self, point: Point) -> Point {
+        let unprojected = self.0 * Vector3::new(point.x, point.y, 1.0);
+
+        Point::new(unprojected.x, unprojected.y)
+    }
 }
 
 impl Mul for Transformation {
