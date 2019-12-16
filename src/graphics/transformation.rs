@@ -68,12 +68,12 @@ impl Transformation {
     ///
     /// Can be used to convert world-coordinates to screen-coordinates
     /// for a camera, for example.
-    pub fn project(&self, point: Point) -> Point {
-        let inverse_mat = self.0.try_inverse().unwrap();
+    pub fn project(&self, point: Point) -> Option<Point> {
+        let inverse_mat = self.0.try_inverse()?;
 
         let projected = inverse_mat * Vector3::new(point.x, point.y, 1.0);
 
-        Point::new(projected.x, projected.y)
+        Some(Point::new(projected.x, projected.y))
     }
 
     /// Does the inverse projection of a point via this transformation.
