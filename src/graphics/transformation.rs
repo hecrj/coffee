@@ -1,7 +1,7 @@
 use nalgebra::{Matrix3, Vector3};
 use std::ops::Mul;
 
-use crate::graphics::Vector;
+use crate::graphics::{Point, Vector};
 
 /// A 2D transformation matrix.
 ///
