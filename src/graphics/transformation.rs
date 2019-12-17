@@ -66,8 +66,7 @@ impl Transformation {
 
     /// Projects a point via this transformation.
     ///
-    /// Can be used to convert screen-coordinates to world-coordinates
-    /// for a camera, for example.
+    /// Can be used to convert screen-coordinates to world-coordinates.
     pub fn project(&self, point: Point) -> Option<Point> {
         let inverse_mat = self.0.try_inverse()?;
 
@@ -78,8 +77,7 @@ impl Transformation {
 
     /// Applies the inverse projection of a point via this transformation.
     ///
-    /// Can be used to convert screen-coordinates to world-coordinates
-    /// for a camera, for example.
+    /// Can be used to convert world-coordinates to screen-coordinates.
     pub fn unproject(&self, point: Point) -> Point {
         let unprojected = self.0 * Vector3::new(point.x, point.y, 1.0);
 
