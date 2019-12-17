@@ -1,4 +1,4 @@
-use nalgebra::Matrix3;
+use nalgebra::{Matrix3, Vector3};
 use std::ops::Mul;
 
 use crate::graphics::Vector;
