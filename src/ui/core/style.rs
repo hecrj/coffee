@@ -113,8 +113,8 @@ impl Style {
 }
 
 impl Default for Style {
-    fn default() -> Style {
-        Style(style::Style {
+    fn default() -> Self {
+        Self(style::Style {
             align_items: style::AlignItems::FlexStart,
             justify_content: style::JustifyContent::FlexStart,
             ..style::Style::default()

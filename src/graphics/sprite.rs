@@ -22,8 +22,8 @@ pub struct Sprite {
 
 impl Default for Sprite {
     #[inline]
-    fn default() -> Sprite {
-        Sprite {
+    fn default() -> Self {
+        Self {
             source: Rectangle {
                 x: 0,
                 y: 0,

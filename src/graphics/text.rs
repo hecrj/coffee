@@ -29,8 +29,8 @@ pub struct Text<'a> {
 
 impl Default for Text<'static> {
     #[inline]
-    fn default() -> Text<'static> {
-        Text {
+    fn default() -> Self {
+        Self {
             content: "",
             position: Point::new(0.0, 0.0),
             bounds: (f32::INFINITY, f32::INFINITY),
