@@ -28,7 +28,7 @@ impl Window {
     pub(crate) fn new(
         mut settings: Settings,
         event_loop: &EventLoop,
-    ) -> Result<Window> {
+    ) -> Result<Self> {
         let (mut width, mut height) = settings.size;
 
         // Try to revert DPI
@@ -59,7 +59,7 @@ impl Window {
             })
             .unwrap_or((width as f32, height as f32));
 
-        Ok(Window {
+        Ok(Self {
             is_fullscreen,
             gpu,
             surface,

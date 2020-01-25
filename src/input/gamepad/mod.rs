@@ -20,12 +20,12 @@ pub(crate) struct Tracker {
 }
 
 impl Tracker {
-    pub fn new() -> Option<Tracker> {
+    pub fn new() -> Option<Self> {
         match Gilrs::new() {
             Ok(context) => Some(Tracker { context }),
             Err(gilrs::Error::NotImplemented(dummy_context)) => {
                 // Use the dummy context as a fallback on unsupported platforms
-                Some(Tracker {
+                Some(Self {
                     context: dummy_context,
                 })
             }

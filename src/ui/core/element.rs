@@ -187,11 +187,11 @@ impl<'a, A, B, Renderer> Map<'a, A, B, Renderer> {
     pub fn new<F>(
         widget: Box<dyn Widget<A, Renderer> + 'a>,
         mapper: F,
-    ) -> Map<'a, A, B, Renderer>
+    ) -> Self
     where
         F: 'static + Fn(A) -> B,
     {
-        Map {
+        Self {
             widget,
             mapper: Box::new(mapper),
         }
@@ -257,7 +257,7 @@ impl<'a, Message, Renderer> std::fmt::Debug for Explain<'a, Message, Renderer> {
 
 impl<'a, Message, Renderer> Explain<'a, Message, Renderer> {
     fn new(element: Element<'a, Message, Renderer>, color: Color) -> Self {
-        Explain { element, color }
+        Self { element, color }
     }
 }
 

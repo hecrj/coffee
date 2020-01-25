@@ -396,8 +396,8 @@ struct Input<I: input::Input> {
 }
 
 impl<I: input::Input> input::Input for Input<I> {
-    fn new() -> Input<I> {
-        Input {
+    fn new() -> Self {
+        Self {
             game_input: I::new(),
             cursor_position: Point::new(0.0, 0.0),
             ui_events: Vec::new(),

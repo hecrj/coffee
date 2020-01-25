@@ -30,8 +30,8 @@ impl KeyboardAndMouse {
 }
 
 impl Input for KeyboardAndMouse {
-    fn new() -> KeyboardAndMouse {
-        KeyboardAndMouse {
+    fn new() -> Self {
+        Self {
             mouse: Mouse::new(),
             keyboard: Keyboard::new(),
         }

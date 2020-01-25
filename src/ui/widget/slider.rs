@@ -187,8 +187,8 @@ impl State {
     /// Creates a new [`State`].
     ///
     /// [`State`]: struct.State.html
-    pub fn new() -> State {
-        State::default()
+    pub fn new() -> Self {
+        Self::default()
     }
 
     /// Returns whether the associated [`Slider`] is currently being dragged or

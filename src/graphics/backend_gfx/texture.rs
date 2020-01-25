@@ -24,7 +24,7 @@ impl Texture {
     pub(super) fn new(
         factory: &mut gl::Factory,
         image: &image::DynamicImage,
-    ) -> Texture {
+    ) -> Self {
         let rgba = image.to_rgba();
         let width = rgba.width() as u16;
         let height = rgba.height() as u16;
@@ -38,7 +38,7 @@ impl Texture {
                 | gfx::memory::Bind::TRANSFER_SRC,
         );
 
-        Texture {
+        Self {
             raw,
             view,
             width,
@@ -50,7 +50,7 @@ impl Texture {
     pub(super) fn new_array(
         factory: &mut gl::Factory,
         layers: &[image::DynamicImage],
-    ) -> Texture {
+    ) -> Self {
         let first_layer = &layers[0].to_rgba();
         let width = first_layer.width() as u16;
         let height = first_layer.height() as u16;
@@ -69,7 +69,7 @@ impl Texture {
                 | gfx::memory::Bind::TRANSFER_SRC,
         );
 
-        Texture {
+        Self {
             raw,
             view,
             width,
@@ -102,7 +102,7 @@ pub struct Drawable {
 }
 
 impl Drawable {
-    pub fn new(factory: &mut gl::Factory, width: u16, height: u16) -> Drawable {
+    pub fn new(factory: &mut gl::Factory, width: u16, height: u16) -> Self {
         let (raw, view) = create_texture_array(
             factory,
             width,
@@ -131,7 +131,7 @@ impl Drawable {
             .view_texture_as_render_target_raw(texture.handle(), render_desc)
             .expect("View texture as render target");
 
-        Drawable { texture, target }
+            Self { texture, target }
     }
 
     pub fn texture(&self) -> &Texture {

@@ -33,8 +33,8 @@ impl Keyboard {
 }
 
 impl Input for Keyboard {
-    fn new() -> Keyboard {
-        Keyboard {
+    fn new() -> Self {
+        Self {
             pressed_keys: HashSet::new(),
             released_keys: HashSet::new(),
         }

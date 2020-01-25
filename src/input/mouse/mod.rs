@@ -73,8 +73,8 @@ impl Mouse {
 }
 
 impl Input for Mouse {
-    fn new() -> Mouse {
-        Mouse {
+    fn new() -> Self {
+        Self {
             cursor_position: Point::new(0.0, 0.0),
             wheel_movement: WheelMovement::new(0.0, 0.0),
             is_cursor_taken: false,

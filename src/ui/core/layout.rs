@@ -26,7 +26,7 @@ impl<'a> Layout<'a> {
         let position =
             parent_position + Vector::new(layout.location.x, layout.location.y);
 
-        Layout { layout, position }
+        Self { layout, position }
     }
 
     /// Gets the bounds of the [`Layout`].

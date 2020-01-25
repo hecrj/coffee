@@ -35,7 +35,7 @@ impl<'a, Message, Renderer> Column<'a, Message, Renderer> {
         let mut style = Style::default().fill_width();
         style.0.flex_direction = stretch::style::FlexDirection::Column;
 
-        Column {
+        Self {
             style,
             spacing: 0,
             children: Vec::new(),

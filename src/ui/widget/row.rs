@@ -32,7 +32,7 @@ impl<'a, Message, Renderer> Row<'a, Message, Renderer> {
     ///
     /// [`Row`]: struct.Row.html
     pub fn new() -> Self {
-        Row {
+        Self {
             style: Style::default().fill_width(),
             spacing: 0,
             children: Vec::new(),

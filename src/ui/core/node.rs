@@ -20,7 +20,7 @@ impl Node {
     ///
     /// [`Node`]: struct.Node.html
     /// [`Style`]: struct.Style.html
-    pub fn new(style: Style) -> Node {
+    pub fn new(style: Style) -> Self {
         Self::with_children(style, Vec::new())
     }
 
@@ -28,8 +28,8 @@ impl Node {
     ///
     /// [`Node`]: struct.Node.html
     /// [`Style`]: struct.Style.html
-    pub(crate) fn with_children(style: Style, children: Vec<Node>) -> Node {
-        Node(node::Node::new(
+    pub(crate) fn with_children(style: Style, children: Vec<Self>) -> Self {
+        Self(node::Node::new(
             style.0,
             children.iter().map(|c| &c.0).collect(),
         ))
@@ -48,11 +48,11 @@ impl Node {
     /// [`Node`]: struct.Node.html
     /// [`Style`]: struct.Style.html
     /// [`Widget`]: trait.Widget.html
-    pub fn with_measure<F>(style: Style, measure: F) -> Node
+    pub fn with_measure<F>(style: Style, measure: F) -> Self
     where
         F: 'static + Fn(Size<Number>) -> Size<f32>,
     {
-        Node(node::Node::new_leaf(
+        Self(node::Node::new_leaf(
             style.0,
             Box::new(move |size| Ok(measure(size))),
         ))

@@ -17,14 +17,14 @@ pub struct Timer {
 }
 
 impl Timer {
-    pub(crate) fn new(ticks_per_second: u16) -> Timer {
+    pub(crate) fn new(ticks_per_second: u16) -> Self {
         let (target_seconds, target_nanos) = match ticks_per_second {
             0 => (std::u64::MAX, 0),
             1 => (1, 0),
             _ => (0, ((1.0 / ticks_per_second as f64) * 1e9) as u32),
         };
 
-        Timer {
+        Self {
             target_ticks: ticks_per_second,
             target_delta: time::Duration::new(target_seconds, target_nanos),
             last_tick: time::Instant::now(),
