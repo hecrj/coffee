@@ -29,8 +29,8 @@ impl<'a, Message, Renderer> Element<'a, Message, Renderer> {
     /// [`Widget`]: trait.Widget.html
     pub fn new(
         widget: impl Widget<Message, Renderer> + 'a,
-    ) -> Element<'a, Message, Renderer> {
-        Element {
+    ) -> Self {
+        Self {
             widget: Box::new(widget),
         }
     }
@@ -151,12 +151,12 @@ impl<'a, Message, Renderer> Element<'a, Message, Renderer> {
     ///
     /// [`Element`]: struct.Element.html
     /// [`Renderer`]: trait.Renderer.html
-    pub fn explain(self, color: Color) -> Element<'a, Message, Renderer>
+    pub fn explain(self, color: Color) -> Self
     where
         Message: 'static,
         Renderer: 'a + core::Renderer,
     {
-        Element {
+        Self {
             widget: Box::new(Explain::new(self, color)),
         }
     }

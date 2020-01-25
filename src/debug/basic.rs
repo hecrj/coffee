@@ -326,8 +326,8 @@ struct TimeBuffer {
 }
 
 impl TimeBuffer {
-    fn new(capacity: usize) -> TimeBuffer {
-        TimeBuffer {
+    fn new(capacity: usize) -> Self {
+        Self {
             head: 0,
             size: 0,
             contents: vec![time::Duration::from_secs(0); capacity],
