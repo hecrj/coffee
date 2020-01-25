@@ -22,14 +22,14 @@ where
     pub fn compute(
         root: Element<'a, Message, Renderer>,
         renderer: &Renderer,
-    ) -> Interface<'a, Message, Renderer> {
+    ) -> Self {
         let hasher = &mut twox_hash::XxHash::default();
         root.hash(hasher);
 
         let hash = hasher.finish();
         let layout = root.compute_layout(renderer);
 
-        Interface { hash, root, layout }
+        Self { hash, root, layout }
     }
 
     pub fn compute_with_cache(
@@ -57,7 +57,7 @@ where
         cursor_position: Point,
         messages: &mut Vec<Message>,
     ) {
-        let Interface { root, layout, .. } = self;
+        let Self { root, layout, .. } = self;
 
         root.widget.on_event(
             event,
@@ -73,7 +73,7 @@ where
         frame: &mut Frame<'_>,
         cursor_position: Point,
     ) -> MouseCursor {
-        let Interface { root, layout, .. } = self;
+        let Self { root, layout, .. } = self;
 
         let cursor =
             root.widget
