@@ -23,8 +23,8 @@ impl Builder {
     ///
     /// [`Builder`]: struct.Builder.html
     /// [`TextureArray`]: struct.TextureArray.html
-    pub fn new(width: u16, height: u16) -> Builder {
-        Builder {
+    pub fn new(width: u16, height: u16) -> Self {
+        Self {
             width: width as u32,
             height: height as u32,
             layers: Vec::new(),
@@ -120,8 +120,8 @@ struct Layer {
 }
 
 impl Layer {
-    fn new(max_width: u16, max_height: u16) -> Layer {
-        Layer {
+    fn new(max_width: u16, max_height: u16) -> Self {
+        Self {
             images: Vec::new(),
             current_row: Vec::new(),
             max_width: max_width as u32,

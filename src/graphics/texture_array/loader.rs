@@ -65,8 +65,8 @@ impl Loader {
     ///
     /// [`Loader`]: struct.Loader.html
     /// [`TextureArray`]: struct.TextureArray.html
-    pub fn new(width: u16, height: u16) -> Loader {
-        Loader {
+    pub fn new(width: u16, height: u16) -> Self {
+        Self {
             width,
             height,
             paths: Vec::new(),

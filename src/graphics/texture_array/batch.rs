@@ -15,8 +15,8 @@ impl Batch {
     ///
     /// [`Batch`]: struct.Batch.html
     /// [`TextureArray`]: struct.TextureArray.html
-    pub fn new(texture_array: TextureArray) -> Batch {
-        Batch {
+    pub fn new(texture_array: TextureArray) -> Self {
+        Self {
             texture_array,
             instances: Vec::new(),
         }
