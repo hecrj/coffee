@@ -127,12 +127,12 @@ impl Default for Configuration {
                 Image::from_image(
                     gpu,
                     &::image::load_from_memory(include_bytes!(
-                        "../../resources/ui.png"
+                        "../../../resources/ui.png"
                     ))?,
                 )
             }),
             font: Font::load_from_bytes(include_bytes!(
-                "../../resources/font/Inconsolata-Regular.ttf"
+                "../../../resources/font/Inconsolata-Regular.ttf"
             )),
         }
     }
