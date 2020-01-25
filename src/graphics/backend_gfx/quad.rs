@@ -67,7 +67,7 @@ impl Pipeline {
         factory: &mut gl::Factory,
         encoder: &mut gfx::Encoder<gl::Resources, gl::CommandBuffer>,
         target: &gfx::handle::RawRenderTargetView<gl::Resources>,
-    ) -> Pipeline {
+    ) -> Self {
         // Create point buffer
         let instances = factory
             .create_buffer(
@@ -123,7 +123,7 @@ impl Pipeline {
             .update_buffer(&data.globals, &[globals], 0)
             .expect("Globals initialization");
 
-        Pipeline {
+        Self {
             slice,
             data,
             shader,

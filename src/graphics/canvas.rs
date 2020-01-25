@@ -17,8 +17,8 @@ impl Canvas {
     /// Creates a new [`Canvas`] with the given size.
     ///
     /// [`Canvas`]: struct.Canvas.html
-    pub fn new(gpu: &mut Gpu, width: u16, height: u16) -> Result<Canvas> {
-        Ok(Canvas {
+    pub fn new(gpu: &mut Gpu, width: u16, height: u16) -> Result<Self> {
+        Ok(Self {
             drawable: gpu.create_drawable_texture(width, height),
         })
     }
@@ -27,8 +27,8 @@ impl Canvas {
     ///
     /// [`Task`]: ../load/struct.Task.html
     /// [`Canvas`]: struct.Canvas.html
-    pub fn load(width: u16, height: u16) -> Task<Canvas> {
-        Task::using_gpu(move |gpu| Canvas::new(gpu, width, height))
+    pub fn load(width: u16, height: u16) -> Task<Self> {
+        Task::using_gpu(move |gpu| Self::new(gpu, width, height))
     }
 
     /// Returns the width of the [`Canvas`].

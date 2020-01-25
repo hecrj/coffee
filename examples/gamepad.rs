@@ -22,8 +22,8 @@ struct Gamepad {
 }
 
 impl Input for Gamepad {
-    fn new() -> Gamepad {
-        Gamepad { last_event: None }
+    fn new() -> Self {
+        Self { last_event: None }
     }
 
     fn update(&mut self, event: input::Event) {

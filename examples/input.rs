@@ -31,8 +31,8 @@ struct CustomInput {
 }
 
 impl Input for CustomInput {
-    fn new() -> CustomInput {
-        CustomInput {
+    fn new() -> Self {
+        Self {
             cursor_position: Point::new(0.0, 0.0),
             mouse_wheel: Point::new(0.0, 0.0),
             keys_pressed: HashSet::new(),

@@ -37,8 +37,8 @@ struct Snake {
 }
 
 impl Snake {
-    fn new() -> Snake {
-        Snake {
+    fn new() -> Self {
+        Self {
             square_pos: vec![],
             direction: None,
         }
@@ -166,9 +166,9 @@ struct Apple {
 }
 
 impl Apple {
-    fn new() -> Apple {
+    fn new() -> Self {
         let (x, y) = new_random_pos();
-        Apple {
+        Self {
             pos: Position(x, y),
             eaten: false,
         }
@@ -297,8 +297,8 @@ struct CustomInput {
 }
 
 impl Input for CustomInput {
-    fn new() -> CustomInput {
-        CustomInput {
+    fn new() -> Self {
+        Self {
             keys_pressed: vec![],
         }
     }

@@ -13,7 +13,7 @@ pub struct Pipeline {
 }
 
 impl Pipeline {
-    pub fn new(device: &mut wgpu::Device) -> Pipeline {
+    pub fn new(device: &mut wgpu::Device) -> Self {
         let sampler = device.create_sampler(&wgpu::SamplerDescriptor {
             address_mode_u: wgpu::AddressMode::ClampToEdge,
             address_mode_v: wgpu::AddressMode::ClampToEdge,
