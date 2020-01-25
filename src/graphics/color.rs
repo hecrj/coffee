@@ -58,7 +58,7 @@ impl Color {
     /// Creates a new [`Color`] from components in the [0, 1.0] range.
     ///
     /// [`Color`]: struct.Color.html
-    pub fn new(r: f32, g: f32, b: f32, a: f32) -> Color {
+    pub fn new(r: f32, g: f32, b: f32, a: f32) -> Self {
         debug_assert!(r >= 0.0, "Red component is < 0.0");
         debug_assert!(r <= 1.0, "Red component is > 1.0");
         debug_assert!(g >= 0.0, "Green component is < 0.0");
@@ -67,14 +67,14 @@ impl Color {
         debug_assert!(b <= 1.0, "Blue component is > 1.0");
         debug_assert!(a >= 0.0, "Alpha component is < 0.0");
         debug_assert!(a <= 1.0, "Alpha component is > 1.0");
-        Color { r, g, b, a }
+        Self { r, g, b, a }
     }
 
     /// Creates a new [`Color`] from its RGB components in the [0, 255] range.
     ///
     /// [`Color`]: struct.Color.html
-    pub fn from_rgb(r: u8, g: u8, b: u8) -> Color {
-        Color {
+    pub fn from_rgb(r: u8, g: u8, b: u8) -> Self {
+        Self {
             r: r as f32 / 255.0,
             g: g as f32 / 255.0,
             b: b as f32 / 255.0,
@@ -85,7 +85,7 @@ impl Color {
     /// Creates a new [`Color`] from its RGB representation (0xRRGGBB).
     ///
     /// [`Color`]: struct.Color.html
-    pub fn from_rgb_u32(color: u32) -> Color {
+    pub fn from_rgb_u32(color: u32) -> Self {
         debug_assert!(
             color <= 0xFFFFFF,
             "Color contains value higher than 0xFFFFFF"
@@ -129,10 +129,10 @@ impl Color {
 }
 
 impl From<[u8; 3]> for Color {
-    fn from(values: [u8; 3]) -> Color {
+    fn from(values: [u8; 3]) -> Self {
         let [r, g, b] = values;
 
-        Color::from_rgb(r, g, b)
+        Self::from_rgb(r, g, b)
     }
 }
 

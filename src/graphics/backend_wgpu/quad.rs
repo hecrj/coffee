@@ -176,7 +176,7 @@ impl Pipeline {
             usage: wgpu::BufferUsage::VERTEX | wgpu::BufferUsage::TRANSFER_DST,
         });
 
-        Pipeline {
+        Self {
             pipeline,
             transform: transform_buffer,
             vertices,

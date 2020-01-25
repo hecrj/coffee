@@ -42,7 +42,7 @@ impl Pipeline {
         factory: &mut gl::Factory,
         encoder: &mut gfx::Encoder<gl::Resources, gl::CommandBuffer>,
         target: &gfx::handle::RawRenderTargetView<gl::Resources>,
-    ) -> Pipeline {
+    ) -> Self {
         let vertices = factory
             .create_buffer(
                 Self::INITIAL_BUFFER_SIZE,
@@ -87,7 +87,7 @@ impl Pipeline {
             .update_buffer(&data.globals, &[globals], 0)
             .expect("Globals initialization");
 
-        Pipeline {
+        Self {
             data,
             indices,
             shader,
@@ -167,7 +167,7 @@ pub struct Shader {
 }
 
 impl Shader {
-    pub fn new(factory: &mut gl::Factory, init: pipe::Init<'_>) -> Shader {
+    pub fn new(factory: &mut gl::Factory, init: pipe::Init<'_>) -> Self {
         let set = factory
             .create_shader_set(
                 include_bytes!("shader/triangle.vert"),
@@ -192,12 +192,12 @@ impl Shader {
             )
             .expect("Pipeline state creation");
 
-        Shader { state }
+        Self { state }
     }
 }
 
 impl Vertex {
-    pub fn new(position: [f32; 2], color: [f32; 4]) -> Vertex {
-        Vertex { position, color }
+    pub fn new(position: [f32; 2], color: [f32; 4]) -> Self {
+        Self { position, color }
     }
 }

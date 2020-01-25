@@ -30,7 +30,7 @@ impl Texture {
         device: &mut wgpu::Device,
         pipeline: &Pipeline,
         image: &image::DynamicImage,
-    ) -> Texture {
+    ) -> Self {
         let bgra = image.to_bgra();
         let width = bgra.width() as u16;
         let height = bgra.height() as u16;
@@ -44,7 +44,7 @@ impl Texture {
             wgpu::TextureUsage::TRANSFER_DST | wgpu::TextureUsage::SAMPLED,
         );
 
-        Texture {
+        Self {
             raw: Rc::new(texture),
             view: Rc::new(view),
             binding: Rc::new(binding),

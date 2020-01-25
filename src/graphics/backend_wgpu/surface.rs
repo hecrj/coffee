@@ -17,7 +17,7 @@ impl Surface {
         window: winit::Window,
         instance: &wgpu::Instance,
         device: &wgpu::Device,
-    ) -> Surface {
+    ) -> Self {
         let surface = instance.create_surface(&window);
 
         let size = window
@@ -33,7 +33,7 @@ impl Surface {
         let (swap_chain, extent, buffer, target) =
             new_swap_chain(device, &surface, size);
 
-        Surface {
+        Self {
             window,
             surface,
             swap_chain,

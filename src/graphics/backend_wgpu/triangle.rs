@@ -14,7 +14,7 @@ pub struct Pipeline {
 impl Pipeline {
     const INITIAL_BUFFER_SIZE: u32 = 100_000;
 
-    pub fn new(device: &mut wgpu::Device) -> Pipeline {
+    pub fn new(device: &mut wgpu::Device) -> Self {
         let transform_layout =
             device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
                 bindings: &[wgpu::BindGroupLayoutBinding {
@@ -121,7 +121,7 @@ impl Pipeline {
             usage: wgpu::BufferUsage::INDEX | wgpu::BufferUsage::TRANSFER_DST,
         });
 
-        Pipeline {
+        Self {
             pipeline,
             transform: transform_buffer,
             constants: constant_bind_group,
@@ -245,8 +245,8 @@ pub struct Vertex {
 }
 
 impl Vertex {
-    pub fn new(position: [f32; 2], color: [f32; 4]) -> Vertex {
-        Vertex {
+    pub fn new(position: [f32; 2], color: [f32; 4]) -> Self {
+        Self {
             _position: position,
             _color: color,
         }

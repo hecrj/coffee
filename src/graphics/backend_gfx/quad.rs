@@ -179,7 +179,7 @@ pub struct Shader {
 }
 
 impl Shader {
-    pub fn new(factory: &mut gl::Factory, init: pipe::Init<'_>) -> Shader {
+    pub fn new(factory: &mut gl::Factory, init: pipe::Init<'_>) -> Self {
         let set = factory
             .create_shader_set(
                 include_bytes!("shader/quad.vert"),
@@ -204,7 +204,7 @@ impl Shader {
             )
             .expect("Pipeline state creation");
 
-        Shader { state }
+        Self { state }
     }
 }
 

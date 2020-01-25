@@ -25,8 +25,8 @@ impl Mesh {
     /// Creates a new empty [`Mesh`] with a default tolerance of `0.1`.
     ///
     /// [`Mesh`]: struct.Mesh.html
-    pub fn new() -> Mesh {
-        Mesh {
+    pub fn new() -> Self {
+        Self {
             tolerance: 0.1,
             buffers: lyon::VertexBuffers::new(),
         }
@@ -40,8 +40,8 @@ impl Mesh {
     ///
     /// [`Mesh`]: struct.Mesh.html
     /// [`Transformation`]: struct.Transformation.html
-    pub fn new_with_tolerance(tolerance: f32) -> Mesh {
-        Mesh {
+    pub fn new_with_tolerance(tolerance: f32) -> Self {
+        Self {
             tolerance,
             buffers: lyon::VertexBuffers::new(),
         }
