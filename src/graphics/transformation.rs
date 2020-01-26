@@ -13,8 +13,8 @@ pub struct Transformation(Matrix3<f32>);
 
 impl Transformation {
     /// Get the identity transformation.
-    pub fn identity() -> Transformation {
-        Transformation(Matrix3::identity())
+    pub fn identity() -> Self {
+        Self(Matrix3::identity())
     }
 
     /// Creates an orthographic projection.
@@ -24,8 +24,8 @@ impl Transformation {
     ///
     /// [`Target`]: struct.Target.html
     #[rustfmt::skip]
-    pub fn orthographic(width: f32, height: f32) -> Transformation {
-        Transformation(nalgebra::Matrix3::new(
+    pub fn orthographic(width: f32, height: f32) -> Self {
+        Self(nalgebra::Matrix3::new(
             2.0 / width, 0.0, -1.0,
             0.0, 2.0 / height, -1.0,
             0.0, 0.0, 1.0
@@ -35,8 +35,8 @@ impl Transformation {
     /// Creates a translate transformation.
     ///
     /// You can use this to pan your camera, for example.
-    pub fn translate(translation: Vector) -> Transformation {
-        Transformation(Matrix3::new_translation(&Vector::new(
+    pub fn translate(translation: Vector) -> Self {
+        Self(Matrix3::new_translation(&Vector::new(
             translation.x,
             translation.y,
         )))
@@ -45,23 +45,23 @@ impl Transformation {
     /// Creates a uniform scale transformation.
     ///
     /// You can use this to zoom your camera, for example.
-    pub fn scale(scale: f32) -> Transformation {
-        Transformation(Matrix3::new_scaling(scale))
+    pub fn scale(scale: f32) -> Self {
+        Self(Matrix3::new_scaling(scale))
     }
 
     /// Creates a non-uniform scale transformation.
     ///
     /// It allows you to scale each axis independently. You should rarely need
     /// this.
-    pub fn nonuniform_scale(scale: Vector) -> Transformation {
-        Transformation(Matrix3::new_nonuniform_scaling(&scale))
+    pub fn nonuniform_scale(scale: Vector) -> Self {
+        Self(Matrix3::new_nonuniform_scaling(&scale))
     }
 
     /// Creates a rotation transformation (in radians).
     ///
     /// You can use this to rotate your camera, for example.
-    pub fn rotate(rotation: f32) -> Transformation {
-        Transformation(Matrix3::new_rotation(rotation))
+    pub fn rotate(rotation: f32) -> Self {
+        Self(Matrix3::new_rotation(rotation))
     }
 }
 
@@ -69,7 +69,7 @@ impl Mul for Transformation {
     type Output = Self;
 
     fn mul(self, rhs: Self) -> Self {
-        Transformation(self.0 * rhs.0)
+        Self(self.0 * rhs.0)
     }
 }
 
@@ -99,7 +99,7 @@ impl From<Transformation> for [f32; 16] {
 
 impl From<Matrix3<f32>> for Transformation {
     fn from(matrix: Matrix3<f32>) -> Self {
-        Transformation(matrix)
+        Self(matrix)
     }
 }
 
