@@ -32,9 +32,9 @@ impl Settings {
 
         winit::window::WindowBuilder::new()
             .with_title(self.title)
-            .with_inner_size(winit::dpi::LogicalSize {
-                width: self.size.0 as f64,
-                height: self.size.1 as f64,
+            .with_inner_size(winit::dpi::PhysicalSize {
+                width: self.size.0,
+                height: self.size.1,
             })
             .with_resizable(self.resizable)
             .with_fullscreen(monitor.map(winit::window::Fullscreen::Borderless))

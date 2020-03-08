@@ -41,7 +41,11 @@ impl Surface {
         &self.target
     }
 
-    pub fn resize(&mut self, _gpu: &mut Gpu, size: winit::dpi::PhysicalSize) {
+    pub fn resize(
+        &mut self,
+        _gpu: &mut Gpu,
+        size: winit::dpi::PhysicalSize<u32>,
+    ) {
         self.context.resize(size);
 
         let dimensions = self.target.get_dimensions();
@@ -156,10 +160,12 @@ fn get_window_dimensions(
     ctx: &glutin::WindowedContext<glutin::PossiblyCurrent>,
 ) -> gfx::texture::Dimensions {
     let window = ctx.window();
+
     let (width, height) = {
-        let size = window.inner_size().to_physical(window.hidpi_factor());
+        let size = window.inner_size();
         (size.width as _, size.height as _)
     };
+
     let aa = ctx.get_pixel_format().multisampling.unwrap_or(0)
         as gfx::texture::NumSamples;
 

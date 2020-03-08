@@ -27,42 +27,21 @@ pub struct Window {
 
 impl Window {
     pub(crate) fn new(
-        mut settings: Settings,
+        settings: Settings,
         event_loop: &winit::event_loop::EventLoop<()>,
     ) -> Result<Window> {
-        let (mut width, mut height) = settings.size;
-
-        // Try to revert DPI
-        let dpi = event_loop.primary_monitor().hidpi_factor();
-
-        width = (width as f64 / dpi).round() as u32;
-        height = (height as f64 / dpi).round() as u32;
-
-        settings.size = (width, height);
-
+        let (width, height) = settings.size;
         let is_fullscreen = settings.fullscreen;
 
         let (gpu, surface) =
             Gpu::for_window(settings.into_builder(event_loop), event_loop)?;
 
-        let window = surface.window();
-
-        let (width, height) = {
-            let inner_size = window.inner_size();
-            let dpi = window.hidpi_factor();
-
-            (
-                (inner_size.width * dpi) as f32,
-                (inner_size.height * dpi) as f32,
-            )
-        };
-
         Ok(Window {
             is_fullscreen,
             gpu,
             surface,
-            width,
-            height,
+            width: width as f32,
+            height: height as f32,
             cursor_icon: Some(winit::window::CursorIcon::Default),
         })
     }
@@ -111,10 +90,6 @@ impl Window {
         self.height
     }
 
-    pub(crate) fn dpi(&self) -> f64 {
-        self.surface.window().hidpi_factor()
-    }
-
     pub(crate) fn swap_buffers(&mut self) {
         self.surface.swap_buffers(&mut self.gpu);
     }
@@ -123,14 +98,11 @@ impl Window {
         self.surface.request_redraw();
     }
 
-    pub(crate) fn resize(&mut self, new_size: winit::dpi::LogicalSize) {
-        let dpi = self.surface.window().hidpi_factor();
-        let physical_size = new_size.to_physical(dpi);
+    pub(crate) fn resize(&mut self, new_size: winit::dpi::PhysicalSize<u32>) {
+        self.surface.resize(&mut self.gpu, new_size);
 
-        self.surface.resize(&mut self.gpu, physical_size);
-
-        self.width = physical_size.width as f32;
-        self.height = physical_size.height as f32;
+        self.width = new_size.width as f32;
+        self.height = new_size.height as f32;
     }
 
     pub(crate) fn update_cursor(

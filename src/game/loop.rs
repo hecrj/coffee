@@ -128,9 +128,24 @@ pub trait Loop<Game: super::Game> {
                     window.resize(logical_size);
                 }
                 _ => {
-                    if let Some(input_event) =
-                        try_into_input_event(&window, event)
-                    {
+                    match event {
+                        winit::event::WindowEvent::KeyboardInput {
+                            input:
+                                winit::event::KeyboardInput {
+                                    virtual_keycode,
+                                    state: winit::event::ElementState::Released,
+                                    ..
+                                },
+                            ..
+                        } if Game::DEBUG_KEY.is_some() => {
+                            if virtual_keycode == Game::DEBUG_KEY {
+                                debug.toggle();
+                            }
+                        }
+                        _ => {}
+                    }
+
+                    if let Some(input_event) = try_into_input_event(event) {
                         game_loop.on_input(&mut input, input_event);
                     }
                 }
@@ -141,8 +156,7 @@ pub trait Loop<Game: super::Game> {
 }
 
 fn try_into_input_event(
-    window: &Window,
-    event: winit::event::WindowEvent,
+    event: winit::event::WindowEvent<'_>,
 ) -> Option<input::Event> {
     match event {
         winit::event::WindowEvent::KeyboardInput {
@@ -175,8 +189,6 @@ fn try_into_input_event(
             _ => None,
         },
         winit::event::WindowEvent::CursorMoved { position, .. } => {
-            let position = position.to_physical(window.dpi());
-
             Some(input::Event::Mouse(mouse::Event::CursorMoved {
                 x: position.x as f32,
                 y: position.y as f32,
@@ -194,8 +206,6 @@ fn try_into_input_event(
             input::Event::Window(window::Event::Unfocused)
         }),
         winit::event::WindowEvent::Moved(position) => {
-            let position = position.to_physical(window.dpi());
-
             Some(input::Event::Window(window::Event::Moved {
                 x: position.x as f32,
                 y: position.y as f32,
