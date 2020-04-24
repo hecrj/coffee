@@ -15,17 +15,17 @@ use crate::graphics::{Color, Transformation};
 /// [`Canvas`]: struct.Canvas.html
 pub struct Target<'a> {
     gpu: &'a mut Gpu,
-    view: TargetView,
+    view: &'a TargetView,
     transformation: Transformation,
 }
 
 impl<'a> Target<'a> {
     pub(super) fn new(
-        gpu: &mut Gpu,
-        view: TargetView,
+        gpu: &'a mut Gpu,
+        view: &'a TargetView,
         width: f32,
         height: f32,
-    ) -> Target<'_> {
+    ) -> Self {
         Target {
             gpu,
             view,
@@ -34,12 +34,12 @@ impl<'a> Target<'a> {
     }
 
     pub(super) fn with_transformation(
-        gpu: &mut Gpu,
-        view: TargetView,
+        gpu: &'a mut Gpu,
+        view: &'a TargetView,
         width: f32,
         height: f32,
         transformation: Transformation,
-    ) -> Target<'_> {
+    ) -> Self {
         let mut target = Self::new(gpu, view, width, height);
         target.transformation = transformation * target.transformation;
         target
@@ -82,7 +82,7 @@ impl<'a> Target<'a> {
     pub fn transform(&mut self, transformation: Transformation) -> Target<'_> {
         Target {
             gpu: self.gpu,
-            view: self.view.clone(),
+            view: self.view,
             transformation: self.transformation * transformation,
         }
     }

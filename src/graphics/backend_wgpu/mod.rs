@@ -19,6 +19,7 @@ use crate::{Error, Result};
 #[allow(missing_docs)]
 pub struct Gpu {
     device: wgpu::Device,
+    queue: wgpu::Queue,
     quad_pipeline: quad::Pipeline,
     triangle_pipeline: triangle::Pipeline,
     encoder: wgpu::CommandEncoder,
@@ -33,32 +34,43 @@ impl Gpu {
             .build(event_loop)
             .map_err(|error| Error::WindowCreation(error.to_string()))?;
 
-        let instance = wgpu::Instance::new();
+        let (mut device, queue) = futures::executor::block_on(async {
+            let adapter = wgpu::Adapter::request(
+                &wgpu::RequestAdapterOptions {
+                    power_preference: wgpu::PowerPreference::HighPerformance,
+                    compatible_surface: None,
+                },
+                wgpu::BackendBit::all(),
+            )
+            .await
+            .expect("Request adapter");
 
-        let adapter = instance.request_adapter(&wgpu::RequestAdapterOptions {
-            power_preference: wgpu::PowerPreference::HighPerformance,
+            let (device, queue) = adapter
+                .request_device(&wgpu::DeviceDescriptor {
+                    extensions: wgpu::Extensions {
+                        anisotropic_filtering: false,
+                    },
+                    limits: wgpu::Limits::default(),
+                })
+                .await;
+
+            (device, queue)
         });
 
-        let mut device = adapter.request_device(&wgpu::DeviceDescriptor {
-            extensions: wgpu::Extensions {
-                anisotropic_filtering: false,
-            },
-            limits: wgpu::Limits::default(),
-        });
-
-        let surface = Surface::new(window, &instance, &device);
+        let surface = Surface::new(window, &device);
 
         let quad_pipeline = quad::Pipeline::new(&mut device);
         let triangle_pipeline = triangle::Pipeline::new(&mut device);
 
         let encoder =
             device.create_command_encoder(&wgpu::CommandEncoderDescriptor {
-                todo: 0,
+                label: Some("coffee::backend encoder"),
             });
 
         Ok((
             Gpu {
                 device,
+                queue,
                 quad_pipeline,
                 triangle_pipeline,
                 encoder,
@@ -91,14 +103,19 @@ impl Gpu {
         &mut self,
         image: &image::DynamicImage,
     ) -> Texture {
-        Texture::new(&mut self.device, &self.quad_pipeline, image)
+        Texture::new(&mut self.device, &self.queue, &self.quad_pipeline, image)
     }
 
     pub(super) fn upload_texture_array(
         &mut self,
         layers: &[image::DynamicImage],
     ) -> Texture {
-        Texture::new_array(&mut self.device, &self.quad_pipeline, layers)
+        Texture::new_array(
+            &mut self.device,
+            &self.queue,
+            &self.quad_pipeline,
+            layers,
+        )
     }
 
     pub(super) fn create_drawable_texture(
@@ -108,6 +125,7 @@ impl Gpu {
     ) -> texture::Drawable {
         texture::Drawable::new(
             &mut self.device,
+            &self.queue,
             &self.quad_pipeline,
             width,
             height,
@@ -119,12 +137,14 @@ impl Gpu {
         drawable: &texture::Drawable,
     ) -> image::DynamicImage {
         let new_encoder = self.device.create_command_encoder(
-            &wgpu::CommandEncoderDescriptor { todo: 0 },
+            &wgpu::CommandEncoderDescriptor {
+                label: Some("coffee::backend encoder"),
+            },
         );
 
         let encoder = std::mem::replace(&mut self.encoder, new_encoder);
 
-        drawable.read_pixels(&mut self.device, encoder)
+        drawable.read_pixels(&mut self.device, &self.queue, encoder)
     }
 
     pub(super) fn upload_font(&mut self, bytes: &'static [u8]) -> Font {

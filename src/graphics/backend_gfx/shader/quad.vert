@@ -14,13 +14,6 @@ layout (std140) uniform Globals {
 out vec2 v_Uv;
 flat out uint v_Layer;
 
-const mat4 INVERT_Y_AXIS = mat4(
-    vec4(1.0, 0.0, 0.0, 0.0),
-    vec4(0.0, -1.0, 0.0, 0.0),
-    vec4(0.0, 0.0, 1.0, 0.0),
-    vec4(0.0, 0.0, 0.0, 1.0)
-);
-
 void main() {
     v_Uv = a_Pos * a_Src.zw + a_Src.xy;
     v_Layer = t_Layer;
@@ -32,7 +25,7 @@ void main() {
         vec4(a_Translation, 0.0, 1.0)
     );
 
-    vec4 position = INVERT_Y_AXIS * u_MVP * instance_transform * vec4(a_Pos, 0.0, 1.0);
+    vec4 position = u_MVP * instance_transform * vec4(a_Pos, 0.0, 1.0);
 
     gl_Position = position;
 }

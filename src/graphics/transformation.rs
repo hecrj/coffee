@@ -27,7 +27,7 @@ impl Transformation {
     pub fn orthographic(width: f32, height: f32) -> Transformation {
         Transformation(nalgebra::Matrix3::new(
             2.0 / width, 0.0, -1.0,
-            0.0, 2.0 / height, -1.0,
+            0.0, -2.0 / height, 1.0,
             0.0, 0.0, 1.0
         ))
     }

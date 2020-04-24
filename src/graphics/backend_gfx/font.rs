@@ -2,7 +2,7 @@ use gfx_device_gl as gl;
 use gfx_glyph::GlyphCruncher;
 
 use crate::graphics::gpu::{TargetView, Transformation};
-use crate::graphics::{HorizontalAlignment, Text, VerticalAlignment};
+use crate::graphics::{HorizontalAlignment, Text, Vector, VerticalAlignment};
 
 pub struct Font {
     glyphs: gfx_glyph::GlyphBrush<'static, gl::Resources, gl::Factory>,
@@ -46,7 +46,10 @@ impl Font {
 
         self.glyphs
             .use_queue()
-            .transform(transformation)
+            .transform(
+                Transformation::nonuniform_scale(Vector::new(1.0, -1.0))
+                    * transformation,
+            )
             .draw(encoder, &typed_target)
             .expect("Font draw");
     }

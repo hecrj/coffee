@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use super::{Gpu, TargetView};
 
 pub struct Surface {
@@ -7,31 +5,25 @@ pub struct Surface {
     surface: wgpu::Surface,
     swap_chain: wgpu::SwapChain,
     extent: wgpu::Extent3d,
-    buffer: wgpu::Texture,
-    target: TargetView,
+    output: Option<wgpu::SwapChainOutput>,
 }
 
 impl Surface {
     pub fn new(
         window: winit::window::Window,
-        instance: &wgpu::Instance,
         device: &wgpu::Device,
     ) -> Surface {
-        use raw_window_handle::HasRawWindowHandle as _;
+        let surface = wgpu::Surface::create(&window);
+        let size = window.inner_size();
 
-        let surface = instance.create_surface(window.raw_window_handle());
-        let size = window.inner_size().to_physical(window.hidpi_factor());
-
-        let (swap_chain, extent, buffer, target) =
-            new_swap_chain(device, &surface, size);
+        let (swap_chain, extent) = new_swap_chain(device, &surface, size);
 
         Surface {
             window,
             surface,
             swap_chain,
             extent,
-            buffer,
-            target,
+            output: None,
         }
     }
 
@@ -39,56 +31,46 @@ impl Surface {
         &self.window
     }
 
-    pub fn target(&self) -> &TargetView {
-        &self.target
+    pub fn target(&mut self) -> &TargetView {
+        if self.output.is_none() {
+            let output = self
+                .swap_chain
+                .get_next_texture()
+                .expect("Get next texture");
+
+            self.output = Some(output);
+        }
+
+        &self.output.as_ref().unwrap().view
     }
 
-    pub fn resize(&mut self, gpu: &mut Gpu, size: winit::dpi::PhysicalSize) {
-        let (swap_chain, extent, buffer, target) =
+    pub fn resize(
+        &mut self,
+        gpu: &mut Gpu,
+        size: winit::dpi::PhysicalSize<u32>,
+    ) {
+        let (swap_chain, extent) =
             new_swap_chain(&gpu.device, &self.surface, size);
 
         self.swap_chain = swap_chain;
         self.extent = extent;
-        self.buffer = buffer;
-        self.target = target;
+        self.output = None;
     }
 
     pub fn swap_buffers(&mut self, gpu: &mut Gpu) {
-        let output = self.swap_chain.get_next_texture();
-
         let new_encoder = gpu.device.create_command_encoder(
-            &wgpu::CommandEncoderDescriptor { todo: 0 },
+            &wgpu::CommandEncoderDescriptor {
+                label: Some("coffee::backend::surface blit"),
+            },
         );
 
         // We swap the current decoder by a new one here, so we can finish the
         // current frame
-        let mut encoder = std::mem::replace(&mut gpu.encoder, new_encoder);
+        let encoder = std::mem::replace(&mut gpu.encoder, new_encoder);
 
-        encoder.copy_texture_to_texture(
-            wgpu::TextureCopyView {
-                texture: &self.buffer,
-                array_layer: 0,
-                mip_level: 0,
-                origin: wgpu::Origin3d {
-                    x: 0.0,
-                    y: 0.0,
-                    z: 0.0,
-                },
-            },
-            wgpu::TextureCopyView {
-                texture: &output.texture,
-                array_layer: 0,
-                mip_level: 0,
-                origin: wgpu::Origin3d {
-                    x: 0.0,
-                    y: 0.0,
-                    z: 0.0,
-                },
-            },
-            self.extent,
-        );
+        gpu.queue.submit(&[encoder.finish()]);
 
-        gpu.device.get_queue().submit(&[encoder.finish()]);
+        self.output = None;
     }
 
     pub fn request_redraw(&mut self) {
@@ -99,38 +81,25 @@ impl Surface {
 fn new_swap_chain(
     device: &wgpu::Device,
     surface: &wgpu::Surface,
-    size: winit::dpi::PhysicalSize,
-) -> (wgpu::SwapChain, wgpu::Extent3d, wgpu::Texture, TargetView) {
+    size: winit::dpi::PhysicalSize<u32>,
+) -> (wgpu::SwapChain, wgpu::Extent3d) {
     let swap_chain = device.create_swap_chain(
         surface,
         &wgpu::SwapChainDescriptor {
             usage: wgpu::TextureUsage::OUTPUT_ATTACHMENT
                 | wgpu::TextureUsage::COPY_DST,
-            format: wgpu::TextureFormat::Bgra8Unorm,
-            width: size.width.round() as u32,
-            height: size.height.round() as u32,
-            present_mode: wgpu::PresentMode::Vsync,
+            format: wgpu::TextureFormat::Bgra8UnormSrgb,
+            width: size.width,
+            height: size.height,
+            present_mode: wgpu::PresentMode::Mailbox,
         },
     );
 
     let extent = wgpu::Extent3d {
-        width: size.width.round() as u32,
-        height: size.height.round() as u32,
+        width: size.width,
+        height: size.height,
         depth: 1,
     };
 
-    let buffer = device.create_texture(&wgpu::TextureDescriptor {
-        size: extent,
-        dimension: wgpu::TextureDimension::D2,
-        array_layer_count: 1,
-        mip_level_count: 1,
-        sample_count: 1,
-        format: wgpu::TextureFormat::Bgra8UnormSrgb,
-        usage: wgpu::TextureUsage::OUTPUT_ATTACHMENT
-            | wgpu::TextureUsage::COPY_SRC,
-    });
-
-    let target = Rc::new(buffer.create_default_view());
-
-    (swap_chain, extent, buffer, target)
+    (swap_chain, extent)
 }

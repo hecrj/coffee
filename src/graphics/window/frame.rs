@@ -48,11 +48,17 @@ impl<'a> Frame<'a> {
     ///
     /// [`Target`]: struct.Target.html
     pub fn as_target(&mut self) -> Target<'_> {
-        let view = self.window.surface.target().clone();
-        let width = self.window.width;
-        let height = self.window.height;
+        let Window {
+            surface,
+            gpu,
+            width,
+            height,
+            ..
+        } = &mut self.window;
 
-        Target::new(self.window.gpu(), view, width, height)
+        let view = surface.target();
+
+        Target::new(gpu, view, *width, *height)
     }
 
     /// Clear the frame with the given [`Color`].

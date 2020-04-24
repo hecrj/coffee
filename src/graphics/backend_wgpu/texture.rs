@@ -8,7 +8,7 @@ use crate::graphics::Transformation;
 #[derive(Clone)]
 pub struct Texture {
     raw: Rc<wgpu::Texture>,
-    view: TargetView,
+    view: Rc<TargetView>,
     binding: Rc<quad::TextureBinding>,
     width: u16,
     height: u16,
@@ -28,6 +28,7 @@ impl fmt::Debug for Texture {
 impl Texture {
     pub(super) fn new(
         device: &mut wgpu::Device,
+        queue: &wgpu::Queue,
         pipeline: &Pipeline,
         image: &image::DynamicImage,
     ) -> Texture {
@@ -37,9 +38,10 @@ impl Texture {
 
         let (texture, view, binding) = create_texture_array(
             device,
+            queue,
             pipeline,
-            width,
-            height,
+            u32::from(width),
+            u32::from(height),
             Some(&[&bgra.into_raw()[..]]),
             wgpu::TextureUsage::COPY_DST | wgpu::TextureUsage::SAMPLED,
         );
@@ -56,6 +58,7 @@ impl Texture {
 
     pub(super) fn new_array(
         device: &mut wgpu::Device,
+        queue: &wgpu::Queue,
         pipeline: &Pipeline,
         layers: &[image::DynamicImage],
     ) -> Texture {
@@ -70,9 +73,10 @@ impl Texture {
 
         let (texture, view, binding) = create_texture_array(
             device,
+            queue,
             pipeline,
-            width,
-            height,
+            u32::from(width),
+            u32::from(height),
             Some(&raw_layers[..]),
             wgpu::TextureUsage::COPY_DST | wgpu::TextureUsage::SAMPLED,
         );
@@ -112,15 +116,17 @@ pub struct Drawable {
 impl Drawable {
     pub fn new(
         device: &mut wgpu::Device,
+        queue: &wgpu::Queue,
         pipeline: &Pipeline,
         width: u16,
         height: u16,
     ) -> Drawable {
         let (texture, view, binding) = create_texture_array(
             device,
+            queue,
             pipeline,
-            width,
-            height,
+            u32::from(width),
+            u32::from(height),
             None,
             wgpu::TextureUsage::OUTPUT_ATTACHMENT
                 | wgpu::TextureUsage::SAMPLED
@@ -150,6 +156,7 @@ impl Drawable {
     pub fn read_pixels(
         &self,
         device: &mut wgpu::Device,
+        queue: &wgpu::Queue,
         mut encoder: wgpu::CommandEncoder,
     ) -> image::DynamicImage {
         let texture = self.texture();
@@ -157,6 +164,7 @@ impl Drawable {
         let buffer_size = 4 * texture.width() as u64 * texture.height() as u64;
 
         let buffer = device.create_buffer(&wgpu::BufferDescriptor {
+            label: Some("coffee::backend::texture pixels"),
             size: buffer_size,
             usage: wgpu::BufferUsage::COPY_DST
                 | wgpu::BufferUsage::COPY_SRC
@@ -168,47 +176,31 @@ impl Drawable {
                 texture: &texture.raw,
                 mip_level: 0,
                 array_layer: 0,
-                origin: wgpu::Origin3d {
-                    x: 0.0,
-                    y: 0.0,
-                    z: 0.0,
-                },
+                origin: wgpu::Origin3d { x: 0, y: 0, z: 0 },
             },
             wgpu::BufferCopyView {
                 buffer: &buffer,
                 offset: 0,
-                row_pitch: 4 * texture.width() as u32,
-                image_height: texture.height() as u32,
+                bytes_per_row: 4 * u32::from(texture.width()),
+                rows_per_image: u32::from(texture.height()),
             },
             wgpu::Extent3d {
-                width: texture.width() as u32,
-                height: texture.height() as u32,
+                width: u32::from(texture.width()),
+                height: u32::from(texture.height()),
                 depth: 1,
             },
         );
 
-        device.get_queue().submit(&[encoder.finish()]);
+        queue.submit(&[encoder.finish()]);
 
-        use std::cell::RefCell;
+        use futures::executor::block_on;
 
-        let pixels: Rc<RefCell<Option<Vec<u8>>>> = Rc::new(RefCell::new(None));
-        let write = pixels.clone();
+        let result = block_on(buffer.map_read(0, buffer_size));
 
-        buffer.map_read_async(0, buffer_size, move |result| {
-            match result {
-                Ok(mapping) => {
-                    *write.borrow_mut() = Some(mapping.data.to_vec());
-                }
-                Err(_) => {
-                    *write.borrow_mut() = Some(vec![]);
-                }
-            };
-        });
-
-        device.poll(true);
-
-        let data = pixels.borrow();
-        let bgra = data.clone().unwrap();
+        let bgra = match result {
+            Ok(mapping) => mapping.as_slice().to_vec(),
+            Err(_) => vec![],
+        };
 
         image::DynamicImage::ImageBgra8(
             image::ImageBuffer::from_raw(
@@ -228,21 +220,23 @@ impl Drawable {
 // Helpers
 fn create_texture_array(
     device: &mut wgpu::Device,
+    queue: &wgpu::Queue,
     pipeline: &Pipeline,
-    width: u16,
-    height: u16,
+    width: u32,
+    height: u32,
     layers: Option<&[&[u8]]>,
     usage: wgpu::TextureUsage,
 ) -> (wgpu::Texture, wgpu::TextureView, quad::TextureBinding) {
     let extent = wgpu::Extent3d {
-        width: width as u32,
-        height: height as u32,
+        width: width,
+        height: height,
         depth: 1,
     };
 
     let layer_count = layers.map(|l| l.len()).unwrap_or(1) as u32;
 
     let texture = device.create_texture(&wgpu::TextureDescriptor {
+        label: Some("coffee::backend::texture array"),
         size: extent,
         array_layer_count: layer_count,
         mip_level_count: 1,
@@ -259,35 +253,30 @@ fn create_texture_array(
             layers.iter().cloned().flatten().cloned().collect();
 
         let temp_buf = device
-            .create_buffer_mapped(slice.len(), wgpu::BufferUsage::COPY_SRC)
-            .fill_from_slice(&slice[..]);
+            .create_buffer_with_data(&slice[..], wgpu::BufferUsage::COPY_SRC);
 
         let mut encoder =
             device.create_command_encoder(&wgpu::CommandEncoderDescriptor {
-                todo: 0,
+                label: Some("coffee::backend::texture upload"),
             });
 
         encoder.copy_buffer_to_texture(
             wgpu::BufferCopyView {
                 buffer: &temp_buf,
                 offset: 0,
-                row_pitch: 4 * width as u32,
-                image_height: height as u32,
+                bytes_per_row: 4 * width,
+                rows_per_image: height,
             },
             wgpu::TextureCopyView {
                 texture: &texture,
                 array_layer: 0,
                 mip_level: 0,
-                origin: wgpu::Origin3d {
-                    x: 0.0,
-                    y: 0.0,
-                    z: 0.0,
-                },
+                origin: wgpu::Origin3d { x: 0, y: 0, z: 0 },
             },
             extent,
         );
 
-        device.get_queue().submit(&[encoder.finish()]);
+        queue.submit(&[encoder.finish()]);
     }
 
     let view = texture.create_view(&wgpu::TextureViewDescriptor {
