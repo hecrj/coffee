@@ -94,14 +94,14 @@ use backend_gfx as gpu;
     feature = "vulkan",
     feature = "metal",
     feature = "dx11",
-    feature = "dx12"
+    feature = "dx12",
 ))]
 mod backend_wgpu;
 #[cfg(any(
     feature = "vulkan",
     feature = "metal",
     feature = "dx11",
-    feature = "dx12"
+    feature = "dx12",
 ))]
 use backend_wgpu as gpu;
 
@@ -141,4 +141,4 @@ pub use text::{HorizontalAlignment, Text, VerticalAlignment};
 pub use texture_array::TextureArray;
 pub use transformation::Transformation;
 pub use vector::Vector;
-pub use window::{Frame, Settings as WindowSettings, Window};
+pub use window::{CursorIcon, Frame, Settings as WindowSettings, Window};

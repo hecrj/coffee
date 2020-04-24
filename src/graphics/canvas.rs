@@ -49,14 +49,14 @@ impl Canvas {
     ///
     /// [`Canvas`]: struct.Canvas.html
     /// [`Target`]: struct.Target.html
-    pub fn as_target<'a>(&mut self, gpu: &'a mut Gpu) -> Target<'a> {
+    pub fn as_target<'a>(&'a mut self, gpu: &'a mut Gpu) -> Target<'a> {
         let texture = self.drawable.texture();
 
         Target::with_transformation(
             gpu,
-            self.drawable.target().clone(),
-            texture.width() as f32,
-            texture.height() as f32,
+            self.drawable.target(),
+            f32::from(texture.width()),
+            f32::from(texture.height()),
             texture::Drawable::render_transformation(),
         )
     }

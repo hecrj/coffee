@@ -8,7 +8,7 @@ mod types;
 
 pub use font::Font;
 pub use quad::Quad;
-pub use surface::{winit, Surface};
+pub use surface::Surface;
 pub use texture::Texture;
 pub use triangle::Vertex;
 pub use types::TargetView;
@@ -40,8 +40,8 @@ pub struct Gpu {
 
 impl Gpu {
     pub(super) fn for_window(
-        builder: winit::WindowBuilder,
-        events_loop: &winit::EventsLoop,
+        builder: winit::window::WindowBuilder,
+        events_loop: &winit::event_loop::EventLoop<()>,
     ) -> Result<(Gpu, Surface)> {
         let (surface, device, mut factory) =
             Surface::new(builder, events_loop)?;

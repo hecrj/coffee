@@ -1,12 +1,10 @@
 use crate::graphics;
 
 // Null debug implementation
-#[cfg(not(debug_assertions))]
 #[allow(missing_debug_implementations)]
 #[allow(missing_docs)]
 pub struct Debug {}
 
-#[cfg(not(debug_assertions))]
 impl Debug {
     pub(crate) fn new(_gpu: &mut graphics::Gpu) -> Self {
         Self {}

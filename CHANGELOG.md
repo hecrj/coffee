@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   interface.
 - `Mesh::new_with_tolerance`, which allows to control the tolerance of line
   segment approximations. [#100]
+- `Game::cursor_icon`, which allows customization of the mouse cursor icon.
 
 ### Changed
 - `Mesh::stroke` now takes an `f32` as `line_width` instead of a `u16`.

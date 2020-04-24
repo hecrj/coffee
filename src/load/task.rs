@@ -388,7 +388,7 @@ impl Progress {
     ///
     /// [`Task`]: struct.Task.html
     pub fn percentage(&self) -> f32 {
-        (self.completed_work() as f32 / self.total_work.max(1) as f32 * 100.0)
+        self.completed_work() as f32 / self.total_work.max(1) as f32 * 100.0
     }
 
     /// Returns the title of the current [`Task::stage`], if there is one.
@@ -425,8 +425,8 @@ impl<A: 'static, B: 'static> Join for (Task<A>, Task<B>) {
         Task::sequence(
             loader_a.total_work() + loader_b.total_work(),
             move |task| {
-                ((loader_a.function)(task)
-                    .and_then(|a| (loader_b.function)(task).map(|b| (a, b))))
+                (loader_a.function)(task)
+                    .and_then(|a| (loader_b.function)(task).map(|b| (a, b)))
             },
         )
     }

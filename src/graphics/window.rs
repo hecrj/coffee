@@ -1,10 +1,10 @@
-mod event;
+mod cursor_icon;
 mod frame;
 mod settings;
 
-pub(crate) use crate::graphics::gpu::winit;
-pub(crate) use event::{Event, EventLoop};
+pub(crate) use winit;
 
+pub use cursor_icon::CursorIcon;
 pub use frame::Frame;
 pub use settings::Settings;
 
@@ -22,49 +22,27 @@ pub struct Window {
     width: f32,
     height: f32,
     is_fullscreen: bool,
+    cursor_icon: Option<winit::window::CursorIcon>,
 }
 
 impl Window {
     pub(crate) fn new(
-        mut settings: Settings,
-        event_loop: &EventLoop,
+        settings: Settings,
+        event_loop: &winit::event_loop::EventLoop<()>,
     ) -> Result<Window> {
-        let (mut width, mut height) = settings.size;
-
-        // Try to revert DPI
-        let dpi = event_loop.raw().get_primary_monitor().get_hidpi_factor();
-
-        width = (width as f64 / dpi).round() as u32;
-        height = (height as f64 / dpi).round() as u32;
-
-        settings.size = (width, height);
-
+        let (width, height) = settings.size;
         let is_fullscreen = settings.fullscreen;
 
-        let (gpu, surface) = Gpu::for_window(
-            settings.into_builder(event_loop.raw()),
-            event_loop.raw(),
-        )?;
-
-        let window = surface.window();
-
-        let (width, height) = window
-            .get_inner_size()
-            .map(|inner_size| {
-                let dpi = window.get_hidpi_factor();
-                (
-                    (inner_size.width * dpi) as f32,
-                    (inner_size.height * dpi) as f32,
-                )
-            })
-            .unwrap_or((width as f32, height as f32));
+        let (gpu, surface) =
+            Gpu::for_window(settings.into_builder(event_loop), event_loop)?;
 
         Ok(Window {
             is_fullscreen,
             gpu,
             surface,
-            width,
-            height,
+            width: width as f32,
+            height: height as f32,
+            cursor_icon: Some(winit::window::CursorIcon::Default),
         })
     }
 
@@ -89,10 +67,11 @@ impl Window {
         let monitor = if self.is_fullscreen {
             None
         } else {
-            Some(window.get_primary_monitor())
+            Some(window.primary_monitor())
         };
 
-        window.set_fullscreen(monitor);
+        window
+            .set_fullscreen(monitor.map(winit::window::Fullscreen::Borderless));
 
         self.is_fullscreen = !self.is_fullscreen;
     }
@@ -111,26 +90,34 @@ impl Window {
         self.height
     }
 
-    pub(crate) fn dpi(&self) -> f64 {
-        self.surface.window().get_hidpi_factor()
-    }
-
     pub(crate) fn swap_buffers(&mut self) {
         self.surface.swap_buffers(&mut self.gpu);
     }
 
-    pub(crate) fn resize(&mut self, new_size: winit::dpi::LogicalSize) {
-        let dpi = self.surface.window().get_hidpi_factor();
-        let physical_size = new_size.to_physical(dpi);
-
-        self.surface.resize(&mut self.gpu, physical_size);
-
-        self.width = physical_size.width as f32;
-        self.height = physical_size.height as f32;
+    pub(crate) fn request_redraw(&mut self) {
+        self.surface.request_redraw();
     }
 
-    pub(crate) fn update_cursor(&mut self, new_cursor: winit::MouseCursor) {
-        self.surface.window().set_cursor(new_cursor);
+    pub(crate) fn resize(&mut self, new_size: winit::dpi::PhysicalSize<u32>) {
+        self.surface.resize(&mut self.gpu, new_size);
+
+        self.width = new_size.width as f32;
+        self.height = new_size.height as f32;
+    }
+
+    pub(crate) fn update_cursor(
+        &mut self,
+        new_cursor: Option<winit::window::CursorIcon>,
+    ) {
+        if self.cursor_icon != new_cursor {
+            if let Some(cursor_icon) = new_cursor {
+                self.surface.window().set_cursor_icon(cursor_icon);
+            }
+            self.surface
+                .window()
+                .set_cursor_visible(new_cursor.is_some());
+            self.cursor_icon = new_cursor;
+        }
     }
 }
 

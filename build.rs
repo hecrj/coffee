@@ -3,7 +3,7 @@
     feature = "vulkan",
     feature = "metal",
     feature = "dx11",
-    feature = "dx12"
+    feature = "dx12",
 )))]
 compile_error!(
     "You need to enable a graphics backend feature. \
