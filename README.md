@@ -40,7 +40,7 @@ Add `coffee` as a dependency in your `Cargo.toml` and enable a graphics backend
 feature (`opengl`, `vulkan`, `metal`, `dx11`, or `dx12`):
 
 ```toml
-coffee = { version = "0.3", features = ["opengl"] }
+coffee = { version = "0.4", features = ["opengl"] }
 ```
 
 Rust is quite slow in debug mode. If you experience performance issues when
