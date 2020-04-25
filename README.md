@@ -6,13 +6,9 @@
 [![License](https://img.shields.io/crates/l/coffee.svg)](https://github.com/hecrj/coffee/blob/master/LICENSE)
 [![Gitter chat](https://badges.gitter.im/hecrj/coffee.png)](https://gitter.im/hecrj/coffee)
 
-An opinionated 2D game engine for Rust focused on simplicity, explicitness, and
-type-safety.
+An opinionated 2D game engine for Rust focused on simplicity, explicitness, and type-safety.
 
-__Coffee is in a very early stage of development.__ Active development is
-planned during 2019 (and hopefully beyond that!). Many [basic features are still
-missing], some [dependencies are experimental], and there are probably _many_
-bugs. [Feel free to contribute!]
+__Coffee is in a very early stage of development.__ Many [basic features are still missing], some [dependencies are experimental], and there are probably _many_ bugs. [Feel free to contribute!]
 
 [basic features are still missing]: https://github.com/hecrj/coffee/issues?q=is%3Aissue+is%3Aopen+label%3Afeature
 [dependencies are experimental]: #implementation-details
