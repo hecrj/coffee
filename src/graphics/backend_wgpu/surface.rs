@@ -86,8 +86,7 @@ fn new_swap_chain(
     let swap_chain = device.create_swap_chain(
         surface,
         &wgpu::SwapChainDescriptor {
-            usage: wgpu::TextureUsage::OUTPUT_ATTACHMENT
-                | wgpu::TextureUsage::COPY_DST,
+            usage: wgpu::TextureUsage::OUTPUT_ATTACHMENT,
             format: wgpu::TextureFormat::Bgra8UnormSrgb,
             width: size.width,
             height: size.height,
