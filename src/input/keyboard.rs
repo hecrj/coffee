@@ -30,6 +30,11 @@ impl Keyboard {
     pub fn was_key_released(&self, key_code: KeyCode) -> bool {
         self.released_keys.contains(&key_code)
     }
+
+    /// Returns the set of pressed keys.
+    pub fn pressed_keys(&self) -> &HashSet<KeyCode> {
+        &self.pressed_keys
+    }
 }
 
 impl Input for Keyboard {
