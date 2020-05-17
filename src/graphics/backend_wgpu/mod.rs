@@ -12,7 +12,7 @@ pub use texture::Texture;
 pub use triangle::Vertex;
 pub use types::TargetView;
 
-use crate::graphics::{Color, Transformation};
+use crate::graphics::{Color, Transformation, WindowSettings};
 use crate::{Error, Result};
 
 #[allow(missing_debug_implementations)]
@@ -27,9 +27,11 @@ pub struct Gpu {
 
 impl Gpu {
     pub(super) fn for_window(
-        builder: winit::window::WindowBuilder,
+        settings: WindowSettings,
         event_loop: &winit::event_loop::EventLoop<()>,
     ) -> Result<(Gpu, Surface)> {
+        let vsync = settings.vsync;
+        let builder = settings.into_builder(event_loop);
         let window = builder
             .build(event_loop)
             .map_err(|error| Error::WindowCreation(error.to_string()))?;
@@ -57,7 +59,7 @@ impl Gpu {
             (device, queue)
         });
 
-        let surface = Surface::new(window, &device);
+        let surface = Surface::new(window, &device, vsync);
 
         let quad_pipeline = quad::Pipeline::new(&mut device);
         let triangle_pipeline = triangle::Pipeline::new(&mut device);

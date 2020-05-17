@@ -16,6 +16,7 @@ pub fn main() -> Result<()> {
         resizable: false,
         fullscreen: false,
         maximized: false,
+        vsync: false,
     })
 }
 

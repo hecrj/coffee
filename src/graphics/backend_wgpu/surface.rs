@@ -6,17 +6,20 @@ pub struct Surface {
     swap_chain: wgpu::SwapChain,
     extent: wgpu::Extent3d,
     output: Option<wgpu::SwapChainOutput>,
+    vsync: bool,
 }
 
 impl Surface {
     pub fn new(
         window: winit::window::Window,
         device: &wgpu::Device,
+        vsync: bool,
     ) -> Surface {
         let surface = wgpu::Surface::create(&window);
         let size = window.inner_size();
 
-        let (swap_chain, extent) = new_swap_chain(device, &surface, size);
+        let (swap_chain, extent) =
+            new_swap_chain(device, &surface, size, vsync);
 
         Surface {
             window,
@@ -24,6 +27,7 @@ impl Surface {
             swap_chain,
             extent,
             output: None,
+            vsync,
         }
     }
 
@@ -50,7 +54,7 @@ impl Surface {
         size: winit::dpi::PhysicalSize<u32>,
     ) {
         let (swap_chain, extent) =
-            new_swap_chain(&gpu.device, &self.surface, size);
+            new_swap_chain(&gpu.device, &self.surface, size, self.vsync);
 
         self.swap_chain = swap_chain;
         self.extent = extent;
@@ -82,7 +86,14 @@ fn new_swap_chain(
     device: &wgpu::Device,
     surface: &wgpu::Surface,
     size: winit::dpi::PhysicalSize<u32>,
+    vsync: bool,
 ) -> (wgpu::SwapChain, wgpu::Extent3d) {
+    let present_mode = if vsync {
+        wgpu::PresentMode::Mailbox
+    } else {
+        wgpu::PresentMode::Fifo
+    };
+
     let swap_chain = device.create_swap_chain(
         surface,
         &wgpu::SwapChainDescriptor {
@@ -90,7 +101,7 @@ fn new_swap_chain(
             format: wgpu::TextureFormat::Bgra8UnormSrgb,
             width: size.width,
             height: size.height,
-            present_mode: wgpu::PresentMode::Mailbox,
+            present_mode,
         },
     );
 

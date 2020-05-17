@@ -11,6 +11,7 @@ fn main() -> coffee::Result<()> {
         resizable: true,
         fullscreen: false,
         maximized: false,
+        vsync: false,
     })
 }
 

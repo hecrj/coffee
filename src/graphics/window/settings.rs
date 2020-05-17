@@ -17,10 +17,13 @@ pub struct Settings {
 
     /// Defines whether or not the window should start maximized.
     pub maximized: bool,
+
+    /// Defines whether or not to enable vsync.
+    pub vsync: bool,
 }
 
 impl Settings {
-    pub(super) fn into_builder(
+    pub(crate) fn into_builder(
         self,
         events_loop: &winit::event_loop::EventLoop<()>,
     ) -> winit::window::WindowBuilder {

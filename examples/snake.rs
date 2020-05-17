@@ -1,7 +1,8 @@
 extern crate coffee;
 
 use coffee::graphics::{
-    Color, Font, Frame, Mesh, Point, Rectangle, Shape, Text, Window, WindowSettings,
+    Color, Font, Frame, Mesh, Point, Rectangle, Shape, Text, Window,
+    WindowSettings,
 };
 use coffee::input::keyboard::KeyCode;
 use coffee::input::{self, keyboard, Input};
@@ -18,6 +19,7 @@ fn main() {
         resizable: false,
         maximized: false,
         fullscreen: false,
+        vsync: false,
     })
     .expect("An error occured while starting the game");
 }

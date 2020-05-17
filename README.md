@@ -73,6 +73,7 @@ fn main() -> Result<()> {
         resizable: true,
         fullscreen: false,
         maximized: false,
+        vsync: false,
     })
 }
 
