@@ -1,7 +1,7 @@
 use gfx_device_gl as gl;
 
 use super::{format, Gpu, TargetView};
-use crate::{Error, Result};
+use crate::{graphics::WindowSettings, Error, Result};
 
 pub struct Surface {
     context: glutin::WindowedContext<glutin::PossiblyCurrent>,
@@ -10,7 +10,7 @@ pub struct Surface {
 
 impl Surface {
     pub(super) fn new(
-        builder: winit::window::WindowBuilder,
+        settings: WindowSettings,
         event_loop: &winit::event_loop::EventLoop<()>,
     ) -> Result<(Self, gl::Device, gl::Factory)> {
         let gl_builder = glutin::ContextBuilder::new()
@@ -19,8 +19,9 @@ impl Surface {
             .with_multisampling(0)
             // 24 color bits, 8 alpha bits
             .with_pixel_format(24, 8)
-            .with_vsync(true);
+            .with_vsync(settings.vsync);
 
+        let builder = settings.into_builder(event_loop);
         let (context, device, factory, target, _depth) = init_raw(
             builder,
             gl_builder,

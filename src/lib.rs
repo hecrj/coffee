@@ -42,6 +42,7 @@
 //!         resizable: true,
 //!         fullscreen: false,
 //!         maximized: false,
+//!         vsync: false,
 //!     })
 //! }
 //!

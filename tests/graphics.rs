@@ -23,6 +23,7 @@ fn graphics() -> Result<()> {
         resizable: false,
         fullscreen: false,
         maximized: false,
+        vsync: false,
     })
 }
 

@@ -16,7 +16,7 @@ pub use types::TargetView;
 use gfx::{self, Device};
 use gfx_device_gl as gl;
 
-use crate::graphics::{Color, Transformation};
+use crate::graphics::{Color, Transformation, WindowSettings};
 use crate::Result;
 
 /// A link between your game and a graphics processor.
@@ -40,11 +40,11 @@ pub struct Gpu {
 
 impl Gpu {
     pub(super) fn for_window(
-        builder: winit::window::WindowBuilder,
-        events_loop: &winit::event_loop::EventLoop<()>,
+        settings: WindowSettings,
+        event_loop: &winit::event_loop::EventLoop<()>,
     ) -> Result<(Gpu, Surface)> {
         let (surface, device, mut factory) =
-            Surface::new(builder, events_loop)?;
+            Surface::new(settings, event_loop)?;
 
         let mut encoder: gfx::Encoder<gl::Resources, gl::CommandBuffer> =
             factory.create_command_buffer().into();

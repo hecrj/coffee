@@ -33,8 +33,7 @@ impl Window {
         let (width, height) = settings.size;
         let is_fullscreen = settings.fullscreen;
 
-        let (gpu, surface) =
-            Gpu::for_window(settings.into_builder(event_loop), event_loop)?;
+        let (gpu, surface) = Gpu::for_window(settings, event_loop)?;
 
         Ok(Window {
             is_fullscreen,
