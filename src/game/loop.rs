@@ -94,28 +94,31 @@ pub trait Loop<Game: super::Game> {
                 }
             }
             winit::event::Event::RedrawRequested { .. } => {
-                debug.draw_started();
-                game.draw(&mut window.frame(), &timer);
-                debug.draw_finished();
+                if game.should_draw() {
+                    debug.draw_started();
+                    game.draw(&mut window.frame(), &timer);
+                    debug.draw_finished();
 
-                game_loop.after_draw(
-                    &mut game,
-                    &mut input,
-                    &mut window,
-                    &mut debug,
-                );
+                    game_loop.after_draw(
+                        &mut game,
+                        &mut input,
+                        &mut window,
+                        &mut debug,
+                    );
 
-                if debug.is_enabled() {
-                    debug.debug_started();
-                    game.debug(&input, &mut window.frame(), &mut debug);
-                    debug.debug_finished();
+                    if debug.is_enabled() {
+                        debug.debug_started();
+                        game.debug(&input, &mut window.frame(), &mut debug);
+                        debug.debug_finished();
+                    }
+
+                    window.swap_buffers();
+                    debug.frame_finished();
+
+                    debug.frame_started();
+                    window.request_redraw();
                 }
 
-                window.swap_buffers();
-                debug.frame_finished();
-
-                debug.frame_started();
-                window.request_redraw();
                 timer.update();
             }
             winit::event::Event::WindowEvent { event, .. } => match event {

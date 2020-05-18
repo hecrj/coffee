@@ -173,6 +173,15 @@ pub trait Game {
         false
     }
 
+    /// Returns whether the screen should be drawn.
+    ///
+    /// Use this to limit the amount of drawn frames per second (FPS).
+    ///
+    /// By default, it always returns true.
+    fn should_draw(&self) -> bool {
+        true
+    }
+
     /// Runs the [`Game`] with the given [`WindowSettings`].
     ///
     /// You probably want to call this in your `main` function to run your game!
