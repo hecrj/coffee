@@ -13,10 +13,10 @@ pub struct Sprite {
     /// coordinates.
     pub source: Rectangle<u16>,
 
-    /// The position where the sprite should be drawn.
+    /// The position where the sprite should be drawn, anchored at the center of the sprite.
     pub position: Point,
 
-    /// The rotation to apply to the quad when drawing.
+    /// The clockwise rotation to apply to the sprite when drawing, specified in radians.
     pub rotation: f32,
 
     /// The scale to apply to the sprite.
