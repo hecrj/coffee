@@ -3,3 +3,4 @@ tests/_graphics/models
 **/*.rs.bk
 Cargo.lock
 *.DS_Store
+.vscode

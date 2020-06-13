@@ -4,7 +4,8 @@ use coffee::graphics::{
 };
 use coffee::load::Task;
 use coffee::ui::{
-    Align, Column, Element, Image, Justify, Renderer, Text, UserInterface,
+    Align, Column, Element, Image, Justify, Panel, Renderer, Text,
+    UserInterface,
 };
 use coffee::{Game, Result, Timer};
 
@@ -54,13 +55,13 @@ impl UserInterface for ImageScreen {
             .align_items(Align::Center)
             .justify_content(Justify::Center)
             .spacing(20)
-            .push(
+            .push(Panel::new(
                 Text::new("This is an image")
                     .size(50)
                     .height(60)
                     .horizontal_alignment(HorizontalAlignment::Center)
                     .vertical_alignment(VerticalAlignment::Center),
-            )
+            ))
             .push(Image::new(&self.image).height(250))
             .into()
     }

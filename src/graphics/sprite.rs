@@ -16,6 +16,9 @@ pub struct Sprite {
     /// The position where the sprite should be drawn.
     pub position: Point,
 
+    /// The rotation to apply to the quad when drawing.
+    pub rotation: f32,
+
     /// The scale to apply to the sprite.
     pub scale: (f32, f32),
 }
@@ -31,6 +34,7 @@ impl Default for Sprite {
                 height: 1,
             },
             position: Point::new(0.0, 0.0),
+            rotation: 0.0,
             scale: (1.0, 1.0),
         }
     }
@@ -46,6 +50,7 @@ impl IntoQuad for Sprite {
                 height: self.source.height as f32 * y_unit,
             },
             position: self.position,
+            rotation: self.rotation,
             size: (
                 self.source.width as f32 * self.scale.0,
                 self.source.height as f32 * self.scale.1,

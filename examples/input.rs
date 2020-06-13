@@ -2,8 +2,7 @@
 use std::collections::HashSet;
 
 use coffee::graphics::{
-    Color, Frame, Image, Point, Rectangle, Sprite, Vector, Window,
-    WindowSettings,
+    Color, Frame, Image, Point, Rectangle, Sprite, Window, WindowSettings,
 };
 use coffee::input::{self, keyboard, mouse, Input};
 use coffee::load::Task;
@@ -153,7 +152,8 @@ impl Game for InputExample {
                     width: 1,
                     height: 1,
                 },
-                position: self.cursor_position - Vector::new(3.0, 3.0),
+                position: self.cursor_position,
+                rotation: 0.0,
                 scale: (6.0, 6.0),
             },
             &mut frame.as_target(),

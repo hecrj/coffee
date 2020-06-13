@@ -11,6 +11,9 @@ pub struct Quad {
     /// The position where the quad should be drawn.
     pub position: Point,
 
+    /// The rotation to apply to the quad when drawing.
+    pub rotation: f32,
+
     /// The size of the quad.
     pub size: (f32, f32),
 }
@@ -24,7 +27,8 @@ impl Default for Quad {
                 width: 1.0,
                 height: 1.0,
             },
-            position: Point::new(0.0, 0.0),
+            position: Point::new(0.5, 0.5),
+            rotation: 0.0,
             size: (1.0, 1.0),
         }
     }

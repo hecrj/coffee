@@ -168,8 +168,13 @@ impl Pipeline {
                                 },
                                 wgpu::VertexAttributeDescriptor {
                                     shader_location: 4,
-                                    format: wgpu::VertexFormat::Uint,
+                                    format: wgpu::VertexFormat::Float,
                                     offset: 4 * (4 + 2 + 2),
+                                },
+                                wgpu::VertexAttributeDescriptor {
+                                    shader_location: 5,
+                                    format: wgpu::VertexFormat::Uint,
+                                    offset: 4 * (4 + 2 + 2 + 1),
                                 },
                             ],
                         },
@@ -336,6 +341,7 @@ pub struct Quad {
     source: [f32; 4],
     scale: [f32; 2],
     translation: [f32; 2],
+    rotation: f32,
     pub layer: u32,
 }
 
@@ -347,11 +353,13 @@ impl From<graphics::Quad> for Quad {
     fn from(quad: graphics::Quad) -> Quad {
         let source = quad.source;
         let position = quad.position;
+        let rotation = quad.rotation;
         let (width, height) = quad.size;
 
         Quad {
             source: [source.x, source.y, source.width, source.height],
             translation: [position.x, position.y],
+            rotation: rotation,
             scale: [width, height],
             layer: 0,
         }

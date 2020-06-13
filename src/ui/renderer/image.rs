@@ -1,5 +1,5 @@
-use crate::graphics::{Rectangle, Sprite, Point, Image, Batch};
-use crate::ui::{Renderer, image};
+use crate::graphics::{Batch, Image, Rectangle, Sprite};
+use crate::ui::{image, Renderer};
 
 impl image::Renderer for Renderer {
     fn draw(
@@ -10,26 +10,24 @@ impl image::Renderer for Renderer {
     ) {
         let ratio_x = bounds.width / (source.width as f32);
         let ratio_y = bounds.height / (source.height as f32);
-        let center = bounds.center();
+        let position = bounds.center();
 
-        let (scale, position) = if ratio_x > ratio_y {
-            let position_x = center.x - source.width as f32 * ratio_y / 2.0;
-            let position_y = bounds.y;
-            ((ratio_y, ratio_y), Point::new(position_x, position_y))
+        let scale = if ratio_x > ratio_y {
+            (ratio_y, ratio_y)
         } else {
-            let position_x = bounds.x;
-            let position_y = center.y - source.height as f32 * ratio_x / 2.0;
-            ((ratio_x, ratio_x), Point::new(position_x, position_y))
+            (ratio_x, ratio_x)
         };
 
-        let mut batch = Batch::new(image); 
+        let rotation = 0.0;
+
+        let mut batch = Batch::new(image);
         batch.add(Sprite {
             source,
             position,
+            rotation,
             scale,
         });
 
         self.images.push(batch);
     }
 }
-

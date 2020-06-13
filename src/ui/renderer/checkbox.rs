@@ -26,7 +26,8 @@ impl checkbox::Renderer for Renderer {
                 x: SPRITE.x + (if mouse_over { SPRITE.width } else { 0 }),
                 ..SPRITE
             },
-            position: Point::new(bounds.x, bounds.y),
+            position: bounds.center(),
+            rotation: 0.0,
             scale: (1.0, 1.0),
         });
 
@@ -36,7 +37,8 @@ impl checkbox::Renderer for Renderer {
                     x: SPRITE.x + SPRITE.width * 2,
                     ..SPRITE
                 },
-                position: Point::new(bounds.x, bounds.y),
+                position: bounds.center(),
+                rotation: 0.0,
                 scale: (1.0, 1.0),
             });
         }

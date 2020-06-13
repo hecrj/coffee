@@ -34,16 +34,16 @@ impl LoadingScreen for ProgressBar {
     fn draw(&mut self, progress: &Progress, frame: &mut graphics::Frame<'_>) {
         frame.clear(graphics::Color::BLACK);
 
+        let progress_bar_length =
+            (frame.width() - 100.0) * (progress.percentage() / 100.0);
+
         self.pencil.draw(
             graphics::Quad {
                 position: graphics::Point::new(
-                    50.0,
-                    frame.height() / 2.0 - 25.0,
+                    50.0 + progress_bar_length / 2.0,
+                    frame.height() / 2.0,
                 ),
-                size: (
-                    (frame.width() - 100.0) * (progress.percentage() / 100.0),
-                    50.0,
-                ),
+                size: (progress_bar_length, 50.0),
                 ..Default::default()
             },
             &mut frame.as_target(),
