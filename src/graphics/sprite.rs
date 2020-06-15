@@ -13,7 +13,7 @@ pub struct Sprite {
     /// coordinates.
     pub source: Rectangle<u16>,
 
-    /// The position where the sprite should be drawn, anchored at the center of the sprite.
+    /// The position where the sprite should be drawn, anchored at the top left of the sprite.
     pub position: Point,
 
     /// The clockwise rotation to apply to the sprite when drawing, specified in radians.

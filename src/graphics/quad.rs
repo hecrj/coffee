@@ -8,7 +8,7 @@ pub struct Quad {
     /// coordinates: [0.0, 1.0].
     pub source: Rectangle<f32>,
 
-    /// The position where the quad should be drawn, anchored at the center of the quad.
+    /// The position where the quad should be drawn, anchored at the top left of the quad.
     pub position: Point,
 
     /// The clockwise rotation to apply to the quad when drawing, specified in radians.

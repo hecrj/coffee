@@ -194,8 +194,8 @@ impl Game for Runner {
             canvas.draw(
                 Quad {
                     position: Point::new(
-                        frame.width() * 0.5,
-                        frame.height() * 0.5,
+                        frame.width() * 0.5 - canvas.width() as f32 * 0.5,
+                        frame.height() * 0.5 - canvas.height() as f32 * 0.5,
                     ),
                     size: (canvas.width() as f32, canvas.height() as f32),
                     ..Quad::default()
@@ -211,8 +211,8 @@ impl Game for Runner {
                 image.draw(
                     Quad {
                         position: Point::new(
-                            frame.width() * 0.5,
-                            frame.height() * 0.5,
+                            frame.width() * 0.5 - image.width() as f32 * 0.5,
+                            frame.height() * 0.5 - image.height() as f32 * 0.5,
                         ),
                         size: (image.width() as f32, image.height() as f32),
                         ..Quad::default()
