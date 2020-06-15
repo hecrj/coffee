@@ -33,6 +33,7 @@ gfx_defines! {
         src: [f32; 4] = "a_Src",
         translation: [f32; 2] = "a_Translation",
         scale: [f32; 2] = "a_Scale",
+        rotation: f32 = "a_Rotation",
         layer: u32 = "t_Layer",
     }
 
@@ -213,11 +214,13 @@ impl From<graphics::Quad> for Quad {
         let source = quad.source;
         let position = quad.position;
         let (width, height) = quad.size;
+        let rotation = quad.rotation;
 
         Quad {
             src: [source.x, source.y, source.width, source.height],
             translation: [position.x, position.y],
             scale: [width, height],
+            rotation: rotation,
             layer: 0,
         }
     }

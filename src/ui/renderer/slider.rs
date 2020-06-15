@@ -27,18 +27,21 @@ impl slider::Renderer for Renderer {
         range: RangeInclusive<f32>,
         value: f32,
     ) -> MouseCursor {
+        let rail_length = bounds.width - MARKER.width as f32;
+
         self.sprites.add(Sprite {
             source: RAIL,
             position: Point::new(
                 bounds.x + MARKER.width as f32 / 2.0,
                 bounds.y + 12.5,
             ),
+            rotation: 0.0,
             scale: (bounds.width - MARKER.width as f32, 1.0),
         });
 
         let (range_start, range_end) = range.into_inner();
 
-        let marker_offset = (bounds.width - MARKER.width as f32)
+        let marker_offset = rail_length
             * ((value - range_start) / (range_end - range_start).max(1.0));
 
         let mouse_over = bounds.contains(cursor_position);
@@ -53,6 +56,7 @@ impl slider::Renderer for Renderer {
                 bounds.x + marker_offset.round(),
                 bounds.y + (if state.is_dragging() { 2.0 } else { 0.0 }),
             ),
+            rotation: 0.0,
             scale: (1.0, 1.0),
         });
 

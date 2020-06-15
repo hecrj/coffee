@@ -1,4 +1,4 @@
-use crate::graphics::{Rectangle, Sprite, Point};
+use crate::graphics::{Point, Rectangle, Sprite};
 use crate::ui::{progress_bar, Renderer};
 
 const LEFT: Rectangle<u16> = Rectangle {
@@ -23,20 +23,19 @@ const RIGHT: Rectangle<u16> = Rectangle {
 };
 
 impl progress_bar::Renderer for Renderer {
-    fn draw(
-        &mut self,
-        bounds: Rectangle<f32>,
-        progress: f32,
-    ) {
+    fn draw(&mut self, bounds: Rectangle<f32>, progress: f32) {
         let active_class = 0;
         let background_class = 1;
         let full = 1.0;
-        let left_width_f32 = LEFT.width as f32 / 100.0;
+        let left_width_f32 = LEFT.width as f32 / bounds.width;
         let background_width = 1.0 - 2.0 * left_width_f32;
 
-        self.sprites.add(left_sprite(bounds, background_class, full));
-        self.sprites.add(background_sprite(bounds, background_class, full));
-        self.sprites.add(right_sprite(bounds, background_class, full));
+        self.sprites
+            .add(left_sprite(bounds, background_class, full));
+        self.sprites
+            .add(background_sprite(bounds, background_class, full));
+        self.sprites
+            .add(right_sprite(bounds, background_class, full));
 
         if progress > 0.0 {
             let area = bound(progress / left_width_f32);
@@ -45,11 +44,14 @@ impl progress_bar::Renderer for Renderer {
 
         if progress > left_width_f32 {
             let area = bound((progress - left_width_f32) / background_width);
-            self.sprites.add(background_sprite(bounds, active_class, area));
+            self.sprites
+                .add(background_sprite(bounds, active_class, area));
         }
 
         if progress > left_width_f32 + background_width {
-            let area = bound((progress - left_width_f32 - background_width) / left_width_f32);
+            let area = bound(
+                (progress - left_width_f32 - background_width) / left_width_f32,
+            );
             self.sprites.add(right_sprite(bounds, active_class, area));
         }
     }
@@ -72,11 +74,16 @@ fn left_sprite(bounds: Rectangle<f32>, class_index: u16, area: f32) -> Sprite {
             height: LEFT.height,
         },
         position: Point::new(bounds.x, bounds.y),
+        rotation: 0.0,
         scale: (1.0, 1.0),
     }
 }
 
-fn background_sprite(bounds: Rectangle<f32>, class_index: u16, area: f32) -> Sprite {
+fn background_sprite(
+    bounds: Rectangle<f32>,
+    class_index: u16,
+    area: f32,
+) -> Sprite {
     Sprite {
         source: Rectangle {
             x: BACKGROUND.x,
@@ -84,7 +91,11 @@ fn background_sprite(bounds: Rectangle<f32>, class_index: u16, area: f32) -> Spr
             ..BACKGROUND
         },
         position: Point::new(bounds.x + LEFT.width as f32, bounds.y),
-        scale: ((bounds.width - (LEFT.width + RIGHT.width) as f32) * area, 1.0),
+        rotation: 0.0,
+        scale: (
+            (bounds.width - (LEFT.width + RIGHT.width) as f32) * area,
+            1.0,
+        ),
     }
 }
 
@@ -100,6 +111,7 @@ fn right_sprite(bounds: Rectangle<f32>, class_index: u16, area: f32) -> Sprite {
             bounds.x + bounds.width - RIGHT.width as f32,
             bounds.y,
         ),
+        rotation: 0.0,
         scale: (1.0, 1.0),
     }
 }

@@ -27,6 +27,7 @@ impl checkbox::Renderer for Renderer {
                 ..SPRITE
             },
             position: Point::new(bounds.x, bounds.y),
+            rotation: 0.0,
             scale: (1.0, 1.0),
         });
 
@@ -37,6 +38,7 @@ impl checkbox::Renderer for Renderer {
                     ..SPRITE
                 },
                 position: Point::new(bounds.x, bounds.y),
+                rotation: 0.0,
                 scale: (1.0, 1.0),
             });
         }

@@ -67,7 +67,6 @@ const BOTTOM_RIGHT: Rectangle<u16> = Rectangle {
     width: TOP_RIGHT.width,
     height: TOP_RIGHT.height,
 };
-
 impl panel::Renderer for Renderer {
     fn draw(&mut self, bounds: Rectangle<f32>) {
         self.sprites.add(Sprite {
@@ -83,6 +82,7 @@ impl panel::Renderer for Renderer {
                 bounds.width - (TOP_LEFT.width + TOP_RIGHT.width) as f32,
                 1.0,
             ),
+            rotation: 0.0,
         });
 
         self.sprites.add(Sprite {
@@ -97,6 +97,7 @@ impl panel::Renderer for Renderer {
         self.sprites.add(Sprite {
             source: CONTENT_BACKGROUND,
             position: Point::new(bounds.x, bounds.y + TOP_BORDER.height as f32),
+            rotation: 0.0,
             scale: (
                 bounds.width,
                 bounds.height
@@ -107,6 +108,7 @@ impl panel::Renderer for Renderer {
         self.sprites.add(Sprite {
             source: LEFT_BORDER,
             position: Point::new(bounds.x, bounds.y + TOP_BORDER.height as f32),
+            rotation: 0.0,
             scale: (
                 1.0,
                 bounds.height - (TOP_BORDER.height + BOTTOM_LEFT.height) as f32,
@@ -119,6 +121,7 @@ impl panel::Renderer for Renderer {
                 bounds.x + bounds.width - RIGHT_BORDER.width as f32,
                 bounds.y + TOP_BORDER.height as f32,
             ),
+            rotation: 0.0,
             scale: (
                 1.0,
                 bounds.height
@@ -141,6 +144,7 @@ impl panel::Renderer for Renderer {
                 bounds.x + BOTTOM_LEFT.width as f32,
                 bounds.y + bounds.height - BOTTOM_BORDER.height as f32,
             ),
+            rotation: 0.0,
             scale: (
                 bounds.width - (BOTTOM_LEFT.width + BOTTOM_LEFT.width) as f32,
                 1.0,

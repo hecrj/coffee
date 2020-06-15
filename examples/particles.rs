@@ -149,6 +149,7 @@ impl Game for Particles {
                     height: 1,
                 },
                 position: particle.position + velocity * delta_factor,
+                rotation: 0.0,
                 scale: (1.0, 1.0),
             }
         });

@@ -8,8 +8,11 @@ pub struct Quad {
     /// coordinates: [0.0, 1.0].
     pub source: Rectangle<f32>,
 
-    /// The position where the quad should be drawn.
+    /// The position where the quad should be drawn, anchored at the top left of the quad.
     pub position: Point,
+
+    /// The clockwise rotation to apply to the quad when drawing, specified in radians.
+    pub rotation: f32,
 
     /// The size of the quad.
     pub size: (f32, f32),
@@ -25,6 +28,7 @@ impl Default for Quad {
                 height: 1.0,
             },
             position: Point::new(0.0, 0.0),
+            rotation: 0.0,
             size: (1.0, 1.0),
         }
     }

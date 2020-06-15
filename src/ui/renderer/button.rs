@@ -61,6 +61,7 @@ impl button::Renderer for Renderer {
                 ..LEFT
             },
             position: Point::new(bounds.x, bounds.y),
+            rotation: 0.0,
             scale: (1.0, 1.0),
         });
 
@@ -71,6 +72,7 @@ impl button::Renderer for Renderer {
                 ..BACKGROUND
             },
             position: Point::new(bounds.x + LEFT.width as f32, bounds.y),
+            rotation: 0.0,
             scale: (bounds.width - (LEFT.width + RIGHT.width) as f32, 1.0),
         });
 
@@ -84,6 +86,7 @@ impl button::Renderer for Renderer {
                 bounds.x + bounds.width - RIGHT.width as f32,
                 bounds.y,
             ),
+            rotation: 0.0,
             scale: (1.0, 1.0),
         });
 
