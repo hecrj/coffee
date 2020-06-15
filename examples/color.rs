@@ -63,7 +63,7 @@ impl Game for Colors {
                     width: 1.0,
                     height: 1.0,
                 },
-                position: Point::new(250.0, 250.0),
+                position: Point::new(0.0, 0.0),
                 rotation: 0.0,
                 size: (500.0, 500.0),
             },

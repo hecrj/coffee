@@ -40,9 +40,10 @@ void main(){
         vec4(a_Translation,0.,1.)
     );
     
-    mat4 instance_transform=Translate*Rotate*Scale;
+    vec4 temp = (Rotate*vec4(a_Pos-vec2(.5,.5),0.,1.)) + vec4(.5,.5,0,0);
+    mat4 instance_transform=Translate*Scale;
     
-    vec4 position=u_MVP*instance_transform*vec4(a_Pos-vec2(.5,.5),0.,1.);
+    vec4 position=u_MVP*instance_transform*temp;
     
     gl_Position=position;
 }

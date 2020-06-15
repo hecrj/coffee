@@ -152,7 +152,7 @@ impl Game for InputExample {
                     width: 1,
                     height: 1,
                 },
-                position: self.cursor_position,
+                position: self.cursor_position - Vector::new(3.0, 3.0),
                 rotation: 0.0,
                 scale: (6.0, 6.0),
             },

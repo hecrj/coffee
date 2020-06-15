@@ -1,4 +1,4 @@
-use crate::graphics::{Batch, Image, Rectangle, Sprite};
+use crate::graphics::{Batch, Image, Point, Rectangle, Sprite};
 use crate::ui::{image, Renderer};
 
 impl image::Renderer for Renderer {
@@ -10,12 +10,16 @@ impl image::Renderer for Renderer {
     ) {
         let ratio_x = bounds.width / (source.width as f32);
         let ratio_y = bounds.height / (source.height as f32);
-        let position = bounds.center();
+        let center = bounds.center();
 
-        let scale = if ratio_x > ratio_y {
-            (ratio_y, ratio_y)
+        let (scale, position) = if ratio_x > ratio_y {
+            let position_x = center.x - source.width as f32 * ratio_y / 2.0;
+            let position_y = bounds.y;
+            ((ratio_y, ratio_y), Point::new(position_x, position_y))
         } else {
-            (ratio_x, ratio_x)
+            let position_x = bounds.x;
+            let position_y = center.y - source.height as f32 * ratio_x / 2.0;
+            ((ratio_x, ratio_x), Point::new(position_x, position_y))
         };
 
         let rotation = 0.0;

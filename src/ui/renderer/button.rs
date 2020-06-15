@@ -1,5 +1,5 @@
 use crate::graphics::{
-    Color, HorizontalAlignment, Point, Rectangle, Sprite, Text, Vector,
+    Color, HorizontalAlignment, Point, Rectangle, Sprite, Text,
     VerticalAlignment,
 };
 use crate::ui::core::MouseCursor;
@@ -54,16 +54,13 @@ impl button::Renderer for Renderer {
             button::Class::Positive => 2,
         };
 
-        let background_width = bounds.width - (LEFT.width + RIGHT.width) as f32;
-
         self.sprites.add(Sprite {
             source: Rectangle {
                 x: LEFT.x + state_offset,
                 y: LEFT.y + class_index * LEFT.height,
                 ..LEFT
             },
-            position: bounds.center()
-                - Vector::new(background_width / 2.0, 0.0),
+            position: Point::new(bounds.x, bounds.y),
             rotation: 0.0,
             scale: (1.0, 1.0),
         });
@@ -74,9 +71,9 @@ impl button::Renderer for Renderer {
                 y: BACKGROUND.y + class_index * BACKGROUND.height,
                 ..BACKGROUND
             },
-            position: bounds.center(),
+            position: Point::new(bounds.x + LEFT.width as f32, bounds.y),
             rotation: 0.0,
-            scale: (background_width, 1.0),
+            scale: (bounds.width - (LEFT.width + RIGHT.width) as f32, 1.0),
         });
 
         self.sprites.add(Sprite {
@@ -85,8 +82,10 @@ impl button::Renderer for Renderer {
                 y: RIGHT.y + class_index * RIGHT.height,
                 ..RIGHT
             },
-            position: bounds.center()
-                + Vector::new(background_width / 2.0, 0.0),
+            position: Point::new(
+                bounds.x + bounds.width - RIGHT.width as f32,
+                bounds.y,
+            ),
             rotation: 0.0,
             scale: (1.0, 1.0),
         });

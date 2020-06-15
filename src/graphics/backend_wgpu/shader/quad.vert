@@ -39,7 +39,8 @@ void main(){
         vec4(a_Translation,0.,1.)
     );
     
-    mat4 a_Transform=Translate*Rotate*Scale;
+    vec4 temp = (Rotate*vec4(a_Pos-vec2(.5,.5),0.,1.)) + vec4(.5,.5,0,0);
+    mat4 a_Transform=Translate*Scale;
     
-    gl_Position=u_Transform*a_Transform*vec4(a_Pos-vec2(.5,.5),0.,1.);
+    gl_Position=u_Transform*a_Transform*temp;
 }

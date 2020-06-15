@@ -1,4 +1,4 @@
-use crate::graphics::{Rectangle, Sprite, Vector};
+use crate::graphics::{Point, Rectangle, Sprite};
 use crate::ui::widget::panel;
 use crate::ui::Renderer;
 
@@ -67,22 +67,17 @@ const BOTTOM_RIGHT: Rectangle<u16> = Rectangle {
     width: TOP_RIGHT.width,
     height: TOP_RIGHT.height,
 };
-
 impl panel::Renderer for Renderer {
     fn draw(&mut self, bounds: Rectangle<f32>) {
-        let border_offset_vert = (bounds.height - TOP_LEFT.height as f32) / 2.0;
-        let border_offset_horiz = (bounds.width - TOP_LEFT.width as f32) / 2.0;
-
         self.sprites.add(Sprite {
             source: TOP_LEFT,
-            position: bounds.center()
-                + Vector::new(-border_offset_horiz, -border_offset_vert),
+            position: Point::new(bounds.x, bounds.y),
             ..Sprite::default()
         });
 
         self.sprites.add(Sprite {
             source: TOP_BORDER,
-            position: bounds.center() + Vector::new(0.0, -border_offset_vert),
+            position: Point::new(bounds.x + TOP_LEFT.width as f32, bounds.y),
             scale: (
                 bounds.width - (TOP_LEFT.width + TOP_RIGHT.width) as f32,
                 1.0,
@@ -92,17 +87,19 @@ impl panel::Renderer for Renderer {
 
         self.sprites.add(Sprite {
             source: TOP_RIGHT,
-            position: bounds.center()
-                + Vector::new(border_offset_horiz, -border_offset_vert),
+            position: Point::new(
+                bounds.x + bounds.width - TOP_RIGHT.width as f32,
+                bounds.y,
+            ),
             ..Sprite::default()
         });
 
         self.sprites.add(Sprite {
             source: CONTENT_BACKGROUND,
-            position: bounds.center(),
+            position: Point::new(bounds.x, bounds.y + TOP_BORDER.height as f32),
             rotation: 0.0,
             scale: (
-                bounds.width - (LEFT_BORDER.width + RIGHT_BORDER.width) as f32,
+                bounds.width,
                 bounds.height
                     - (TOP_BORDER.height + BOTTOM_BORDER.height) as f32,
             ),
@@ -110,7 +107,7 @@ impl panel::Renderer for Renderer {
 
         self.sprites.add(Sprite {
             source: LEFT_BORDER,
-            position: bounds.center() + Vector::new(-border_offset_horiz, 0.0),
+            position: Point::new(bounds.x, bounds.y + TOP_BORDER.height as f32),
             rotation: 0.0,
             scale: (
                 1.0,
@@ -120,7 +117,10 @@ impl panel::Renderer for Renderer {
 
         self.sprites.add(Sprite {
             source: RIGHT_BORDER,
-            position: bounds.center() + Vector::new(border_offset_horiz, 0.0),
+            position: Point::new(
+                bounds.x + bounds.width - RIGHT_BORDER.width as f32,
+                bounds.y + TOP_BORDER.height as f32,
+            ),
             rotation: 0.0,
             scale: (
                 1.0,
@@ -131,14 +131,19 @@ impl panel::Renderer for Renderer {
 
         self.sprites.add(Sprite {
             source: BOTTOM_LEFT,
-            position: bounds.center()
-                + Vector::new(-border_offset_horiz, border_offset_vert),
+            position: Point::new(
+                bounds.x,
+                bounds.y + bounds.height - BOTTOM_LEFT.height as f32,
+            ),
             ..Sprite::default()
         });
 
         self.sprites.add(Sprite {
             source: BOTTOM_BORDER,
-            position: bounds.center() + Vector::new(0.0, border_offset_vert),
+            position: Point::new(
+                bounds.x + BOTTOM_LEFT.width as f32,
+                bounds.y + bounds.height - BOTTOM_BORDER.height as f32,
+            ),
             rotation: 0.0,
             scale: (
                 bounds.width - (BOTTOM_LEFT.width + BOTTOM_LEFT.width) as f32,
@@ -148,8 +153,10 @@ impl panel::Renderer for Renderer {
 
         self.sprites.add(Sprite {
             source: BOTTOM_RIGHT,
-            position: bounds.center()
-                + Vector::new(border_offset_horiz, border_offset_vert),
+            position: Point::new(
+                bounds.x + bounds.width - BOTTOM_RIGHT.width as f32,
+                bounds.y + bounds.height - BOTTOM_RIGHT.height as f32,
+            ),
             ..Sprite::default()
         });
     }

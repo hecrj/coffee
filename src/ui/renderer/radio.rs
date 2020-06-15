@@ -25,7 +25,7 @@ impl radio::Renderer for Renderer {
                 x: SPRITE.x + (if mouse_over { SPRITE.width } else { 0 }),
                 ..SPRITE
             },
-            position: bounds.center(),
+            position: Point::new(bounds.x, bounds.y),
             rotation: 0.0,
             scale: (1.0, 1.0),
         });
@@ -36,7 +36,7 @@ impl radio::Renderer for Renderer {
                     x: SPRITE.x + SPRITE.width * 2,
                     ..SPRITE
                 },
-                position: bounds.center(),
+                position: Point::new(bounds.x, bounds.y),
                 rotation: 0.0,
                 scale: (1.0, 1.0),
             });

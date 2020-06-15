@@ -73,10 +73,7 @@ fn left_sprite(bounds: Rectangle<f32>, class_index: u16, area: f32) -> Sprite {
             width: (LEFT.width as f32 * area) as u16,
             height: LEFT.height,
         },
-        position: Point::new(
-            bounds.x + (LEFT.width as f32 * area) / 2.0,
-            bounds.y + LEFT.height as f32 / 2.0,
-        ),
+        position: Point::new(bounds.x, bounds.y),
         rotation: 0.0,
         scale: (1.0, 1.0),
     }
@@ -87,20 +84,18 @@ fn background_sprite(
     class_index: u16,
     area: f32,
 ) -> Sprite {
-    let background_width =
-        (bounds.width - (LEFT.width + RIGHT.width) as f32) * area;
     Sprite {
         source: Rectangle {
             x: BACKGROUND.x,
             y: BACKGROUND.y + class_index * BACKGROUND.height,
             ..BACKGROUND
         },
-        position: Point::new(
-            bounds.x + LEFT.width as f32 + (background_width / 2.0),
-            bounds.y + BACKGROUND.height as f32 / 2.0,
-        ),
+        position: Point::new(bounds.x + LEFT.width as f32, bounds.y),
         rotation: 0.0,
-        scale: (background_width, 1.0),
+        scale: (
+            (bounds.width - (LEFT.width + RIGHT.width) as f32) * area,
+            1.0,
+        ),
     }
 }
 
@@ -113,9 +108,8 @@ fn right_sprite(bounds: Rectangle<f32>, class_index: u16, area: f32) -> Sprite {
             height: RIGHT.height,
         },
         position: Point::new(
-            bounds.x + bounds.width - RIGHT.width as f32
-                + (RIGHT.width as f32 * area) / 2.0,
-            bounds.y + RIGHT.height as f32 / 2.0,
+            bounds.x + bounds.width - RIGHT.width as f32,
+            bounds.y,
         ),
         rotation: 0.0,
         scale: (1.0, 1.0),

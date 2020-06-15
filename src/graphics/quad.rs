@@ -27,7 +27,7 @@ impl Default for Quad {
                 width: 1.0,
                 height: 1.0,
             },
-            position: Point::new(0.5, 0.5),
+            position: Point::new(0.0, 0.0),
             rotation: 0.0,
             size: (1.0, 1.0),
         }
