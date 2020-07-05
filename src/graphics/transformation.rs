@@ -66,7 +66,7 @@ impl Transformation {
         Transformation(Matrix3::new_rotation(rotation))
     }
 
-    /// Does the inverse projection of a point via this transformation.
+    /// Attempt to get the inverse of the transform.
     ///
     /// Can be used to convert world-coordinates to screen-coordinates.
     pub fn inverse(&self) -> Option<Transformation> {
