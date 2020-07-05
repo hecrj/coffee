@@ -1,6 +1,8 @@
 use nalgebra::Matrix3;
+use nalgebra::Vector3;
 use std::ops::Mul;
 
+use crate::graphics::Point;
 use crate::graphics::Vector;
 
 /// A 2D transformation matrix.
@@ -62,6 +64,21 @@ impl Transformation {
     /// You can use this to rotate your camera, for example.
     pub fn rotate(rotation: f32) -> Transformation {
         Transformation(Matrix3::new_rotation(rotation))
+    }
+
+    /// Does the inverse projection of a point via this transformation.
+    ///
+    /// Can be used to convert world-coordinates to screen-coordinates.
+    pub fn inverse(&self) -> Option<Transformation> {
+        Some(Transformation(self.0.try_inverse()?))
+    }
+}
+
+impl Mul<Point> for Transformation {
+    type Output = Point;
+
+    fn mul(self, rhs: Point) -> Point {
+        Point::from((self.0 * Vector3::new(rhs.x, rhs.y, 1.0)).xy())
     }
 }
 
