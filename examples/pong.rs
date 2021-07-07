@@ -1,29 +1,89 @@
-use coffee::graphics::{Color, Frame, Window, WindowSettings};
-use coffee::input::keyboard;
-use coffee::load::Task;
-use coffee::{Game, Result, Timer};
+extern crate coffee;
 
-fn main() -> Result <()> {
+use coffee::graphics::{Color, Frame, Window, WindowSettings};
+use coffee::input::keyboard::Keyboard;
+use coffee::load::Task;
+use coffee::{Game, Timer};
+
+// Load game with stated parameters
+fn main() {
     PongGame::run(WindowSettings {
         title: String::from("Pong"),
-        size: (1280, 1024),
-        resizable: true,
+        size: (900, 600),
+        resizable: false,
         fullscreen: false,
         maximized: false,
     })
+    .expect("An error occured while starting the game");
+}
+
+struct Position(f32, f32);
+
+// Define the paddles
+struct Paddle {
+    pos: [Position; 2]
+}
+
+impl Paddle {
+    fn new_l() -> Paddle { 
+        Paddle {pos: [Position(1.0,10.0), Position(1.0,20.0)]}
+    }
+    fn new_r() -> Paddle {
+        Paddle {pos: [Position(50.0,10.0), Position(50.0,20.0)]}
+    }
+}
+
+// Define movement for the ball
+struct Ball {
+    pos: Position,
+    speed: i8,
+}
+
+impl Ball {
+    fn new() -> Ball {
+        Ball {
+            pos: Position(30.0,15.0),
+            speed: 3,
+        }
+    }
+}
+
+// How to keep score, game ends a player gets to 10 points
+struct Score {
+    l_score: i8,
+    r_score: i8,
+}
+
+impl Score {
+    fn new(l: i8, r: i8) -> Score {
+        Score {
+            l_score: l,
+            r_score: r,
+        }
+    }
 }
 
 struct PongGame {
-
+    l_paddle: Paddle,
+    r_paddle: Paddle,
+    ball: Ball,
+    score: Score,
 }
 
 impl Game for PongGame {
-    type Input = (keyboard);
+    type Input = Keyboard;
     type LoadingScreen = ();
 
-    fn load(_window: &Window) -> Task<PongAssets> {
-        Task::succeed(|| PongAssets {
-            // Insert pong assets here
+    fn load(_window: &Window) -> Task<PongGame> {
+        let mut l_paddle = Paddle::new_l();
+        let mut r_paddle = Paddle::new_r();
+        let mut ball = Ball::new();
+        let mut score = Score::new(0,0);
+        Task::succeed(|| PongGame {
+            l_paddle: l_paddle,
+            r_paddle: r_paddle,
+            ball: ball,
+            score: score,
         })
     }
 
