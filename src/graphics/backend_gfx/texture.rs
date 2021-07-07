@@ -25,7 +25,7 @@ impl Texture {
         factory: &mut gl::Factory,
         image: &image::DynamicImage,
     ) -> Texture {
-        let rgba = image.to_rgba();
+        let rgba = image.to_rgba8();
         let width = rgba.width() as u16;
         let height = rgba.height() as u16;
 
@@ -51,12 +51,12 @@ impl Texture {
         factory: &mut gl::Factory,
         layers: &[image::DynamicImage],
     ) -> Texture {
-        let first_layer = &layers[0].to_rgba();
+        let first_layer = &layers[0].to_rgba8();
         let width = first_layer.width() as u16;
         let height = first_layer.height() as u16;
 
         let rgba: Vec<Vec<u8>> =
-            layers.iter().map(|i| i.to_rgba().into_raw()).collect();
+            layers.iter().map(|i| i.to_rgba8().into_raw()).collect();
 
         let raw_layers: Vec<&[u8]> = rgba.iter().map(|i| &i[..]).collect();
 
