@@ -1,6 +1,6 @@
 extern crate coffee;
 
-use coffee::graphics::{Color, Frame, Window, WindowSettings};
+use coffee::graphics::{Color, Font, Frame, Point, Text, Window, WindowSettings};
 use coffee::input::keyboard::Keyboard;
 use coffee::load::Task;
 use coffee::{Game, Timer};
@@ -90,5 +90,22 @@ impl Game for PongGame {
     fn draw(&mut self, frame: &mut Frame, _timer: &Timer) {
         // Clear the frame
         frame.clear(Color::BLACK);
+        // Load the font
+        let mut font = Font::from_bytes(
+            frame.gpu(),
+            include_bytes!("../resources/font/Inconsolata-Regular.ttf"),
+        )
+        .expect("Font has failed to load");
+
+        // Write score
+        let mut score_text = String::from("0|0");
+        font.add(Text{
+            content: &score_text,
+            position: Point::new(450.0, 50.0),
+            size: 50.0,
+            color: Color::WHITE,
+            ..Text::default()
+        });
+        font.draw(&mut frame.as_target());
     }
 }
