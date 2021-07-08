@@ -28,7 +28,7 @@ impl Paddle {
     }
 
     fn new_r() -> Paddle {
-        Paddle {pos: (850.0,50.0)}
+        Paddle {pos: (830.0,225.0)}
     }
 }
 
@@ -104,7 +104,7 @@ impl Game for PongGame {
         );
         font.add(Text{
             content: &score_text,
-            position: Point::new(450.0, 10.0),
+            position: Point::new(425.0, 10.0),
             size: 50.0,
             color: Color::WHITE,
             ..Text::default()
@@ -122,6 +122,19 @@ impl Game for PongGame {
             }),
             Color::WHITE,
         );
-        lp_mesh.draw(&mut frame.as_target())
+        lp_mesh.draw(&mut frame.as_target());
+
+        // Draw right paddle
+        let mut rp_mesh = Mesh::new();
+        rp_mesh.fill(
+            Shape::Rectangle(Rectangle {
+                x: self.r_paddle.pos.0,
+                y: self.r_paddle.pos.1,
+                width: 20.0,
+                height: 150.0,
+            }),
+            Color::WHITE,
+        );
+        rp_mesh.draw(&mut frame.as_target());
     }
 }
