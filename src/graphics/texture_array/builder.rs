@@ -51,7 +51,7 @@ impl Builder {
             let mut buf = Vec::new();
             let mut reader = File::open(&path)?;
             let _ = reader.read_to_end(&mut buf)?;
-            let rgba = image::load_from_memory(&buf)?.to_rgba();
+            let rgba = image::load_from_memory(&buf)?.to_rgba8();
             Arc::new(rgba)
         };
 
@@ -202,8 +202,8 @@ impl Layer {
             let mut row_height = 0;
 
             for image in row {
-                image::imageops::overlay(&mut texture, &image, x, y);
-
+                let image_view = image.as_ref();
+                image::imageops::overlay(&mut texture, image_view, x, y);
                 x += image.width();
                 row_height = row_height.max(image.height());
             }

@@ -10,8 +10,8 @@ pub struct Surface {
 
 impl Surface {
     pub(super) fn new(
-        builder: winit::window::WindowBuilder,
-        event_loop: &winit::event_loop::EventLoop<()>,
+        builder: glutin::window::WindowBuilder,
+        event_loop: &glutin::event_loop::EventLoop<()>,
     ) -> Result<(Self, gl::Device, gl::Factory)> {
         let gl_builder = glutin::ContextBuilder::new()
             .with_gl(glutin::GlRequest::Latest)
@@ -33,7 +33,7 @@ impl Surface {
         Ok((Self { context, target }, device, factory))
     }
 
-    pub fn window(&self) -> &winit::window::Window {
+    pub fn window(&self) -> &glutin::window::Window {
         self.context.window()
     }
 
@@ -44,7 +44,7 @@ impl Surface {
     pub fn resize(
         &mut self,
         _gpu: &mut Gpu,
-        size: winit::dpi::PhysicalSize<u32>,
+        size: glutin::dpi::PhysicalSize<u32>,
     ) {
         self.context.resize(size);
 
