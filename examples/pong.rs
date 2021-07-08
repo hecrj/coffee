@@ -34,11 +34,19 @@ impl Paddle {
     // Define movement for the left paddle
     fn move_l(p: &Paddle, key: KeyCode) -> Paddle {
         let mut new_p = Paddle{pos: (p.pos.0, p.pos.1)};
-        if p.pos.1 > 0.0 && p.pos.1 < 600.0 {
+        if p.pos.1 > 0.0 && p.pos.1 < 450.0 {
             if key == KeyCode::W {
                 new_p.pos.1 -= 5.0;
             } else if key == KeyCode::S {
                 new_p.pos.1 += 5.0;
+            }
+        } else if p.pos.1 == 0.0 {
+            if key == KeyCode::S {
+                new_p.pos.1 += 5.0;
+            }
+        } else if p.pos.1 == 450.0 {
+            if key == KeyCode::W {
+                new_p.pos.1 -= 5.0;
             }
         }
         new_p 
@@ -47,11 +55,19 @@ impl Paddle {
     // Define movement for the right paddle
     fn move_r(p: &Paddle, key: KeyCode) -> Paddle {
         let mut new_p = Paddle{pos: (p.pos.0, p.pos.1)};
-        if p.pos.1 > 0.0 && p.pos.1 < 600.0 {
+        if p.pos.1 > 0.0 && p.pos.1 < 450.0 {
             if key == KeyCode::Up {
                 new_p.pos.1 -= 5.0;
             } else if key == KeyCode::Down {
                 new_p.pos.1 += 5.0;
+            }
+        } else if p.pos.1 == 0.0 {
+            if key == KeyCode::Down {
+                new_p.pos.1 += 5.0;
+            }
+        } else if p.pos.1 == 450.0 {
+            if key == KeyCode::Up {
+                new_p.pos.1 -= 5.0;
             }
         }
         new_p 
