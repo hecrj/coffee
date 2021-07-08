@@ -32,26 +32,26 @@ impl Paddle {
     }
 
     // Define movement for the left paddle
-    fn move_l(p: Paddle, key: KeyCode) -> Paddle {
-        let mut new_p = p
-        if p.pos.1 > 0.0 & p.pos.1 < 600.0 {
-            if KeyCode == W {
-                new_p.pos.1 -= 1.0;
-            } else if KeyCode == S {
-                new_p.pos.1 += 1.0;
+    fn move_l(p: &Paddle, key: KeyCode) -> Paddle {
+        let mut new_p = Paddle{pos: (p.pos.0, p.pos.1)};
+        if p.pos.1 > 0.0 && p.pos.1 < 600.0 {
+            if key == KeyCode::W {
+                new_p.pos.1 -= 5.0;
+            } else if key == KeyCode::S {
+                new_p.pos.1 += 5.0;
             }
         }
         new_p 
     }
 
     // Define movement for the right paddle
-    fn move_r(p: Paddle, key: KeyCode) -> Paddle {
-        let mut new_p = p
-        if p.pos.1 > 0.0 & p.pos.1 < 600.0 {
-            if KeyCode == Up {
-                new_p.pos.1 -= 1.0;
-            } else if KeyCode == Down {
-                new_p.pos.1 += 1.0;
+    fn move_r(p: &Paddle, key: KeyCode) -> Paddle {
+        let mut new_p = Paddle{pos: (p.pos.0, p.pos.1)};
+        if p.pos.1 > 0.0 && p.pos.1 < 600.0 {
+            if key == KeyCode::Up {
+                new_p.pos.1 -= 5.0;
+            } else if key == KeyCode::Down {
+                new_p.pos.1 += 5.0;
             }
         }
         new_p 
@@ -175,5 +175,21 @@ impl Game for PongGame {
             Color::WHITE,
         );
         b_mesh.draw(&mut frame.as_target());
+    }
+    
+    fn interact(&mut self, input: &mut Self::Input, _window: &mut Window) {
+        if input.is_key_pressed(KeyCode::W) {
+            self.l_paddle = Paddle::move_l(&self.l_paddle, KeyCode::W);
+        } else if input.is_key_pressed(KeyCode::S) {
+            self.l_paddle = Paddle::move_l(&self.l_paddle, KeyCode::S);
+        } else if input.is_key_pressed(KeyCode::Up) {
+            self.r_paddle = Paddle::move_r(&self.r_paddle, KeyCode::Up);
+        } else if input.is_key_pressed(KeyCode::Down) {
+            self.r_paddle = Paddle::move_r(&self.r_paddle, KeyCode::Down);
+        }
+    }
+
+    fn update(&mut self, _window: &Window) {
+        
     }
 }
