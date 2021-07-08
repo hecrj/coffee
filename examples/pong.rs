@@ -30,6 +30,32 @@ impl Paddle {
     fn new_r() -> Paddle {
         Paddle {pos: (830.0,225.0)}
     }
+
+    // Define movement for the left paddle
+    fn move_l(p: Paddle, key: KeyCode) -> Paddle {
+        let mut new_p = p
+        if p.pos.1 > 0.0 & p.pos.1 < 600.0 {
+            if KeyCode == W {
+                new_p.pos.1 -= 1.0;
+            } else if KeyCode == S {
+                new_p.pos.1 += 1.0;
+            }
+        }
+        new_p 
+    }
+
+    // Define movement for the right paddle
+    fn move_r(p: Paddle, key: KeyCode) -> Paddle {
+        let mut new_p = p
+        if p.pos.1 > 0.0 & p.pos.1 < 600.0 {
+            if KeyCode == Up {
+                new_p.pos.1 -= 1.0;
+            } else if KeyCode == Down {
+                new_p.pos.1 += 1.0;
+            }
+        }
+        new_p 
+    }
 }
 
 // Define movement for the ball
