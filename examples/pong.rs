@@ -1,6 +1,6 @@
 extern crate coffee;
 
-use coffee::graphics::{Color, Font, Frame, Point, Text, Window, WindowSettings};
+use coffee::graphics::{Color, Font, Frame, Mesh, Point, Rectangle, Shape, Text, Window, WindowSettings};
 use coffee::input::keyboard::Keyboard;
 use coffee::load::Task;
 use coffee::{Game, Timer};
@@ -98,7 +98,11 @@ impl Game for PongGame {
         .expect("Font has failed to load");
 
         // Write score
-        let mut score_text = String::from("0|0");
+        let score_text = format!(
+            "{}|{}",
+            self.score.l_score,
+            self.score.r_score,
+        );
         font.add(Text{
             content: &score_text,
             position: Point::new(450.0, 50.0),
@@ -107,5 +111,6 @@ impl Game for PongGame {
             ..Text::default()
         });
         font.draw(&mut frame.as_target());
+        )
     }
 }
