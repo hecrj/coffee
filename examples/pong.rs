@@ -74,6 +74,7 @@ impl Paddle {
     }
 }
 
+#[derive(Debug)]
 // Define movement for the ball
 struct Ball {
     pos: (f32, f32),
@@ -91,12 +92,26 @@ impl Ball {
     }
 
     // Describes movement of the ball
-    fn update(b: &Ball) -> Ball {
-        let new_b = Ball {
+    fn update(b: &Ball, lp: &Paddle, rp: &Paddle) -> Ball {
+        let mut new_b = Ball {
             pos: ((b.pos.0 + b.fly.0 * b.speed), (b.pos.1 + b.fly.1 * b.speed)),
-            fly: (-1.0, 0.0), // TODO update this based on whether there was a collision
-            speed: 3.0, // TODO update this based on paddle collision
+            fly: (b.fly.0, b.fly.1),
+            speed: 3.0,
         };
+        // How to react if it hits the left paddle
+        
+        // How to react if it hits the right paddle
+
+        // How to react if it hits the top wall
+        if new_b.pos.1 < 20.0 {
+            new_b.fly.1 = -(b.fly.1);
+        };
+        
+        // How to react if it hits the bottom wall
+        if new_b.pos.1 > 600.0 {
+            new_b.fly.1 = -(b.fly.1);
+        };
+
         new_b
     }
 }
@@ -237,15 +252,16 @@ impl Game for PongGame {
     }
 
     fn update(&mut self, _window: &Window) {
-        self.ball = Ball::update(&self.ball);
+        self.ball = Ball::update(&self.ball, &self.l_paddle, &self.r_paddle);
 
-        // Update score if it goes off the edges and reset ball
+        // Update score if ball goes off the edges and reset ball
         if self.ball.pos.0 < 0.0 {
             self.ball = Ball::new();
             self.score = Score::update(true, &self.score)
-        } else if self.ball.pos.0 > 600.0 {
+        } else if self.ball.pos.0 > 900.0 {
             self.ball = Ball::new();
             self.score = Score::update(false, &self.score)
         }
+
     }
 }
