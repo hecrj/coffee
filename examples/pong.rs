@@ -17,32 +17,31 @@ fn main() {
     .expect("An error occured while starting the game");
 }
 
-struct Position(f32, f32);
-
 // Define the paddles
 struct Paddle {
-    pos: [Position; 2]
+    pos: (f32, f32)
 }
 
 impl Paddle {
     fn new_l() -> Paddle { 
-        Paddle {pos: [Position(1.0,10.0), Position(1.0,20.0)]}
+        Paddle {pos: (50.0,225.0)}
     }
+
     fn new_r() -> Paddle {
-        Paddle {pos: [Position(50.0,10.0), Position(50.0,20.0)]}
+        Paddle {pos: (850.0,50.0)}
     }
 }
 
 // Define movement for the ball
 struct Ball {
-    pos: Position,
+    pos: (f32, f32),
     speed: i8,
 }
 
 impl Ball {
     fn new() -> Ball {
         Ball {
-            pos: Position(30.0,15.0),
+            pos: (30.0,15.0),
             speed: 3,
         }
     }
@@ -105,12 +104,24 @@ impl Game for PongGame {
         );
         font.add(Text{
             content: &score_text,
-            position: Point::new(450.0, 50.0),
+            position: Point::new(450.0, 10.0),
             size: 50.0,
             color: Color::WHITE,
             ..Text::default()
         });
         font.draw(&mut frame.as_target());
-        )
+
+        // Draw left paddle
+        let mut lp_mesh = Mesh::new();
+        lp_mesh.fill(
+            Shape::Rectangle(Rectangle {
+                x: self.l_paddle.pos.0,
+                y: self.l_paddle.pos.1,
+                width: 20.0,
+                height: 150.0,
+            }),
+            Color::WHITE,
+        );
+        lp_mesh.draw(&mut frame.as_target())
     }
 }
