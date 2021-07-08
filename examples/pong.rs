@@ -1,7 +1,7 @@
 extern crate coffee;
 
 use coffee::graphics::{Color, Font, Frame, Mesh, Point, Rectangle, Shape, Text, Window, WindowSettings};
-use coffee::input::keyboard::Keyboard;
+use coffee::input::keyboard::{Keyboard, KeyCode};
 use coffee::load::Task;
 use coffee::{Game, Timer};
 
@@ -41,7 +41,7 @@ struct Ball {
 impl Ball {
     fn new() -> Ball {
         Ball {
-            pos: (30.0,15.0),
+            pos: (440.0, 290.0),
             speed: 3,
         }
     }
@@ -104,7 +104,7 @@ impl Game for PongGame {
         );
         font.add(Text{
             content: &score_text,
-            position: Point::new(425.0, 10.0),
+            position: Point::new(415.0, 10.0),
             size: 50.0,
             color: Color::WHITE,
             ..Text::default()
@@ -136,5 +136,18 @@ impl Game for PongGame {
             Color::WHITE,
         );
         rp_mesh.draw(&mut frame.as_target());
+
+        // Draw ball
+        let mut b_mesh = Mesh::new();
+        b_mesh.fill(
+            Shape::Rectangle(Rectangle {
+                x: self.ball.pos.0,
+                y: self.ball.pos.1,
+                width: 20.0,
+                height: 20.0,
+            }),
+            Color::WHITE,
+        );
+        b_mesh.draw(&mut frame.as_target());
     }
 }
