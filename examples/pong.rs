@@ -101,20 +101,20 @@ impl Ball {
         };
 
         // How to react if it hits the left paddle
-        if new_b.pos.0 < lp.pos.0 + 20.0 &&
-            new_b.pos.0 > lp.pos.0 &&
-            new_b.pos.1 > lp.pos.1 &&
-            new_b.pos.1 < lp.pos.1 + 150.0 {
+        if (new_b.pos.0 < lp.pos.0 + 20.0 || new_b.pos.0 + 20.0 < lp.pos.0 + 20.0) &&
+            (new_b.pos.0 > lp.pos.0 || new_b.pos.0 + 20.0 > lp.pos.0) &&
+            (new_b.pos.1 > lp.pos.1 || new_b.pos.1 + 20.0 > lp.pos.1) &&
+            (new_b.pos.1 < lp.pos.1 + 150.0 || new_b.pos.1 + 20.0 < lp.pos.1 + 150.0) {
             
             new_b.fly.1 = ((lp.pos.1 - b.pos.1)/150.0) + 0.5;
             new_b.fly.0 = -(b.fly.0);
         };
 
         // How to react if it hits the right paddle
-        if new_b.pos.0 > rp.pos.0 - 20.0 &&
-            new_b.pos.0 < rp.pos.0 + 20.0 &&
-            new_b.pos.1 > rp.pos.1 &&
-            new_b.pos.1 < rp.pos.1 + 150.0 {
+        if (new_b.pos.0 > rp.pos.0 || new_b.pos.0 + 20.0 > rp.pos.0) &&
+            (new_b.pos.0 < rp.pos.0 + 20.0 || new_b.pos.0 + 20.0 < rp.pos.0 + 20.0) &&
+            (new_b.pos.1 > rp.pos.1 || new_b.pos.1 + 20.0 > rp.pos.1) && 
+            (new_b.pos.1 < rp.pos.1 + 150.0 || new_b.pos.1 < rp.pos.1 + 150.0){
             
             new_b.fly.1 = ((rp.pos.1 - b.pos.1)/150.0) + 0.5;
             new_b.fly.0 = -(b.fly.0);
