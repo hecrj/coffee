@@ -17,6 +17,7 @@ fn main() {
     .expect("An error occured while starting the game");
 }
 
+#[derive(Debug)]
 // Define the paddles
 struct Paddle {
     pos: (f32, f32)
@@ -86,7 +87,7 @@ impl Ball {
     fn new() -> Ball {
         Ball {
             pos: (440.0, 290.0),
-            fly: (-1.0, 0.0),
+            fly: (-1.0, 0.0), // Affects the direction the ball starts moving in
             speed: 3.0,
         }
     }
@@ -98,17 +99,34 @@ impl Ball {
             fly: (b.fly.0, b.fly.1),
             speed: 3.0,
         };
+
         // How to react if it hits the left paddle
-        
+        if new_b.pos.0 < lp.pos.0 + 20.0 &&
+            new_b.pos.0 > lp.pos.0 &&
+            new_b.pos.1 > lp.pos.1 &&
+            new_b.pos.1 < lp.pos.1 + 150.0 {
+            
+            new_b.fly.1 = ((lp.pos.1 - b.pos.1)/150.0) + 0.5;
+            new_b.fly.0 = -(b.fly.0);
+        };
+
         // How to react if it hits the right paddle
+        if new_b.pos.0 > rp.pos.0 - 20.0 &&
+            new_b.pos.0 < rp.pos.0 + 20.0 &&
+            new_b.pos.1 > rp.pos.1 &&
+            new_b.pos.1 < rp.pos.1 + 150.0 {
+            
+            new_b.fly.1 = ((rp.pos.1 - b.pos.1)/150.0) + 0.5;
+            new_b.fly.0 = -(b.fly.0);
+        };
 
         // How to react if it hits the top wall
-        if new_b.pos.1 < 20.0 {
+        if new_b.pos.1 < 0.0 {
             new_b.fly.1 = -(b.fly.1);
         };
         
         // How to react if it hits the bottom wall
-        if new_b.pos.1 > 600.0 {
+        if new_b.pos.1 > 580.0 {
             new_b.fly.1 = -(b.fly.1);
         };
 
