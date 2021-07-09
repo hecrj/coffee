@@ -17,7 +17,6 @@ fn main() {
     .expect("An error occured while starting the game");
 }
 
-#[derive(Debug)]
 // Define the paddles
 struct Paddle {
     pos: (f32, f32)
@@ -75,7 +74,6 @@ impl Paddle {
     }
 }
 
-#[derive(Debug)]
 // Define movement for the ball
 struct Ball {
     pos: (f32, f32),
@@ -166,6 +164,16 @@ impl Score {
         }
         new_score
     }
+
+    fn win(score: &Score) -> String {
+        let mut winner = String::from("");
+        if score.l_score == 10 {
+            winner = String::from("Left paddle wins!");
+        } else if score.r_score == 10 {
+            winner = String::from("Right paddle wins!");
+        }
+        winner
+    }
 }
 
 struct PongGame {
@@ -255,6 +263,29 @@ impl Game for PongGame {
             Color::WHITE,
         );
         b_mesh.draw(&mut frame.as_target());
+
+        // If someone gets to 10 points
+        if self.score.l_score == 10 || self.score.r_score == 10 {
+            frame.clear(Color::BLACK);
+
+            // Stop the ball from moving
+            self.ball = Ball {
+                pos: (440.0, 290.0),
+                fly: (0.0, 0.0),
+                speed: 0.0,
+            };
+
+            // Announce winner
+            let win_text = Score::win(&self.score);
+            font.add(Text{
+                content: &win_text,
+                position: Point::new(30.0, 200.0),
+                size: 100.0,
+                color: Color::WHITE,
+                ..Text::default()
+            });
+            font.draw(&mut frame.as_target());
+        }
     }
     
     fn interact(&mut self, input: &mut Self::Input, _window: &mut Window) {
