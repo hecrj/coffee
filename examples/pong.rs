@@ -147,22 +147,20 @@ impl Score {
     }
 
     fn update(l_winner: bool, score: &Score) -> Score {
-        let mut new_score = Score {
-            l_score: score.l_score,
-            r_score: score.r_score,
-        };
         if l_winner {
-            new_score = Score {
+            let new_score = Score {
             l_score: score.l_score + 1,
             r_score: score.r_score,
             };
+            return new_score;
         } else {
-            new_score = Score {
+            let new_score = Score {
             l_score: score.l_score,
             r_score: score.r_score + 1,
             };
+            return new_score;
         }
-        new_score
+        
     }
 
     fn win(score: &Score) -> String {
@@ -188,10 +186,10 @@ impl Game for PongGame {
     type LoadingScreen = ();
 
     fn load(_window: &Window) -> Task<PongGame> {
-        let mut l_paddle = Paddle::new_l();
-        let mut r_paddle = Paddle::new_r();
-        let mut ball = Ball::new();
-        let mut score = Score::new(0,0);
+        let l_paddle = Paddle::new_l();
+        let r_paddle = Paddle::new_r();
+        let ball = Ball::new();
+        let score = Score::new(0,0);
         Task::succeed(|| PongGame {
             l_paddle: l_paddle,
             r_paddle: r_paddle,
@@ -279,7 +277,7 @@ impl Game for PongGame {
             let win_text = Score::win(&self.score);
             font.add(Text{
                 content: &win_text,
-                position: Point::new(30.0, 200.0),
+                position: Point::new(30.0, 225.0),
                 size: 100.0,
                 color: Color::WHITE,
                 ..Text::default()
